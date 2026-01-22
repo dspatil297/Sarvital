@@ -1,0 +1,190 @@
+<section class="product-grid-section">
+  <div class="product-grid-section__container">
+    {% if section.settings.title != blank %}
+      <h2 class="product-grid-section__title">{{ section.settings.title }}</h2>
+    {% endif %}
+    
+    {% if section.settings.description != blank %}
+      <p class="product-grid-section__description">{{ section.settings.description }}</p>
+    {% endif %}
+    
+    {% if section.settings.collection != blank %}
+      {% assign collection = collections[section.settings.collection] %}
+      
+      {% if collection.products.size > 0 %}
+        <div class="product-grid-section__grid">
+          {% for product in collection.products limit: section.settings.products_to_show %}
+            {% render 'product-card', product: product %}
+          {% endfor %}
+        </div>
+        
+        {% if section.settings.show_view_all %}
+          <div class="product-grid-section__footer">
+            <a href="{{ collection.url }}" class="btn btn-outline btn-large">
+              {{ section.settings.view_all_text | default: 'View All Products' }}
+            </a>
+          </div>
+        {% endif %}
+      {% else %}
+        <div class="product-grid-section__empty">
+          <p>No products found in this collection.</p>
+        </div>
+      {% endif %}
+    {% else %}
+      <div class="product-grid-section__empty">
+        <p>Please select a collection to display products.</p>
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+{% stylesheet %}
+  .product-grid-section {
+    width: 100vw;
+    max-width: 100vw;
+    padding: var(--spacing-4xl) var(--spacing-lg);
+    background: var(--white);
+    position: relative;
+  }
+
+  .product-grid-section__container {
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .product-grid-section__title {
+    text-align: center;
+    font-family: var(--font-heading);
+    font-size: clamp(36px, 4vw, 52px);
+    font-weight: 800;
+    color: var(--forest-green);
+    margin-bottom: var(--spacing-md);
+    letter-spacing: -0.02em;
+    position: relative;
+    display: inline-block;
+    width: 100%;
+  }
+
+  .product-grid-section__title::after {
+    content: '';
+    position: absolute;
+    bottom: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    border-radius: var(--radius-full);
+  }
+
+  .product-grid-section__description {
+    text-align: center;
+    font-size: var(--body-large);
+    font-weight: 400;
+    color: rgba(26, 26, 26, 0.7);
+    margin-top: var(--spacing-xl);
+    margin-bottom: var(--spacing-4xl);
+    max-width: 650px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.7;
+  }
+
+  .product-grid-section__grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--spacing-xl);
+    margin-bottom: var(--spacing-4xl);
+  }
+
+  @media (min-width: 1400px) {
+    .product-grid-section__grid {
+      gap: var(--spacing-2xl);
+    }
+  }
+
+  .product-grid-section__footer {
+    text-align: center;
+  }
+
+  .product-grid-section__empty {
+    text-align: center;
+    padding: var(--spacing-4xl) var(--spacing-lg);
+    color: #999;
+  }
+
+  @media (max-width: 1024px) {
+    .product-grid-section__grid {
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--spacing-lg);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .product-grid-section {
+      padding: var(--spacing-3xl) var(--spacing-md);
+    }
+
+    .product-grid-section__grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--spacing-md);
+    }
+  }
+
+  @media (max-width: 480px) {
+    .product-grid-section__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Product Grid",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Section Title",
+      "default": "Our Premium Powders"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "Discover our range of premium fruit and vegetable powders, carefully crafted for your wellness journey."
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "products_to_show",
+      "label": "Products to Show",
+      "min": 2,
+      "max": 12,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "checkbox",
+      "id": "show_view_all",
+      "label": "Show View All Button",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "view_all_text",
+      "label": "View All Button Text",
+      "default": "View All Products"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product Grid"
+    }
+  ]
+}
+{% endschema %}

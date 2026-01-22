@@ -1,0 +1,323 @@
+<section class="sustainability-impact">
+  <div class="sustainability-impact__container">
+    {% if section.settings.title != blank %}
+      <h2 class="sustainability-impact__title">{{ section.settings.title }}</h2>
+    {% endif %}
+    
+    {% if section.settings.description != blank %}
+      <p class="sustainability-impact__description">{{ section.settings.description }}</p>
+    {% endif %}
+    
+    <div class="sustainability-impact__metrics">
+      {% for block in section.blocks %}
+        <div class="impact-metric" {{ block.shopify_attributes }}>
+          {% if block.settings.icon_name != blank %}
+            <div class="impact-metric__icon">
+              {% render 'icon', name: block.settings.icon_name %}
+            </div>
+          {% endif %}
+          
+          <div class="impact-metric__value" data-counter="{{ block.settings.value }}">
+            <span class="counter-number">0</span>
+            {% if block.settings.suffix != blank %}
+              <span class="counter-suffix">{{ block.settings.suffix }}</span>
+            {% endif %}
+          </div>
+          
+          {% if block.settings.label != blank %}
+            <h3 class="impact-metric__label">{{ block.settings.label }}</h3>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+    
+    {% if section.settings.cta_text != blank and section.settings.cta_link != blank %}
+      <div class="sustainability-impact__footer">
+        <a href="{{ section.settings.cta_link }}" class="btn btn-outline btn-large">
+          {{ section.settings.cta_text }}
+        </a>
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+{% stylesheet %}
+  .sustainability-impact {
+    width: 100vw;
+    max-width: 100vw;
+    padding: var(--spacing-4xl) var(--spacing-lg);
+    background-color: var(--forest-green);
+    color: var(--white);
+  }
+
+  .sustainability-impact__container {
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .sustainability-impact__title {
+    font-family: var(--font-heading);
+    font-size: var(--h2-size);
+    font-weight: 700;
+    color: var(--white);
+    margin-bottom: var(--spacing-md);
+  }
+
+  .sustainability-impact__description {
+    font-size: var(--body-large);
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: var(--spacing-3xl);
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .sustainability-impact__metrics {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--spacing-2xl);
+    margin-bottom: var(--spacing-3xl);
+  }
+
+  .impact-metric {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-md);
+  }
+
+  .impact-metric__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    margin-bottom: var(--spacing-sm);
+  }
+
+  .impact-metric__icon svg {
+    width: 100%;
+    height: 100%;
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  .impact-metric__value {
+    font-family: var(--font-heading);
+    font-size: clamp(36px, 4vw, 56px);
+    font-weight: 900;
+    color: var(--gold);
+    display: flex;
+    align-items: baseline;
+    gap: var(--spacing-xs);
+  }
+
+  .counter-suffix {
+    font-size: clamp(24px, 2.5vw, 36px);
+    font-weight: 700;
+  }
+
+  .impact-metric__label {
+    font-family: var(--font-heading);
+    font-size: var(--h5-size);
+    font-weight: 600;
+    color: var(--white);
+    margin: 0;
+  }
+
+  .sustainability-impact__footer {
+    margin-top: var(--spacing-2xl);
+  }
+
+  .sustainability-impact__footer .btn {
+    background-color: transparent;
+    color: var(--white);
+    border-color: var(--white);
+  }
+
+  .sustainability-impact__footer .btn:hover {
+    background-color: var(--white);
+    color: var(--forest-green);
+  }
+
+  @media (max-width: 1024px) {
+    .sustainability-impact__metrics {
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--spacing-xl);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .sustainability-impact {
+      padding: var(--spacing-3xl) var(--spacing-md);
+    }
+
+    .sustainability-impact__metrics {
+      grid-template-columns: 1fr;
+      gap: var(--spacing-lg);
+    }
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  (function() {
+    'use strict';
+
+    const counters = document.querySelectorAll('[data-counter]');
+    
+    function animateCounter(element) {
+      const target = parseInt(element.dataset.counter);
+      const duration = 2000;
+      const increment = target / (duration / 16);
+      let current = 0;
+      
+      const timer = setInterval(() => {
+        current += increment;
+        if (current >= target) {
+          element.querySelector('.counter-number').textContent = Math.floor(target);
+          clearInterval(timer);
+        } else {
+          element.querySelector('.counter-number').textContent = Math.floor(current);
+        }
+      }, 16);
+    }
+
+    function initCounters() {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const counter = entry.target.querySelector('[data-counter]');
+            if (counter && !counter.classList.contains('animated')) {
+              counter.classList.add('animated');
+              animateCounter(counter);
+            }
+          }
+        });
+      }, { threshold: 0.5 });
+
+      counters.forEach(counter => {
+        const metric = counter.closest('.impact-metric');
+        if (metric) {
+          observer.observe(metric);
+        }
+      });
+    }
+
+    if (counters.length > 0) {
+      initCounters();
+    }
+  })();
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Sustainability Impact",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "Our Impact"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "Together, we're making a positive impact on communities and the environment."
+    },
+    {
+      "type": "text",
+      "id": "cta_text",
+      "label": "CTA Text",
+      "default": "Learn More About Our Impact"
+    },
+    {
+      "type": "url",
+      "id": "cta_link",
+      "label": "CTA Link"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "metric",
+      "name": "Impact Metric",
+      "limit": 4,
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon_name",
+          "label": "Icon",
+          "options": [
+            { "value": "farmer", "label": "Farmer" },
+            { "value": "recycle", "label": "Recycle" },
+            { "value": "package", "label": "Package" },
+            { "value": "globe", "label": "Globe" }
+          ],
+          "default": "farmer"
+        },
+        {
+          "type": "number",
+          "id": "value",
+          "label": "Value",
+          "default": 500
+        },
+        {
+          "type": "text",
+          "id": "suffix",
+          "label": "Suffix (e.g., +, kg, %)",
+          "default": "+"
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Farmers Supported"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Sustainability Impact",
+      "blocks": [
+        {
+          "type": "metric",
+          "settings": {
+            "icon_name": "farmer",
+            "value": 500,
+            "suffix": "+",
+            "label": "Farmers Supported"
+          }
+        },
+        {
+          "type": "metric",
+          "settings": {
+            "icon_name": "recycle",
+            "value": 10000,
+            "suffix": "kg",
+            "label": "Waste Reduced"
+          }
+        },
+        {
+          "type": "metric",
+          "settings": {
+            "icon_name": "package",
+            "value": 50,
+            "suffix": "+",
+            "label": "Products Created"
+          }
+        },
+        {
+          "type": "metric",
+          "settings": {
+            "icon_name": "globe",
+            "value": 25,
+            "suffix": "+",
+            "label": "Communities Impacted"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

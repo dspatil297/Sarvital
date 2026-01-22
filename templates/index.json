@@ -1,20 +1,217 @@
-/*
- * ------------------------------------------------------------
- * IMPORTANT: The contents of this file are auto-generated.
- *
- * This file may be updated by the Shopify admin theme editor
- * or related systems. Please exercise caution as any changes
- * made to this file may be overwritten.
- * ------------------------------------------------------------
- */
 {
   "sections": {
-    "main": {
-      "type": "hello-world",
-      "settings": {}
-    }
+    "hero_banner": {
+      "type": "hero-banner",
+      "settings": {
+        "heading": "Pure Nutrition from Nature",
+        "subheading": "Premium fruit & vegetable powders for your wellness journey",
+        "cta_text": "Shop All Products",
+        "cta_link": "/collections/all",
+        "secondary_cta_text": "Learn About Us",
+        "secondary_cta_link": "/pages/about"
+      }
+    },
+    "usp_icons": {
+      "type": "usp-icons",
+      "settings": {
+        "title": "Why Choose Sarvital"
+      },
+      "blocks": {
+        "usp_1": {
+          "type": "usp_item",
+          "settings": {
+            "icon_name": "lab-test",
+            "title": "Lab-Tested Quality",
+            "description": "Every product undergoes rigorous lab testing to ensure purity and quality."
+          }
+        },
+        "usp_2": {
+          "type": "usp_item",
+          "settings": {
+            "icon_name": "sustainable",
+            "title": "Sustainable Sourcing",
+            "description": "We partner with local farmers to source the freshest ingredients sustainably."
+          }
+        },
+        "usp_3": {
+          "type": "usp_item",
+          "settings": {
+            "icon_name": "natural",
+            "title": "100% Natural",
+            "description": "Pure, additive-free formulations with no artificial ingredients or preservatives."
+          }
+        },
+        "usp_4": {
+          "type": "usp_item",
+          "settings": {
+            "icon_name": "farmer",
+            "title": "Local Farmer Support",
+            "description": "Supporting local communities and empowering farmers through fair trade practices."
+          }
+        }
+      },
+      "block_order": [
+        "usp_1",
+        "usp_2",
+        "usp_3",
+        "usp_4"
+      ]
+    },
+    "featured_products": {
+      "type": "product-grid",
+      "settings": {
+        "title": "Our Premium Powders",
+        "description": "Discover our range of premium fruit and vegetable powders, carefully crafted for your wellness journey.",
+        "products_to_show": 4,
+        "show_view_all": true,
+        "view_all_text": "View All Products"
+      }
+    },
+    "lifestyle_usage": {
+      "type": "lifestyle-usage",
+      "settings": {
+        "title": "Transform Your Daily Routine",
+        "description": "Our premium powders seamlessly integrate into your lifestyle, whether you're starting your day with a nutritious smoothie or adding a health boost to your favorite recipes.",
+        "cta_text": "Discover Your Perfect Match",
+        "cta_link": "/collections/all"
+      },
+      "blocks": {
+        "feature_1": {
+          "type": "feature",
+          "settings": {
+            "icon_name": "smoothie",
+            "title": "Smoothie Bowls",
+            "description": "Add a nutritional boost to your morning smoothie bowls."
+          }
+        },
+        "feature_2": {
+          "type": "feature",
+          "settings": {
+            "icon_name": "cooking",
+            "title": "Cooking & Baking",
+            "description": "Enhance your recipes with natural fruit and vegetable powders."
+          }
+        },
+        "feature_3": {
+          "type": "feature",
+          "settings": {
+            "icon_name": "wellness",
+            "title": "Daily Wellness",
+            "description": "Incorporate into your daily wellness routine for optimal health."
+          }
+        },
+        "feature_4": {
+          "type": "feature",
+          "settings": {
+            "icon_name": "workout",
+            "title": "Post-Workout Recovery",
+            "description": "Support your recovery with nutrient-rich superfood powders."
+          }
+        }
+      },
+      "block_order": [
+        "feature_1",
+        "feature_2",
+        "feature_3",
+        "feature_4"
+      ]
+    },
+    "quality_assurance": {
+      "type": "quality-assurance",
+      "settings": {
+        "title": "Quality You Can Trust",
+        "description": "We're committed to delivering the highest quality products through rigorous testing and quality assurance.",
+        "promise_text": "Every product is lab-tested, certified, and guaranteed to meet our premium quality standards."
+      },
+      "blocks": {
+        "badge_1": {
+          "type": "badge",
+          "settings": {
+            "icon_name": "lab-test",
+            "title": "Lab Tested",
+            "description": "Every batch is tested in certified laboratories for purity and quality."
+          }
+        },
+        "badge_2": {
+          "type": "badge",
+          "settings": {
+            "icon_name": "certified",
+            "title": "Certified Organic",
+            "description": "Certified organic ingredients sourced from trusted suppliers."
+          }
+        },
+        "badge_3": {
+          "type": "badge",
+          "settings": {
+            "icon_name": "organic",
+            "title": "100% Natural",
+            "description": "No artificial additives, preservatives, or fillers."
+          }
+        },
+        "badge_4": {
+          "type": "badge",
+          "settings": {
+            "icon_name": "premium",
+            "title": "Premium Quality",
+            "description": "Rigorous quality control ensures consistent premium standards."
+          }
+        }
+      },
+      "block_order": [
+        "badge_1",
+        "badge_2",
+        "badge_3",
+        "badge_4"
+      ]
+    },
+    "testimonials": {
+      "type": "testimonials",
+      "settings": {
+        "title": "What Our Customers Say",
+        "auto_rotate": true
+      },
+      "blocks": {
+        "testimonial_1": {
+          "type": "testimonial",
+          "settings": {
+            "rating": 5,
+            "text": "These powders have transformed my morning routine. The quality is exceptional and I love knowing I'm supporting sustainable farming.",
+            "name": "Sarah Johnson",
+            "location": "New York, NY"
+          }
+        },
+        "testimonial_2": {
+          "type": "testimonial",
+          "settings": {
+            "rating": 5,
+            "text": "Best quality fruit powders I've ever tried. They're so versatile - I use them in smoothies, baking, and even my morning oatmeal!",
+            "name": "Michael Chen",
+            "location": "Los Angeles, CA"
+          }
+        },
+        "testimonial_3": {
+          "type": "testimonial",
+          "settings": {
+            "rating": 5,
+            "text": "The sustainability aspect really drew me in, and the products exceeded my expectations. Highly recommend!",
+            "name": "Emily Rodriguez",
+            "location": "Austin, TX"
+          }
+        }
+      },
+      "block_order": [
+        "testimonial_1",
+        "testimonial_2",
+        "testimonial_3"
+      ]
+    },
   },
   "order": [
-    "main"
+    "hero_banner",
+    "usp_icons",
+    "featured_products",
+    "lifestyle_usage",
+    "quality_assurance",
+    "testimonials"
   ]
 }

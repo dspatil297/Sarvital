@@ -1,0 +1,286 @@
+<section class="lifestyle-usage">
+  <div class="lifestyle-usage__container">
+    <div class="lifestyle-usage__content">
+      <div class="lifestyle-usage__image">
+        {% if section.settings.image %}
+          <img 
+            src="{{ section.settings.image | image_url: width: 800 }}" 
+            alt="{{ section.settings.image.alt | default: section.settings.title }}"
+            loading="lazy"
+            width="800"
+            height="600"
+          >
+        {% else %}
+          {{ 'lifestyle-1' | placeholder_svg_tag: 'placeholder' }}
+        {% endif %}
+      </div>
+      
+      <div class="lifestyle-usage__text">
+        {% if section.settings.title != blank %}
+          <h2 class="lifestyle-usage__title">{{ section.settings.title }}</h2>
+        {% endif %}
+        
+        {% if section.settings.description != blank %}
+          <p class="lifestyle-usage__description">{{ section.settings.description }}</p>
+        {% endif %}
+        
+        <div class="lifestyle-usage__features">
+          {% for block in section.blocks %}
+            <div class="lifestyle-feature" {{ block.shopify_attributes }}>
+              {% if block.settings.icon_name != blank %}
+                <span class="lifestyle-feature__icon">
+                  {% render 'icon', name: block.settings.icon_name %}
+                </span>
+              {% endif %}
+              <div class="lifestyle-feature__content">
+                {% if block.settings.title != blank %}
+                  <h3 class="lifestyle-feature__title">{{ block.settings.title }}</h3>
+                {% endif %}
+                {% if block.settings.description != blank %}
+                  <p class="lifestyle-feature__description">{{ block.settings.description }}</p>
+                {% endif %}
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+        
+        {% if section.settings.cta_text != blank and section.settings.cta_link != blank %}
+          <a href="{{ section.settings.cta_link }}" class="btn btn-primary btn-large lifestyle-usage__cta">
+            {{ section.settings.cta_text }}
+          </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+  .lifestyle-usage {
+    width: 100vw;
+    max-width: 100vw;
+    padding: var(--spacing-4xl) var(--spacing-lg);
+    background-color: var(--white);
+  }
+
+  .lifestyle-usage__container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .lifestyle-usage__content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-3xl);
+    align-items: center;
+  }
+
+  .lifestyle-usage__image {
+    position: relative;
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+  }
+
+  .lifestyle-usage__image img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .lifestyle-usage__text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+  }
+
+  .lifestyle-usage__title {
+    font-family: var(--font-heading);
+    font-size: var(--h2-size);
+    font-weight: 700;
+    color: var(--forest-green);
+    margin-bottom: var(--spacing-md);
+  }
+
+  .lifestyle-usage__description {
+    font-size: var(--body-large);
+    color: var(--text);
+    line-height: 1.7;
+    margin-bottom: var(--spacing-lg);
+  }
+
+  .lifestyle-usage__features {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
+  }
+
+  .lifestyle-feature {
+    display: flex;
+    gap: var(--spacing-md);
+    align-items: flex-start;
+  }
+
+  .lifestyle-feature__icon {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+  }
+
+  .lifestyle-feature__icon svg {
+    width: 100%;
+    height: 100%;
+    color: var(--sage-green);
+  }
+
+  .lifestyle-feature__content {
+    flex: 1;
+  }
+
+  .lifestyle-feature__title {
+    font-family: var(--font-heading);
+    font-size: var(--h5-size);
+    font-weight: 600;
+    color: var(--forest-green);
+    margin-bottom: var(--spacing-xs);
+  }
+
+  .lifestyle-feature__description {
+    font-size: var(--body-normal);
+    color: var(--text);
+    line-height: 1.7;
+    margin: 0;
+  }
+
+  .lifestyle-usage__cta {
+    align-self: flex-start;
+  }
+
+  @media (max-width: 968px) {
+    .lifestyle-usage__content {
+      grid-template-columns: 1fr;
+      gap: var(--spacing-2xl);
+    }
+
+    .lifestyle-usage__image {
+      order: -1;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .lifestyle-usage {
+      padding: var(--spacing-3xl) var(--spacing-md);
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Lifestyle Usage",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "Transform Your Daily Routine"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "Our premium powders seamlessly integrate into your lifestyle, whether you're starting your day with a nutritious smoothie or adding a health boost to your favorite recipes."
+    },
+    {
+      "type": "text",
+      "id": "cta_text",
+      "label": "CTA Text",
+      "default": "Discover Your Perfect Match"
+    },
+    {
+      "type": "url",
+      "id": "cta_link",
+      "label": "CTA Link",
+      "default": "/collections/all"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "feature",
+      "name": "Feature",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon_name",
+          "label": "Icon",
+          "options": [
+            { "value": "smoothie", "label": "Smoothie" },
+            { "value": "cooking", "label": "Cooking" },
+            { "value": "wellness", "label": "Wellness" },
+            { "value": "workout", "label": "Workout" }
+          ],
+          "default": "smoothie"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Smoothie Bowls"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Description",
+          "default": "Add a nutritional boost to your morning smoothie bowls."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Lifestyle Usage",
+      "blocks": [
+        {
+          "type": "feature",
+          "settings": {
+            "icon_name": "smoothie",
+            "title": "Smoothie Bowls",
+            "description": "Add a nutritional boost to your morning smoothie bowls."
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "icon_name": "cooking",
+            "title": "Cooking & Baking",
+            "description": "Enhance your recipes with natural fruit and vegetable powders."
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "icon_name": "wellness",
+            "title": "Daily Wellness",
+            "description": "Incorporate into your daily wellness routine for optimal health."
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "icon_name": "workout",
+            "title": "Post-Workout Recovery",
+            "description": "Support your recovery with nutrient-rich superfood powders."
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

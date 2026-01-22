@@ -1,0 +1,223 @@
+<section class="newsletter-cta">
+  <div class="newsletter-cta__container">
+    <div class="newsletter-cta__content">
+      {% if section.settings.heading != blank %}
+        <h2 class="newsletter-cta__heading">{{ section.settings.heading }}</h2>
+      {% endif %}
+      
+      {% if section.settings.subheading != blank %}
+        <p class="newsletter-cta__subheading">{{ section.settings.subheading }}</p>
+      {% endif %}
+      
+      {% form 'customer', class: 'newsletter-cta__form', id: 'newsletter-form' %}
+        <div class="newsletter-cta__input-group">
+          <input 
+            type="email" 
+            name="contact[email]" 
+            placeholder="{{ section.settings.placeholder | default: 'Your email address' }}"
+            class="newsletter-cta__input"
+            required
+            aria-label="Email address"
+          >
+          <button type="submit" class="btn btn-primary newsletter-cta__submit">
+            {{ section.settings.button_text | default: 'Subscribe' }}
+          </button>
+        </div>
+        
+        {% if form.posted_successfully? %}
+          <p class="newsletter-cta__message newsletter-cta__message--success">
+            {{ section.settings.success_message | default: 'Thank you for subscribing!' }}
+          </p>
+        {% endif %}
+        
+        {% if form.errors %}
+          <p class="newsletter-cta__message newsletter-cta__message--error">
+            {{ form.errors | default_errors }}
+          </p>
+        {% endif %}
+        
+        {% if section.settings.show_privacy_link %}
+          <p class="newsletter-cta__privacy">
+            <small>
+              By subscribing, you agree to our 
+              <a href="{{ section.settings.privacy_link | default: '/pages/privacy-policy' }}" target="_blank">Privacy Policy</a>
+            </small>
+          </p>
+        {% endif %}
+      {% endform %}
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+  .newsletter-cta {
+    width: 100vw;
+    max-width: 100vw;
+    padding: var(--spacing-4xl) var(--spacing-lg);
+    background-color: var(--sage-green);
+    color: var(--white);
+  }
+
+  .newsletter-cta__container {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .newsletter-cta__content {
+    text-align: center;
+  }
+
+  .newsletter-cta__heading {
+    font-family: var(--font-heading);
+    font-size: var(--h2-size);
+    font-weight: 700;
+    color: var(--white);
+    margin-bottom: var(--spacing-md);
+  }
+
+  .newsletter-cta__subheading {
+    font-size: var(--body-large);
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: var(--spacing-2xl);
+  }
+
+  .newsletter-cta__form {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .newsletter-cta__input-group {
+    display: flex;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+  }
+
+  .newsletter-cta__input {
+    flex: 1;
+    padding: var(--spacing-md) var(--spacing-lg);
+    font-size: var(--body-normal);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: var(--radius-md);
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--white);
+  }
+
+  .newsletter-cta__input::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .newsletter-cta__input:focus {
+    outline: none;
+    border-color: var(--white);
+    background-color: rgba(255, 255, 255, 0.15);
+  }
+
+  .newsletter-cta__submit {
+    background-color: var(--gold);
+    color: var(--text);
+    border-color: var(--gold);
+    white-space: nowrap;
+  }
+
+  .newsletter-cta__submit:hover {
+    background-color: #c19d2f;
+    border-color: #c19d2f;
+  }
+
+  .newsletter-cta__message {
+    margin-top: var(--spacing-md);
+    font-size: var(--body-normal);
+  }
+
+  .newsletter-cta__message--success {
+    color: var(--gold);
+    font-weight: 600;
+  }
+
+  .newsletter-cta__message--error {
+    color: #ff6b6b;
+  }
+
+  .newsletter-cta__privacy {
+    margin-top: var(--spacing-md);
+    font-size: var(--body-small);
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  .newsletter-cta__privacy a {
+    color: var(--white);
+    text-decoration: underline;
+  }
+
+  .newsletter-cta__privacy a:hover {
+    color: var(--gold);
+  }
+
+  @media (max-width: 768px) {
+    .newsletter-cta {
+      padding: var(--spacing-3xl) var(--spacing-md);
+    }
+
+    .newsletter-cta__input-group {
+      flex-direction: column;
+    }
+
+    .newsletter-cta__submit {
+      width: 100%;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Newsletter CTA",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Join Our Wellness Community"
+    },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Subscribe to our newsletter for wellness tips, new products, and exclusive offers."
+    },
+    {
+      "type": "text",
+      "id": "placeholder",
+      "label": "Input Placeholder",
+      "default": "Your email address"
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button Text",
+      "default": "Subscribe"
+    },
+    {
+      "type": "text",
+      "id": "success_message",
+      "label": "Success Message",
+      "default": "Thank you for subscribing!"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_privacy_link",
+      "label": "Show Privacy Policy Link",
+      "default": true
+    },
+    {
+      "type": "url",
+      "id": "privacy_link",
+      "label": "Privacy Policy Link"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Newsletter CTA"
+    }
+  ]
+}
+{% endschema %}

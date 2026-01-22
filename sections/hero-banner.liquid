@@ -1,0 +1,370 @@
+<section class="hero-banner" id="hero-banner">
+  {% if section.settings.hero_image %}
+    <div class="hero-banner__image">
+      <img 
+        src="{{ section.settings.hero_image | image_url: width: 1920 }}" 
+        alt="{{ section.settings.hero_image.alt | default: section.settings.heading }}"
+        width="{{ section.settings.hero_image.width }}"
+        height="{{ section.settings.hero_image.height }}"
+        loading="eager"
+      >
+      <div class="hero-banner__overlay"></div>
+      <div class="hero-banner__gradient-ornament"></div>
+    </div>
+  {% endif %}
+  
+  <div class="hero-banner__content">
+    <div class="hero-banner__text">
+      {% if section.settings.heading != blank %}
+        <h1 class="hero-banner__heading">
+          <span class="hero-banner__heading-line">{{ section.settings.heading }}</span>
+        </h1>
+      {% endif %}
+      
+      {% if section.settings.subheading != blank %}
+        <p class="hero-banner__subheading">{{ section.settings.subheading }}</p>
+      {% endif %}
+      
+      <div class="hero-banner__ctas">
+        {% if section.settings.cta_text != blank and section.settings.cta_link != blank %}
+          <a href="{{ section.settings.cta_link }}" class="btn btn-primary btn-large hero-banner__cta-primary">
+            <span>{{ section.settings.cta_text }}</span>
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M7.5 15L12.5 10L7.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </a>
+        {% endif %}
+        
+        {% if section.settings.secondary_cta_text != blank and section.settings.secondary_cta_link != blank %}
+          <a href="{{ section.settings.secondary_cta_link }}" class="btn btn-outline btn-large hero-banner__cta-secondary">
+            {{ section.settings.secondary_cta_text }}
+          </a>
+        {% endif %}
+      </div>
+    </div>
+    
+    <div class="hero-banner__scroll-indicator">
+      <span>Scroll</span>
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M7 10L12 15L17 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+  .hero-banner {
+    position: relative;
+    width: 100vw;
+    max-width: 100vw;
+    height: 90vh;
+    min-height: 600px;
+    max-height: 900px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .hero-banner__image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+  }
+
+  .hero-banner__image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .hero-banner__overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      180deg,
+      rgba(45, 80, 22, 0.85) 0%,
+      rgba(45, 80, 22, 0.6) 50%,
+      rgba(74, 124, 44, 0.4) 100%
+    );
+    z-index: 2;
+  }
+
+  .hero-banner__gradient-ornament {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 200px;
+    background: linear-gradient(
+      180deg,
+      transparent 0%,
+      rgba(212, 175, 55, 0.1) 100%
+    );
+    z-index: 2;
+    clip-path: polygon(0 40%, 100% 0%, 100% 100%, 0% 100%);
+  }
+
+  .hero-banner__content {
+    position: relative;
+    z-index: 3;
+    width: 100%;
+    max-width: 1400px;
+    padding: 0 var(--spacing-lg);
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 100%;
+    animation: fadeInUp 1s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .hero-banner__text {
+    max-width: 700px;
+  }
+
+  .hero-banner__heading {
+    font-family: var(--font-heading);
+    font-size: clamp(42px, 6vw, 80px);
+    font-weight: 900;
+    color: var(--white);
+    margin-bottom: var(--spacing-xl);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+  }
+
+  .hero-banner__heading-line {
+    display: block;
+    background: linear-gradient(135deg, var(--white) 0%, rgba(255, 255, 255, 0.9) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: none;
+    animation: slideInLeft 1s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+  }
+
+  .hero-banner__subheading {
+    font-size: clamp(18px, 2.2vw, 26px);
+    font-weight: 300;
+    color: rgba(255, 255, 255, 0.95);
+    margin-bottom: var(--spacing-3xl);
+    line-height: 1.6;
+    max-width: 600px;
+    animation: fadeInUp 1s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both;
+  }
+
+  .hero-banner__ctas {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-lg);
+    flex-wrap: wrap;
+    animation: fadeInUp 1s cubic-bezier(0.16, 1, 0.3, 1) 0.6s both;
+  }
+
+  .hero-banner__cta-primary {
+    background: linear-gradient(135deg, var(--gold) 0%, #e8c547 100%);
+    color: var(--text);
+    border: none;
+    padding: var(--spacing-md) var(--spacing-2xl);
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    box-shadow: 0 4px 20px rgba(212, 175, 55, 0.4);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-banner__cta-primary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s;
+  }
+
+  .hero-banner__cta-primary:hover::before {
+    left: 100%;
+  }
+
+  .hero-banner__cta-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 30px rgba(212, 175, 55, 0.5);
+  }
+
+  .hero-banner__cta-primary svg {
+    transition: transform var(--transition-base);
+  }
+
+  .hero-banner__cta-primary:hover svg {
+    transform: translateX(4px);
+  }
+
+  .hero-banner__cta-secondary {
+    background-color: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    color: var(--white);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    padding: var(--spacing-md) var(--spacing-2xl);
+  }
+
+  .hero-banner__cta-secondary:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: translateY(-2px);
+  }
+
+  .hero-banner__scroll-indicator {
+    position: absolute;
+    bottom: var(--spacing-2xl);
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-xs);
+    color: rgba(255, 255, 255, 0.7);
+    font-size: var(--body-small);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    animation: fadeInUp 1s cubic-bezier(0.16, 1, 0.3, 1) 0.8s both, bounce 2s infinite 2s;
+  }
+
+  .hero-banner__scroll-indicator svg {
+    animation: bounceArrow 1.5s infinite;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(40px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slideInLeft {
+    from {
+      opacity: 0;
+      transform: translateX(-30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+      transform: translateX(-50%) translateY(0);
+    }
+    40% {
+      transform: translateX(-50%) translateY(-10px);
+    }
+    60% {
+      transform: translateX(-50%) translateY(-5px);
+    }
+  }
+
+  @keyframes bounceArrow {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(8px);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .hero-banner {
+      height: 85vh;
+      min-height: 600px;
+    }
+
+    .hero-banner__content {
+      padding: 0 var(--spacing-md);
+      text-align: center;
+    }
+
+    .hero-banner__text {
+      max-width: 100%;
+    }
+
+    .hero-banner__ctas {
+      flex-direction: column;
+      width: 100%;
+    }
+
+    .hero-banner__ctas .btn {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .hero-banner__scroll-indicator {
+      display: none;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Hero Banner",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "hero_image",
+      "label": "Hero Image"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Pure Nutrition from Nature"
+    },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Premium fruit & vegetable powders for your wellness journey"
+    },
+    {
+      "type": "text",
+      "id": "cta_text",
+      "label": "Primary CTA Text",
+      "default": "Shop All Products"
+    },
+    {
+      "type": "url",
+      "id": "cta_link",
+      "label": "Primary CTA Link"
+    },
+    {
+      "type": "text",
+      "id": "secondary_cta_text",
+      "label": "Secondary CTA Text",
+      "default": "Learn About Us"
+    },
+    {
+      "type": "url",
+      "id": "secondary_cta_link",
+      "label": "Secondary CTA Link"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Hero Banner"
+    }
+  ]
+}
+{% endschema %}

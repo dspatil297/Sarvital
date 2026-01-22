@@ -1,0 +1,251 @@
+{% comment %}
+  Product Card Snippet - Reusable product card component
+{% endcomment %}
+
+<div class="product-card" data-product-card>
+  <a href="{{ product.url }}" class="product-card__link">
+    <div class="product-card__image-wrapper">
+      {% if product.featured_image %}
+        <img 
+          src="{{ product.featured_image | image_url: width: 600 }}" 
+          alt="{{ product.featured_image.alt | default: product.title }}"
+          class="product-card__image"
+          loading="lazy"
+          width="600"
+          height="600"
+        >
+      {% else %}
+        <div class="product-card__image-placeholder">
+          {{ 'product-1' | placeholder_svg_tag: 'placeholder' }}
+        </div>
+      {% endif %}
+      
+      {% if product.compare_at_price > product.price %}
+        <span class="product-card__badge product-card__badge--sale">Sale</span>
+      {% endif %}
+      
+      {% if product.tags contains 'new' %}
+        <span class="product-card__badge product-card__badge--new">New</span>
+      {% endif %}
+      
+      <div class="product-card__overlay">
+        <button type="button" class="btn btn-primary product-card__quick-view" data-quick-view="{{ product.id }}">
+          Quick View
+        </button>
+      </div>
+    </div>
+    
+    <div class="product-card__info">
+      <h3 class="product-card__title">{{ product.title }}</h3>
+      
+      {% if product.tags.size > 0 %}
+        <div class="product-card__tags">
+          {% assign health_tags = product.tags | where: 'health-' %}
+          {% for tag in health_tags limit: 3 %}
+            <span class="product-card__tag">{{ tag | remove: 'health-' | capitalize }}</span>
+          {% endfor %}
+        </div>
+      {% endif %}
+      
+      <div class="product-card__price">
+        {% if product.compare_at_price > product.price %}
+          <span class="product-card__price--compare">{{ product.compare_at_price | money }}</span>
+        {% endif %}
+        <span class="product-card__price--current">{{ product.price | money }}</span>
+      </div>
+      
+      <form action="/cart/add" method="post" enctype="multipart/form-data" class="product-card__form">
+        <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+        <button type="submit" class="btn btn-secondary product-card__add-to-cart">
+          Add to Cart
+        </button>
+      </form>
+    </div>
+  </a>
+</div>
+
+{% stylesheet %}
+  .product-card {
+    position: relative;
+    background-color: var(--white);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid rgba(74, 124, 44, 0.06);
+  }
+
+  .product-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 50px rgba(45, 80, 22, 0.15);
+    border-color: rgba(74, 124, 44, 0.15);
+  }
+
+  .product-card__link {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .product-card__image-wrapper {
+    position: relative;
+    width: 100%;
+    padding-top: 100%;
+    overflow: hidden;
+    background: linear-gradient(135deg, rgba(250, 250, 250, 0.8) 0%, rgba(255, 255, 255, 1) 100%);
+  }
+
+  .product-card__image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .product-card:hover .product-card__image {
+    transform: scale(1.08);
+  }
+
+  .product-card__image-placeholder {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--bg);
+  }
+
+  .product-card__badge {
+    position: absolute;
+    top: var(--spacing-md);
+    left: var(--spacing-md);
+    padding: var(--spacing-xs) var(--spacing-md);
+    font-size: var(--body-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    border-radius: var(--radius-full);
+    z-index: 2;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .product-card__badge--sale {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ff5252 100%);
+    color: var(--white);
+  }
+
+  .product-card__badge--new {
+    background: linear-gradient(135deg, var(--gold) 0%, #e8c547 100%);
+    color: var(--text);
+  }
+
+  .product-card__overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(180deg, rgba(45, 80, 22, 0.7) 0%, rgba(45, 80, 22, 0.5) 100%);
+    backdrop-filter: blur(2px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 3;
+  }
+
+  .product-card:hover .product-card__overlay {
+    opacity: 1;
+  }
+
+  .product-card__quick-view {
+    background-color: var(--white);
+    color: var(--forest-green);
+    border-color: var(--white);
+  }
+
+  .product-card__quick-view:hover {
+    background-color: var(--gold);
+    color: var(--text);
+    border-color: var(--gold);
+  }
+
+  .product-card__info {
+    padding: var(--spacing-xl);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: var(--white);
+  }
+
+  .product-card__title {
+    font-family: var(--font-heading);
+    font-size: var(--h5-size);
+    font-weight: 700;
+    color: var(--forest-green);
+    margin-bottom: var(--spacing-md);
+    line-height: 1.4;
+    letter-spacing: -0.01em;
+  }
+
+  .product-card__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-xs);
+    margin-bottom: var(--spacing-md);
+  }
+
+  .product-card__tag {
+    display: inline-block;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: var(--body-xs);
+    font-weight: 500;
+    background-color: rgba(74, 124, 44, 0.1);
+    color: var(--sage-green);
+    border-radius: var(--radius-full);
+  }
+
+  .product-card__price {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+  }
+
+  .product-card__price--current {
+    font-family: var(--font-heading);
+    font-size: clamp(20px, 2vw, 24px);
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--gold) 0%, #e8c547 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .product-card__price--compare {
+    font-size: var(--body-small);
+    color: #999;
+    text-decoration: line-through;
+  }
+
+  .product-card__form {
+    margin-top: auto;
+  }
+
+  .product-card__add-to-cart {
+    width: 100%;
+    justify-content: center;
+  }
+{% endstylesheet %}
