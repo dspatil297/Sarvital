@@ -1,0 +1,161 @@
+<section class="collection-toolbar">
+  <div class="collection-toolbar__container">
+    <div class="collection-toolbar__left">
+      <div class="collection-toolbar__results">
+        Showing <span class="results-count">{{ collection.products_count }}</span> products
+      </div>
+    </div>
+
+    <div class="collection-toolbar__right">
+      <!-- Products Per Page -->
+      <div class="toolbar-item">
+        <label for="products-per-page" class="toolbar-label">Show:</label>
+        <select id="products-per-page" class="toolbar-select" name="limit">
+          <option value="12" {% if paginate.page_size == 12 %}selected{% endif %}>12</option>
+          <option value="24" {% if paginate.page_size == 24 %}selected{% endif %}>24</option>
+          <option value="48" {% if paginate.page_size == 48 %}selected{% endif %}>48</option>
+        </select>
+      </div>
+
+      <!-- Sort Options -->
+      <div class="toolbar-item">
+        <label for="sort-by" class="toolbar-label">Sort:</label>
+        <select id="sort-by" class="toolbar-select" name="sort_by">
+          <option value="manual" {% if collection.sort_by == 'manual' %}selected{% endif %}>Featured</option>
+          <option value="price-ascending" {% if collection.sort_by == 'price-ascending' %}selected{% endif %}>Price: Low to High</option>
+          <option value="price-descending" {% if collection.sort_by == 'price-descending' %}selected{% endif %}>Price: High to Low</option>
+          <option value="created-descending" {% if collection.sort_by == 'created-descending' %}selected{% endif %}>Newest First</option>
+          <option value="best-selling" {% if collection.sort_by == 'best-selling' %}selected{% endif %}>Best Selling</option>
+        </select>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+  .collection-toolbar {
+    width: 100vw;
+    max-width: 100vw;
+    padding: var(--spacing-lg) var(--spacing-lg);
+    background-color: var(--white);
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .collection-toolbar__container {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-lg);
+  }
+
+  .collection-toolbar__results {
+    font-size: var(--body-normal);
+    color: rgba(26, 26, 26, 0.7);
+  }
+
+  .results-count {
+    font-weight: 600;
+    color: var(--forest-green);
+  }
+
+  .collection-toolbar__right {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-lg);
+  }
+
+  .toolbar-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+  }
+
+  .toolbar-label {
+    font-size: var(--body-small);
+    color: rgba(26, 26, 26, 0.7);
+    white-space: nowrap;
+  }
+
+  .toolbar-select {
+    padding: var(--spacing-xs) var(--spacing-md);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background-color: var(--white);
+    color: var(--text);
+    font-size: var(--body-normal);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    min-width: 120px;
+  }
+
+  .toolbar-select:hover {
+    border-color: var(--sage-green);
+  }
+
+  .toolbar-select:focus {
+    outline: none;
+    border-color: var(--sage-green);
+    box-shadow: 0 0 0 3px rgba(74, 124, 44, 0.1);
+  }
+
+  @media (max-width: 768px) {
+    .collection-toolbar {
+      padding: var(--spacing-md);
+    }
+
+    .collection-toolbar__container {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--spacing-md);
+    }
+
+    .collection-toolbar__right {
+      width: 100%;
+      flex-wrap: wrap;
+    }
+
+    .toolbar-item {
+      flex: 1;
+      min-width: 140px;
+    }
+
+    .toolbar-select {
+      width: 100%;
+    }
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  (function() {
+    'use strict';
+
+    const sortSelect = document.getElementById('sort-by');
+    const perPageSelect = document.getElementById('products-per-page');
+
+    if (sortSelect) {
+      sortSelect.addEventListener('change', function() {
+        const url = new URL(window.location.href);
+        url.searchParams.set('sort_by', this.value);
+        window.location.href = url.toString();
+      });
+    }
+
+    if (perPageSelect) {
+      perPageSelect.addEventListener('change', function() {
+        const url = new URL(window.location.href);
+        url.searchParams.set('limit', this.value);
+        url.searchParams.delete('page'); // Reset to first page
+        window.location.href = url.toString();
+      });
+    }
+  })();
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Collection Toolbar",
+  "settings": []
+}
+{% endschema %}

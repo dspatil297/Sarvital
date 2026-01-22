@@ -1,0 +1,268 @@
+{% comment %}
+  Product Sustainability Information Section
+{% endcomment %}
+
+<section class="product-sustainability">
+  <div class="product-sustainability__container">
+    {% if section.settings.title != blank %}
+      <h2 class="product-sustainability__title">{{ section.settings.title }}</h2>
+    {% endif %}
+    
+    <div class="product-sustainability__content">
+      {% if section.settings.farmer_story != blank %}
+        <div class="sustainability-story">
+          <h3>Farmer Partnership</h3>
+          <div class="sustainability-story__content">
+            {{ section.settings.farmer_story }}
+          </div>
+        </div>
+      {% endif %}
+      
+      {% if section.settings.environmental_impact != blank %}
+        <div class="environmental-impact">
+          <h3>Environmental Impact</h3>
+          <div class="environmental-impact__content">
+            {{ section.settings.environmental_impact }}
+          </div>
+        </div>
+      {% endif %}
+      
+      {% if section.settings.packaging_info != blank %}
+        <div class="packaging-info">
+          <h3>Eco-Friendly Packaging</h3>
+          <div class="packaging-info__content">
+            {{ section.settings.packaging_info }}
+          </div>
+        </div>
+      {% endif %}
+    </div>
+    
+    {% if section.blocks.size > 0 %}
+      <div class="sustainability-badges">
+        {% for block in section.blocks %}
+          <div class="sustainability-badge" {{ block.shopify_attributes }}>
+            {% if block.settings.icon_name != blank %}
+              <div class="sustainability-badge__icon">
+                {% render 'icon', name: block.settings.icon_name %}
+              </div>
+            {% endif %}
+            
+            {% if block.settings.title != blank %}
+              <h4 class="sustainability-badge__title">{{ block.settings.title }}</h4>
+            {% endif %}
+            
+            {% if block.settings.description != blank %}
+              <p class="sustainability-badge__description">{{ block.settings.description }}</p>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+{% stylesheet %}
+  .product-sustainability {
+    width: 100%;
+    max-width: 100%;
+    padding: var(--spacing-5xl) var(--spacing-lg);
+    background: linear-gradient(135deg, rgba(45, 80, 22, 0.05) 0%, rgba(74, 124, 44, 0.03) 100%);
+    box-sizing: border-box;
+  }
+
+  .product-sustainability__container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .product-sustainability__title {
+    text-align: center;
+    font-family: var(--font-heading);
+    font-size: clamp(36px, 4.5vw, 56px);
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--forest-green) 0%, var(--sage-green) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: var(--spacing-4xl);
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    padding: 10px;
+    margin-top: var(--spacing-2xl);
+  }
+
+  .product-sustainability__content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--spacing-xl);
+    margin-bottom: var(--spacing-4xl);
+  }
+
+  .sustainability-story,
+  .environmental-impact,
+  .packaging-info {
+    background: var(--white);
+    padding: var(--spacing-2xl);
+    border-radius: var(--radius-xl);
+    box-shadow: 0 4px 20px rgba(45, 80, 22, 0.08);
+    border-left: 4px solid var(--sage-green);
+  }
+
+  .sustainability-story h3,
+  .environmental-impact h3,
+  .packaging-info h3 {
+    font-family: var(--font-heading);
+    font-size: var(--h3-size);
+    color: var(--forest-green);
+    margin-bottom: var(--spacing-lg);
+  }
+
+  .sustainability-story__content,
+  .environmental-impact__content,
+  .packaging-info__content {
+    font-size: var(--body-large);
+    line-height: 1.8;
+    color: var(--text);
+  }
+
+  .sustainability-badges {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--spacing-lg);
+  }
+
+  .sustainability-badge {
+    text-align: center;
+    padding: var(--spacing-xl);
+    background: linear-gradient(135deg, rgba(74, 124, 44, 0.1) 0%, rgba(212, 175, 55, 0.05) 100%);
+    border-radius: var(--radius-lg);
+    border: 2px solid rgba(74, 124, 44, 0.2);
+    transition: all 0.3s ease;
+  }
+
+  .sustainability-badge:hover {
+    transform: translateY(-4px);
+    border-color: var(--sage-green);
+    box-shadow: 0 8px 25px rgba(45, 80, 22, 0.1);
+  }
+
+  .sustainability-badge__icon {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto var(--spacing-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--forest-green) 0%, var(--sage-green) 100%);
+    border-radius: var(--radius-full);
+  }
+
+  .sustainability-badge__icon svg {
+    width: 30px;
+    height: 30px;
+    color: var(--white);
+  }
+
+  .sustainability-badge__title {
+    font-family: var(--font-heading);
+    font-size: var(--h5-size);
+    font-weight: 700;
+    color: var(--forest-green);
+    margin-bottom: var(--spacing-xs);
+  }
+
+  .sustainability-badge__description {
+    font-size: var(--body-small);
+    color: var(--text);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  @media (max-width: 768px) {
+    .product-sustainability__content {
+      grid-template-columns: 1fr;
+    }
+
+    .sustainability-badges {
+      grid-template-columns: 1fr;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Product Sustainability",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Section Title",
+      "default": "Sustainability & Impact"
+    },
+    {
+      "type": "richtext",
+      "id": "farmer_story",
+      "label": "Farmer Partnership Story"
+    },
+    {
+      "type": "richtext",
+      "id": "environmental_impact",
+      "label": "Environmental Impact Information"
+    },
+    {
+      "type": "richtext",
+      "id": "packaging_info",
+      "label": "Packaging Information"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "badge",
+      "name": "Sustainability Badge",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon_name",
+          "label": "Icon",
+          "options": [
+            {
+              "value": "sustainable",
+              "label": "Sustainable"
+            },
+            {
+              "value": "farmer",
+              "label": "Farmer"
+            },
+            {
+              "value": "recycle",
+              "label": "Recycle"
+            },
+            {
+              "value": "globe",
+              "label": "Globe"
+            }
+          ],
+          "default": "sustainable"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Sustainable"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Description",
+          "default": "Eco-friendly and sustainable practices."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product Sustainability"
+    }
+  ]
+}
+{% endschema %}

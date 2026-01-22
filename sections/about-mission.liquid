@@ -1,0 +1,311 @@
+{% comment %}
+  About Mission Section - Mission, vision, and goals
+{% endcomment %}
+
+<section class="about-mission">
+  <div class="about-mission__container">
+    <div class="about-mission__grid">
+      {% if section.settings.mission_title != blank %}
+        <div class="mission-card">
+          <div class="mission-card__icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <h2 class="mission-card__title">{{ section.settings.mission_title }}</h2>
+          {% if section.settings.mission_text != blank %}
+            <div class="mission-card__content">
+              {{ section.settings.mission_text }}
+            </div>
+          {% endif %}
+        </div>
+      {% endif %}
+      
+      {% if section.settings.vision_title != blank %}
+        <div class="mission-card">
+          <div class="mission-card__icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2Z" stroke="currentColor" stroke-width="2"/>
+              <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <h2 class="mission-card__title">{{ section.settings.vision_title }}</h2>
+          {% if section.settings.vision_text != blank %}
+            <div class="mission-card__content">
+              {{ section.settings.vision_text }}
+            </div>
+          {% endif %}
+        </div>
+      {% endif %}
+    </div>
+    
+    {% if section.settings.goals_title != blank or section.blocks.size > 0 %}
+      <div class="about-mission__goals">
+        {% if section.settings.goals_title != blank %}
+          <h2 class="about-mission__goals-title">{{ section.settings.goals_title }}</h2>
+        {% endif %}
+        
+        {% if section.blocks.size > 0 %}
+          <div class="goals-grid">
+            {% for block in section.blocks %}
+              <div class="goal-item" {{ block.shopify_attributes }}>
+                {% if block.settings.icon_name != blank %}
+                  <div class="goal-item__icon">
+                    {% render 'icon', name: block.settings.icon_name %}
+                  </div>
+                {% endif %}
+                
+                {% if block.settings.title != blank %}
+                  <h3 class="goal-item__title">{{ block.settings.title }}</h3>
+                {% endif %}
+                
+                {% if block.settings.description != blank %}
+                  <p class="goal-item__description">{{ block.settings.description }}</p>
+                {% endif %}
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+{% stylesheet %}
+  .about-mission {
+    width: 100%;
+    max-width: 100%;
+    padding: var(--spacing-5xl) var(--spacing-lg);
+    background: linear-gradient(135deg, rgba(74, 124, 44, 0.02) 0%, rgba(212, 175, 55, 0.02) 100%);
+    box-sizing: border-box;
+  }
+
+  .about-mission__container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .about-mission__grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-4xl);
+    margin-bottom: var(--spacing-5xl);
+  }
+
+  .mission-card {
+    background: var(--white);
+    padding: var(--spacing-3xl);
+    border-radius: var(--radius-xl);
+    box-shadow: 0 10px 40px rgba(45, 80, 22, 0.1);
+    border-top: 4px solid var(--gold);
+    text-align: center;
+    transition: all 0.4s ease;
+  }
+
+  .mission-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 60px rgba(45, 80, 22, 0.15);
+  }
+
+  .mission-card__icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto var(--spacing-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, rgba(74, 124, 44, 0.1) 0%, rgba(212, 175, 55, 0.1) 100%);
+    border-radius: var(--radius-full);
+    color: var(--forest-green);
+  }
+
+  .mission-card__title {
+    font-family: var(--font-heading);
+    font-size: clamp(28px, 3.5vw, 40px);
+    font-weight: 900;
+    color: var(--forest-green);
+    margin-bottom: var(--spacing-lg);
+    line-height: 1.2;
+    padding: 10px;
+    padding-top: 0;
+  }
+
+  .mission-card__content {
+    font-size: var(--body-large);
+    line-height: 1.8;
+    color: var(--text);
+    text-align: left;
+  }
+
+  .about-mission__goals {
+    text-align: center;
+  }
+
+  .about-mission__goals-title {
+    font-family: var(--font-heading);
+    font-size: clamp(36px, 4.5vw, 56px);
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--forest-green) 0%, var(--sage-green) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: var(--spacing-4xl);
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    padding: 10px;
+    margin-top: var(--spacing-2xl);
+  }
+
+  .goals-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--spacing-xl);
+  }
+
+  .goal-item {
+    background: linear-gradient(135deg, var(--white) 0%, rgba(250, 250, 250, 0.8) 100%);
+    padding: var(--spacing-2xl);
+    border-radius: var(--radius-lg);
+    border: 2px solid rgba(74, 124, 44, 0.1);
+    text-align: center;
+    transition: all 0.3s ease;
+  }
+
+  .goal-item:hover {
+    transform: translateY(-4px);
+    border-color: var(--sage-green);
+    box-shadow: 0 8px 25px rgba(45, 80, 22, 0.1);
+  }
+
+  .goal-item__icon {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto var(--spacing-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--sage-green) 0%, var(--gold) 100%);
+    border-radius: var(--radius-full);
+  }
+
+  .goal-item__icon svg {
+    width: 30px;
+    height: 30px;
+    color: var(--white);
+  }
+
+  .goal-item__title {
+    font-family: var(--font-heading);
+    font-size: var(--h4-size);
+    font-weight: 700;
+    color: var(--forest-green);
+    margin-bottom: var(--spacing-sm);
+  }
+
+  .goal-item__description {
+    font-size: var(--body-normal);
+    color: var(--text);
+    line-height: 1.7;
+    margin: 0;
+  }
+
+  @media (max-width: 968px) {
+    .about-mission__grid {
+      grid-template-columns: 1fr;
+      gap: var(--spacing-2xl);
+    }
+
+    .mission-card {
+      padding: var(--spacing-xl);
+    }
+
+    .goals-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "About Mission",
+  "settings": [
+    {
+      "type": "text",
+      "id": "mission_title",
+      "label": "Mission Title",
+      "default": "Our Mission"
+    },
+    {
+      "type": "richtext",
+      "id": "mission_text",
+      "label": "Mission Statement"
+    },
+    {
+      "type": "text",
+      "id": "vision_title",
+      "label": "Vision Title",
+      "default": "Our Vision"
+    },
+    {
+      "type": "richtext",
+      "id": "vision_text",
+      "label": "Vision Statement"
+    },
+    {
+      "type": "text",
+      "id": "goals_title",
+      "label": "Goals Title",
+      "default": "Our Goals"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "goal",
+      "name": "Goal",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon_name",
+          "label": "Icon",
+          "options": [
+            {
+              "value": "sustainable",
+              "label": "Sustainable"
+            },
+            {
+              "value": "wellness",
+              "label": "Wellness"
+            },
+            {
+              "value": "premium",
+              "label": "Premium"
+            },
+            {
+              "value": "farmer",
+              "label": "Farmer"
+            }
+          ],
+          "default": "sustainable"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Goal Title"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Goal Description"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "About Mission"
+    }
+  ]
+}
+{% endschema %}

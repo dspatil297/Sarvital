@@ -1,0 +1,39 @@
+{
+  "sections": {
+    "about_intro": {
+      "type": "about-intro",
+      "settings": {
+        "heading": "About Sarvital",
+        "subheading": "Transforming Health Through Nature's Finest"
+      }
+    },
+    "about_mission": {
+      "type": "about-mission",
+      "settings": {
+        "mission_title": "Our Mission",
+        "vision_title": "Our Vision",
+        "goals_title": "Our Goals"
+      }
+    },
+    "about_values": {
+      "type": "about-values",
+      "settings": {
+        "title": "Our Core Values"
+      }
+    },
+    "about_impact": {
+      "type": "about-impact",
+      "settings": {
+        "title": "Our Impact",
+        "farmer_stories_title": "Farmer Impact Stories",
+        "community_initiatives_title": "Community Initiatives"
+      }
+    }
+  },
+  "order": [
+    "about_intro",
+    "about_mission",
+    "about_values",
+    "about_impact"
+  ]
+}

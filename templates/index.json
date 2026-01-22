@@ -3,11 +3,11 @@
     "hero_banner": {
       "type": "hero-banner",
       "settings": {
-        "heading": "Pure Nutrition from Nature",
-        "subheading": "Premium fruit & vegetable powders for your wellness journey",
-        "cta_text": "Shop All Products",
+        "heading": "Transform Your Health with Nature's Finest",
+        "subheading": "Premium organic fruit & vegetable powders. Lab-tested, sustainably sourced, and packed with natural goodness.",
+        "cta_text": "Shop Now",
         "cta_link": "/collections/all",
-        "secondary_cta_text": "Learn About Us",
+        "secondary_cta_text": "Learn More",
         "secondary_cta_link": "/pages/about"
       }
     },

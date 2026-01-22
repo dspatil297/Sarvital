@@ -1,0 +1,325 @@
+{% comment %}
+  Product Usage Instructions Section
+{% endcomment %}
+
+<section class="product-usage">
+  <div class="product-usage__container">
+    {% if section.settings.title != blank %}
+      <h2 class="product-usage__title">{{ section.settings.title }}</h2>
+    {% endif %}
+    
+    <div class="product-usage__content">
+      <div class="product-usage__instructions">
+        {% if section.settings.how_to_use != blank %}
+          <div class="usage-instructions">
+            <h3>How to Use</h3>
+            <div class="usage-instructions__content">
+              {{ section.settings.how_to_use }}
+            </div>
+          </div>
+        {% endif %}
+        
+        {% if section.blocks.size > 0 %}
+          <div class="usage-suggestions">
+            <h3>Serving Suggestions</h3>
+            <div class="usage-suggestions__grid">
+              {% for block in section.blocks %}
+                <div class="usage-suggestion" {{ block.shopify_attributes }}>
+                  {% if block.settings.icon_name != blank %}
+                    <div class="usage-suggestion__icon">
+                      {% render 'icon', name: block.settings.icon_name %}
+                    </div>
+                  {% endif %}
+                  
+                  {% if block.settings.title != blank %}
+                    <h4 class="usage-suggestion__title">{{ block.settings.title }}</h4>
+                  {% endif %}
+                  
+                  {% if block.settings.description != blank %}
+                    <p class="usage-suggestion__description">{{ block.settings.description }}</p>
+                  {% endif %}
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+        {% endif %}
+      </div>
+      
+      {% if section.settings.storage_info != blank or section.settings.best_practices != blank %}
+        <div class="product-usage__additional">
+          {% if section.settings.storage_info != blank %}
+            <div class="storage-info">
+              <h3>Storage Instructions</h3>
+              <div class="storage-info__content">
+                {{ section.settings.storage_info }}
+              </div>
+            </div>
+          {% endif %}
+          
+          {% if section.settings.best_practices != blank %}
+            <div class="best-practices">
+              <h3>Best Practices</h3>
+              <div class="best-practices__content">
+                {{ section.settings.best_practices }}
+              </div>
+            </div>
+          {% endif %}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+  .product-usage {
+    width: 100%;
+    max-width: 100%;
+    padding: var(--spacing-5xl) var(--spacing-lg);
+    background: linear-gradient(180deg, var(--white) 0%, rgba(250, 250, 250, 0.3) 50%, var(--white) 100%);
+    box-sizing: border-box;
+  }
+
+  .product-usage__container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .product-usage__title {
+    text-align: center;
+    font-family: var(--font-heading);
+    font-size: clamp(36px, 4.5vw, 56px);
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--forest-green) 0%, var(--sage-green) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: var(--spacing-4xl);
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    padding: 10px;
+    margin-top: var(--spacing-2xl);
+  }
+
+  .product-usage__content {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: var(--spacing-4xl);
+  }
+
+  .usage-instructions {
+    background: var(--white);
+    padding: var(--spacing-2xl);
+    border-radius: var(--radius-xl);
+    box-shadow: 0 4px 20px rgba(45, 80, 22, 0.08);
+    margin-bottom: var(--spacing-2xl);
+  }
+
+  .usage-instructions h3 {
+    font-family: var(--font-heading);
+    font-size: var(--h3-size);
+    color: var(--forest-green);
+    margin-bottom: var(--spacing-lg);
+  }
+
+  .usage-instructions__content {
+    font-size: var(--body-large);
+    line-height: 1.8;
+    color: var(--text);
+  }
+
+  .usage-instructions__content ul,
+  .usage-instructions__content ol {
+    margin-left: var(--spacing-lg);
+    margin-top: var(--spacing-md);
+  }
+
+  .usage-instructions__content li {
+    margin-bottom: var(--spacing-sm);
+  }
+
+  .usage-suggestions {
+    background: var(--white);
+    padding: var(--spacing-2xl);
+    border-radius: var(--radius-xl);
+    box-shadow: 0 4px 20px rgba(45, 80, 22, 0.08);
+  }
+
+  .usage-suggestions h3 {
+    font-family: var(--font-heading);
+    font-size: var(--h3-size);
+    color: var(--forest-green);
+    margin-bottom: var(--spacing-xl);
+  }
+
+  .usage-suggestions__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--spacing-lg);
+  }
+
+  .usage-suggestion {
+    text-align: center;
+    padding: var(--spacing-lg);
+    background: linear-gradient(135deg, rgba(74, 124, 44, 0.05) 0%, rgba(212, 175, 55, 0.05) 100%);
+    border-radius: var(--radius-lg);
+    border: 2px solid rgba(74, 124, 44, 0.1);
+    transition: all 0.3s ease;
+  }
+
+  .usage-suggestion:hover {
+    transform: translateY(-4px);
+    border-color: var(--sage-green);
+    box-shadow: 0 8px 25px rgba(45, 80, 22, 0.1);
+  }
+
+  .usage-suggestion__icon {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto var(--spacing-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--sage-green) 0%, var(--gold) 100%);
+    border-radius: var(--radius-full);
+  }
+
+  .usage-suggestion__icon svg {
+    width: 30px;
+    height: 30px;
+    color: var(--white);
+  }
+
+  .usage-suggestion__title {
+    font-family: var(--font-heading);
+    font-size: var(--h5-size);
+    font-weight: 700;
+    color: var(--forest-green);
+    margin-bottom: var(--spacing-xs);
+  }
+
+  .usage-suggestion__description {
+    font-size: var(--body-small);
+    color: var(--text);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .product-usage__additional {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xl);
+  }
+
+  .storage-info,
+  .best-practices {
+    background: var(--white);
+    padding: var(--spacing-xl);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 4px 20px rgba(45, 80, 22, 0.08);
+    border-left: 4px solid var(--gold);
+  }
+
+  .storage-info h3,
+  .best-practices h3 {
+    font-family: var(--font-heading);
+    font-size: var(--h4-size);
+    color: var(--forest-green);
+    margin-bottom: var(--spacing-md);
+  }
+
+  .storage-info__content,
+  .best-practices__content {
+    font-size: var(--body-normal);
+    line-height: 1.7;
+    color: var(--text);
+  }
+
+  @media (max-width: 968px) {
+    .product-usage__content {
+      grid-template-columns: 1fr;
+      gap: var(--spacing-2xl);
+    }
+
+    .usage-suggestions__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Product Usage",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Section Title",
+      "default": "How to Use"
+    },
+    {
+      "type": "richtext",
+      "id": "how_to_use",
+      "label": "How to Use Instructions"
+    },
+    {
+      "type": "richtext",
+      "id": "storage_info",
+      "label": "Storage Instructions"
+    },
+    {
+      "type": "richtext",
+      "id": "best_practices",
+      "label": "Best Practices"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "suggestion",
+      "name": "Serving Suggestion",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon_name",
+          "label": "Icon",
+          "options": [
+            {
+              "value": "smoothie",
+              "label": "Smoothie"
+            },
+            {
+              "value": "cooking",
+              "label": "Cooking"
+            },
+            {
+              "value": "wellness",
+              "label": "Wellness"
+            },
+            {
+              "value": "workout",
+              "label": "Workout"
+            }
+          ],
+          "default": "smoothie"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Serving Suggestion"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Description",
+          "default": "Add to your favorite smoothie or recipe."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product Usage"
+    }
+  ]
+}
+{% endschema %}

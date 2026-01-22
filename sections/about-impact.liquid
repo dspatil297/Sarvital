@@ -1,0 +1,367 @@
+{% comment %}
+  About Impact Section - Sustainability metrics and impact stories
+{% endcomment %}
+
+<section class="about-impact">
+  <div class="about-impact__container">
+    {% if section.settings.title != blank %}
+      <h2 class="about-impact__title">{{ section.settings.title }}</h2>
+    {% endif %}
+    
+    {% if section.blocks.size > 0 %}
+      <div class="impact-metrics">
+        {% for block in section.blocks %}
+          <div class="impact-metric" {{ block.shopify_attributes }}>
+            {% if block.settings.icon_name != blank %}
+              <div class="impact-metric__icon">
+                {% render 'icon', name: block.settings.icon_name %}
+              </div>
+            {% endif %}
+            
+            {% if block.settings.number != blank %}
+              <div class="impact-metric__number" data-count="{{ block.settings.number }}">
+                {{ block.settings.number }}
+              </div>
+            {% endif %}
+            
+            {% if block.settings.label != blank %}
+              <div class="impact-metric__label">{{ block.settings.label }}</div>
+            {% endif %}
+            
+            {% if block.settings.description != blank %}
+              <p class="impact-metric__description">{{ block.settings.description }}</p>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+    
+    {% if section.settings.farmer_stories_title != blank or section.settings.farmer_stories != blank %}
+      <div class="farmer-stories">
+        {% if section.settings.farmer_stories_title != blank %}
+          <h3 class="farmer-stories__title">{{ section.settings.farmer_stories_title }}</h3>
+        {% endif %}
+        
+        {% if section.settings.farmer_stories != blank %}
+          <div class="farmer-stories__content">
+            {{ section.settings.farmer_stories }}
+          </div>
+        {% endif %}
+      </div>
+    {% endif %}
+    
+    {% if section.settings.community_initiatives_title != blank or section.settings.community_initiatives != blank %}
+      <div class="community-initiatives">
+        {% if section.settings.community_initiatives_title != blank %}
+          <h3 class="community-initiatives__title">{{ section.settings.community_initiatives_title }}</h3>
+        {% endif %}
+        
+        {% if section.settings.community_initiatives != blank %}
+          <div class="community-initiatives__content">
+            {{ section.settings.community_initiatives }}
+          </div>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+{% stylesheet %}
+  .about-impact {
+    width: 100%;
+    max-width: 100%;
+    padding: var(--spacing-5xl) var(--spacing-lg);
+    background: linear-gradient(135deg, rgba(45, 80, 22, 0.05) 0%, rgba(74, 124, 44, 0.03) 100%);
+    box-sizing: border-box;
+  }
+
+  .about-impact__container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .about-impact__title {
+    text-align: center;
+    font-family: var(--font-heading);
+    font-size: clamp(36px, 4.5vw, 56px);
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--forest-green) 0%, var(--sage-green) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: var(--spacing-4xl);
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    padding: 10px;
+    margin-top: var(--spacing-2xl);
+  }
+
+  .impact-metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--spacing-xl);
+    margin-bottom: var(--spacing-5xl);
+  }
+
+  .impact-metric {
+    text-align: center;
+    padding: var(--spacing-2xl);
+    background: var(--white);
+    border-radius: var(--radius-xl);
+    box-shadow: 0 10px 40px rgba(45, 80, 22, 0.1);
+    border-top: 4px solid var(--gold);
+    transition: all 0.4s ease;
+  }
+
+  .impact-metric:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 60px rgba(45, 80, 22, 0.15);
+  }
+
+  .impact-metric__icon {
+    width: 70px;
+    height: 70px;
+    margin: 0 auto var(--spacing-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--sage-green) 0%, var(--gold) 100%);
+    border-radius: var(--radius-full);
+  }
+
+  .impact-metric__icon svg {
+    width: 35px;
+    height: 35px;
+    color: var(--white);
+  }
+
+  .impact-metric__number {
+    font-family: var(--font-heading);
+    font-size: clamp(36px, 4vw, 56px);
+    font-weight: 900;
+    color: var(--gold);
+    line-height: 1;
+    margin-bottom: var(--spacing-sm);
+  }
+
+  .impact-metric__label {
+    font-size: var(--body-large);
+    font-weight: 700;
+    color: var(--forest-green);
+    margin-bottom: var(--spacing-xs);
+  }
+
+  .impact-metric__description {
+    font-size: var(--body-small);
+    color: var(--text);
+    line-height: 1.6;
+    margin: 0;
+    margin-top: var(--spacing-sm);
+  }
+
+  .farmer-stories,
+  .community-initiatives {
+    background: var(--white);
+    padding: var(--spacing-3xl);
+    border-radius: var(--radius-xl);
+    box-shadow: 0 10px 40px rgba(45, 80, 22, 0.1);
+    margin-bottom: var(--spacing-3xl);
+    border-left: 4px solid var(--sage-green);
+  }
+
+  .farmer-stories__title,
+  .community-initiatives__title {
+    font-family: var(--font-heading);
+    font-size: var(--h3-size);
+    color: var(--forest-green);
+    margin-bottom: var(--spacing-lg);
+  }
+
+  .farmer-stories__content,
+  .community-initiatives__content {
+    font-size: var(--body-large);
+    line-height: 1.8;
+    color: var(--text);
+  }
+
+  @media (max-width: 768px) {
+    .impact-metrics {
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--spacing-lg);
+    }
+
+    .impact-metric {
+      padding: var(--spacing-xl);
+    }
+
+    .farmer-stories,
+    .community-initiatives {
+      padding: var(--spacing-xl);
+    }
+  }
+
+  @media (max-width: 480px) {
+    .impact-metrics {
+      grid-template-columns: 1fr;
+    }
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  // Animated counter for impact metrics
+  document.addEventListener('DOMContentLoaded', function() {
+    const counters = document.querySelectorAll('[data-count]');
+    
+    const animateCounter = (counter) => {
+      const target = parseInt(counter.dataset.count.replace(/[^0-9]/g, ''));
+      const suffix = counter.dataset.count.replace(/[0-9]/g, '');
+      const duration = 2000;
+      const increment = target / (duration / 16);
+      let current = 0;
+      
+      const updateCounter = () => {
+        current += increment;
+        if (current < target) {
+          counter.textContent = Math.floor(current) + suffix;
+          requestAnimationFrame(updateCounter);
+        } else {
+          counter.textContent = target + suffix;
+        }
+      };
+      
+      // Start animation when element is in viewport
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            updateCounter();
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.5 });
+      
+      observer.observe(counter);
+    };
+    
+    counters.forEach(animateCounter);
+  });
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "About Impact",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Section Title",
+      "default": "Our Impact"
+    },
+    {
+      "type": "text",
+      "id": "farmer_stories_title",
+      "label": "Farmer Stories Title",
+      "default": "Farmer Impact Stories"
+    },
+    {
+      "type": "richtext",
+      "id": "farmer_stories",
+      "label": "Farmer Stories Content"
+    },
+    {
+      "type": "text",
+      "id": "community_initiatives_title",
+      "label": "Community Initiatives Title",
+      "default": "Community Initiatives"
+    },
+    {
+      "type": "richtext",
+      "id": "community_initiatives",
+      "label": "Community Initiatives Content"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "metric",
+      "name": "Impact Metric",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon_name",
+          "label": "Icon",
+          "options": [
+            {
+              "value": "farmer",
+              "label": "Farmer"
+            },
+            {
+              "value": "sustainable",
+              "label": "Sustainable"
+            },
+            {
+              "value": "recycle",
+              "label": "Recycle"
+            },
+            {
+              "value": "globe",
+              "label": "Globe"
+            }
+          ],
+          "default": "farmer"
+        },
+        {
+          "type": "text",
+          "id": "number",
+          "label": "Number",
+          "default": "500+",
+          "info": "Include suffix if needed (e.g., '500+', '1000kg')"
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Farmers Supported"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Description"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "About Impact",
+      "blocks": [
+        {
+          "type": "metric",
+          "settings": {
+            "icon_name": "farmer",
+            "number": "500+",
+            "label": "Farmers Supported",
+            "description": "Local farmers empowered through fair trade"
+          }
+        },
+        {
+          "type": "metric",
+          "settings": {
+            "icon_name": "recycle",
+            "number": "1000kg",
+            "label": "Waste Reduced",
+            "description": "Annual waste reduction through our processes"
+          }
+        },
+        {
+          "type": "metric",
+          "settings": {
+            "icon_name": "globe",
+            "number": "50+",
+            "label": "Communities Impacted",
+            "description": "Communities benefiting from our initiatives"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

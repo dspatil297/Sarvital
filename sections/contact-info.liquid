@@ -1,0 +1,308 @@
+{% comment %}
+  Contact Info Section - Business information and contact details
+{% endcomment %}
+
+<section class="contact-info">
+  <div class="contact-info__container">
+    {% if section.settings.title != blank %}
+      <h2 class="contact-info__title">{{ section.settings.title }}</h2>
+    {% endif %}
+    
+    <div class="contact-info__grid">
+      {% if section.settings.address != blank %}
+        <div class="contact-info-card">
+          <div class="contact-info-card__icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M21 10C21 17 12 23 12 23C12 23 3 17 3 10C3 7.61305 3.94821 5.32387 5.63604 3.63604C7.32387 1.94821 9.61305 1 12 1C14.3869 1 16.6761 1.94821 18.364 3.63604C20.0518 5.32387 21 7.61305 21 10Z" stroke="currentColor" stroke-width="2"/>
+              <path d="M12 13C13.6569 13 15 11.6569 15 10C15 8.34315 13.6569 7 12 7C10.3431 7 9 8.34315 9 10C9 11.6569 10.3431 13 12 13Z" stroke="currentColor" stroke-width="2"/>
+            </svg>
+          </div>
+          <h3 class="contact-info-card__title">Address</h3>
+          <div class="contact-info-card__content">
+            {{ section.settings.address }}
+          </div>
+        </div>
+      {% endif %}
+      
+      {% if section.settings.email != blank %}
+        <div class="contact-info-card">
+          <div class="contact-info-card__icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 4H20C21.1 4 22 4.9 22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6C2 4.9 2.9 4 4 4Z" stroke="currentColor" stroke-width="2"/>
+              <path d="L22 6L12 13L2 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <h3 class="contact-info-card__title">Email</h3>
+          <div class="contact-info-card__content">
+            <a href="mailto:{{ section.settings.email }}" class="contact-info-card__link">
+              {{ section.settings.email }}
+            </a>
+          </div>
+        </div>
+      {% endif %}
+      
+      {% if section.settings.phone != blank %}
+        <div class="contact-info-card">
+          <div class="contact-info-card__icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M22 16.92V19.92C22.0011 20.1985 21.9441 20.4742 21.8325 20.7292C21.7209 20.9842 21.5573 21.2126 21.3528 21.3992C21.1482 21.5857 20.9074 21.7261 20.6446 21.8114C20.3818 21.8967 20.1028 21.9251 19.8266 21.8946C16.7427 21.4556 13.787 20.3761 11.19 18.73C8.77382 17.2148 6.72533 15.1657 5.20999 12.75C3.56397 10.1512 2.48384 7.19305 2.044 4.107C2.01345 3.83079 2.04189 3.55179 2.12723 3.28901C2.21257 3.02623 2.35296 2.78546 2.5395 2.58089C2.72604 2.37632 2.95447 2.21274 3.20946 2.10115C3.46445 1.98956 3.74018 1.93257 4.01866 1.93366H7.01866C7.49866 1.93366 7.94866 2.12366 8.26866 2.45366L10.0187 4.20366C10.3387 4.52366 10.5287 4.97366 10.5287 5.45366C10.5287 6.40366 10.3487 7.34366 10.0087 8.22366C9.80866 8.71366 9.44866 9.12366 8.99866 9.37366L7.76866 10.0037C9.11866 12.6337 11.3587 14.8737 13.9887 16.2237L14.6187 14.9937C14.8687 14.5437 15.2787 14.1837 15.7687 13.9837C16.6487 13.6437 17.5887 13.4637 18.5387 13.4637C19.0187 13.4637 19.4687 13.6537 19.7887 13.9737L21.5387 15.7237C21.8587 16.0437 22.0487 16.4937 22.0487 16.9737L22.0187 16.9237Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <h3 class="contact-info-card__title">Phone</h3>
+          <div class="contact-info-card__content">
+            <a href="tel:{{ section.settings.phone }}" class="contact-info-card__link">
+              {{ section.settings.phone }}
+            </a>
+          </div>
+        </div>
+      {% endif %}
+      
+      {% if section.settings.support_hours != blank %}
+        <div class="contact-info-card">
+          <div class="contact-info-card__icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2"/>
+              <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <h3 class="contact-info-card__title">Support Hours</h3>
+          <div class="contact-info-card__content">
+            {{ section.settings.support_hours }}
+          </div>
+        </div>
+      {% endif %}
+    </div>
+    
+    {% if section.settings.show_social %}
+      <div class="contact-info__social">
+        <h3 class="contact-info__social-title">Follow Us</h3>
+        <div class="social-links">
+          {% if section.settings.facebook_url != blank %}
+            <a href="{{ section.settings.facebook_url }}" target="_blank" rel="noopener" class="social-link" aria-label="Facebook">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/>
+              </svg>
+            </a>
+          {% endif %}
+          
+          {% if section.settings.instagram_url != blank %}
+            <a href="{{ section.settings.instagram_url }}" target="_blank" rel="noopener" class="social-link" aria-label="Instagram">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+              </svg>
+            </a>
+          {% endif %}
+          
+          {% if section.settings.twitter_url != blank %}
+            <a href="{{ section.settings.twitter_url }}" target="_blank" rel="noopener" class="social-link" aria-label="Twitter">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"/>
+              </svg>
+            </a>
+          {% endif %}
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+{% stylesheet %}
+  .contact-info {
+    width: 100%;
+    max-width: 100%;
+    padding: var(--spacing-5xl) var(--spacing-lg);
+    background: linear-gradient(135deg, rgba(74, 124, 44, 0.02) 0%, rgba(212, 175, 55, 0.02) 100%);
+    box-sizing: border-box;
+  }
+
+  .contact-info__container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .contact-info__title {
+    text-align: center;
+    font-family: var(--font-heading);
+    font-size: clamp(36px, 4.5vw, 56px);
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--forest-green) 0%, var(--sage-green) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: var(--spacing-4xl);
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    padding: 10px;
+    margin-top: var(--spacing-2xl);
+  }
+
+  .contact-info__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--spacing-xl);
+    margin-bottom: var(--spacing-4xl);
+  }
+
+  .contact-info-card {
+    background: var(--white);
+    padding: var(--spacing-2xl);
+    border-radius: var(--radius-xl);
+    box-shadow: 0 10px 40px rgba(45, 80, 22, 0.1);
+    border-top: 4px solid var(--sage-green);
+    text-align: center;
+    transition: all 0.4s ease;
+  }
+
+  .contact-info-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 60px rgba(45, 80, 22, 0.15);
+  }
+
+  .contact-info-card__icon {
+    width: 70px;
+    height: 70px;
+    margin: 0 auto var(--spacing-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, rgba(74, 124, 44, 0.1) 0%, rgba(212, 175, 55, 0.1) 100%);
+    border-radius: var(--radius-full);
+    color: var(--forest-green);
+  }
+
+  .contact-info-card__title {
+    font-family: var(--font-heading);
+    font-size: var(--h4-size);
+    font-weight: 700;
+    color: var(--forest-green);
+    margin-bottom: var(--spacing-md);
+  }
+
+  .contact-info-card__content {
+    font-size: var(--body-normal);
+    line-height: 1.7;
+    color: var(--text);
+  }
+
+  .contact-info-card__link {
+    color: var(--sage-green);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease;
+  }
+
+  .contact-info-card__link:hover {
+    color: var(--forest-green);
+    text-decoration: underline;
+  }
+
+  .contact-info__social {
+    text-align: center;
+    padding-top: var(--spacing-4xl);
+    border-top: 2px solid rgba(74, 124, 44, 0.1);
+  }
+
+  .contact-info__social-title {
+    font-family: var(--font-heading);
+    font-size: var(--h4-size);
+    color: var(--forest-green);
+    margin-bottom: var(--spacing-lg);
+  }
+
+  .social-links {
+    display: flex;
+    justify-content: center;
+    gap: var(--spacing-lg);
+    flex-wrap: wrap;
+  }
+
+  .social-link {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, rgba(74, 124, 44, 0.1) 0%, rgba(212, 175, 55, 0.1) 100%);
+    border-radius: var(--radius-full);
+    color: var(--forest-green);
+    transition: all 0.3s ease;
+    text-decoration: none;
+  }
+
+  .social-link:hover {
+    background: linear-gradient(135deg, var(--sage-green) 0%, var(--gold) 100%);
+    color: var(--white);
+    transform: translateY(-4px);
+  }
+
+  @media (max-width: 768px) {
+    .contact-info__grid {
+      grid-template-columns: 1fr;
+    }
+
+    .contact-info-card {
+      padding: var(--spacing-xl);
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Contact Info",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Section Title",
+      "default": "Contact Information"
+    },
+    {
+      "type": "richtext",
+      "id": "address",
+      "label": "Business Address"
+    },
+    {
+      "type": "text",
+      "id": "email",
+      "label": "Email Address"
+    },
+    {
+      "type": "text",
+      "id": "phone",
+      "label": "Phone Number"
+    },
+    {
+      "type": "text",
+      "id": "support_hours",
+      "label": "Support Hours",
+      "default": "Monday - Friday: 9:00 AM - 6:00 PM"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_social",
+      "label": "Show Social Media Links",
+      "default": true
+    },
+    {
+      "type": "url",
+      "id": "facebook_url",
+      "label": "Facebook URL"
+    },
+    {
+      "type": "url",
+      "id": "instagram_url",
+      "label": "Instagram URL"
+    },
+    {
+      "type": "url",
+      "id": "twitter_url",
+      "label": "Twitter URL"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Contact Info"
+    }
+  ]
+}
+{% endschema %}

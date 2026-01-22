@@ -38,10 +38,23 @@
 
 {% stylesheet %}
   .quality-assurance {
-    width: 100vw;
-    max-width: 100vw;
-    padding: var(--spacing-4xl) var(--spacing-lg);
-    background-color: var(--white);
+    width: 100%;
+    max-width: 100%;
+    padding: var(--spacing-5xl) var(--spacing-lg);
+    background: linear-gradient(135deg, rgba(74, 124, 44, 0.03) 0%, rgba(212, 175, 55, 0.02) 100%);
+    position: relative;
+    overflow: hidden;
+    box-sizing: border-box;
+  }
+
+  .quality-assurance::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(74, 124, 44, 0.2), transparent);
   }
 
   .quality-assurance__container {
@@ -52,10 +65,16 @@
 
   .quality-assurance__title {
     font-family: var(--font-heading);
-    font-size: var(--h2-size);
-    font-weight: 700;
-    color: var(--forest-green);
+    font-size: clamp(40px, 5vw, 64px);
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--forest-green) 0%, var(--sage-green) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
     margin-bottom: var(--spacing-md);
+    margin-top: var(--spacing-2xl);
+    letter-spacing: -0.03em;
+    padding: 10px;
   }
 
   .quality-assurance__description {
@@ -75,17 +94,36 @@
   }
 
   .quality-badge {
-    padding: var(--spacing-xl);
-    background-color: var(--bg);
-    border-radius: var(--radius-lg);
-    border: 2px solid rgba(74, 124, 44, 0.1);
-    transition: all var(--transition-base);
+    padding: var(--spacing-2xl);
+    background: linear-gradient(135deg, var(--white) 0%, rgba(250, 250, 250, 0.8) 100%);
+    border-radius: var(--radius-xl);
+    border: 2px solid rgba(74, 124, 44, 0.15);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 4px 20px rgba(45, 80, 22, 0.08);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .quality-badge::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.1), transparent);
+    transition: left 0.5s;
+  }
+
+  .quality-badge:hover::before {
+    left: 100%;
   }
 
   .quality-badge:hover {
-    border-color: var(--sage-green);
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-md);
+    border-color: var(--gold);
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 20px 50px rgba(45, 80, 22, 0.15), 0 0 0 4px rgba(212, 175, 55, 0.1);
+    background: linear-gradient(135deg, var(--white) 0%, rgba(255, 255, 255, 1) 100%);
   }
 
   .quality-badge__icon {

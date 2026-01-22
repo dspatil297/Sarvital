@@ -18,6 +18,8 @@
     initSmoothScroll();
     initLazyLoading();
     initFormValidation();
+    initScrollAnimations();
+    initImageOptimization();
   }
 
   /**
@@ -178,6 +180,93 @@
         setTimeout(() => inThrottle = false, limit);
       }
     };
+  }
+
+  /**
+   * Scroll-triggered animations
+   */
+  function initScrollAnimations() {
+    // Check if user prefers reduced motion
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) {
+      // Remove animation classes and show elements immediately
+      document.querySelectorAll('.scroll-animate, .scroll-animate-left, .scroll-animate-right, .scroll-animate-scale').forEach(el => {
+        el.classList.add('animated');
+      });
+      return;
+    }
+
+    if ('IntersectionObserver' in window) {
+      const animationObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('animated');
+            // Optionally unobserve after animation
+            // animationObserver.unobserve(entry.target);
+          }
+        });
+      }, {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+      });
+
+      // Observe all elements with scroll-animate classes
+      document.querySelectorAll('.scroll-animate, .scroll-animate-left, .scroll-animate-right, .scroll-animate-scale').forEach(el => {
+        animationObserver.observe(el);
+      });
+    } else {
+      // Fallback: show all animations immediately
+      document.querySelectorAll('.scroll-animate, .scroll-animate-left, .scroll-animate-right, .scroll-animate-scale').forEach(el => {
+        el.classList.add('animated');
+      });
+    }
+  }
+
+  /**
+   * Enhanced image optimization and lazy loading
+   */
+  function initImageOptimization() {
+    if ('IntersectionObserver' in window) {
+      const imageObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const img = entry.target;
+            
+            // Handle data-src for lazy loading
+            if (img.dataset.src) {
+              img.src = img.dataset.src;
+              img.removeAttribute('data-src');
+            }
+            
+            // Handle srcset for responsive images
+            if (img.dataset.srcset) {
+              img.srcset = img.dataset.srcset;
+              img.removeAttribute('data-srcset');
+            }
+            
+            // Add loaded class for fade-in effect
+            img.classList.add('loaded');
+            
+            // Stop observing once loaded
+            observer.unobserve(img);
+          }
+        });
+      }, {
+        rootMargin: '50px'
+      });
+
+      // Observe all images with lazy loading attributes
+      document.querySelectorAll('img[data-src], img[data-srcset]').forEach(img => {
+        imageObserver.observe(img);
+      });
+    }
+
+    // Add loading state to images
+    document.querySelectorAll('img[loading="lazy"]').forEach(img => {
+      img.addEventListener('load', function() {
+        this.classList.add('loaded');
+      });
+    });
   }
 
   // Export utilities to window for global access

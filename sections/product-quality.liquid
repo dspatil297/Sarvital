@@ -1,0 +1,308 @@
+{% comment %}
+  Product Quality & Certifications Section
+{% endcomment %}
+
+<section class="product-quality">
+  <div class="product-quality__container">
+    {% if section.settings.title != blank %}
+      <h2 class="product-quality__title">{{ section.settings.title }}</h2>
+    {% endif %}
+    
+    {% if section.blocks.size > 0 %}
+      <div class="product-quality__badges">
+        {% for block in section.blocks %}
+          <div class="quality-badge-card" {{ block.shopify_attributes }}>
+            {% if block.settings.icon_name != blank %}
+              <div class="quality-badge-card__icon">
+                {% render 'icon', name: block.settings.icon_name %}
+              </div>
+            {% endif %}
+            
+            {% if block.settings.title != blank %}
+              <h3 class="quality-badge-card__title">{{ block.settings.title }}</h3>
+            {% endif %}
+            
+            {% if block.settings.description != blank %}
+              <p class="quality-badge-card__description">{{ block.settings.description }}</p>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+    
+    {% if section.settings.source_info != blank or section.settings.processing_info != blank %}
+      <div class="product-quality__details">
+        {% if section.settings.source_info != blank %}
+          <div class="quality-detail">
+            <h3>Source Information</h3>
+            <div class="quality-detail__content">
+              {{ section.settings.source_info }}
+            </div>
+          </div>
+        {% endif %}
+        
+        {% if section.settings.processing_info != blank %}
+          <div class="quality-detail">
+            <h3>Processing Method</h3>
+            <div class="quality-detail__content">
+              {{ section.settings.processing_info }}
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+{% stylesheet %}
+  .product-quality {
+    width: 100%;
+    max-width: 100%;
+    padding: var(--spacing-5xl) var(--spacing-lg);
+    background: linear-gradient(135deg, rgba(74, 124, 44, 0.03) 0%, rgba(212, 175, 55, 0.02) 100%);
+    box-sizing: border-box;
+  }
+
+  .product-quality__container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .product-quality__title {
+    text-align: center;
+    font-family: var(--font-heading);
+    font-size: clamp(36px, 4.5vw, 56px);
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--forest-green) 0%, var(--sage-green) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: var(--spacing-4xl);
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    padding: 10px;
+    margin-top: var(--spacing-2xl);
+  }
+
+  .product-quality__badges {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--spacing-xl);
+    margin-bottom: var(--spacing-4xl);
+  }
+
+  .quality-badge-card {
+    text-align: center;
+    padding: var(--spacing-2xl);
+    background: linear-gradient(135deg, var(--white) 0%, rgba(250, 250, 250, 0.8) 100%);
+    border-radius: var(--radius-xl);
+    border: 2px solid rgba(74, 124, 44, 0.15);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(45, 80, 22, 0.08);
+  }
+
+  .quality-badge-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.05) 0%, transparent 100%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+
+  .quality-badge-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 50px rgba(45, 80, 22, 0.15);
+    border-color: var(--gold);
+  }
+
+  .quality-badge-card:hover::before {
+    opacity: 1;
+  }
+
+  .quality-badge-card__icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto var(--spacing-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, rgba(74, 124, 44, 0.1) 0%, rgba(212, 175, 55, 0.1) 100%);
+    border-radius: var(--radius-full);
+    transition: all 0.4s ease;
+  }
+
+  .quality-badge-card__icon svg {
+    width: 40px;
+    height: 40px;
+    color: var(--forest-green);
+    transition: all 0.4s ease;
+  }
+
+  .quality-badge-card:hover .quality-badge-card__icon {
+    background: linear-gradient(135deg, var(--sage-green) 0%, var(--gold) 100%);
+    transform: scale(1.1) rotate(5deg);
+  }
+
+  .quality-badge-card:hover .quality-badge-card__icon svg {
+    color: var(--white);
+    transform: scale(1.1);
+  }
+
+  .quality-badge-card__title {
+    font-family: var(--font-heading);
+    font-size: var(--h4-size);
+    font-weight: 700;
+    color: var(--forest-green);
+    margin-bottom: var(--spacing-sm);
+    line-height: 1.3;
+  }
+
+  .quality-badge-card__description {
+    font-size: var(--body-normal);
+    color: var(--text);
+    line-height: 1.7;
+    margin: 0;
+  }
+
+  .product-quality__details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--spacing-xl);
+  }
+
+  .quality-detail {
+    background: var(--white);
+    padding: var(--spacing-xl);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 4px 20px rgba(45, 80, 22, 0.08);
+    border-top: 4px solid var(--gold);
+  }
+
+  .quality-detail h3 {
+    font-family: var(--font-heading);
+    font-size: var(--h4-size);
+    color: var(--forest-green);
+    margin-bottom: var(--spacing-md);
+  }
+
+  .quality-detail__content {
+    font-size: var(--body-normal);
+    line-height: 1.7;
+    color: var(--text);
+  }
+
+  @media (max-width: 768px) {
+    .product-quality__badges {
+      grid-template-columns: 1fr;
+    }
+
+    .product-quality__details {
+      grid-template-columns: 1fr;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Product Quality",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Section Title",
+      "default": "Quality & Certifications"
+    },
+    {
+      "type": "richtext",
+      "id": "source_info",
+      "label": "Source Information"
+    },
+    {
+      "type": "richtext",
+      "id": "processing_info",
+      "label": "Processing Method Information"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "badge",
+      "name": "Quality Badge",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon_name",
+          "label": "Icon",
+          "options": [
+            {
+              "value": "lab-test",
+              "label": "Lab Test"
+            },
+            {
+              "value": "certified",
+              "label": "Certified"
+            },
+            {
+              "value": "organic",
+              "label": "Organic"
+            },
+            {
+              "value": "premium",
+              "label": "Premium"
+            }
+          ],
+          "default": "lab-test"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Lab Tested"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Description",
+          "default": "Every batch is tested in certified laboratories."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product Quality",
+      "blocks": [
+        {
+          "type": "badge",
+          "settings": {
+            "icon_name": "lab-test",
+            "title": "Lab Tested",
+            "description": "Every batch is tested in certified laboratories."
+          }
+        },
+        {
+          "type": "badge",
+          "settings": {
+            "icon_name": "certified",
+            "title": "Certified Organic",
+            "description": "Certified organic ingredients from trusted suppliers."
+          }
+        },
+        {
+          "type": "badge",
+          "settings": {
+            "icon_name": "premium",
+            "title": "Premium Quality",
+            "description": "Rigorous quality control ensures consistent standards."
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

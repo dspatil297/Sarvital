@@ -1,0 +1,26 @@
+{
+  "sections": {
+    "contact_form": {
+      "type": "contact-form",
+      "settings": {
+        "title": "Get in Touch",
+        "description": "Have a question or want to learn more? We'd love to hear from you.",
+        "show_phone": true,
+        "show_subject": true,
+        "subject_options": "General Inquiry, Product Question, Order Support, Partnership"
+      }
+    },
+    "contact_info": {
+      "type": "contact-info",
+      "settings": {
+        "title": "Contact Information",
+        "support_hours": "Monday - Friday: 9:00 AM - 6:00 PM",
+        "show_social": true
+      }
+    }
+  },
+  "order": [
+    "contact_form",
+    "contact_info"
+  ]
+}

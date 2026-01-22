@@ -76,10 +76,23 @@
 
 {% stylesheet %}
   .testimonials {
-    width: 100vw;
-    max-width: 100vw;
-    padding: var(--spacing-4xl) var(--spacing-lg);
-    background-color: var(--bg);
+    width: 100%;
+    max-width: 100%;
+    padding: var(--spacing-5xl) var(--spacing-lg);
+    background: linear-gradient(180deg, rgba(250, 250, 250, 0.5) 0%, var(--white) 50%, rgba(250, 250, 250, 0.5) 100%);
+    position: relative;
+    overflow: hidden;
+    box-sizing: border-box;
+  }
+
+  .testimonials::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold) 30%, rgba(74, 124, 44, 0.3) 50%, var(--gold) 70%, transparent);
   }
 
   .testimonials__container {
@@ -90,10 +103,16 @@
   .testimonials__title {
     text-align: center;
     font-family: var(--font-heading);
-    font-size: var(--h2-size);
-    font-weight: 700;
-    color: var(--forest-green);
+    font-size: clamp(40px, 5vw, 64px);
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--forest-green) 0%, var(--sage-green) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
     margin-bottom: var(--spacing-3xl);
+    margin-top: var(--spacing-2xl);
+    letter-spacing: -0.03em;
+    padding: 10px;
   }
 
   .testimonials__carousel {
@@ -114,11 +133,26 @@
   }
 
   .testimonial-card__content {
-    background-color: var(--white);
-    padding: var(--spacing-2xl);
+    background: linear-gradient(135deg, var(--white) 0%, rgba(250, 250, 250, 0.9) 100%);
+    padding: var(--spacing-3xl);
     border-radius: var(--radius-xl);
-    box-shadow: var(--shadow-md);
+    box-shadow: 0 10px 40px rgba(45, 80, 22, 0.1), 0 0 0 1px rgba(74, 124, 44, 0.05);
     text-align: center;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .testimonial-card__content::before {
+    content: '"';
+    position: absolute;
+    top: -20px;
+    left: 30px;
+    font-size: 120px;
+    font-family: var(--font-heading);
+    color: rgba(212, 175, 55, 0.1);
+    line-height: 1;
+    font-weight: 900;
   }
 
   .testimonial-card__rating {
@@ -135,6 +169,19 @@
 
   .star--filled {
     color: var(--gold);
+    filter: drop-shadow(0 2px 4px rgba(212, 175, 55, 0.3));
+    animation: star-twinkle 2s ease-in-out infinite;
+  }
+
+  @keyframes star-twinkle {
+    0%, 100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.8;
+      transform: scale(1.1);
+    }
   }
 
   .testimonial-card__text {

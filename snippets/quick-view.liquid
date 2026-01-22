@@ -1,0 +1,341 @@
+{% comment %}
+  Quick View Modal Component
+  Usage: {% render 'quick-view', product: product %}
+{% endcomment %}
+
+<div class="quick-view" id="quick-view-{{ product.id }}" data-quick-view-modal>
+  <div class="quick-view__overlay" data-quick-view-close></div>
+  
+  <div class="quick-view__modal">
+    <button type="button" class="quick-view__close" data-quick-view-close aria-label="Close quick view">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+
+    <div class="quick-view__content">
+      <div class="quick-view__image">
+        {% if product.featured_image %}
+          <img 
+            src="{{ product.featured_image | image_url: width: 600 }}" 
+            alt="{{ product.featured_image.alt | default: product.title }}"
+            loading="lazy"
+            width="600"
+            height="600"
+          >
+        {% else %}
+          {{ 'product-1' | placeholder_svg_tag: 'placeholder' }}
+        {% endif %}
+      </div>
+
+      <div class="quick-view__info">
+        <h2 class="quick-view__title">{{ product.title }}</h2>
+        
+        <div class="quick-view__price">
+          {% if product.compare_at_price > product.price %}
+            <span class="price-compare">{{ product.compare_at_price | money }}</span>
+          {% endif %}
+          <span class="price-current">{{ product.price | money }}</span>
+        </div>
+
+        {% if product.description != blank %}
+          <div class="quick-view__description">
+            {{ product.description | strip_html | truncatewords: 30 }}
+          </div>
+        {% endif %}
+
+        {% if product.tags.size > 0 %}
+          <div class="quick-view__badges">
+            {% assign health_tags = product.tags | where: 'health-' %}
+            {% for tag in health_tags limit: 3 %}
+              <span class="badge badge--health">{{ tag | remove: 'health-' | capitalize }}</span>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        <form action="/cart/add" method="post" enctype="multipart/form-data" class="quick-view__form">
+          {% if product.variants.size > 1 %}
+            <select name="id" class="quick-view__variant-select">
+              {% for variant in product.variants %}
+                <option value="{{ variant.id }}" {% if variant == product.selected_or_first_available_variant %}selected{% endif %}>
+                  {{ variant.title }} - {{ variant.price | money }}
+                </option>
+              {% endfor %}
+            </select>
+          {% else %}
+            <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+          {% endif %}
+
+          <div class="quick-view__quantity">
+            <label for="quantity-{{ product.id }}">Quantity:</label>
+            <input 
+              type="number" 
+              id="quantity-{{ product.id }}" 
+              name="quantity" 
+              value="1" 
+              min="1" 
+              class="quantity-input"
+            >
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-large quick-view__add-to-cart">
+            Add to Cart
+          </button>
+        </form>
+
+        <a href="{{ product.url }}" class="quick-view__view-full">
+          View Full Details
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M6 12L10 8L6 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% stylesheet %}
+  .quick-view {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: var(--z-modal);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-lg);
+  }
+
+  .quick-view.active {
+    display: flex;
+  }
+
+  .quick-view__overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+  }
+
+  .quick-view__modal {
+    position: relative;
+    width: 100%;
+    max-width: 900px;
+    max-height: 90vh;
+    background-color: var(--white);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-2xl);
+    overflow: hidden;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .quick-view__close {
+    position: absolute;
+    top: var(--spacing-md);
+    right: var(--spacing-md);
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--white);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-full);
+    color: var(--text);
+    cursor: pointer;
+    z-index: 2;
+    transition: all var(--transition-base);
+  }
+
+  .quick-view__close:hover {
+    background-color: var(--forest-green);
+    color: var(--white);
+    border-color: var(--forest-green);
+  }
+
+  .quick-view__content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-2xl);
+    padding: var(--spacing-2xl);
+    overflow-y: auto;
+  }
+
+  .quick-view__image {
+    position: relative;
+    width: 100%;
+    padding-top: 100%;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background-color: var(--bg);
+  }
+
+  .quick-view__image img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .quick-view__info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+  }
+
+  .quick-view__title {
+    font-family: var(--font-heading);
+    font-size: var(--h2-size);
+    font-weight: 700;
+    color: var(--forest-green);
+    margin: 0;
+  }
+
+  .quick-view__price {
+    display: flex;
+    align-items: baseline;
+    gap: var(--spacing-sm);
+  }
+
+  .price-compare {
+    font-size: var(--body-large);
+    color: rgba(26, 26, 26, 0.5);
+    text-decoration: line-through;
+  }
+
+  .price-current {
+    font-family: var(--font-heading);
+    font-size: var(--h3-size);
+    font-weight: 700;
+    color: var(--gold);
+  }
+
+  .quick-view__description {
+    font-size: var(--body-normal);
+    color: rgba(26, 26, 26, 0.7);
+    line-height: 1.7;
+  }
+
+  .quick-view__badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+  }
+
+  .badge--health {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    background-color: rgba(74, 124, 44, 0.1);
+    color: var(--sage-green);
+    font-size: var(--body-small);
+    font-weight: 600;
+    border-radius: var(--radius-full);
+  }
+
+  .quick-view__form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+
+  .quick-view__variant-select {
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    font-size: var(--body-normal);
+  }
+
+  .quick-view__quantity {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+  }
+
+  .quick-view__quantity label {
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .quantity-input {
+    width: 80px;
+    padding: var(--spacing-sm);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    text-align: center;
+  }
+
+  .quick-view__view-full {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    color: var(--sage-green);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color var(--transition-base);
+  }
+
+  .quick-view__view-full:hover {
+    color: var(--forest-green);
+  }
+
+  @media (max-width: 768px) {
+    .quick-view__content {
+      grid-template-columns: 1fr;
+      gap: var(--spacing-lg);
+      padding: var(--spacing-lg);
+    }
+
+    .quick-view__image {
+      padding-top: 100%;
+    }
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  (function() {
+    'use strict';
+
+    // Open quick view
+    document.addEventListener('click', function(e) {
+      const quickViewBtn = e.target.closest('[data-quick-view]');
+      if (quickViewBtn) {
+        const productId = quickViewBtn.dataset.quickView;
+        const modal = document.getElementById('quick-view-' + productId);
+        if (modal) {
+          modal.classList.add('active');
+          document.body.style.overflow = 'hidden';
+        }
+      }
+    });
+
+    // Close quick view
+    document.addEventListener('click', function(e) {
+      if (e.target.closest('[data-quick-view-close]')) {
+        const modal = e.target.closest('.quick-view');
+        if (modal) {
+          modal.classList.remove('active');
+          document.body.style.overflow = '';
+        }
+      }
+    });
+
+    // Close on Escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        const activeModal = document.querySelector('.quick-view.active');
+        if (activeModal) {
+          activeModal.classList.remove('active');
+          document.body.style.overflow = '';
+        }
+      }
+    });
+  })();
+{% endjavascript %}

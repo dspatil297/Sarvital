@@ -1,0 +1,550 @@
+<section class="product-filters" id="product-filters">
+  <div class="product-filters__container">
+    <!-- Mobile Filter Toggle -->
+    <div class="product-filters__mobile-header">
+      <button type="button" class="product-filters__toggle show-mobile" data-filter-toggle aria-label="Toggle filters">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M2 5H18M2 10H18M2 15H18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>Filters</span>
+        {% if current_tags.size > 0 %}
+          <span class="filter-count-badge">{{ current_tags.size }}</span>
+        {% endif %}
+      </button>
+      
+      <!-- Active Filters Display -->
+      {% if current_tags.size > 0 %}
+        <div class="product-filters__active">
+          {% for tag in current_tags %}
+            <span class="active-filter-chip">
+              {{ tag | remove: 'health-' | remove: 'usage-' | remove: 'ingredient-' | remove: 'diet-' | capitalize }}
+              <a href="{{ tag | link_to_remove_tag: tag }}" class="remove-filter" aria-label="Remove filter">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M10 4L4 10M4 4L10 10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+              </a>
+            </span>
+          {% endfor %}
+          <a href="{{ collection.url }}" class="clear-all-filters">Clear All</a>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Filter Sidebar -->
+    <div class="product-filters__sidebar" data-filter-sidebar>
+      <div class="product-filters__content">
+        <div class="product-filters__header">
+          <h2 class="product-filters__title">Filter Products</h2>
+          <button type="button" class="product-filters__close show-mobile" data-filter-close aria-label="Close filters">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+
+        <form class="product-filters__form" action="{{ collection.url }}" method="get">
+          <!-- Health Benefits Filter -->
+          <div class="filter-group">
+            <h3 class="filter-group__title">Health Benefits</h3>
+            <div class="filter-group__options">
+              <label class="filter-checkbox">
+                <input type="checkbox" name="filter" value="health-immunity" {% if current_tags contains 'health-immunity' %}checked{% endif %}>
+                <span class="checkmark"></span>
+                <span class="filter-label">Immunity Support</span>
+              </label>
+              <label class="filter-checkbox">
+                <input type="checkbox" name="filter" value="health-digestion" {% if current_tags contains 'health-digestion' %}checked{% endif %}>
+                <span class="checkmark"></span>
+                <span class="filter-label">Digestive Health</span>
+              </label>
+              <label class="filter-checkbox">
+                <input type="checkbox" name="filter" value="health-energy" {% if current_tags contains 'health-energy' %}checked{% endif %}>
+                <span class="checkmark"></span>
+                <span class="filter-label">Energy & Vitality</span>
+              </label>
+              <label class="filter-checkbox">
+                <input type="checkbox" name="filter" value="health-detox" {% if current_tags contains 'health-detox' %}checked{% endif %}>
+                <span class="checkmark"></span>
+                <span class="filter-label">Detoxification</span>
+              </label>
+              <label class="filter-checkbox">
+                <input type="checkbox" name="filter" value="health-heart" {% if current_tags contains 'health-heart' %}checked{% endif %}>
+                <span class="checkmark"></span>
+                <span class="filter-label">Heart Health</span>
+              </label>
+              <label class="filter-checkbox">
+                <input type="checkbox" name="filter" value="health-skin" {% if current_tags contains 'health-skin' %}checked{% endif %}>
+                <span class="checkmark"></span>
+                <span class="filter-label">Skin Health</span>
+              </label>
+              <label class="filter-checkbox">
+                <input type="checkbox" name="filter" value="health-bones" {% if current_tags contains 'health-bones' %}checked{% endif %}>
+                <span class="checkmark"></span>
+                <span class="filter-label">Bone & Joint Health</span>
+              </label>
+              <label class="filter-checkbox">
+                <input type="checkbox" name="filter" value="health-brain" {% if current_tags contains 'health-brain' %}checked{% endif %}>
+                <span class="checkmark"></span>
+                <span class="filter-label">Brain Function</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Usage/Lifestyle Filter -->
+          <div class="filter-group">
+            <h3 class="filter-group__title">Usage</h3>
+            <div class="filter-group__options">
+              <label class="filter-checkbox">
+                <input type="checkbox" name="filter" value="usage-daily" {% if current_tags contains 'usage-daily' %}checked{% endif %}>
+                <span class="checkmark"></span>
+                <span class="filter-label">Daily Wellness</span>
+              </label>
+              <label class="filter-checkbox">
+                <input type="checkbox" name="filter" value="usage-smoothie" {% if current_tags contains 'usage-smoothie' %}checked{% endif %}>
+                <span class="checkmark"></span>
+                <span class="filter-label">Smoothie Ingredients</span>
+              </label>
+              <label class="filter-checkbox">
+                <input type="checkbox" name="filter" value="usage-cooking" {% if current_tags contains 'usage-cooking' %}checked{% endif %}>
+                <span class="checkmark"></span>
+                <span class="filter-label">Cooking & Baking</span>
+              </label>
+              <label class="filter-checkbox">
+                <input type="checkbox" name="filter" value="usage-post-workout" {% if current_tags contains 'usage-post-workout' %}checked{% endif %}>
+                <span class="checkmark"></span>
+                <span class="filter-label">Post-Workout</span>
+              </label>
+              <label class="filter-checkbox">
+                <input type="checkbox" name="filter" value="usage-breakfast" {% if current_tags contains 'usage-breakfast' %}checked{% endif %}>
+                <span class="checkmark"></span>
+                <span class="filter-label">Breakfast Addition</span>
+              </label>
+              <label class="filter-checkbox">
+                <input type="checkbox" name="filter" value="usage-snack" {% if current_tags contains 'usage-snack' %}checked{% endif %}>
+                <span class="checkmark"></span>
+                <span class="filter-label">Healthy Snacking</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Ingredient Type Filter -->
+          <div class="filter-group">
+            <h3 class="filter-group__title">Ingredient Type</h3>
+            <div class="filter-group__options">
+              <label class="filter-checkbox">
+                <input type="checkbox" name="filter" value="ingredient-fruit" {% if current_tags contains 'ingredient-fruit' %}checked{% endif %}>
+                <span class="checkmark"></span>
+                <span class="filter-label">Fruit Powders</span>
+              </label>
+              <label class="filter-checkbox">
+                <input type="checkbox" name="filter" value="ingredient-vegetable" {% if current_tags contains 'ingredient-vegetable' %}checked{% endif %}>
+                <span class="checkmark"></span>
+                <span class="filter-label">Vegetable Powders</span>
+              </label>
+              <label class="filter-checkbox">
+                <input type="checkbox" name="filter" value="ingredient-green" {% if current_tags contains 'ingredient-green' %}checked{% endif %}>
+                <span class="checkmark"></span>
+                <span class="filter-label">Green Superfoods</span>
+              </label>
+              <label class="filter-checkbox">
+                <input type="checkbox" name="filter" value="ingredient-berry" {% if current_tags contains 'ingredient-berry' %}checked{% endif %}>
+                <span class="checkmark"></span>
+                <span class="filter-label">Berry Powders</span>
+              </label>
+              <label class="filter-checkbox">
+                <input type="checkbox" name="filter" value="ingredient-root" {% if current_tags contains 'ingredient-root' %}checked{% endif %}>
+                <span class="checkmark"></span>
+                <span class="filter-label">Root Vegetables</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Dietary Tags Filter -->
+          <div class="filter-group">
+            <h3 class="filter-group__title">Dietary</h3>
+            <div class="filter-group__options">
+              <label class="filter-checkbox">
+                <input type="checkbox" name="filter" value="diet-vegan" {% if current_tags contains 'diet-vegan' %}checked{% endif %}>
+                <span class="checkmark"></span>
+                <span class="filter-label">Vegan</span>
+              </label>
+              <label class="filter-checkbox">
+                <input type="checkbox" name="filter" value="diet-organic" {% if current_tags contains 'diet-organic' %}checked{% endif %}>
+                <span class="checkmark"></span>
+                <span class="filter-label">Organic</span>
+              </label>
+              <label class="filter-checkbox">
+                <input type="checkbox" name="filter" value="diet-glutenfree" {% if current_tags contains 'diet-glutenfree' %}checked{% endif %}>
+                <span class="checkmark"></span>
+                <span class="filter-label">Gluten-Free</span>
+              </label>
+              <label class="filter-checkbox">
+                <input type="checkbox" name="filter" value="diet-natural" {% if current_tags contains 'diet-natural' %}checked{% endif %}>
+                <span class="checkmark"></span>
+                <span class="filter-label">100% Natural</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="product-filters__actions">
+            <button type="submit" class="btn btn-primary">Apply Filters</button>
+            <a href="{{ collection.url }}" class="btn btn-outline">Clear All</a>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Filter Overlay (Mobile) -->
+    <div class="product-filters__overlay" data-filter-overlay></div>
+  </div>
+</section>
+
+{% stylesheet %}
+  .product-filters {
+    position: relative;
+  }
+
+  @media (min-width: 769px) {
+    .product-filters {
+      position: sticky;
+      top: var(--spacing-lg);
+      align-self: flex-start;
+      padding: var(--spacing-lg);
+      background-color: var(--white);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-color);
+    }
+  }
+
+  .product-filters__mobile-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-lg);
+    background-color: var(--white);
+    border-bottom: 1px solid var(--border-color);
+    gap: var(--spacing-md);
+    flex-wrap: wrap;
+  }
+
+  .product-filters__toggle {
+    display: none;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm) var(--spacing-md);
+    background-color: var(--white);
+    border: 2px solid var(--sage-green);
+    border-radius: var(--radius-md);
+    color: var(--forest-green);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-base);
+  }
+
+  .product-filters__toggle:hover {
+    background-color: var(--sage-green);
+    color: var(--white);
+  }
+
+  .filter-count-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 var(--spacing-xs);
+    background-color: var(--gold);
+    color: var(--text);
+    font-size: var(--body-xs);
+    font-weight: 700;
+    border-radius: var(--radius-full);
+  }
+
+  .product-filters__active {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
+    flex: 1;
+  }
+
+  .active-filter-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    background-color: rgba(74, 124, 44, 0.1);
+    color: var(--sage-green);
+    font-size: var(--body-small);
+    font-weight: 500;
+    border-radius: var(--radius-full);
+  }
+
+  .remove-filter {
+    display: flex;
+    align-items: center;
+    color: var(--sage-green);
+    text-decoration: none;
+    transition: color var(--transition-fast);
+  }
+
+  .remove-filter:hover {
+    color: var(--forest-green);
+  }
+
+  .clear-all-filters {
+    font-size: var(--body-small);
+    color: var(--sage-green);
+    text-decoration: underline;
+  }
+
+  .clear-all-filters:hover {
+    color: var(--forest-green);
+  }
+
+  .product-filters__sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 320px;
+    height: 100vh;
+    background-color: var(--white);
+    box-shadow: var(--shadow-xl);
+    transform: translateX(-100%);
+    transition: transform var(--transition-base);
+    z-index: var(--z-modal);
+    overflow-y: auto;
+  }
+
+  .product-filters__sidebar.active {
+    transform: translateX(0);
+  }
+
+  .product-filters__content {
+    padding: var(--spacing-lg);
+  }
+
+  .product-filters__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--spacing-xl);
+    padding-bottom: var(--spacing-lg);
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .product-filters__title {
+    font-family: var(--font-heading);
+    font-size: var(--h3-size);
+    font-weight: 700;
+    color: var(--forest-green);
+    margin: 0;
+  }
+
+  .product-filters__close {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--text);
+    cursor: pointer;
+    padding: var(--spacing-sm);
+  }
+
+  .filter-group {
+    margin-bottom: var(--spacing-2xl);
+  }
+
+  .filter-group__title {
+    font-family: var(--font-heading);
+    font-size: var(--h5-size);
+    font-weight: 600;
+    color: var(--forest-green);
+    margin-bottom: var(--spacing-md);
+  }
+
+  .filter-group__options {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+
+  .filter-checkbox {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    cursor: pointer;
+    padding: var(--spacing-xs) 0;
+  }
+
+  .filter-checkbox input[type="checkbox"] {
+    display: none;
+  }
+
+  .checkmark {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    position: relative;
+    flex-shrink: 0;
+    transition: all var(--transition-base);
+  }
+
+  .filter-checkbox input[type="checkbox"]:checked + .checkmark {
+    background-color: var(--sage-green);
+    border-color: var(--sage-green);
+  }
+
+  .filter-checkbox input[type="checkbox"]:checked + .checkmark::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 6px;
+    width: 5px;
+    height: 10px;
+    border: solid var(--white);
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+
+  .filter-label {
+    font-size: var(--body-normal);
+    color: var(--text);
+    user-select: none;
+  }
+
+  .filter-checkbox:hover .filter-label {
+    color: var(--sage-green);
+  }
+
+  .product-filters__actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-xl);
+    padding-top: var(--spacing-xl);
+    border-top: 1px solid var(--border-color);
+  }
+
+  .product-filters__overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: calc(var(--z-modal) - 1);
+    opacity: 0;
+    visibility: hidden;
+    transition: all var(--transition-base);
+  }
+
+  .product-filters__overlay.active {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  /* Desktop Styles */
+  @media (min-width: 769px) {
+    .product-filters {
+      position: sticky;
+      top: var(--spacing-lg);
+      align-self: flex-start;
+    }
+
+    .product-filters__mobile-header {
+      display: none;
+    }
+
+    .product-filters__sidebar {
+      position: static;
+      width: 100%;
+      height: auto;
+      transform: none;
+      box-shadow: none;
+      border: none;
+    }
+
+    .product-filters__sidebar.active {
+      transform: none;
+    }
+
+    .product-filters__close {
+      display: none;
+    }
+
+    .product-filters__overlay {
+      display: none !important;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .product-filters__toggle {
+      display: flex;
+    }
+
+    .product-filters__close {
+      display: block;
+    }
+
+    .product-filters__overlay {
+      display: block;
+    }
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  (function() {
+    'use strict';
+
+    const filterToggle = document.querySelector('[data-filter-toggle]');
+    const filterSidebar = document.querySelector('[data-filter-sidebar]');
+    const filterOverlay = document.querySelector('[data-filter-overlay]');
+    const filterClose = document.querySelector('[data-filter-close]');
+
+    function openFilters() {
+      filterSidebar.classList.add('active');
+      filterOverlay.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeFilters() {
+      filterSidebar.classList.remove('active');
+      filterOverlay.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    if (filterToggle) {
+      filterToggle.addEventListener('click', openFilters);
+    }
+
+    if (filterClose) {
+      filterClose.addEventListener('click', closeFilters);
+    }
+
+    if (filterOverlay) {
+      filterOverlay.addEventListener('click', closeFilters);
+    }
+
+    // Auto-submit on checkbox change (desktop)
+    if (window.innerWidth >= 769) {
+      const checkboxes = document.querySelectorAll('.filter-checkbox input[type="checkbox"]');
+      checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+          // Small delay to allow multiple selections
+          setTimeout(() => {
+            this.closest('form').submit();
+          }, 300);
+        });
+      });
+    }
+  })();
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Product Filters",
+  "settings": []
+}
+{% endschema %}
