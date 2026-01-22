@@ -1,0 +1,1 @@
+G:/fire fist/sarvitalv2/Sarvital/AGENTS.md
