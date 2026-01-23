@@ -2,49 +2,57 @@
 <html lang="{{ request.locale.iso_code }}">
   <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     
-    {% # Google Fonts - Preconnect for faster loading %}
-    <link rel="preconnect" href="https://fonts.googleapis.com">
+    {%- comment -%} Performance: Resource Hints {%- endcomment -%}
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
     
-    {% # Inlined CSS Variables %}
+    {%- comment -%} Performance: Font Loading Optimization {%- endcomment -%}
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&family=Inter:wght@300;400;500;600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"></noscript>
+    
+    {%- comment -%} Inlined CSS Variables {%- endcomment -%}
     {% render 'css-variables' %}
 
-    {% comment %}
+    {%- comment -%}
       Font preloading:
       1. Preconnect to font CDN for faster connection
       2. Preload only the critical font variant (base weight)
       3. Additional variants load on-demand via @font-face
-    {% endcomment %}
+    {%- endcomment -%}
     {% unless settings.type_primary_font.system? %}
       <link rel="preconnect" href="https://fonts.shopifycdn.com" crossorigin>
-
-      {% comment %} Preload the base font variant for initial page render {% endcomment %}
       {{ settings.type_primary_font | font_url | preload_tag: as: 'font', crossorigin: 'anonymous' }}
     {% endunless %}
 
-    {% # Load and preload the critical CSS %}
+    {%- comment -%} Critical CSS - Load with preload {%- endcomment -%}
     {{ 'critical.css' | asset_url | stylesheet_tag: preload: true }}
 
-    {% # Social, title, etc. %}
+    {%- comment -%} SEO Meta Tags {%- endcomment -%}
     {% render 'meta-tags' %}
 
     {{ content_for_header }}
   </head>
 
-  <body>
+  <body class="template-{{ request.page_type | handle }}">
+    {%- comment -%} Skip to main content link for accessibility {%- endcomment -%}
+    <a href="#main-content" class="skip-to-main">{{ 'general.accessibility.skip_to_content' | t | default: 'Skip to main content' }}</a>
+    
     {% sections 'header-group' %}
 
-    {{ content_for_layout }}
+    <main id="main-content" role="main" tabindex="-1">
+      {{ content_for_layout }}
+    </main>
 
     {% sections 'footer-group' %}
 
-    {% # Cart Drawer %}
+    {%- comment -%} Cart Drawer {%- endcomment -%}
     {% render 'cart-drawer' %}
 
-    {% # Base JavaScript %}
-    {{ 'application.js' | asset_url | script_tag }}
+    {%- comment -%} Base JavaScript - Load with defer for better performance {%- endcomment -%}
+    {{ 'application.js' | asset_url | script_tag: defer: true }}
   </body>
 </html>

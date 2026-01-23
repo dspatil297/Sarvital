@@ -1,5 +1,5 @@
 {% comment %}
-  Product Quality & Certifications Section
+  Product Quality & Certifications Section - Minimalist Design
 {% endcomment %}
 
 <section class="product-quality">
@@ -29,28 +29,6 @@
         {% endfor %}
       </div>
     {% endif %}
-    
-    {% if section.settings.source_info != blank or section.settings.processing_info != blank %}
-      <div class="product-quality__details">
-        {% if section.settings.source_info != blank %}
-          <div class="quality-detail">
-            <h3>Source Information</h3>
-            <div class="quality-detail__content">
-              {{ section.settings.source_info }}
-            </div>
-          </div>
-        {% endif %}
-        
-        {% if section.settings.processing_info != blank %}
-          <div class="quality-detail">
-            <h3>Processing Method</h3>
-            <div class="quality-detail__content">
-              {{ section.settings.processing_info }}
-            </div>
-          </div>
-        {% endif %}
-      </div>
-    {% endif %}
   </div>
 </section>
 
@@ -58,8 +36,8 @@
   .product-quality {
     width: 100%;
     max-width: 100%;
-    padding: var(--spacing-5xl) var(--spacing-lg);
-    background: linear-gradient(135deg, rgba(74, 124, 44, 0.03) 0%, rgba(212, 175, 55, 0.02) 100%);
+    padding: 80px var(--spacing-lg);
+    background: var(--white);
     box-sizing: border-box;
   }
 
@@ -71,139 +49,102 @@
   .product-quality__title {
     text-align: center;
     font-family: var(--font-heading);
-    font-size: clamp(36px, 4.5vw, 56px);
-    font-weight: 900;
-    background: linear-gradient(135deg, var(--forest-green) 0%, var(--sage-green) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin-bottom: var(--spacing-4xl);
-    letter-spacing: -0.02em;
-    line-height: 1.2;
-    padding: 10px;
-    margin-top: var(--spacing-2xl);
+    font-size: 48px;
+    font-weight: 300;
+    color: var(--text);
+    margin-bottom: 60px;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
   }
 
   .product-quality__badges {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: var(--spacing-xl);
-    margin-bottom: var(--spacing-4xl);
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
   }
 
   .quality-badge-card {
     text-align: center;
-    padding: var(--spacing-2xl);
-    background: linear-gradient(135deg, var(--white) 0%, rgba(250, 250, 250, 0.8) 100%);
-    border-radius: var(--radius-xl);
-    border: 2px solid rgba(74, 124, 44, 0.15);
-    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 4px 20px rgba(45, 80, 22, 0.08);
-  }
-
-  .quality-badge-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, rgba(212, 175, 55, 0.05) 0%, transparent 100%);
-    opacity: 0;
-    transition: opacity 0.4s ease;
+    padding: 40px 30px;
+    background: var(--bg);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
   }
 
   .quality-badge-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 20px 50px rgba(45, 80, 22, 0.15);
-    border-color: var(--gold);
-  }
-
-  .quality-badge-card:hover::before {
-    opacity: 1;
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(45, 80, 22, 0.1);
+    border-color: var(--sage-green);
   }
 
   .quality-badge-card__icon {
-    width: 80px;
-    height: 80px;
-    margin: 0 auto var(--spacing-lg);
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 24px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, rgba(74, 124, 44, 0.1) 0%, rgba(212, 175, 55, 0.1) 100%);
-    border-radius: var(--radius-full);
-    transition: all 0.4s ease;
+    background: rgba(74, 124, 44, 0.08);
+    border-radius: 50%;
+    transition: all 0.3s ease;
   }
 
   .quality-badge-card__icon svg {
-    width: 40px;
-    height: 40px;
+    width: 28px;
+    height: 28px;
     color: var(--forest-green);
-    transition: all 0.4s ease;
   }
 
   .quality-badge-card:hover .quality-badge-card__icon {
-    background: linear-gradient(135deg, var(--sage-green) 0%, var(--gold) 100%);
-    transform: scale(1.1) rotate(5deg);
+    background: var(--forest-green);
   }
 
   .quality-badge-card:hover .quality-badge-card__icon svg {
     color: var(--white);
-    transform: scale(1.1);
   }
 
   .quality-badge-card__title {
     font-family: var(--font-heading);
-    font-size: var(--h4-size);
-    font-weight: 700;
+    font-size: 20px;
+    font-weight: 600;
     color: var(--forest-green);
-    margin-bottom: var(--spacing-sm);
+    margin-bottom: 12px;
     line-height: 1.3;
   }
 
   .quality-badge-card__description {
-    font-size: var(--body-normal);
-    color: var(--text);
-    line-height: 1.7;
+    font-size: 15px;
+    color: rgba(26, 26, 26, 0.65);
+    line-height: 1.6;
     margin: 0;
+    font-weight: 300;
   }
 
-  .product-quality__details {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: var(--spacing-xl);
-  }
-
-  .quality-detail {
-    background: var(--white);
-    padding: var(--spacing-xl);
-    border-radius: var(--radius-lg);
-    box-shadow: 0 4px 20px rgba(45, 80, 22, 0.08);
-    border-top: 4px solid var(--gold);
-  }
-
-  .quality-detail h3 {
-    font-family: var(--font-heading);
-    font-size: var(--h4-size);
-    color: var(--forest-green);
-    margin-bottom: var(--spacing-md);
-  }
-
-  .quality-detail__content {
-    font-size: var(--body-normal);
-    line-height: 1.7;
-    color: var(--text);
+  @media (max-width: 968px) {
+    .product-quality__badges {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 30px;
+    }
   }
 
   @media (max-width: 768px) {
-    .product-quality__badges {
-      grid-template-columns: 1fr;
+    .product-quality {
+      padding: 60px var(--spacing-md);
     }
 
-    .product-quality__details {
+    .product-quality__title {
+      font-size: 36px;
+      margin-bottom: 40px;
+    }
+
+    .product-quality__badges {
       grid-template-columns: 1fr;
+      gap: 24px;
+    }
+
+    .quality-badge-card {
+      padding: 32px 24px;
     }
   }
 {% endstylesheet %}
@@ -217,16 +158,6 @@
       "id": "title",
       "label": "Section Title",
       "default": "Quality & Certifications"
-    },
-    {
-      "type": "richtext",
-      "id": "source_info",
-      "label": "Source Information"
-    },
-    {
-      "type": "richtext",
-      "id": "processing_info",
-      "label": "Processing Method Information"
     }
   ],
   "blocks": [

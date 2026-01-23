@@ -1,5 +1,5 @@
 {% comment %}
-  Product Benefits Section - Key benefits with icons
+  Product Benefits Section - Minimalist Design
 {% endcomment %}
 
 <section class="product-benefits">
@@ -29,25 +29,6 @@
         {% endfor %}
       </div>
     {% endif %}
-    
-    {% if section.settings.show_expandable %}
-      <div class="product-benefits__expandable">
-        <button type="button" class="product-benefits__expand-btn" data-expand-benefits>
-          <span>Learn More About Benefits</span>
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>
-        
-        <div class="product-benefits__expanded-content" data-expanded-content>
-          {% if section.settings.expanded_content != blank %}
-            <div class="product-benefits__expanded-text">
-              {{ section.settings.expanded_content }}
-            </div>
-          {% endif %}
-        </div>
-      </div>
-    {% endif %}
   </div>
 </section>
 
@@ -55,8 +36,8 @@
   .product-benefits {
     width: 100%;
     max-width: 100%;
-    padding: var(--spacing-5xl) var(--spacing-lg);
-    background: linear-gradient(180deg, var(--white) 0%, rgba(250, 250, 250, 0.5) 50%, var(--white) 100%);
+    padding: 80px var(--spacing-lg);
+    background: var(--bg);
     box-sizing: border-box;
   }
 
@@ -68,188 +49,105 @@
   .product-benefits__title {
     text-align: center;
     font-family: var(--font-heading);
-    font-size: clamp(36px, 4.5vw, 56px);
-    font-weight: 900;
-    background: linear-gradient(135deg, var(--forest-green) 0%, var(--sage-green) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin-bottom: var(--spacing-4xl);
-    letter-spacing: -0.02em;
-    line-height: 1.2;
-    padding: 10px;
-    margin-top: var(--spacing-2xl);
+    font-size: 48px;
+    font-weight: 300;
+    color: var(--text);
+    margin-bottom: 60px;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
   }
 
   .product-benefits__grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: var(--spacing-xl);
-    margin-bottom: var(--spacing-4xl);
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
   }
 
   .product-benefit {
     text-align: center;
-    padding: var(--spacing-2xl);
-    background: linear-gradient(135deg, var(--white) 0%, rgba(250, 250, 250, 0.8) 100%);
-    border-radius: var(--radius-xl);
-    border: 2px solid rgba(74, 124, 44, 0.1);
-    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    position: relative;
-    overflow: hidden;
-  }
-
-  .product-benefit::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 4px;
-    background: linear-gradient(90deg, var(--forest-green) 0%, var(--gold) 50%, var(--sage-green) 100%);
-    transform: scaleX(0);
-    transition: transform 0.4s ease;
+    padding: 40px 30px;
+    background: var(--white);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
   }
 
   .product-benefit:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 20px 50px rgba(45, 80, 22, 0.15);
-    border-color: rgba(74, 124, 44, 0.3);
-  }
-
-  .product-benefit:hover::before {
-    transform: scaleX(1);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(45, 80, 22, 0.1);
+    border-color: var(--sage-green);
   }
 
   .product-benefit__icon {
-    width: 80px;
-    height: 80px;
-    margin: 0 auto var(--spacing-lg);
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 24px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, rgba(74, 124, 44, 0.1) 0%, rgba(212, 175, 55, 0.1) 100%);
-    border-radius: var(--radius-full);
-    transition: all 0.4s ease;
+    background: rgba(74, 124, 44, 0.08);
+    border-radius: 50%;
+    transition: all 0.3s ease;
   }
 
   .product-benefit__icon svg {
-    width: 40px;
-    height: 40px;
+    width: 28px;
+    height: 28px;
     color: var(--forest-green);
-    transition: all 0.4s ease;
   }
 
   .product-benefit:hover .product-benefit__icon {
-    background: linear-gradient(135deg, var(--sage-green) 0%, var(--gold) 100%);
-    transform: scale(1.1) rotate(5deg);
+    background: var(--forest-green);
   }
 
   .product-benefit:hover .product-benefit__icon svg {
     color: var(--white);
-    transform: scale(1.1);
   }
 
   .product-benefit__title {
     font-family: var(--font-heading);
-    font-size: var(--h4-size);
-    font-weight: 700;
+    font-size: 20px;
+    font-weight: 600;
     color: var(--forest-green);
-    margin-bottom: var(--spacing-sm);
+    margin-bottom: 12px;
     line-height: 1.3;
   }
 
   .product-benefit__description {
-    font-size: var(--body-normal);
-    color: var(--text);
-    line-height: 1.7;
+    font-size: 15px;
+    color: rgba(26, 26, 26, 0.65);
+    line-height: 1.6;
     margin: 0;
+    font-weight: 300;
   }
 
-  .product-benefits__expandable {
-    text-align: center;
-    margin-top: var(--spacing-4xl);
-  }
-
-  .product-benefits__expand-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-    padding: var(--spacing-md) var(--spacing-2xl);
-    background: linear-gradient(135deg, var(--forest-green) 0%, var(--sage-green) 100%);
-    color: var(--white);
-    border: none;
-    border-radius: var(--radius-full);
-    font-size: var(--body-normal);
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
-
-  .product-benefits__expand-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(74, 124, 44, 0.3);
-  }
-
-  .product-benefits__expand-btn svg {
-    transition: transform 0.3s ease;
-  }
-
-  .product-benefits__expand-btn[aria-expanded="true"] svg {
-    transform: rotate(180deg);
-  }
-
-  .product-benefits__expanded-content {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.4s ease;
-    margin-top: var(--spacing-lg);
-  }
-
-  .product-benefits__expanded-content[aria-hidden="false"] {
-    max-height: 1000px;
-  }
-
-  .product-benefits__expanded-text {
-    padding: var(--spacing-xl);
-    background: rgba(74, 124, 44, 0.05);
-    border-radius: var(--radius-lg);
-    font-size: var(--body-large);
-    line-height: 1.8;
-    color: var(--text);
-    text-align: left;
+  @media (max-width: 968px) {
+    .product-benefits__grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 30px;
+    }
   }
 
   @media (max-width: 768px) {
+    .product-benefits {
+      padding: 60px var(--spacing-md);
+    }
+
+    .product-benefits__title {
+      font-size: 36px;
+      margin-bottom: 40px;
+    }
+
     .product-benefits__grid {
       grid-template-columns: 1fr;
-      gap: var(--spacing-lg);
+      gap: 24px;
     }
 
     .product-benefit {
-      padding: var(--spacing-xl);
+      padding: 32px 24px;
     }
   }
 {% endstylesheet %}
-
-{% javascript %}
-  document.addEventListener('DOMContentLoaded', function() {
-    const expandBtn = document.querySelector('[data-expand-benefits]');
-    const expandedContent = document.querySelector('[data-expanded-content]');
-    
-    if (expandBtn && expandedContent) {
-      expandBtn.addEventListener('click', function() {
-        const isExpanded = this.getAttribute('aria-expanded') === 'true';
-        this.setAttribute('aria-expanded', !isExpanded);
-        expandedContent.setAttribute('aria-hidden', isExpanded);
-      });
-      
-      // Initialize
-      expandBtn.setAttribute('aria-expanded', 'false');
-      expandedContent.setAttribute('aria-hidden', 'true');
-    }
-  });
-{% endjavascript %}
 
 {% schema %}
 {
@@ -260,18 +158,6 @@
       "id": "title",
       "label": "Section Title",
       "default": "Why Choose This Product"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_expandable",
-      "label": "Show Expandable Content",
-      "default": true
-    },
-    {
-      "type": "richtext",
-      "id": "expanded_content",
-      "label": "Expanded Content",
-      "default": "<p>Learn more about the comprehensive benefits of this product and how it can support your wellness journey.</p>"
     }
   ],
   "blocks": [

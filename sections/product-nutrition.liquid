@@ -1,5 +1,5 @@
 {% comment %}
-  Product Nutrition Information Section - Tabbed interface
+  Product Nutrition Information Section - Minimalist Design
 {% endcomment %}
 
 <section class="product-nutrition">
@@ -37,60 +37,110 @@
     
     <div class="product-nutrition__content">
       <div class="product-nutrition__panel active" data-panel="nutrition" aria-hidden="false">
-        {% if section.settings.nutrition_facts != blank %}
+        {% assign nutrition_html = product.metafields.custom.nutrition_facts | default: section.settings.nutrition_facts %}
+        {% if nutrition_html != blank %}
           <div class="nutrition-facts">
-            {{ section.settings.nutrition_facts }}
+            {{ nutrition_html }}
           </div>
         {% else %}
           <div class="nutrition-facts">
             <div class="nutrition-facts__header">
               <h3>Nutrition Facts</h3>
-              <p class="nutrition-facts__serving">Serving Size: {{ section.settings.serving_size | default: "1 scoop (10g)" }}</p>
+              {% assign serving_size = product.metafields.custom.serving_size | default: section.settings.serving_size | default: "1 scoop (10g)" %}
+              <p class="nutrition-facts__serving">Serving Size: {{ serving_size }}</p>
             </div>
-            <table class="nutrition-facts__table">
-              <tbody>
-                {% if section.settings.calories != blank %}
-                  <tr>
-                    <td class="nutrition-facts__label">Calories</td>
-                    <td class="nutrition-facts__value">{{ section.settings.calories }}</td>
-                  </tr>
-                {% endif %}
-                {% if section.settings.protein != blank %}
-                  <tr>
-                    <td class="nutrition-facts__label">Protein</td>
-                    <td class="nutrition-facts__value">{{ section.settings.protein }}g</td>
-                  </tr>
-                {% endif %}
-                {% if section.settings.carbs != blank %}
-                  <tr>
-                    <td class="nutrition-facts__label">Total Carbohydrates</td>
-                    <td class="nutrition-facts__value">{{ section.settings.carbs }}g</td>
-                  </tr>
-                {% endif %}
-                {% if section.settings.fiber != blank %}
-                  <tr>
-                    <td class="nutrition-facts__label">Dietary Fiber</td>
-                    <td class="nutrition-facts__value">{{ section.settings.fiber }}g</td>
-                  </tr>
-                {% endif %}
-                {% if section.settings.fat != blank %}
-                  <tr>
-                    <td class="nutrition-facts__label">Total Fat</td>
-                    <td class="nutrition-facts__value">{{ section.settings.fat }}g</td>
-                  </tr>
-                {% endif %}
-              </tbody>
-            </table>
+            <ul class="nutrition-facts__list">
+              {% assign calories = product.metafields.custom.calories | default: section.settings.calories %}
+              {% if calories != blank %}
+                <li class="nutrition-facts__item">
+                  <span class="nutrition-facts__label">Calories</span>
+                  <span class="nutrition-facts__value">{{ calories }}</span>
+                </li>
+              {% endif %}
+              
+              {% assign protein = product.metafields.custom.protein | default: section.settings.protein %}
+              {% if protein != blank %}
+                <li class="nutrition-facts__item">
+                  <span class="nutrition-facts__label">Protein</span>
+                  <span class="nutrition-facts__value">{{ protein }}{% unless protein contains 'g' %}g{% endunless %}</span>
+                </li>
+              {% endif %}
+              
+              {% assign carbs = product.metafields.custom.carbs | default: product.metafields.custom.carbohydrates | default: section.settings.carbs %}
+              {% if carbs != blank %}
+                <li class="nutrition-facts__item">
+                  <span class="nutrition-facts__label">Total Carbohydrates</span>
+                  <span class="nutrition-facts__value">{{ carbs }}{% unless carbs contains 'g' %}g{% endunless %}</span>
+                </li>
+              {% endif %}
+              
+              {% assign fiber = product.metafields.custom.fiber | default: product.metafields.custom.dietary_fiber | default: section.settings.fiber %}
+              {% if fiber != blank %}
+                <li class="nutrition-facts__item">
+                  <span class="nutrition-facts__label">Dietary Fiber</span>
+                  <span class="nutrition-facts__value">{{ fiber }}{% unless fiber contains 'g' %}g{% endunless %}</span>
+                </li>
+              {% endif %}
+              
+              {% assign fat = product.metafields.custom.fat | default: product.metafields.custom.total_fat | default: section.settings.fat %}
+              {% if fat != blank %}
+                <li class="nutrition-facts__item">
+                  <span class="nutrition-facts__label">Total Fat</span>
+                  <span class="nutrition-facts__value">{{ fat }}{% unless fat contains 'g' %}g{% endunless %}</span>
+                </li>
+              {% endif %}
+              
+              {% assign sugar = product.metafields.custom.sugar | default: product.metafields.custom.total_sugar %}
+              {% if sugar != blank %}
+                <li class="nutrition-facts__item">
+                  <span class="nutrition-facts__label">Total Sugar</span>
+                  <span class="nutrition-facts__value">{{ sugar }}{% unless sugar contains 'g' %}g{% endunless %}</span>
+                </li>
+              {% endif %}
+              
+              {% assign sodium = product.metafields.custom.sodium %}
+              {% if sodium != blank %}
+                <li class="nutrition-facts__item">
+                  <span class="nutrition-facts__label">Sodium</span>
+                  <span class="nutrition-facts__value">{{ sodium }}{% unless sodium contains 'mg' %}mg{% endunless %}</span>
+                </li>
+              {% endif %}
+              
+              {% assign vitamin_c = product.metafields.custom.vitamin_c %}
+              {% if vitamin_c != blank %}
+                <li class="nutrition-facts__item">
+                  <span class="nutrition-facts__label">Vitamin C</span>
+                  <span class="nutrition-facts__value">{{ vitamin_c }}</span>
+                </li>
+              {% endif %}
+              
+              {% assign iron = product.metafields.custom.iron %}
+              {% if iron != blank %}
+                <li class="nutrition-facts__item">
+                  <span class="nutrition-facts__label">Iron</span>
+                  <span class="nutrition-facts__value">{{ iron }}</span>
+                </li>
+              {% endif %}
+              
+              {% assign calcium = product.metafields.custom.calcium %}
+              {% if calcium != blank %}
+                <li class="nutrition-facts__item">
+                  <span class="nutrition-facts__label">Calcium</span>
+                  <span class="nutrition-facts__value">{{ calcium }}</span>
+                </li>
+              {% endif %}
+            </ul>
           </div>
         {% endif %}
       </div>
       
       <div class="product-nutrition__panel" data-panel="ingredients" aria-hidden="true">
-        {% if section.settings.ingredients != blank %}
+        {% assign ingredients = product.metafields.custom.ingredients | default: section.settings.ingredients %}
+        {% if ingredients != blank %}
           <div class="ingredients-list">
             <h3>Ingredients</h3>
             <div class="ingredients-list__content">
-              {{ section.settings.ingredients }}
+              {{ ingredients }}
             </div>
           </div>
         {% else %}
@@ -102,28 +152,18 @@
       </div>
       
       <div class="product-nutrition__panel" data-panel="allergens" aria-hidden="true">
-        {% if section.settings.allergen_info != blank %}
+        {% assign allergen_info = product.metafields.custom.allergen_info | default: product.metafields.custom.allergens | default: section.settings.allergen_info %}
+        {% if allergen_info != blank %}
           <div class="allergen-info">
             <h3>Allergen Information</h3>
             <div class="allergen-info__content">
-              {{ section.settings.allergen_info }}
+              {{ allergen_info }}
             </div>
           </div>
         {% else %}
           <div class="allergen-info">
             <h3>Allergen Information</h3>
             <p>This product is free from common allergens. Processed in a facility that may handle nuts, dairy, and soy.</p>
-          </div>
-        {% endif %}
-        
-        {% if section.settings.dietary_certifications.size > 0 %}
-          <div class="dietary-certifications">
-            <h4>Dietary Certifications</h4>
-            <div class="dietary-certifications__badges">
-              {% for certification in section.settings.dietary_certifications %}
-                <span class="dietary-badge">{{ certification }}</span>
-              {% endfor %}
-            </div>
           </div>
         {% endif %}
       </div>
@@ -135,52 +175,46 @@
   .product-nutrition {
     width: 100%;
     max-width: 100%;
-    padding: var(--spacing-5xl) var(--spacing-lg);
-    background: linear-gradient(135deg, rgba(74, 124, 44, 0.02) 0%, rgba(212, 175, 55, 0.02) 100%);
+    padding: 80px var(--spacing-lg);
+    background: var(--white);
     box-sizing: border-box;
   }
 
   .product-nutrition__container {
-    max-width: 1000px;
+    max-width: 900px;
     margin: 0 auto;
   }
 
   .product-nutrition__title {
     text-align: center;
     font-family: var(--font-heading);
-    font-size: clamp(36px, 4.5vw, 56px);
-    font-weight: 900;
-    background: linear-gradient(135deg, var(--forest-green) 0%, var(--sage-green) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin-bottom: var(--spacing-4xl);
-    letter-spacing: -0.02em;
-    line-height: 1.2;
-    padding: 10px;
-    margin-top: var(--spacing-2xl);
+    font-size: 48px;
+    font-weight: 300;
+    color: var(--text);
+    margin-bottom: 50px;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
   }
 
   .product-nutrition__tabs {
     display: flex;
-    gap: var(--spacing-sm);
-    margin-bottom: var(--spacing-2xl);
-    border-bottom: 2px solid rgba(74, 124, 44, 0.1);
-    flex-wrap: wrap;
+    gap: 0;
+    margin-bottom: 40px;
+    border-bottom: 1px solid var(--border-color);
   }
 
   .product-nutrition__tab {
-    padding: var(--spacing-md) var(--spacing-xl);
+    padding: 16px 32px;
     background: transparent;
     border: none;
-    border-bottom: 3px solid transparent;
-    font-size: var(--body-normal);
-    font-weight: 600;
-    color: var(--text);
+    border-bottom: 2px solid transparent;
+    font-size: 15px;
+    font-weight: 400;
+    color: rgba(26, 26, 26, 0.6);
     cursor: pointer;
     transition: all 0.3s ease;
     position: relative;
-    bottom: -2px;
+    bottom: -1px;
   }
 
   .product-nutrition__tab:hover {
@@ -189,12 +223,13 @@
 
   .product-nutrition__tab.active {
     color: var(--forest-green);
-    border-bottom-color: var(--gold);
+    border-bottom-color: var(--forest-green);
+    font-weight: 500;
   }
 
   .product-nutrition__content {
     position: relative;
-    min-height: 300px;
+    min-height: 200px;
   }
 
   .product-nutrition__panel {
@@ -217,133 +252,107 @@
     }
   }
 
-  .nutrition-facts {
+  .nutrition-facts,
+  .ingredients-list,
+  .allergen-info {
     background: var(--white);
-    padding: var(--spacing-2xl);
-    border-radius: var(--radius-xl);
-    box-shadow: 0 4px 20px rgba(45, 80, 22, 0.08);
+    padding: 0;
   }
 
   .nutrition-facts__header {
-    margin-bottom: var(--spacing-lg);
-    padding-bottom: var(--spacing-md);
-    border-bottom: 2px solid rgba(74, 124, 44, 0.1);
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border-color);
   }
 
   .nutrition-facts__header h3 {
     font-family: var(--font-heading);
-    font-size: var(--h3-size);
+    font-size: 24px;
     color: var(--forest-green);
-    margin-bottom: var(--spacing-xs);
+    margin-bottom: 8px;
+    font-weight: 600;
   }
 
   .nutrition-facts__serving {
-    font-size: var(--body-small);
-    color: #666;
+    font-size: 14px;
+    color: rgba(26, 26, 26, 0.6);
+    margin: 0;
+    font-weight: 300;
+  }
+
+  .nutrition-facts__list {
+    list-style: none;
+    padding: 0;
     margin: 0;
   }
 
-  .nutrition-facts__table {
-    width: 100%;
-    border-collapse: collapse;
+  .nutrition-facts__item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border-color);
   }
 
-  .nutrition-facts__table tr {
-    border-bottom: 1px solid rgba(74, 124, 44, 0.1);
-  }
-
-  .nutrition-facts__table tr:last-child {
+  .nutrition-facts__item:last-child {
     border-bottom: none;
   }
 
   .nutrition-facts__label {
-    padding: var(--spacing-md) var(--spacing-md) var(--spacing-md) 0;
-    font-weight: 600;
+    font-weight: 400;
     color: var(--text);
-    text-align: left;
+    font-size: 15px;
+    flex: 1;
   }
 
   .nutrition-facts__value {
-    padding: var(--spacing-md) 0;
-    font-weight: 700;
+    font-weight: 600;
     color: var(--forest-green);
-    text-align: right;
-  }
-
-  .ingredients-list,
-  .allergen-info {
-    background: var(--white);
-    padding: var(--spacing-2xl);
-    border-radius: var(--radius-xl);
-    box-shadow: 0 4px 20px rgba(45, 80, 22, 0.08);
+    font-size: 15px;
+    margin-left: 20px;
   }
 
   .ingredients-list h3,
   .allergen-info h3 {
     font-family: var(--font-heading);
-    font-size: var(--h3-size);
+    font-size: 24px;
     color: var(--forest-green);
-    margin-bottom: var(--spacing-lg);
-  }
-
-  .ingredients-list__content {
-    font-size: var(--body-large);
-    line-height: 1.8;
-    color: var(--text);
-  }
-
-  .allergen-info__content {
-    font-size: var(--body-normal);
-    line-height: 1.7;
-    color: var(--text);
-    margin-bottom: var(--spacing-xl);
-  }
-
-  .dietary-certifications {
-    margin-top: var(--spacing-xl);
-    padding-top: var(--spacing-xl);
-    border-top: 1px solid rgba(74, 124, 44, 0.1);
-  }
-
-  .dietary-certifications h4 {
-    font-family: var(--font-heading);
-    font-size: var(--h4-size);
-    color: var(--forest-green);
-    margin-bottom: var(--spacing-md);
-  }
-
-  .dietary-certifications__badges {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--spacing-sm);
-  }
-
-  .dietary-badge {
-    padding: var(--spacing-xs) var(--spacing-md);
-    background: linear-gradient(135deg, rgba(74, 124, 44, 0.1) 0%, rgba(212, 175, 55, 0.1) 100%);
-    border: 2px solid var(--sage-green);
-    border-radius: var(--radius-full);
-    font-size: var(--body-small);
+    margin-bottom: 20px;
     font-weight: 600;
-    color: var(--forest-green);
+  }
+
+  .ingredients-list__content,
+  .allergen-info__content {
+    font-size: 15px;
+    line-height: 1.7;
+    color: rgba(26, 26, 26, 0.65);
+    font-weight: 300;
   }
 
   @media (max-width: 768px) {
+    .product-nutrition {
+      padding: 60px var(--spacing-md);
+    }
+
+    .product-nutrition__title {
+      font-size: 36px;
+      margin-bottom: 40px;
+    }
+
     .product-nutrition__tabs {
       flex-direction: column;
       border-bottom: none;
     }
 
     .product-nutrition__tab {
-      border-bottom: 2px solid rgba(74, 124, 44, 0.1);
-      border-left: 3px solid transparent;
-      border-right: none;
+      border-bottom: 1px solid var(--border-color);
+      border-left: 2px solid transparent;
       text-align: left;
     }
 
     .product-nutrition__tab.active {
-      border-left-color: var(--gold);
-      border-bottom-color: rgba(74, 124, 44, 0.1);
+      border-left-color: var(--forest-green);
+      border-bottom-color: var(--border-color);
     }
   }
 {% endstylesheet %}
@@ -357,7 +366,6 @@
       tab.addEventListener('click', function() {
         const targetTab = this.dataset.tab;
         
-        // Update tabs
         tabs.forEach(t => {
           t.classList.remove('active');
           t.setAttribute('aria-selected', 'false');
@@ -365,7 +373,6 @@
         this.classList.add('active');
         this.setAttribute('aria-selected', 'true');
         
-        // Update panels
         panels.forEach(panel => {
           panel.classList.remove('active');
           panel.setAttribute('aria-hidden', 'true');
@@ -435,12 +442,6 @@
       "type": "richtext",
       "id": "allergen_info",
       "label": "Allergen Information"
-    },
-    {
-      "type": "text",
-      "id": "dietary_certifications",
-      "label": "Dietary Certifications",
-      "info": "Comma-separated list (e.g., Organic, Vegan, Gluten-Free)"
     }
   ],
   "presets": [

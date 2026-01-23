@@ -1,5 +1,5 @@
 {% comment %}
-  Related Products Section
+  Related Products Section - Minimalist Design
 {% endcomment %}
 
 <section class="related-products">
@@ -48,8 +48,8 @@
   .related-products {
     width: 100%;
     max-width: 100%;
-    padding: var(--spacing-5xl) var(--spacing-lg);
-    background: linear-gradient(135deg, rgba(74, 124, 44, 0.02) 0%, rgba(212, 175, 55, 0.02) 100%);
+    padding: 80px var(--spacing-lg);
+    background: var(--bg);
     box-sizing: border-box;
   }
 
@@ -61,30 +61,26 @@
   .related-products__title {
     text-align: center;
     font-family: var(--font-heading);
-    font-size: clamp(36px, 4.5vw, 56px);
-    font-weight: 900;
-    background: linear-gradient(135deg, var(--forest-green) 0%, var(--sage-green) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin-bottom: var(--spacing-4xl);
-    letter-spacing: -0.02em;
-    line-height: 1.2;
-    padding: 10px;
-    margin-top: var(--spacing-2xl);
+    font-size: 48px;
+    font-weight: 300;
+    color: var(--text);
+    margin-bottom: 60px;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
   }
 
   .related-products__grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: var(--spacing-xl);
+    gap: 30px;
   }
 
   .related-products__empty {
     text-align: center;
-    padding: var(--spacing-4xl);
-    color: #999;
-    font-size: var(--body-large);
+    padding: 60px;
+    color: rgba(26, 26, 26, 0.5);
+    font-size: 16px;
+    font-weight: 300;
   }
 
   @media (max-width: 1200px) {
@@ -93,10 +89,25 @@
     }
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 968px) {
     .related-products__grid {
       grid-template-columns: repeat(2, 1fr);
-      gap: var(--spacing-lg);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .related-products {
+      padding: 60px var(--spacing-md);
+    }
+
+    .related-products__title {
+      font-size: 36px;
+      margin-bottom: 40px;
+    }
+
+    .related-products__grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
     }
   }
 

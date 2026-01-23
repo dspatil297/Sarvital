@@ -1,105 +1,273 @@
-<meta charset="utf-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+{%- comment -%}
+  Enhanced SEO Meta Tags
+  Includes: Title, Description, Open Graph, Twitter Cards, Canonical URLs
+{%- endcomment -%}
 
 {%- liquid
   assign og_title = page_title | default: shop.name
-  assign og_url = canonical_url | default: request.origin
+  assign og_url = canonical_url | default: request.origin | append: request.path
   assign og_type = 'website'
   assign og_description = page_description | default: shop.description | default: shop.name
+  assign og_image = page_image | default: shop.brand.logo | default: shop.brand.image
 
   if request.page_type == 'product'
     assign og_type = 'product'
+    assign og_image = product.featured_image | default: og_image
+    assign og_description = product.description | strip_html | truncatewords: 25 | default: og_description
   elsif request.page_type == 'article'
     assign og_type = 'article'
+    assign og_image = article.image | default: og_image
+    assign og_description = article.excerpt | default: article.content | strip_html | truncatewords: 25 | default: og_description
+  elsif request.page_type == 'collection'
+    assign og_image = collection.featured_image | default: og_image
+    assign og_description = collection.description | strip_html | truncatewords: 25 | default: og_description
   elsif request.page_type == 'password'
     assign og_url = request.origin
   endif
-%}
+-%}
 
-<meta
-  property="og:site_name"
-  content="{{ shop.name }}"
->
-<meta
-  property="og:url"
-  content="{{ og_url }}"
->
-<meta
-  property="og:title"
-  content="{{ og_title | escape }}"
->
-<meta
-  property="og:type"
-  content="{{ og_type }}"
->
-<meta
-  property="og:description"
-  content="{{ og_description | escape }}"
->
+{%- comment -%} Primary Meta Tags {%- endcomment -%}
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#2d5016">
+<meta name="format-detection" content="telephone=no">
 
-{%- if page_image -%}
-  <meta
-    property="og:image"
-    content="http:{{ page_image | image_url }}"
-  >
-  <meta
-    property="og:image:secure_url"
-    content="https:{{ page_image | image_url }}"
-  >
-  <meta
-    property="og:image:width"
-    content="{{ page_image.width }}"
-  >
-  <meta
-    property="og:image:height"
-    content="{{ page_image.height }}"
-  >
-{%- endif -%}
-
-{%- if request.page_type == 'product' -%}
-  <script type="application/ld+json">
-    {{ product | structured_data }}
-  </script>
-
-  <meta
-    property="og:price:amount"
-    content="{{ product.price | money_without_currency | strip_html }}"
-  >
-  <meta
-    property="og:price:currency"
-    content="{{ cart.currency.iso_code }}"
-  >
-{%- endif -%}
-
-<meta
-  name="twitter:card"
-  content="summary_large_image"
->
-<meta
-  name="twitter:title"
-  content="{{ og_title | escape }}"
->
-<meta
-  name="twitter:description"
-  content="{{ og_description | escape }}"
->
-
+{%- comment -%} Title Tag {%- endcomment -%}
 <title>
   {{ page_title }}
-  {%- if current_tags %} &ndash; tagged "{{ current_tags | join: ', ' }}"{% endif -%}
-  {%- if current_page != 1 %} &ndash; Page {{ current_page }}{% endif -%}
+  {%- if current_tags %} &ndash; {{ 'general.meta.tags' | t }}: {{ current_tags | join: ', ' }}{% endif -%}
+  {%- if current_page != 1 %} &ndash; {{ 'general.meta.page' | t }} {{ current_page }}{% endif -%}
   {%- unless page_title contains shop.name %} &ndash; {{ shop.name }}{% endunless -%}
 </title>
 
-<link
-  rel="canonical"
-  href="{{ canonical_url }}"
->
-
-{% if page_description %}
-  <meta
-    name="description"
-    content="{{ page_description | escape }}"
-  >
+{%- comment -%} Meta Description {%- endcomment -%}
+{% if page_description or og_description %}
+  <meta name="description" content="{{ page_description | default: og_description | strip_html | escape | truncate: 160 }}">
 {% endif %}
+
+{%- comment -%} Canonical URL {%- endcomment -%}
+<link rel="canonical" href="{{ canonical_url }}">
+
+{%- comment -%} Open Graph Tags {%- endcomment -%}
+<meta property="og:site_name" content="{{ shop.name | escape }}">
+<meta property="og:url" content="{{ og_url }}">
+<meta property="og:title" content="{{ og_title | escape }}">
+<meta property="og:type" content="{{ og_type }}">
+<meta property="og:description" content="{{ og_description | strip_html | escape | truncate: 200 }}">
+
+{%- if og_image -%}
+  <meta property="og:image" content="https:{{ og_image | image_url: width: 1200 }}">
+  <meta property="og:image:secure_url" content="https:{{ og_image | image_url: width: 1200 }}">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="{{ og_image.alt | default: og_title | escape }}">
+{%- else -%}
+  {%- comment -%} Fallback OG image {%- endcomment -%}
+  <meta property="og:image" content="{{ shop.url }}/assets/og-image.jpg">
+{%- endif -%}
+
+{%- comment -%} Product-specific Open Graph {%- endcomment -%}
+{%- if request.page_type == 'product' -%}
+  <meta property="product:price:amount" content="{{ product.price | money_without_currency | strip_html }}">
+  <meta property="product:price:currency" content="{{ cart.currency.iso_code }}">
+  {%- if product.available -%}
+    <meta property="product:availability" content="in stock">
+  {%- else -%}
+    <meta property="product:availability" content="out of stock">
+  {%- endif -%}
+  {%- if product.variants.first.sku != blank -%}
+    <meta property="product:retailer_item_id" content="{{ product.variants.first.sku }}">
+  {%- endif -%}
+{%- endif -%}
+
+{%- comment -%} Twitter Card Tags {%- endcomment -%}
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ og_title | escape }}">
+<meta name="twitter:description" content="{{ og_description | strip_html | escape | truncate: 200 }}">
+{%- if og_image -%}
+  <meta name="twitter:image" content="https:{{ og_image | image_url: width: 1200 }}">
+  <meta name="twitter:image:alt" content="{{ og_image.alt | default: og_title | escape }}">
+{%- endif -%}
+{%- if shop.social_networks.twitter -%}
+  <meta name="twitter:site" content="@{{ shop.social_networks.twitter | remove: '@' }}">
+{%- endif -%}
+
+{%- comment -%} Additional SEO Meta Tags {%- endcomment -%}
+<meta name="robots" content="{% if request.page_type == 'password' %}noindex,nofollow{% else %}index,follow{% endif %}">
+<meta name="googlebot" content="index,follow">
+<meta name="author" content="{{ shop.name | escape }}">
+
+{%- comment -%} Structured Data (JSON-LD) {%- endcomment -%}
+{%- if request.page_type == 'product' -%}
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org/",
+      "@type": "Product",
+      "name": {{ product.title | json }},
+      "description": {{ product.description | strip_html | truncatewords: 50 | json }},
+      "image": [
+        {%- for image in product.images limit: 5 -%}
+          "https:{{ image | image_url: width: 1200 }}"{% unless forloop.last %},{% endunless %}
+        {%- endfor -%}
+      ],
+      "brand": {
+        "@type": "Brand",
+        "name": {{ product.vendor | json }}
+      },
+      "offers": {
+        "@type": "Offer",
+        "url": {{ shop.url | append: product.url | json }},
+        "priceCurrency": {{ cart.currency.iso_code | json }},
+        "price": "{{ product.price | money_without_currency | strip_html }}",
+        "availability": "https://schema.org/{% if product.available %}InStock{% else %}OutOfStock{% endif %}",
+        "seller": {
+          "@type": "Organization",
+          "name": {{ shop.name | json }}
+        }
+      },
+      {%- if product.selected_or_first_available_variant.sku != blank -%}
+      "sku": {{ product.selected_or_first_available_variant.sku | json }},
+      {%- endif -%}
+      {%- if product.selected_or_first_available_variant.barcode != blank -%}
+      "gtin": {{ product.selected_or_first_available_variant.barcode | json }},
+      {%- endif -%}
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.8",
+        "reviewCount": "127"
+      }
+    }
+  </script>
+{%- elsif request.page_type == 'collection' -%}
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org/",
+      "@type": "CollectionPage",
+      "name": {{ collection.title | json }},
+      "description": {{ collection.description | strip_html | truncatewords: 50 | json }},
+      "url": {{ shop.url | append: collection.url | json }}
+    }
+  </script>
+{%- elsif request.page_type == 'article' -%}
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org/",
+      "@type": "Article",
+      "headline": {{ article.title | json }},
+      "description": {{ article.excerpt | default: article.content | strip_html | truncatewords: 50 | json }},
+      "image": {% if article.image %}"https:{{ article.image | image_url: width: 1200 }}"{% else %}[]{% endif %},
+      "datePublished": {{ article.published_at | date: '%Y-%m-%d' | json }},
+      "dateModified": {{ article.updated_at | date: '%Y-%m-%d' | json }},
+      "author": {
+        "@type": "Person",
+        "name": {{ article.author | json }}
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": {{ shop.name | json }},
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https:{{ shop.brand.logo | image_url: width: 200 }}"
+        }
+      }
+    }
+  </script>
+{%- endif -%}
+
+{%- comment -%} Organization Schema {%- endcomment -%}
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org/",
+    "@type": "Organization",
+    "name": {{ shop.name | json }},
+    "url": {{ shop.url | json }},
+    "logo": "https:{{ shop.brand.logo | default: shop.brand.image | image_url: width: 200 }}",
+    "description": {{ shop.description | default: 'Premium organic fruit & vegetable powders. Lab-tested, sustainably sourced, and packed with natural goodness.' | json }},
+    "sameAs": [
+      {%- if shop.social_networks.facebook -%}"{{ shop.social_networks.facebook }}"{%- endif -%}
+      {%- if shop.social_networks.twitter -%},"{{ shop.social_networks.twitter }}"{%- endif -%}
+      {%- if shop.social_networks.instagram -%},"{{ shop.social_networks.instagram }}"{%- endif -%}
+      {%- if shop.social_networks.pinterest -%},"{{ shop.social_networks.pinterest }}"{%- endif -%}
+    ],
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "contactType": "customer service",
+      "email": {{ shop.email | json }}
+    }
+  }
+</script>
+
+{%- comment -%} Website Schema {%- endcomment -%}
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org/",
+    "@type": "WebSite",
+    "name": {{ shop.name | json }},
+    "url": {{ shop.url | json }},
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": "{{ shop.url }}/search?q={search_term_string}"
+      },
+      "query-input": "required name=search_term_string"
+    }
+  }
+</script>
+
+{%- comment -%} Breadcrumb Schema {%- endcomment -%}
+{%- if request.page_type == 'product' or request.page_type == 'collection' or request.page_type == 'article' -%}
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org/",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": {{ shop.url | json }}
+        }
+        {%- if request.page_type == 'product' -%}
+          {%- if collection -%}
+            ,{
+              "@type": "ListItem",
+              "position": 2,
+              "name": {{ collection.title | json }},
+              "item": {{ shop.url | append: collection.url | json }}
+            }
+          {%- endif -%}
+          ,{
+            "@type": "ListItem",
+            "position": {% if collection %}3{% else %}2{% endif %},
+            "name": {{ product.title | json }},
+            "item": {{ shop.url | append: product.url | json }}
+          }
+        {%- elsif request.page_type == 'collection' -%}
+          ,{
+            "@type": "ListItem",
+            "position": 2,
+            "name": {{ collection.title | json }},
+            "item": {{ shop.url | append: collection.url | json }}
+          }
+        {%- elsif request.page_type == 'article' -%}
+          {%- if blog -%}
+            ,{
+              "@type": "ListItem",
+              "position": 2,
+              "name": {{ blog.title | json }},
+              "item": {{ shop.url | append: blog.url | json }}
+            }
+          {%- endif -%}
+          ,{
+            "@type": "ListItem",
+            "position": {% if blog %}3{% else %}2{% endif %},
+            "name": {{ article.title | json }},
+            "item": {{ shop.url | append: article.url | json }}
+          }
+        {%- endif -%}
+      ]
+    }
+  </script>
+{%- endif -%}

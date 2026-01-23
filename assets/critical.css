@@ -878,3 +878,145 @@ img[loading="lazy"].loaded {
     transform: none;
   }
 }
+
+/** ============================================
+    ACCESSIBILITY IMPROVEMENTS
+    ============================================ */
+
+/* Focus Indicators - WCAG 2.1 AA Compliant */
+*:focus-visible {
+  outline: 3px solid var(--sage-green);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Skip to main content link */
+.skip-to-main {
+  position: absolute;
+  top: -100px;
+  left: 0;
+  background: var(--forest-green);
+  color: var(--white);
+  padding: var(--spacing-md) var(--spacing-lg);
+  text-decoration: none;
+  z-index: var(--z-tooltip);
+  font-weight: 700;
+  border-radius: 0 0 var(--radius-md) 0;
+}
+
+.skip-to-main:focus {
+  top: 0;
+}
+
+/* Button Focus States */
+.btn:focus-visible {
+  outline: 3px solid var(--sage-green);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 3px rgba(74, 124, 44, 0.2);
+}
+
+/* Link Focus States */
+a:focus-visible {
+  outline: 2px solid var(--sage-green);
+  outline-offset: 2px;
+  text-decoration: underline;
+}
+
+/* Form Input Focus States */
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 3px solid var(--sage-green);
+  outline-offset: 2px;
+  border-color: var(--sage-green);
+}
+
+/* Remove default focus outline for mouse users, keep for keyboard */
+*:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+  :root {
+    --border-color: #000;
+    --shadow-color: rgba(0, 0, 0, 0.3);
+  }
+  
+  .btn {
+    border-width: 2px;
+  }
+}
+
+/* Screen Reader Only Content */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Ensure interactive elements are keyboard accessible */
+button,
+a,
+input,
+select,
+textarea,
+[tabindex]:not([tabindex="-1"]) {
+  &:focus-visible {
+    outline: 3px solid var(--sage-green);
+    outline-offset: 2px;
+  }
+}
+
+/* Improve color contrast for text */
+.text-muted {
+  color: #555;
+}
+
+/* Ensure sufficient color contrast for links */
+a {
+  color: var(--forest-green);
+  text-decoration: underline;
+}
+
+a:hover,
+a:focus {
+  color: var(--sage-green);
+  text-decoration: none;
+}
+
+/* Loading states for screen readers */
+.loading[aria-busy="true"]::after {
+  content: "Loading...";
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+/* Error states */
+.error {
+  border-color: #d32f2f;
+}
+
+.error-message {
+  color: #d32f2f;
+  font-size: var(--body-small);
+  margin-top: var(--spacing-xs);
+  display: block;
+}
+
+/* Success states */
+.success-message {
+  color: var(--sage-green);
+  font-size: var(--body-small);
+  margin-top: var(--spacing-xs);
+  display: block;
+}

@@ -8,14 +8,6 @@
         "show_background_image": false
       }
     },
-    "product_filters": {
-      "type": "product-filters",
-      "settings": {}
-    },
-    "collection_toolbar": {
-      "type": "collection-toolbar",
-      "settings": {}
-    },
     "collection_product_grid": {
       "type": "collection-product-grid",
       "settings": {
@@ -25,8 +17,6 @@
   },
   "order": [
     "shop_header",
-    "product_filters",
-    "collection_toolbar",
     "collection_product_grid"
   ]
 }
