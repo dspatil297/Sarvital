@@ -25,28 +25,20 @@
       >
         Ingredients
       </button>
-      <button 
-        type="button" 
-        class="product-nutrition__tab" 
-        data-tab="allergens"
-        aria-selected="false"
-      >
-        Allergens
-      </button>
     </div>
     
     <div class="product-nutrition__content">
       <div class="product-nutrition__panel active" data-panel="nutrition" aria-hidden="false">
         {% assign nutrition_data = product.metafields.custom.nutrition_facts %}
-        {% if nutrition_data != blank %}
-          <div class="nutrition-facts">
-            <div class="nutrition-facts__header">
-              <h3>Nutrition Facts</h3>
-              {% assign serving_size = product.metafields.custom.serving_size | default: section.settings.serving_size %}
-              {% if serving_size != blank %}
-                <p class="nutrition-facts__serving">Serving Size: {{ serving_size }}</p>
-              {% endif %}
-            </div>
+        <div class="nutrition-facts">
+          <div class="nutrition-facts__header">
+            <h3>Nutrition Facts</h3>
+            {% assign serving_size = product.metafields.custom.serving_size | default: section.settings.serving_size %}
+            {% if serving_size != blank %}
+              <p class="nutrition-facts__serving">Serving Size: {{ serving_size }}</p>
+            {% endif %}
+          </div>
+          {% if nutrition_data != blank %}
             {% comment %} Check if it's a list metafield (array) {% endcomment %}
             {% if nutrition_data.first %}
               <ul class="nutrition-facts__list" id="nutrition-facts-list">
@@ -69,99 +61,20 @@
               {% comment %} It's a JSON string or single value - use JavaScript to parse {% endcomment %}
               <ul class="nutrition-facts__list" data-nutrition-data="{{ nutrition_data | escape | replace: '"', '&quot;' }}" id="nutrition-facts-list">
                 {% comment %} List items will be populated by JavaScript {% endcomment %}
+                <li class="nutrition-facts__item" style="opacity: 0.5;">
+                  <span class="nutrition-facts__label">Loading nutrition facts...</span>
+                </li>
               </ul>
             {% endif %}
-          </div>
-        {% else %}
-          <div class="nutrition-facts">
-            <div class="nutrition-facts__header">
-              <h3>Nutrition Facts</h3>
-              {% assign serving_size = product.metafields.custom.serving_size | default: section.settings.serving_size | default: "1 scoop (10g)" %}
-              <p class="nutrition-facts__serving">Serving Size: {{ serving_size }}</p>
-            </div>
-            <ul class="nutrition-facts__list">
-              {% assign calories = product.metafields.custom.calories | default: section.settings.calories %}
-              {% if calories != blank %}
-                <li class="nutrition-facts__item">
-                  <span class="nutrition-facts__label">Calories</span>
-                  <span class="nutrition-facts__value">{{ calories }}</span>
-                </li>
-              {% endif %}
-              
-              {% assign protein = product.metafields.custom.protein | default: section.settings.protein %}
-              {% if protein != blank %}
-                <li class="nutrition-facts__item">
-                  <span class="nutrition-facts__label">Protein</span>
-                  <span class="nutrition-facts__value">{{ protein }}{% unless protein contains 'g' %}g{% endunless %}</span>
-                </li>
-              {% endif %}
-              
-              {% assign carbs = product.metafields.custom.carbs | default: product.metafields.custom.carbohydrates | default: section.settings.carbs %}
-              {% if carbs != blank %}
-                <li class="nutrition-facts__item">
-                  <span class="nutrition-facts__label">Total Carbohydrates</span>
-                  <span class="nutrition-facts__value">{{ carbs }}{% unless carbs contains 'g' %}g{% endunless %}</span>
-                </li>
-              {% endif %}
-              
-              {% assign fiber = product.metafields.custom.fiber | default: product.metafields.custom.dietary_fiber | default: section.settings.fiber %}
-              {% if fiber != blank %}
-                <li class="nutrition-facts__item">
-                  <span class="nutrition-facts__label">Dietary Fiber</span>
-                  <span class="nutrition-facts__value">{{ fiber }}{% unless fiber contains 'g' %}g{% endunless %}</span>
-                </li>
-              {% endif %}
-              
-              {% assign fat = product.metafields.custom.fat | default: product.metafields.custom.total_fat | default: section.settings.fat %}
-              {% if fat != blank %}
-                <li class="nutrition-facts__item">
-                  <span class="nutrition-facts__label">Total Fat</span>
-                  <span class="nutrition-facts__value">{{ fat }}{% unless fat contains 'g' %}g{% endunless %}</span>
-                </li>
-              {% endif %}
-              
-              {% assign sugar = product.metafields.custom.sugar | default: product.metafields.custom.total_sugar %}
-              {% if sugar != blank %}
-                <li class="nutrition-facts__item">
-                  <span class="nutrition-facts__label">Total Sugar</span>
-                  <span class="nutrition-facts__value">{{ sugar }}{% unless sugar contains 'g' %}g{% endunless %}</span>
-                </li>
-              {% endif %}
-              
-              {% assign sodium = product.metafields.custom.sodium %}
-              {% if sodium != blank %}
-                <li class="nutrition-facts__item">
-                  <span class="nutrition-facts__label">Sodium</span>
-                  <span class="nutrition-facts__value">{{ sodium }}{% unless sodium contains 'mg' %}mg{% endunless %}</span>
-                </li>
-              {% endif %}
-              
-              {% assign vitamin_c = product.metafields.custom.vitamin_c %}
-              {% if vitamin_c != blank %}
-                <li class="nutrition-facts__item">
-                  <span class="nutrition-facts__label">Vitamin C</span>
-                  <span class="nutrition-facts__value">{{ vitamin_c }}</span>
-                </li>
-              {% endif %}
-              
-              {% assign iron = product.metafields.custom.iron %}
-              {% if iron != blank %}
-                <li class="nutrition-facts__item">
-                  <span class="nutrition-facts__label">Iron</span>
-                  <span class="nutrition-facts__value">{{ iron }}</span>
-                </li>
-              {% endif %}
-              
-              {% assign calcium = product.metafields.custom.calcium %}
-              {% if calcium != blank %}
-                <li class="nutrition-facts__item">
-                  <span class="nutrition-facts__label">Calcium</span>
-                  <span class="nutrition-facts__value">{{ calcium }}</span>
-                </li>
-              {% endif %}
+          {% else %}
+            {% comment %} No metafield data - show empty state {% endcomment %}
+            <ul class="nutrition-facts__list" id="nutrition-facts-list">
+              <li class="nutrition-facts__item">
+                <span class="nutrition-facts__label" style="color: rgba(26, 26, 26, 0.5);">No nutrition facts available. Please add nutrition data in product metafields.</span>
+              </li>
             </ul>
-          </div>
-        {% endif %}
+          {% endif %}
+        </div>
       </div>
       
       <div class="product-nutrition__panel" data-panel="ingredients" aria-hidden="true">
@@ -191,22 +104,6 @@
         {% endif %}
       </div>
       
-      <div class="product-nutrition__panel" data-panel="allergens" aria-hidden="true">
-        {% assign allergen_info = product.metafields.custom.allergen_info | default: product.metafields.custom.allergens | default: section.settings.allergen_info %}
-        {% if allergen_info != blank %}
-          <div class="allergen-info">
-            <h3>Allergen Information</h3>
-            <div class="allergen-info__content">
-              {{ allergen_info }}
-            </div>
-          </div>
-        {% else %}
-          <div class="allergen-info">
-            <h3>Allergen Information</h3>
-            <p>This product is free from common allergens. Processed in a facility that may handle nuts, dairy, and soy.</p>
-          </div>
-        {% endif %}
-      </div>
     </div>
   </div>
 </section>
@@ -297,8 +194,7 @@
   }
 
   .nutrition-facts,
-  .ingredients-list,
-  .allergen-info {
+  .ingredients-list {
     background: var(--white);
     padding: 48px;
     border-radius: 12px;
@@ -452,8 +348,7 @@
     }
 
     .nutrition-facts,
-    .ingredients-list,
-    .allergen-info {
+    .ingredients-list {
       padding: 32px 24px;
     }
   }
@@ -593,10 +488,19 @@
       const tabs = document.querySelectorAll('.product-nutrition__tab');
       const panels = document.querySelectorAll('.product-nutrition__panel');
       
+      if (tabs.length === 0 || panels.length === 0) {
+        console.log('Tabs or panels not found');
+        return;
+      }
+      
       tabs.forEach(tab => {
-        tab.addEventListener('click', function() {
-          const targetTab = this.dataset.tab;
+        tab.addEventListener('click', function(e) {
+          e.preventDefault();
+          const targetTab = this.getAttribute('data-tab');
           
+          console.log('Tab clicked:', targetTab);
+          
+          // Update tabs
           tabs.forEach(t => {
             t.classList.remove('active');
             t.setAttribute('aria-selected', 'false');
@@ -604,12 +508,16 @@
           this.classList.add('active');
           this.setAttribute('aria-selected', 'true');
           
+          // Update panels
           panels.forEach(panel => {
+            const panelTab = panel.getAttribute('data-panel');
             panel.classList.remove('active');
             panel.setAttribute('aria-hidden', 'true');
-            if (panel.dataset.panel === targetTab) {
+            
+            if (panelTab === targetTab) {
               panel.classList.add('active');
               panel.setAttribute('aria-hidden', 'false');
+              console.log('Showing panel:', panelTab);
             }
           });
         });
