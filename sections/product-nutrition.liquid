@@ -37,17 +37,22 @@
     
     <div class="product-nutrition__content">
       <div class="product-nutrition__panel active" data-panel="nutrition" aria-hidden="false">
-        {% assign nutrition_data = product.metafields.custom.nutrition_facts | default: section.settings.nutrition_facts %}
+        {% assign nutrition_data = product.metafields.custom.nutrition_facts %}
         {% if nutrition_data != blank %}
           <div class="nutrition-facts">
             <div class="nutrition-facts__header">
               <h3>Nutrition Facts</h3>
+              {% assign serving_size = product.metafields.custom.serving_size | default: section.settings.serving_size %}
+              {% if serving_size != blank %}
+                <p class="nutrition-facts__serving">Serving Size: {{ serving_size }}</p>
+              {% endif %}
             </div>
-            {% comment %} Check if it's a list metafield {% endcomment %}
+            {% comment %} Check if it's a list metafield (array) {% endcomment %}
             {% if nutrition_data.first %}
-              <ul class="nutrition-facts__list">
+              <ul class="nutrition-facts__list" id="nutrition-facts-list">
                 {% for item in nutrition_data %}
-                  {% assign item_parts = item | split: ':' %}
+                  {% assign item_string = item | string %}
+                  {% assign item_parts = item_string | split: ':' %}
                   {% if item_parts.size > 1 %}
                     <li class="nutrition-facts__item">
                       <span class="nutrition-facts__label">{{ item_parts.first | strip }}</span>
@@ -55,17 +60,15 @@
                     </li>
                   {% else %}
                     <li class="nutrition-facts__item">
-                      <span class="nutrition-facts__label">{{ item | strip }}</span>
+                      <span class="nutrition-facts__label">{{ item_string | strip }}</span>
                     </li>
                   {% endif %}
                 {% endfor %}
               </ul>
             {% else %}
+              {% comment %} It's a JSON string or single value - use JavaScript to parse {% endcomment %}
               <ul class="nutrition-facts__list" data-nutrition-data="{{ nutrition_data | escape | replace: '"', '&quot;' }}" id="nutrition-facts-list">
                 {% comment %} List items will be populated by JavaScript {% endcomment %}
-                <li class="nutrition-facts__item" style="display: none;">
-                  <span class="nutrition-facts__label">Loading...</span>
-                </li>
               </ul>
             {% endif %}
           </div>
@@ -162,12 +165,22 @@
       </div>
       
       <div class="product-nutrition__panel" data-panel="ingredients" aria-hidden="true">
-        {% assign ingredients = product.metafields.custom.ingredients | default: section.settings.ingredients %}
+        {% assign ingredients = product.metafields.custom.ingredients %}
         {% if ingredients != blank %}
           <div class="ingredients-list">
             <h3>Ingredients</h3>
             <div class="ingredients-list__content">
-              {{ ingredients }}
+              {% comment %} Check if it's a list metafield (array) {% endcomment %}
+              {% if ingredients.first %}
+                <ul class="ingredients-list__items">
+                  {% for ingredient in ingredients %}
+                    <li>{{ ingredient }}</li>
+                  {% endfor %}
+                </ul>
+              {% else %}
+                {% comment %} It's a string or rich text {% endcomment %}
+                {{ ingredients }}
+              {% endif %}
             </div>
           </div>
         {% else %}
@@ -381,6 +394,32 @@
     line-height: 1.8;
     color: rgba(26, 26, 26, 0.7);
     font-weight: 300;
+  }
+
+  .ingredients-list__items {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .ingredients-list__items li {
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(26, 26, 26, 0.08);
+    position: relative;
+    padding-left: 24px;
+  }
+
+  .ingredients-list__items li:last-child {
+    border-bottom: none;
+  }
+
+  .ingredients-list__items li::before {
+    content: '•';
+    position: absolute;
+    left: 0;
+    color: var(--forest-green);
+    font-weight: bold;
+    font-size: 20px;
   }
 
   @media (max-width: 768px) {
