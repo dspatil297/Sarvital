@@ -1,5 +1,6 @@
 {% comment %}
-  Product Nutrition Information Section - Minimalist Design
+  Product Nutrition Information Section
+  Displays nutrition facts and ingredients from metafields
 {% endcomment %}
 
 <section class="product-nutrition">
@@ -28,8 +29,18 @@
     </div>
     
     <div class="product-nutrition__content">
-      <div class="product-nutrition__panel active" data-panel="nutrition" aria-hidden="false">
+      <!-- Nutrition Facts Panel -->
+      <div class="product-nutrition__panel active" data-panel="nutrition" id="nutrition-panel">
         {% assign nutrition_data = product.metafields.custom.nutrition_facts %}
+        {% comment %} Debug: Uncomment to see metafield data {% endcomment %}
+        {% comment %}
+        <div style="background: #f0f0f0; padding: 10px; margin-bottom: 20px; font-size: 12px;">
+          <strong>Debug Info:</strong><br>
+          Metafield exists: {{ nutrition_data | json }}<br>
+          Type: {{ nutrition_data | type }}<br>
+          First item: {{ nutrition_data.first | json }}
+        </div>
+        {% endcomment %}
         <div class="nutrition-facts">
           <div class="nutrition-facts__header">
             <h3>Nutrition Facts</h3>
@@ -38,9 +49,11 @@
               <p class="nutrition-facts__serving">Serving Size: {{ serving_size }}</p>
             {% endif %}
           </div>
+          
           {% if nutrition_data != blank %}
-            {% comment %} Check if it's a list metafield (array) {% endcomment %}
+            {% comment %} Try different metafield formats {% endcomment %}
             {% if nutrition_data.first %}
+              {% comment %} It's a list metafield (array) {% endcomment %}
               <ul class="nutrition-facts__list" id="nutrition-facts-list">
                 {% for item in nutrition_data %}
                   {% assign item_string = item | string %}
@@ -57,31 +70,58 @@
                   {% endif %}
                 {% endfor %}
               </ul>
-            {% else %}
-              {% comment %} It's a JSON string or single value - use JavaScript to parse {% endcomment %}
-              <ul class="nutrition-facts__list" data-nutrition-data="{{ nutrition_data | escape | replace: '"', '&quot;' }}" id="nutrition-facts-list">
-                {% comment %} List items will be populated by JavaScript {% endcomment %}
-                <li class="nutrition-facts__item" style="opacity: 0.5;">
+            {% elsif nutrition_data contains '[' or nutrition_data contains ']' %}
+              {% comment %} It's a JSON string {% endcomment %}
+              <ul class="nutrition-facts__list" id="nutrition-facts-list" data-nutrition-data="{{ nutrition_data | escape }}">
+                <li class="nutrition-facts__item nutrition-facts__loading">
                   <span class="nutrition-facts__label">Loading nutrition facts...</span>
                 </li>
               </ul>
+            {% else %}
+              {% comment %} It's a plain string - try to split by newlines or commas {% endcomment %}
+              <ul class="nutrition-facts__list" id="nutrition-facts-list">
+                {% assign items = nutrition_data | split: '\n' %}
+                {% if items.size == 1 %}
+                  {% assign items = nutrition_data | split: ',' %}
+                {% endif %}
+                {% for item in items %}
+                  {% assign item_string = item | string | strip %}
+                  {% if item_string != blank %}
+                    {% assign item_parts = item_string | split: ':' %}
+                    {% if item_parts.size > 1 %}
+                      <li class="nutrition-facts__item">
+                        <span class="nutrition-facts__label">{{ item_parts.first | strip }}</span>
+                        <span class="nutrition-facts__value">{{ item_parts.last | strip }}</span>
+                      </li>
+                    {% else %}
+                      <li class="nutrition-facts__item">
+                        <span class="nutrition-facts__label">{{ item_string }}</span>
+                      </li>
+                    {% endif %}
+                  {% endif %}
+                {% endfor %}
+              </ul>
             {% endif %}
           {% else %}
-            {% comment %} No metafield data - show empty state {% endcomment %}
+            {% comment %} No metafield data - show helpful message {% endcomment %}
             <ul class="nutrition-facts__list" id="nutrition-facts-list">
               <li class="nutrition-facts__item">
-                <span class="nutrition-facts__label" style="color: rgba(26, 26, 26, 0.5);">No nutrition facts available. Please add nutrition data in product metafields.</span>
+                <span class="nutrition-facts__label" style="color: rgba(26, 26, 26, 0.6); font-style: italic;">
+                  No nutrition facts available. Please add nutrition data in product metafields.<br>
+                  <small style="font-size: 12px; margin-top: 8px; display: block;">Metafield: custom.nutrition_facts (List or JSON string)</small>
+                </span>
               </li>
             </ul>
           {% endif %}
         </div>
       </div>
       
-      <div class="product-nutrition__panel" data-panel="ingredients" aria-hidden="true">
+      <!-- Ingredients Panel -->
+      <div class="product-nutrition__panel" data-panel="ingredients" id="ingredients-panel">
         {% assign ingredients = product.metafields.custom.ingredients %}
-        {% if ingredients != blank %}
-          <div class="ingredients-list">
-            <h3>Ingredients</h3>
+        <div class="ingredients-list">
+          <h3>Ingredients</h3>
+          {% if ingredients != blank %}
             <div class="ingredients-list__content">
               {% comment %} Check if it's a list metafield (array) {% endcomment %}
               {% if ingredients.first %}
@@ -95,15 +135,14 @@
                 {{ ingredients }}
               {% endif %}
             </div>
-          </div>
-        {% else %}
-          <div class="ingredients-list">
-            <h3>Ingredients</h3>
-            <p>100% pure fruit/vegetable powder. No additives, preservatives, or fillers.</p>
-          </div>
-        {% endif %}
+          {% else %}
+            <p style="color: rgba(26, 26, 26, 0.6); font-style: italic;">
+              No ingredients information available. Please add ingredients in product metafields.<br>
+              <small style="font-size: 12px; margin-top: 8px; display: block;">Metafield: custom.ingredients (List or Text)</small>
+            </p>
+          {% endif %}
+        </div>
       </div>
-      
     </div>
   </div>
 </section>
@@ -112,23 +151,23 @@
   .product-nutrition {
     width: 100%;
     max-width: 100%;
-    padding: 100px 40px;
+    padding: 60px 40px;
     background: var(--bg);
     box-sizing: border-box;
   }
 
   .product-nutrition__container {
-    max-width: 1200px;
+    max-width: 1000px;
     margin: 0 auto;
   }
 
   .product-nutrition__title {
     text-align: center;
     font-family: var(--font-heading);
-    font-size: 42px;
+    font-size: 32px;
     font-weight: 600;
     color: var(--text);
-    margin-bottom: 50px;
+    margin-bottom: 32px;
     letter-spacing: -0.02em;
     line-height: 1.2;
   }
@@ -136,18 +175,18 @@
   .product-nutrition__tabs {
     display: flex;
     gap: 0;
-    margin-bottom: 50px;
+    margin-bottom: 32px;
     border-bottom: 2px solid var(--border-color);
     justify-content: center;
     flex-wrap: wrap;
   }
 
   .product-nutrition__tab {
-    padding: 18px 36px;
+    padding: 14px 28px;
     background: transparent;
     border: none;
     border-bottom: 3px solid transparent;
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 500;
     color: rgba(26, 26, 26, 0.6);
     cursor: pointer;
@@ -179,7 +218,9 @@
   }
 
   .product-nutrition__panel.active {
-    display: block;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
   }
 
   @keyframes fadeIn {
@@ -196,23 +237,23 @@
   .nutrition-facts,
   .ingredients-list {
     background: var(--white);
-    padding: 48px;
+    padding: 32px;
     border-radius: 12px;
     border: 1px solid var(--border-color);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
   }
 
   .nutrition-facts__header {
-    margin-bottom: 32px;
-    padding-bottom: 24px;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
     border-bottom: 2px solid var(--border-color);
   }
 
   .nutrition-facts__header h3 {
     font-family: var(--font-heading);
-    font-size: 28px;
+    font-size: 24px;
     color: var(--forest-green);
-    margin-bottom: 12px;
+    margin-bottom: 8px;
     font-weight: 600;
   }
 
@@ -227,23 +268,14 @@
     list-style: none;
     padding: 0;
     margin: 0;
-    min-height: 100px;
-  }
-
-  .nutrition-facts__list:empty::before {
-    content: 'Loading nutrition facts...';
-    display: block;
-    padding: 20px;
-    text-align: center;
-    color: rgba(26, 26, 26, 0.5);
-    font-style: italic;
+    min-height: 50px;
   }
 
   .nutrition-facts__item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 18px 0;
+    padding: 14px 0;
     border-bottom: 1px solid rgba(26, 26, 26, 0.08);
     transition: all 0.3s ease;
   }
@@ -260,34 +292,37 @@
     border-bottom: none;
   }
 
+  .nutrition-facts__loading {
+    opacity: 0.6;
+    font-style: italic;
+  }
+
   .nutrition-facts__label {
     font-weight: 500;
     color: var(--text);
-    font-size: 16px;
+    font-size: 15px;
     flex: 1;
   }
 
   .nutrition-facts__value {
     font-weight: 700;
     color: var(--forest-green);
-    font-size: 16px;
+    font-size: 15px;
     margin-left: 20px;
     font-family: var(--font-heading);
   }
 
-  .ingredients-list h3,
-  .allergen-info h3 {
+  .ingredients-list h3 {
     font-family: var(--font-heading);
-    font-size: 28px;
+    font-size: 24px;
     color: var(--forest-green);
-    margin-bottom: 24px;
+    margin-bottom: 20px;
     font-weight: 600;
   }
 
-  .ingredients-list__content,
-  .allergen-info__content {
-    font-size: 16px;
-    line-height: 1.8;
+  .ingredients-list__content {
+    font-size: 15px;
+    line-height: 1.7;
     color: rgba(26, 26, 26, 0.7);
     font-weight: 300;
   }
@@ -299,7 +334,7 @@
   }
 
   .ingredients-list__items li {
-    padding: 12px 0;
+    padding: 10px 0;
     border-bottom: 1px solid rgba(26, 26, 26, 0.08);
     position: relative;
     padding-left: 24px;
@@ -356,43 +391,37 @@
 
 {% javascript %}
   (function() {
+    'use strict';
+    
+    // Parse and render nutrition facts from JSON array - optimized for speed
     function initNutritionFacts() {
-      // Parse and render nutrition facts from JSON array
-      const nutritionList = document.querySelector('.nutrition-facts__list[data-nutrition-data]');
+      const nutritionList = document.getElementById('nutrition-facts-list');
       if (!nutritionList) {
-        console.log('No nutrition list found with data attribute');
         return;
       }
       
+      // Check if it has data attribute (JSON string)
       const nutritionData = nutritionList.getAttribute('data-nutrition-data');
       if (!nutritionData || nutritionData.trim() === '') {
-        console.warn('No nutrition data found in attribute');
-        nutritionList.innerHTML = '<li class="nutrition-facts__item"><span class="nutrition-facts__label">No nutrition data available</span></li>';
-        return;
+        return; // Already rendered server-side
       }
       
-      console.log('Nutrition data found:', nutritionData);
-      
       try {
-        // Unescape HTML entities
-        let dataString = nutritionData.replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, '&');
+        // Unescape HTML entities and parse JSON
+        let dataString = nutritionData
+          .replace(/&quot;/g, '"')
+          .replace(/&#39;/g, "'")
+          .replace(/&amp;/g, '&')
+          .trim();
         
-        // Remove any leading/trailing whitespace
-        dataString = dataString.trim();
-        
-        console.log('Parsing data string:', dataString);
-        
-        // Parse JSON array
         const nutritionArray = JSON.parse(dataString);
         
-        console.log('Parsed array:', nutritionArray);
-        
         if (Array.isArray(nutritionArray) && nutritionArray.length > 0) {
-          nutritionList.innerHTML = ''; // Clear placeholder
+          // Use DocumentFragment for faster DOM manipulation
+          const fragment = document.createDocumentFragment();
           
           nutritionArray.forEach(function(item) {
             if (typeof item === 'string' && item.trim() !== '') {
-              // Check if item contains ":" separator (Label: Value format)
               const colonIndex = item.indexOf(':');
               let label, value;
               
@@ -400,19 +429,16 @@
                 label = item.substring(0, colonIndex).trim();
                 value = item.substring(colonIndex + 1).trim();
               } else {
-                // If no colon, treat entire string as label
                 label = item.trim();
                 value = '';
               }
               
-              // Create list item
               const listItem = document.createElement('li');
               listItem.className = 'nutrition-facts__item';
               
               const labelSpan = document.createElement('span');
               labelSpan.className = 'nutrition-facts__label';
               labelSpan.textContent = label;
-              
               listItem.appendChild(labelSpan);
               
               if (value) {
@@ -422,125 +448,130 @@
                 listItem.appendChild(valueSpan);
               }
               
-              nutritionList.appendChild(listItem);
+              fragment.appendChild(listItem);
             }
           });
           
-          console.log('Successfully rendered', nutritionArray.length, 'nutrition items');
-        } else {
-          console.warn('Nutrition data is not a valid array:', nutritionArray);
-          nutritionList.innerHTML = '<li class="nutrition-facts__item"><span class="nutrition-facts__label">Invalid nutrition data format</span></li>';
+          nutritionList.innerHTML = '';
+          nutritionList.appendChild(fragment);
         }
       } catch (e) {
-        console.error('Error parsing nutrition facts:', e, 'Data:', nutritionData);
-        // Fallback: try to display as plain text or split by comma
-        nutritionList.innerHTML = '';
-        let dataString = nutritionData.replace(/&quot;/g, '"').replace(/&#39;/g, "'");
-        
-        // Try to extract array items manually
-        const match = dataString.match(/\[(.*?)\]/);
-        if (match && match[1]) {
-          const items = match[1].split(',').map(function(item) {
-            return item.trim().replace(/^["']|["']$/g, '');
-          });
-          
-          items.forEach(function(item) {
-            if (item.trim() !== '') {
-              const colonIndex = item.indexOf(':');
-              let label, value;
-              
-              if (colonIndex > -1) {
-                label = item.substring(0, colonIndex).trim();
-                value = item.substring(colonIndex + 1).trim();
-              } else {
-                label = item.trim();
-                value = '';
+        // Try fallback parsing
+        try {
+          let dataString = nutritionData.replace(/&quot;/g, '"').replace(/&#39;/g, "'");
+          const match = dataString.match(/\[(.*?)\]/);
+          if (match && match[1]) {
+            const items = match[1].split(',').map(function(item) {
+              return item.trim().replace(/^["']|["']$/g, '');
+            });
+            
+            const fragment = document.createDocumentFragment();
+            items.forEach(function(item) {
+              if (item.trim() !== '') {
+                const colonIndex = item.indexOf(':');
+                let label = colonIndex > -1 ? item.substring(0, colonIndex).trim() : item.trim();
+                let value = colonIndex > -1 ? item.substring(colonIndex + 1).trim() : '';
+                
+                const listItem = document.createElement('li');
+                listItem.className = 'nutrition-facts__item';
+                
+                const labelSpan = document.createElement('span');
+                labelSpan.className = 'nutrition-facts__label';
+                labelSpan.textContent = label;
+                listItem.appendChild(labelSpan);
+                
+                if (value) {
+                  const valueSpan = document.createElement('span');
+                  valueSpan.className = 'nutrition-facts__value';
+                  valueSpan.textContent = value;
+                  listItem.appendChild(valueSpan);
+                }
+                
+                fragment.appendChild(listItem);
               }
-              
-              const listItem = document.createElement('li');
-              listItem.className = 'nutrition-facts__item';
-              
-              const labelSpan = document.createElement('span');
-              labelSpan.className = 'nutrition-facts__label';
-              labelSpan.textContent = label;
-              
-              listItem.appendChild(labelSpan);
-              
-              if (value) {
-                const valueSpan = document.createElement('span');
-                valueSpan.className = 'nutrition-facts__value';
-                valueSpan.textContent = value;
-                listItem.appendChild(valueSpan);
-              }
-              
-              nutritionList.appendChild(listItem);
-            }
-          });
-        } else {
-          // Last resort: show error message
-          nutritionList.innerHTML = '<li class="nutrition-facts__item"><span class="nutrition-facts__label">Unable to parse nutrition data. Please check the metafield format.</span></li>';
+            });
+            
+            nutritionList.innerHTML = '';
+            nutritionList.appendChild(fragment);
+          }
+        } catch (fallbackError) {
+          // Error already handled, keep loading message
         }
       }
     }
     
-    // Tab functionality
+    // Tab functionality - simplified and faster
     function initTabs() {
       const tabs = document.querySelectorAll('.product-nutrition__tab');
       const panels = document.querySelectorAll('.product-nutrition__panel');
       
       if (tabs.length === 0 || panels.length === 0) {
-        console.log('Tabs or panels not found');
         return;
       }
       
-      tabs.forEach(tab => {
+      // Remove existing listeners to prevent duplicates
+      tabs.forEach(function(tab) {
+        const newTab = tab.cloneNode(true);
+        tab.parentNode.replaceChild(newTab, tab);
+      });
+      
+      // Get fresh references after cloning
+      const freshTabs = document.querySelectorAll('.product-nutrition__tab');
+      const freshPanels = document.querySelectorAll('.product-nutrition__panel');
+      
+      freshTabs.forEach(function(tab) {
         tab.addEventListener('click', function(e) {
           e.preventDefault();
+          e.stopPropagation();
+          
           const targetTab = this.getAttribute('data-tab');
           
-          console.log('Tab clicked:', targetTab);
-          
-          // Update tabs
-          tabs.forEach(t => {
+          // Update all tabs
+          freshTabs.forEach(function(t) {
             t.classList.remove('active');
             t.setAttribute('aria-selected', 'false');
           });
           this.classList.add('active');
           this.setAttribute('aria-selected', 'true');
           
-          // Update panels
-          panels.forEach(panel => {
+          // Update all panels
+          freshPanels.forEach(function(panel) {
             const panelTab = panel.getAttribute('data-panel');
-            panel.classList.remove('active');
-            panel.setAttribute('aria-hidden', 'true');
             
             if (panelTab === targetTab) {
+              // Show this panel - use class only, let CSS handle display
               panel.classList.add('active');
               panel.setAttribute('aria-hidden', 'false');
-              console.log('Showing panel:', panelTab);
+              panel.removeAttribute('style'); // Remove any inline styles
+            } else {
+              // Hide other panels
+              panel.classList.remove('active');
+              panel.setAttribute('aria-hidden', 'true');
+              panel.removeAttribute('style'); // Remove any inline styles
             }
           });
         });
       });
     }
     
-    // Initialize immediately and also on DOM ready
+    // Initialize function
     function init() {
       initNutritionFacts();
       initTabs();
     }
     
-    // Try multiple times to ensure it runs
+    // Run initialization immediately
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', init);
     } else {
+      // DOM already loaded, run immediately
       init();
     }
     
-    // Also try after a short delay in case the section loads dynamically
-    setTimeout(init, 100);
-    setTimeout(init, 500);
-    setTimeout(init, 1000);
+    // Also run once more after a short delay for dynamically loaded content
+    setTimeout(function() {
+      initTabs(); // Re-initialize tabs in case they weren't found initially
+    }, 50);
   })();
 {% endjavascript %}
 
@@ -559,47 +590,6 @@
       "id": "serving_size",
       "label": "Serving Size",
       "default": "1 scoop (10g)"
-    },
-    {
-      "type": "richtext",
-      "id": "nutrition_facts",
-      "label": "Nutrition Facts (HTML)",
-      "info": "Leave blank to use individual fields below"
-    },
-    {
-      "type": "text",
-      "id": "calories",
-      "label": "Calories"
-    },
-    {
-      "type": "text",
-      "id": "protein",
-      "label": "Protein (g)"
-    },
-    {
-      "type": "text",
-      "id": "carbs",
-      "label": "Total Carbohydrates (g)"
-    },
-    {
-      "type": "text",
-      "id": "fiber",
-      "label": "Dietary Fiber (g)"
-    },
-    {
-      "type": "text",
-      "id": "fat",
-      "label": "Total Fat (g)"
-    },
-    {
-      "type": "richtext",
-      "id": "ingredients",
-      "label": "Ingredients List"
-    },
-    {
-      "type": "richtext",
-      "id": "allergen_info",
-      "label": "Allergen Information"
     }
   ],
   "presets": [
@@ -609,4 +599,3 @@
   ]
 }
 {% endschema %}
-
