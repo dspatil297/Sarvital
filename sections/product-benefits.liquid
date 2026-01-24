@@ -1,11 +1,17 @@
 {% comment %}
-  Product Benefits Section - Minimalist Design
+  Product Benefits Section - Conversion-Optimized Design
+  Focused on clear value propositions and visual appeal
 {% endcomment %}
 
 <section class="product-benefits">
   <div class="product-benefits__container">
     {% if section.settings.title != blank %}
-      <h2 class="product-benefits__title">{{ section.settings.title }}</h2>
+      <div class="product-benefits__header">
+        <h2 class="product-benefits__title">{{ section.settings.title }}</h2>
+        {% if section.settings.subtitle != blank %}
+          <p class="product-benefits__subtitle">{{ section.settings.subtitle }}</p>
+        {% endif %}
+      </div>
     {% endif %}
     
     {% if section.blocks.size > 0 %}
@@ -25,6 +31,16 @@
             {% if block.settings.description != blank %}
               <p class="product-benefit__description">{{ block.settings.description }}</p>
             {% endif %}
+            
+            {% if block.settings.cta_text != blank %}
+              <a href="{{ block.settings.cta_link | default: '#product-hero' }}" class="product-benefit__cta">
+                {{ block.settings.cta_text }}
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="5" y1="12" x2="19" y2="12"/>
+                  <polyline points="12 5 19 12 12 19"/>
+                </svg>
+              </a>
+            {% endif %}
           </div>
         {% endfor %}
       </div>
@@ -36,8 +52,8 @@
   .product-benefits {
     width: 100%;
     max-width: 100%;
-    padding: 80px var(--spacing-lg);
-    background: var(--bg);
+    padding: 100px 40px;
+    background: var(--white);
     box-sizing: border-box;
   }
 
@@ -46,79 +62,152 @@
     margin: 0 auto;
   }
 
-  .product-benefits__title {
+  .product-benefits__header {
     text-align: center;
-    font-family: var(--font-heading);
-    font-size: 48px;
-    font-weight: 300;
-    color: var(--text);
     margin-bottom: 60px;
-    letter-spacing: -0.03em;
-    line-height: 1.1;
+  }
+
+  .product-benefits__title {
+    font-family: var(--font-heading);
+    font-size: 42px;
+    font-weight: 600;
+    color: var(--text);
+    margin: 0 0 16px 0;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+
+  .product-benefits__subtitle {
+    font-size: 18px;
+    color: rgba(26, 26, 26, 0.7);
+    margin: 0;
+    font-weight: 300;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.6;
   }
 
   .product-benefits__grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 40px;
+    gap: 32px;
   }
 
   .product-benefit {
     text-align: center;
-    padding: 40px 30px;
+    padding: 48px 32px;
     background: var(--white);
-    border-radius: 8px;
+    border-radius: 12px;
     border: 1px solid var(--border-color);
-    transition: all 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .product-benefit::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--forest-green), var(--sage-green));
+    transform: scaleX(0);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .product-benefit:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(45, 80, 22, 0.1);
+    transform: translateY(-8px);
+    box-shadow: 0 12px 32px rgba(74, 124, 44, 0.12);
     border-color: var(--sage-green);
   }
 
+  .product-benefit:hover::before {
+    transform: scaleX(1);
+  }
+
   .product-benefit__icon {
-    width: 60px;
-    height: 60px;
-    margin: 0 auto 24px;
+    width: 72px;
+    height: 72px;
+    margin: 0 auto 28px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(74, 124, 44, 0.08);
-    border-radius: 50%;
-    transition: all 0.3s ease;
+    background: linear-gradient(135deg, rgba(74, 124, 44, 0.1), rgba(74, 124, 44, 0.05));
+    border-radius: 16px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
   }
 
   .product-benefit__icon svg {
-    width: 28px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
     color: var(--forest-green);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .product-benefit:hover .product-benefit__icon {
-    background: var(--forest-green);
+    background: linear-gradient(135deg, var(--forest-green), var(--sage-green));
+    transform: scale(1.1) rotate(5deg);
   }
 
   .product-benefit:hover .product-benefit__icon svg {
     color: var(--white);
+    transform: scale(1.1);
   }
 
   .product-benefit__title {
     font-family: var(--font-heading);
-    font-size: 20px;
+    font-size: 22px;
     font-weight: 600;
-    color: var(--forest-green);
-    margin-bottom: 12px;
+    color: var(--text);
+    margin-bottom: 14px;
     line-height: 1.3;
+    transition: color 0.3s ease;
+  }
+
+  .product-benefit:hover .product-benefit__title {
+    color: var(--forest-green);
   }
 
   .product-benefit__description {
     font-size: 15px;
-    color: rgba(26, 26, 26, 0.65);
-    line-height: 1.6;
-    margin: 0;
+    color: rgba(26, 26, 26, 0.7);
+    line-height: 1.7;
+    margin: 0 0 24px 0;
     font-weight: 300;
+    flex-grow: 1;
+  }
+
+  .product-benefit__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--forest-green);
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    margin-top: auto;
+    transition: all 0.3s ease;
+  }
+
+  .product-benefit__cta:hover {
+    gap: 10px;
+    color: var(--sage-green);
+  }
+
+  .product-benefit__cta svg {
+    transition: transform 0.3s ease;
+  }
+
+  .product-benefit__cta:hover svg {
+    transform: translateX(4px);
+  }
+
+  .product-benefit {
+    display: flex;
+    flex-direction: column;
   }
 
   @media (max-width: 968px) {
@@ -128,14 +217,29 @@
     }
   }
 
+  @media (max-width: 968px) {
+    .product-benefits {
+      padding: 80px 30px;
+    }
+
+    .product-benefits__grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+    }
+  }
+
   @media (max-width: 768px) {
     .product-benefits {
-      padding: 60px var(--spacing-md);
+      padding: 60px 20px;
     }
 
     .product-benefits__title {
       font-size: 36px;
-      margin-bottom: 40px;
+      margin-bottom: 20px;
+    }
+
+    .product-benefits__subtitle {
+      font-size: 16px;
     }
 
     .product-benefits__grid {
@@ -144,7 +248,13 @@
     }
 
     .product-benefit {
-      padding: 32px 24px;
+      padding: 40px 28px;
+    }
+
+    .product-benefit__icon {
+      width: 64px;
+      height: 64px;
+      margin-bottom: 24px;
     }
   }
 {% endstylesheet %}
@@ -158,6 +268,12 @@
       "id": "title",
       "label": "Section Title",
       "default": "Why Choose This Product"
+    },
+    {
+      "type": "textarea",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "Discover what makes our products special"
     }
   ],
   "blocks": [
@@ -224,6 +340,17 @@
           "id": "description",
           "label": "Description",
           "default": "Detailed description of this benefit."
+        },
+        {
+          "type": "text",
+          "id": "cta_text",
+          "label": "CTA Text",
+          "default": "Learn More"
+        },
+        {
+          "type": "url",
+          "id": "cta_link",
+          "label": "CTA Link"
         }
       ]
     }
@@ -261,3 +388,4 @@
   ]
 }
 {% endschema %}
+

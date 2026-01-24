@@ -1,0 +1,333 @@
+{% comment %}
+  Product Guarantee Section - Trust & Conversion Focused
+  Builds trust and reduces purchase anxiety
+{% endcomment %}
+
+<section class="product-guarantee">
+  <div class="product-guarantee__container">
+    <div class="product-guarantee__content">
+      <div class="guarantee-badge">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          <path d="M9 12l2 2 4-4"/>
+        </svg>
+      </div>
+      
+      <h2 class="guarantee-title">{{ section.settings.title | default: "100% Satisfaction Guarantee" }}</h2>
+      
+      {% if section.settings.description != blank %}
+        <p class="guarantee-description">{{ section.settings.description }}</p>
+      {% endif %}
+      
+      <div class="guarantee-features">
+        {% if section.settings.show_free_shipping %}
+          <div class="guarantee-feature">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 7h-4M8 7H4M16 7v14M8 7v14M12 3v4M6 3h12"/>
+            </svg>
+            <div>
+              <strong>Free Shipping</strong>
+              <span>{{ section.settings.free_shipping_text | default: "On orders over ₹500" }}</span>
+            </div>
+          </div>
+        {% endif %}
+        
+        {% if section.settings.show_returns %}
+          <div class="guarantee-feature">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 7v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2z"/>
+              <polyline points="3 7 12 13 21 7"/>
+            </svg>
+            <div>
+              <strong>{{ section.settings.returns_title | default: "30-Day Returns" }}</strong>
+              <span>{{ section.settings.returns_text | default: "No questions asked" }}</span>
+            </div>
+          </div>
+        {% endif %}
+        
+        {% if section.settings.show_secure_payment %}
+          <div class="guarantee-feature">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+              <line x1="1" y1="10" x2="23" y2="10"/>
+            </svg>
+            <div>
+              <strong>Secure Payment</strong>
+              <span>{{ section.settings.secure_payment_text | default: "SSL encrypted checkout" }}</span>
+            </div>
+          </div>
+        {% endif %}
+        
+        {% if section.settings.show_support %}
+          <div class="guarantee-feature">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+            <div>
+              <strong>{{ section.settings.support_title | default: "24/7 Support" }}</strong>
+              <span>{{ section.settings.support_text | default: "We're here to help" }}</span>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+      
+      {% if section.settings.cta_text != blank %}
+        <a href="{{ section.settings.cta_link | default: '#product-hero' }}" class="guarantee-cta">
+          {{ section.settings.cta_text }}
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="5" y1="12" x2="19" y2="12"/>
+            <polyline points="12 5 19 12 12 19"/>
+          </svg>
+        </a>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+  .product-guarantee {
+    width: 100%;
+    max-width: 100%;
+    padding: 80px var(--spacing-lg);
+    background: linear-gradient(135deg, rgba(74, 124, 44, 0.05) 0%, rgba(212, 175, 55, 0.05) 100%);
+    box-sizing: border-box;
+  }
+
+  .product-guarantee__container {
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .product-guarantee__content {
+    text-align: center;
+    padding: 60px 40px;
+    background: var(--white);
+    border-radius: 16px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  }
+
+  .guarantee-badge {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(74, 124, 44, 0.1);
+    border-radius: 50%;
+    color: var(--forest-green);
+  }
+
+  .guarantee-title {
+    font-family: var(--font-heading);
+    font-size: 36px;
+    font-weight: 600;
+    color: var(--text);
+    margin: 0 0 16px 0;
+    line-height: 1.2;
+  }
+
+  .guarantee-description {
+    font-size: 16px;
+    color: rgba(26, 26, 26, 0.7);
+    line-height: 1.7;
+    margin: 0 0 40px 0;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .guarantee-features {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    margin-bottom: 40px;
+    text-align: left;
+  }
+
+  .guarantee-feature {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 24px;
+    background: rgba(74, 124, 44, 0.03);
+    border-radius: 12px;
+    transition: all 0.3s ease;
+  }
+
+  .guarantee-feature:hover {
+    background: rgba(74, 124, 44, 0.06);
+    transform: translateY(-2px);
+  }
+
+  .guarantee-feature svg {
+    flex-shrink: 0;
+    color: var(--forest-green);
+    margin-top: 2px;
+  }
+
+  .guarantee-feature div {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .guarantee-feature strong {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .guarantee-feature span {
+    font-size: 14px;
+    color: rgba(26, 26, 26, 0.7);
+  }
+
+  .guarantee-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 32px;
+    background: var(--forest-green);
+    color: var(--white);
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+
+  .guarantee-cta:hover {
+    background: var(--sage-green);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(74, 124, 44, 0.3);
+  }
+
+  .guarantee-cta svg {
+    transition: transform 0.3s ease;
+  }
+
+  .guarantee-cta:hover svg {
+    transform: translateX(4px);
+  }
+
+  @media (max-width: 768px) {
+    .product-guarantee {
+      padding: 60px var(--spacing-md);
+    }
+
+    .product-guarantee__content {
+      padding: 40px 24px;
+    }
+
+    .guarantee-title {
+      font-size: 28px;
+    }
+
+    .guarantee-features {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    .guarantee-feature {
+      padding: 20px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Product Guarantee",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "100% Satisfaction Guarantee"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "We stand behind our products. If you're not completely satisfied, we'll make it right."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_free_shipping",
+      "label": "Show Free Shipping",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "free_shipping_text",
+      "label": "Free Shipping Text",
+      "default": "On orders over ₹500"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_returns",
+      "label": "Show Returns",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "returns_title",
+      "label": "Returns Title",
+      "default": "30-Day Returns"
+    },
+    {
+      "type": "text",
+      "id": "returns_text",
+      "label": "Returns Text",
+      "default": "No questions asked"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_secure_payment",
+      "label": "Show Secure Payment",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "secure_payment_text",
+      "label": "Secure Payment Text",
+      "default": "SSL encrypted checkout"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_support",
+      "label": "Show Support",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "support_title",
+      "label": "Support Title",
+      "default": "24/7 Support"
+    },
+    {
+      "type": "text",
+      "id": "support_text",
+      "label": "Support Text",
+      "default": "We're here to help"
+    },
+    {
+      "type": "text",
+      "id": "cta_text",
+      "label": "CTA Text",
+      "default": "Shop Now"
+    },
+    {
+      "type": "url",
+      "id": "cta_link",
+      "label": "CTA Link"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product Guarantee"
+    }
+  ]
+}
+{% endschema %}
+

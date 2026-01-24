@@ -138,6 +138,23 @@
         "show_review_form": true
       }
     },
+    "product_guarantee": {
+      "type": "product-guarantee",
+      "settings": {
+        "title": "100% Satisfaction Guarantee",
+        "description": "We stand behind our products. If you're not completely satisfied, we'll make it right.",
+        "show_free_shipping": true,
+        "free_shipping_text": "On orders over ₹500",
+        "show_returns": true,
+        "returns_title": "30-Day Returns",
+        "returns_text": "No questions asked",
+        "show_secure_payment": true,
+        "secure_payment_text": "SSL encrypted checkout",
+        "show_support": true,
+        "support_title": "24/7 Support",
+        "support_text": "We're here to help"
+      }
+    },
     "related_products": {
       "type": "related-products",
       "settings": {
@@ -154,6 +171,7 @@
     "product_quality",
     "product_sustainability",
     "product_reviews",
+    "product_guarantee",
     "related_products"
   ]
 }

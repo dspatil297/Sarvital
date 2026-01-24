@@ -37,10 +37,37 @@
     
     <div class="product-nutrition__content">
       <div class="product-nutrition__panel active" data-panel="nutrition" aria-hidden="false">
-        {% assign nutrition_html = product.metafields.custom.nutrition_facts | default: section.settings.nutrition_facts %}
-        {% if nutrition_html != blank %}
+        {% assign nutrition_data = product.metafields.custom.nutrition_facts | default: section.settings.nutrition_facts %}
+        {% if nutrition_data != blank %}
           <div class="nutrition-facts">
-            {{ nutrition_html }}
+            <div class="nutrition-facts__header">
+              <h3>Nutrition Facts</h3>
+            </div>
+            {% comment %} Check if it's a list metafield {% endcomment %}
+            {% if nutrition_data.first %}
+              <ul class="nutrition-facts__list">
+                {% for item in nutrition_data %}
+                  {% assign item_parts = item | split: ':' %}
+                  {% if item_parts.size > 1 %}
+                    <li class="nutrition-facts__item">
+                      <span class="nutrition-facts__label">{{ item_parts.first | strip }}</span>
+                      <span class="nutrition-facts__value">{{ item_parts.last | strip }}</span>
+                    </li>
+                  {% else %}
+                    <li class="nutrition-facts__item">
+                      <span class="nutrition-facts__label">{{ item | strip }}</span>
+                    </li>
+                  {% endif %}
+                {% endfor %}
+              </ul>
+            {% else %}
+              <ul class="nutrition-facts__list" data-nutrition-data="{{ nutrition_data | escape | replace: '"', '&quot;' }}" id="nutrition-facts-list">
+                {% comment %} List items will be populated by JavaScript {% endcomment %}
+                <li class="nutrition-facts__item" style="display: none;">
+                  <span class="nutrition-facts__label">Loading...</span>
+                </li>
+              </ul>
+            {% endif %}
           </div>
         {% else %}
           <div class="nutrition-facts">
@@ -175,56 +202,60 @@
   .product-nutrition {
     width: 100%;
     max-width: 100%;
-    padding: 80px var(--spacing-lg);
-    background: var(--white);
+    padding: 100px 40px;
+    background: var(--bg);
     box-sizing: border-box;
   }
 
   .product-nutrition__container {
-    max-width: 900px;
+    max-width: 1200px;
     margin: 0 auto;
   }
 
   .product-nutrition__title {
     text-align: center;
     font-family: var(--font-heading);
-    font-size: 48px;
-    font-weight: 300;
+    font-size: 42px;
+    font-weight: 600;
     color: var(--text);
     margin-bottom: 50px;
-    letter-spacing: -0.03em;
-    line-height: 1.1;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
   }
 
   .product-nutrition__tabs {
     display: flex;
     gap: 0;
-    margin-bottom: 40px;
-    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 50px;
+    border-bottom: 2px solid var(--border-color);
+    justify-content: center;
+    flex-wrap: wrap;
   }
 
   .product-nutrition__tab {
-    padding: 16px 32px;
+    padding: 18px 36px;
     background: transparent;
     border: none;
-    border-bottom: 2px solid transparent;
-    font-size: 15px;
-    font-weight: 400;
+    border-bottom: 3px solid transparent;
+    font-size: 16px;
+    font-weight: 500;
     color: rgba(26, 26, 26, 0.6);
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
-    bottom: -1px;
+    bottom: -2px;
+    font-family: var(--font-heading);
   }
 
   .product-nutrition__tab:hover {
     color: var(--forest-green);
+    background: rgba(74, 124, 44, 0.03);
   }
 
   .product-nutrition__tab.active {
     color: var(--forest-green);
     border-bottom-color: var(--forest-green);
-    font-weight: 500;
+    font-weight: 600;
   }
 
   .product-nutrition__content {
@@ -256,20 +287,23 @@
   .ingredients-list,
   .allergen-info {
     background: var(--white);
-    padding: 0;
+    padding: 48px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
   }
 
   .nutrition-facts__header {
-    margin-bottom: 30px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+    border-bottom: 2px solid var(--border-color);
   }
 
   .nutrition-facts__header h3 {
     font-family: var(--font-heading);
-    font-size: 24px;
+    font-size: 28px;
     color: var(--forest-green);
-    margin-bottom: 8px;
+    margin-bottom: 12px;
     font-weight: 600;
   }
 
@@ -284,14 +318,33 @@
     list-style: none;
     padding: 0;
     margin: 0;
+    min-height: 100px;
+  }
+
+  .nutrition-facts__list:empty::before {
+    content: 'Loading nutrition facts...';
+    display: block;
+    padding: 20px;
+    text-align: center;
+    color: rgba(26, 26, 26, 0.5);
+    font-style: italic;
   }
 
   .nutrition-facts__item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 16px 0;
-    border-bottom: 1px solid var(--border-color);
+    padding: 18px 0;
+    border-bottom: 1px solid rgba(26, 26, 26, 0.08);
+    transition: all 0.3s ease;
+  }
+
+  .nutrition-facts__item:hover {
+    padding-left: 8px;
+    background: rgba(74, 124, 44, 0.02);
+    margin: 0 -8px;
+    padding-right: 8px;
+    border-radius: 6px;
   }
 
   .nutrition-facts__item:last-child {
@@ -299,39 +352,40 @@
   }
 
   .nutrition-facts__label {
-    font-weight: 400;
+    font-weight: 500;
     color: var(--text);
-    font-size: 15px;
+    font-size: 16px;
     flex: 1;
   }
 
   .nutrition-facts__value {
-    font-weight: 600;
+    font-weight: 700;
     color: var(--forest-green);
-    font-size: 15px;
+    font-size: 16px;
     margin-left: 20px;
+    font-family: var(--font-heading);
   }
 
   .ingredients-list h3,
   .allergen-info h3 {
     font-family: var(--font-heading);
-    font-size: 24px;
+    font-size: 28px;
     color: var(--forest-green);
-    margin-bottom: 20px;
+    margin-bottom: 24px;
     font-weight: 600;
   }
 
   .ingredients-list__content,
   .allergen-info__content {
-    font-size: 15px;
-    line-height: 1.7;
-    color: rgba(26, 26, 26, 0.65);
+    font-size: 16px;
+    line-height: 1.8;
+    color: rgba(26, 26, 26, 0.7);
     font-weight: 300;
   }
 
   @media (max-width: 768px) {
     .product-nutrition {
-      padding: 60px var(--spacing-md);
+      padding: 60px 20px;
     }
 
     .product-nutrition__title {
@@ -342,48 +396,205 @@
     .product-nutrition__tabs {
       flex-direction: column;
       border-bottom: none;
+      gap: 8px;
     }
 
     .product-nutrition__tab {
       border-bottom: 1px solid var(--border-color);
-      border-left: 2px solid transparent;
+      border-left: 3px solid transparent;
       text-align: left;
+      padding: 16px 24px;
     }
 
     .product-nutrition__tab.active {
       border-left-color: var(--forest-green);
       border-bottom-color: var(--border-color);
+      background: rgba(74, 124, 44, 0.05);
+    }
+
+    .nutrition-facts,
+    .ingredients-list,
+    .allergen-info {
+      padding: 32px 24px;
     }
   }
 {% endstylesheet %}
 
 {% javascript %}
-  document.addEventListener('DOMContentLoaded', function() {
-    const tabs = document.querySelectorAll('.product-nutrition__tab');
-    const panels = document.querySelectorAll('.product-nutrition__panel');
+  (function() {
+    function initNutritionFacts() {
+      // Parse and render nutrition facts from JSON array
+      const nutritionList = document.querySelector('.nutrition-facts__list[data-nutrition-data]');
+      if (!nutritionList) {
+        console.log('No nutrition list found with data attribute');
+        return;
+      }
+      
+      const nutritionData = nutritionList.getAttribute('data-nutrition-data');
+      if (!nutritionData || nutritionData.trim() === '') {
+        console.warn('No nutrition data found in attribute');
+        nutritionList.innerHTML = '<li class="nutrition-facts__item"><span class="nutrition-facts__label">No nutrition data available</span></li>';
+        return;
+      }
+      
+      console.log('Nutrition data found:', nutritionData);
+      
+      try {
+        // Unescape HTML entities
+        let dataString = nutritionData.replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, '&');
+        
+        // Remove any leading/trailing whitespace
+        dataString = dataString.trim();
+        
+        console.log('Parsing data string:', dataString);
+        
+        // Parse JSON array
+        const nutritionArray = JSON.parse(dataString);
+        
+        console.log('Parsed array:', nutritionArray);
+        
+        if (Array.isArray(nutritionArray) && nutritionArray.length > 0) {
+          nutritionList.innerHTML = ''; // Clear placeholder
+          
+          nutritionArray.forEach(function(item) {
+            if (typeof item === 'string' && item.trim() !== '') {
+              // Check if item contains ":" separator (Label: Value format)
+              const colonIndex = item.indexOf(':');
+              let label, value;
+              
+              if (colonIndex > -1) {
+                label = item.substring(0, colonIndex).trim();
+                value = item.substring(colonIndex + 1).trim();
+              } else {
+                // If no colon, treat entire string as label
+                label = item.trim();
+                value = '';
+              }
+              
+              // Create list item
+              const listItem = document.createElement('li');
+              listItem.className = 'nutrition-facts__item';
+              
+              const labelSpan = document.createElement('span');
+              labelSpan.className = 'nutrition-facts__label';
+              labelSpan.textContent = label;
+              
+              listItem.appendChild(labelSpan);
+              
+              if (value) {
+                const valueSpan = document.createElement('span');
+                valueSpan.className = 'nutrition-facts__value';
+                valueSpan.textContent = value;
+                listItem.appendChild(valueSpan);
+              }
+              
+              nutritionList.appendChild(listItem);
+            }
+          });
+          
+          console.log('Successfully rendered', nutritionArray.length, 'nutrition items');
+        } else {
+          console.warn('Nutrition data is not a valid array:', nutritionArray);
+          nutritionList.innerHTML = '<li class="nutrition-facts__item"><span class="nutrition-facts__label">Invalid nutrition data format</span></li>';
+        }
+      } catch (e) {
+        console.error('Error parsing nutrition facts:', e, 'Data:', nutritionData);
+        // Fallback: try to display as plain text or split by comma
+        nutritionList.innerHTML = '';
+        let dataString = nutritionData.replace(/&quot;/g, '"').replace(/&#39;/g, "'");
+        
+        // Try to extract array items manually
+        const match = dataString.match(/\[(.*?)\]/);
+        if (match && match[1]) {
+          const items = match[1].split(',').map(function(item) {
+            return item.trim().replace(/^["']|["']$/g, '');
+          });
+          
+          items.forEach(function(item) {
+            if (item.trim() !== '') {
+              const colonIndex = item.indexOf(':');
+              let label, value;
+              
+              if (colonIndex > -1) {
+                label = item.substring(0, colonIndex).trim();
+                value = item.substring(colonIndex + 1).trim();
+              } else {
+                label = item.trim();
+                value = '';
+              }
+              
+              const listItem = document.createElement('li');
+              listItem.className = 'nutrition-facts__item';
+              
+              const labelSpan = document.createElement('span');
+              labelSpan.className = 'nutrition-facts__label';
+              labelSpan.textContent = label;
+              
+              listItem.appendChild(labelSpan);
+              
+              if (value) {
+                const valueSpan = document.createElement('span');
+                valueSpan.className = 'nutrition-facts__value';
+                valueSpan.textContent = value;
+                listItem.appendChild(valueSpan);
+              }
+              
+              nutritionList.appendChild(listItem);
+            }
+          });
+        } else {
+          // Last resort: show error message
+          nutritionList.innerHTML = '<li class="nutrition-facts__item"><span class="nutrition-facts__label">Unable to parse nutrition data. Please check the metafield format.</span></li>';
+        }
+      }
+    }
     
-    tabs.forEach(tab => {
-      tab.addEventListener('click', function() {
-        const targetTab = this.dataset.tab;
-        
-        tabs.forEach(t => {
-          t.classList.remove('active');
-          t.setAttribute('aria-selected', 'false');
-        });
-        this.classList.add('active');
-        this.setAttribute('aria-selected', 'true');
-        
-        panels.forEach(panel => {
-          panel.classList.remove('active');
-          panel.setAttribute('aria-hidden', 'true');
-          if (panel.dataset.panel === targetTab) {
-            panel.classList.add('active');
-            panel.setAttribute('aria-hidden', 'false');
-          }
+    // Tab functionality
+    function initTabs() {
+      const tabs = document.querySelectorAll('.product-nutrition__tab');
+      const panels = document.querySelectorAll('.product-nutrition__panel');
+      
+      tabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+          const targetTab = this.dataset.tab;
+          
+          tabs.forEach(t => {
+            t.classList.remove('active');
+            t.setAttribute('aria-selected', 'false');
+          });
+          this.classList.add('active');
+          this.setAttribute('aria-selected', 'true');
+          
+          panels.forEach(panel => {
+            panel.classList.remove('active');
+            panel.setAttribute('aria-hidden', 'true');
+            if (panel.dataset.panel === targetTab) {
+              panel.classList.add('active');
+              panel.setAttribute('aria-hidden', 'false');
+            }
+          });
         });
       });
-    });
-  });
+    }
+    
+    // Initialize immediately and also on DOM ready
+    function init() {
+      initNutritionFacts();
+      initTabs();
+    }
+    
+    // Try multiple times to ensure it runs
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+    
+    // Also try after a short delay in case the section loads dynamically
+    setTimeout(init, 100);
+    setTimeout(init, 500);
+    setTimeout(init, 1000);
+  })();
 {% endjavascript %}
 
 {% schema %}
@@ -451,3 +662,4 @@
   ]
 }
 {% endschema %}
+

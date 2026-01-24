@@ -49,8 +49,8 @@
   .product-usage {
     width: 100%;
     max-width: 100%;
-    padding: 80px var(--spacing-lg);
-    background: var(--bg);
+    padding: 100px 40px;
+    background: var(--white);
     box-sizing: border-box;
   }
 
@@ -62,12 +62,12 @@
   .product-usage__title {
     text-align: center;
     font-family: var(--font-heading);
-    font-size: 48px;
-    font-weight: 300;
+    font-size: 42px;
+    font-weight: 600;
     color: var(--text);
     margin-bottom: 60px;
-    letter-spacing: -0.03em;
-    line-height: 1.1;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
   }
 
   .product-usage__content {
@@ -79,85 +79,113 @@
   .usage-suggestions__grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 30px;
+    gap: 32px;
   }
 
   .usage-suggestion {
     text-align: center;
-    padding: 32px 24px;
+    padding: 40px 32px;
     background: var(--white);
-    border-radius: 8px;
+    border-radius: 12px;
     border: 1px solid var(--border-color);
-    transition: all 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .usage-suggestion::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--forest-green), var(--sage-green));
+    transform: scaleX(0);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .usage-suggestion:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(45, 80, 22, 0.1);
+    transform: translateY(-8px);
+    box-shadow: 0 12px 32px rgba(74, 124, 44, 0.12);
     border-color: var(--sage-green);
   }
 
+  .usage-suggestion:hover::before {
+    transform: scaleX(1);
+  }
+
   .usage-suggestion__icon {
-    width: 50px;
-    height: 50px;
-    margin: 0 auto 20px;
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 24px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(74, 124, 44, 0.08);
-    border-radius: 50%;
-    transition: all 0.3s ease;
+    background: linear-gradient(135deg, rgba(74, 124, 44, 0.1), rgba(74, 124, 44, 0.05));
+    border-radius: 16px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .usage-suggestion__icon svg {
-    width: 24px;
-    height: 24px;
+    width: 28px;
+    height: 28px;
     color: var(--forest-green);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .usage-suggestion:hover .usage-suggestion__icon {
-    background: var(--forest-green);
+    background: linear-gradient(135deg, var(--forest-green), var(--sage-green));
+    transform: scale(1.1) rotate(5deg);
   }
 
   .usage-suggestion:hover .usage-suggestion__icon svg {
     color: var(--white);
+    transform: scale(1.1);
   }
 
   .usage-suggestion__title {
     font-family: var(--font-heading);
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 600;
+    color: var(--text);
+    margin-bottom: 12px;
+    transition: color 0.3s ease;
+  }
+
+  .usage-suggestion:hover .usage-suggestion__title {
     color: var(--forest-green);
-    margin-bottom: 10px;
   }
 
   .usage-suggestion__description {
-    font-size: 14px;
-    color: rgba(26, 26, 26, 0.65);
-    line-height: 1.6;
+    font-size: 15px;
+    color: rgba(26, 26, 26, 0.7);
+    line-height: 1.7;
     margin: 0;
     font-weight: 300;
   }
 
   .usage-instructions {
     background: var(--white);
-    padding: 40px;
-    border-radius: 8px;
+    padding: 48px;
+    border-radius: 12px;
     border: 1px solid var(--border-color);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    margin-top: 40px;
   }
 
   .usage-instructions h3 {
     font-family: var(--font-heading);
-    font-size: 24px;
+    font-size: 28px;
     color: var(--forest-green);
-    margin-bottom: 20px;
+    margin-bottom: 24px;
     font-weight: 600;
   }
 
   .usage-instructions__content {
-    font-size: 15px;
-    line-height: 1.7;
-    color: rgba(26, 26, 26, 0.65);
+    font-size: 16px;
+    line-height: 1.8;
+    color: rgba(26, 26, 26, 0.7);
     font-weight: 300;
   }
 
@@ -179,7 +207,7 @@
 
   @media (max-width: 768px) {
     .product-usage {
-      padding: 60px var(--spacing-md);
+      padding: 60px 20px;
     }
 
     .product-usage__title {
@@ -194,6 +222,7 @@
 
     .usage-instructions {
       padding: 32px 24px;
+      margin-top: 32px;
     }
   }
 {% endstylesheet %}
@@ -265,3 +294,4 @@
   ]
 }
 {% endschema %}
+
