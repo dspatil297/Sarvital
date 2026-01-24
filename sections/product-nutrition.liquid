@@ -1,255 +1,106 @@
 {% comment %}
-  Product Nutrition Information Section
-  Displays nutrition facts and ingredients from metafields
+  Product Nutrition Facts Section
+  Displays nutrition facts from custom.nutrition_facts metafield
+  Always visible - no tabs for better conversions
 {% endcomment %}
 
-<section class="product-nutrition">
-  <div class="product-nutrition__container">
+<section class="product-nutrition-facts">
+  <div class="product-nutrition-facts__container">
     {% if section.settings.title != blank %}
-      <h2 class="product-nutrition__title">{{ section.settings.title }}</h2>
+      <h2 class="product-nutrition-facts__title">{{ section.settings.title }}</h2>
     {% endif %}
     
-    <div class="product-nutrition__tabs">
-      <button 
-        type="button" 
-        class="product-nutrition__tab active" 
-        data-tab="nutrition"
-        aria-selected="true"
-      >
-        Nutrition Facts
-      </button>
-      <button 
-        type="button" 
-        class="product-nutrition__tab" 
-        data-tab="ingredients"
-        aria-selected="false"
-      >
-        Ingredients
-      </button>
-    </div>
-    
-    <div class="product-nutrition__content">
-      <!-- Nutrition Facts Panel -->
-      <div class="product-nutrition__panel active" data-panel="nutrition" id="nutrition-panel">
-        {% assign nutrition_data = product.metafields.custom.nutrition_facts %}
-        {% comment %} Debug: Uncomment to see metafield data {% endcomment %}
-        {% comment %}
-        <div style="background: #f0f0f0; padding: 10px; margin-bottom: 20px; font-size: 12px;">
-          <strong>Debug Info:</strong><br>
-          Metafield exists: {{ nutrition_data | json }}<br>
-          Type: {{ nutrition_data | type }}<br>
-          First item: {{ nutrition_data.first | json }}
-        </div>
-        {% endcomment %}
-        <div class="nutrition-facts">
-          <div class="nutrition-facts__header">
-            <h3>Nutrition Facts</h3>
-            {% assign serving_size = product.metafields.custom.serving_size | default: section.settings.serving_size %}
-            {% if serving_size != blank %}
-              <p class="nutrition-facts__serving">Serving Size: {{ serving_size }}</p>
-            {% endif %}
-          </div>
-          
-          {% if nutrition_data != blank %}
-            {% comment %} Try different metafield formats {% endcomment %}
-            {% if nutrition_data.first %}
-              {% comment %} It's a list metafield (array) {% endcomment %}
-              <ul class="nutrition-facts__list" id="nutrition-facts-list">
-                {% for item in nutrition_data %}
-                  {% assign item_string = item | string %}
-                  {% assign item_parts = item_string | split: ':' %}
-                  {% if item_parts.size > 1 %}
-                    <li class="nutrition-facts__item">
-                      <span class="nutrition-facts__label">{{ item_parts.first | strip }}</span>
-                      <span class="nutrition-facts__value">{{ item_parts.last | strip }}</span>
-                    </li>
-                  {% else %}
-                    <li class="nutrition-facts__item">
-                      <span class="nutrition-facts__label">{{ item_string | strip }}</span>
-                    </li>
-                  {% endif %}
-                {% endfor %}
-              </ul>
-            {% elsif nutrition_data contains '[' or nutrition_data contains ']' %}
-              {% comment %} It's a JSON string {% endcomment %}
-              <ul class="nutrition-facts__list" id="nutrition-facts-list" data-nutrition-data="{{ nutrition_data | escape }}">
-                <li class="nutrition-facts__item nutrition-facts__loading">
-                  <span class="nutrition-facts__label">Loading nutrition facts...</span>
-                </li>
-              </ul>
-            {% else %}
-              {% comment %} It's a plain string - try to split by newlines or commas {% endcomment %}
-              <ul class="nutrition-facts__list" id="nutrition-facts-list">
-                {% assign items = nutrition_data | split: '\n' %}
-                {% if items.size == 1 %}
-                  {% assign items = nutrition_data | split: ',' %}
-                {% endif %}
-                {% for item in items %}
-                  {% assign item_string = item | string | strip %}
-                  {% if item_string != blank %}
-                    {% assign item_parts = item_string | split: ':' %}
-                    {% if item_parts.size > 1 %}
-                      <li class="nutrition-facts__item">
-                        <span class="nutrition-facts__label">{{ item_parts.first | strip }}</span>
-                        <span class="nutrition-facts__value">{{ item_parts.last | strip }}</span>
-                      </li>
-                    {% else %}
-                      <li class="nutrition-facts__item">
-                        <span class="nutrition-facts__label">{{ item_string }}</span>
-                      </li>
-                    {% endif %}
-                  {% endif %}
-                {% endfor %}
-              </ul>
-            {% endif %}
-          {% else %}
-            {% comment %} No metafield data - show helpful message {% endcomment %}
-            <ul class="nutrition-facts__list" id="nutrition-facts-list">
-              <li class="nutrition-facts__item">
-                <span class="nutrition-facts__label" style="color: rgba(26, 26, 26, 0.6); font-style: italic;">
-                  No nutrition facts available. Please add nutrition data in product metafields.<br>
-                  <small style="font-size: 12px; margin-top: 8px; display: block;">Metafield: custom.nutrition_facts (List or JSON string)</small>
-                </span>
-              </li>
-            </ul>
-          {% endif %}
-        </div>
+    {% assign nutrition_data = product.metafields.custom.nutrition_facts %}
+    <div class="nutrition-facts-card">
+      <div class="nutrition-facts-card__header">
+        <h3 class="nutrition-facts-card__heading">Nutrition Facts</h3>
+        {% assign serving_size = product.metafields.custom.serving_size | default: section.settings.serving_size %}
+        {% if serving_size != blank %}
+          <p class="nutrition-facts-card__serving">Serving Size: {{ serving_size }}</p>
+        {% endif %}
       </div>
       
-      <!-- Ingredients Panel -->
-      <div class="product-nutrition__panel" data-panel="ingredients" id="ingredients-panel">
-        {% assign ingredients = product.metafields.custom.ingredients %}
-        <div class="ingredients-list">
-          <h3>Ingredients</h3>
-          {% if ingredients != blank %}
-            <div class="ingredients-list__content">
-              {% comment %} Check if it's a list metafield (array) {% endcomment %}
-              {% if ingredients.first %}
-                <ul class="ingredients-list__items">
-                  {% for ingredient in ingredients %}
-                    <li>{{ ingredient }}</li>
-                  {% endfor %}
-                </ul>
+      {% if nutrition_data != blank %}
+        {% comment %} Check if it's a list metafield (array) {% endcomment %}
+        {% if nutrition_data.first %}
+          {% comment %} It's a list metafield - render directly {% endcomment %}
+          <ul class="nutrition-facts-card__list" id="nutrition-facts-list">
+            {% for item in nutrition_data %}
+              {% assign item_string = item | string %}
+              {% assign item_parts = item_string | split: ':' %}
+              {% if item_parts.size > 1 %}
+                <li class="nutrition-facts-card__item">
+                  <span class="nutrition-facts-card__label">{{ item_parts.first | strip }}</span>
+                  <span class="nutrition-facts-card__value">{{ item_parts.last | strip }}</span>
+                </li>
               {% else %}
-                {% comment %} It's a string or rich text {% endcomment %}
-                {{ ingredients }}
+                <li class="nutrition-facts-card__item">
+                  <span class="nutrition-facts-card__label">{{ item_string | strip }}</span>
+                </li>
               {% endif %}
-            </div>
-          {% else %}
-            <p style="color: rgba(26, 26, 26, 0.6); font-style: italic;">
-              No ingredients information available. Please add ingredients in product metafields.<br>
-              <small style="font-size: 12px; margin-top: 8px; display: block;">Metafield: custom.ingredients (List or Text)</small>
-            </p>
-          {% endif %}
-        </div>
-      </div>
+            {% endfor %}
+          </ul>
+        {% else %}
+          {% comment %} It's a JSON string - parse with JavaScript {% endcomment %}
+          {% assign nutrition_string = nutrition_data | string %}
+          <ul class="nutrition-facts-card__list" id="nutrition-facts-list" data-nutrition-data="{{ nutrition_string | escape }}">
+            <li class="nutrition-facts-card__item nutrition-facts-card__loading">
+              <span class="nutrition-facts-card__label">Loading nutrition facts...</span>
+            </li>
+          </ul>
+        {% endif %}
+      {% else %}
+        <ul class="nutrition-facts-card__list" id="nutrition-facts-list">
+          <li class="nutrition-facts-card__item">
+            <span class="nutrition-facts-card__label" style="color: rgba(26, 26, 26, 0.5); font-style: italic;">
+              No nutrition facts available. Please add data in product metafields (custom.nutrition_facts).
+            </span>
+          </li>
+        </ul>
+      {% endif %}
     </div>
   </div>
 </section>
 
 {% stylesheet %}
-  .product-nutrition {
+  .product-nutrition-facts {
     width: 100%;
-    max-width: 100%;
     padding: 60px 40px;
     background: var(--bg);
     box-sizing: border-box;
   }
 
-  .product-nutrition__container {
-    max-width: 1000px;
+  .product-nutrition-facts__container {
+    max-width: 900px;
     margin: 0 auto;
   }
 
-  .product-nutrition__title {
+  .product-nutrition-facts__title {
     text-align: center;
     font-family: var(--font-heading);
     font-size: 32px;
     font-weight: 600;
     color: var(--text);
-    margin-bottom: 32px;
+    margin-bottom: 40px;
     letter-spacing: -0.02em;
     line-height: 1.2;
   }
 
-  .product-nutrition__tabs {
-    display: flex;
-    gap: 0;
-    margin-bottom: 32px;
-    border-bottom: 2px solid var(--border-color);
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-
-  .product-nutrition__tab {
-    padding: 14px 28px;
-    background: transparent;
-    border: none;
-    border-bottom: 3px solid transparent;
-    font-size: 15px;
-    font-weight: 500;
-    color: rgba(26, 26, 26, 0.6);
-    cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-    bottom: -2px;
-    font-family: var(--font-heading);
-  }
-
-  .product-nutrition__tab:hover {
-    color: var(--forest-green);
-    background: rgba(74, 124, 44, 0.03);
-  }
-
-  .product-nutrition__tab.active {
-    color: var(--forest-green);
-    border-bottom-color: var(--forest-green);
-    font-weight: 600;
-  }
-
-  .product-nutrition__content {
-    position: relative;
-    min-height: 200px;
-  }
-
-  .product-nutrition__panel {
-    display: none;
-    animation: fadeIn 0.4s ease;
-  }
-
-  .product-nutrition__panel.active {
-    display: block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-  }
-
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  .nutrition-facts,
-  .ingredients-list {
+  .nutrition-facts-card {
     background: var(--white);
-    padding: 32px;
+    padding: 40px;
     border-radius: 12px;
     border: 1px solid var(--border-color);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
   }
 
-  .nutrition-facts__header {
-    margin-bottom: 24px;
-    padding-bottom: 16px;
+  .nutrition-facts-card__header {
+    margin-bottom: 28px;
+    padding-bottom: 20px;
     border-bottom: 2px solid var(--border-color);
   }
 
-  .nutrition-facts__header h3 {
+  .nutrition-facts-card__heading {
     font-family: var(--font-heading);
     font-size: 24px;
     color: var(--forest-green);
@@ -257,54 +108,53 @@
     font-weight: 600;
   }
 
-  .nutrition-facts__serving {
+  .nutrition-facts-card__serving {
     font-size: 14px;
     color: rgba(26, 26, 26, 0.6);
     margin: 0;
     font-weight: 300;
   }
 
-  .nutrition-facts__list {
+  .nutrition-facts-card__list {
     list-style: none;
     padding: 0;
     margin: 0;
-    min-height: 50px;
   }
 
-  .nutrition-facts__item {
+  .nutrition-facts-card__item {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 14px 0;
     border-bottom: 1px solid rgba(26, 26, 26, 0.08);
-    transition: all 0.3s ease;
+    transition: background 0.2s ease;
   }
 
-  .nutrition-facts__item:hover {
-    padding-left: 8px;
+  .nutrition-facts-card__item:hover {
     background: rgba(74, 124, 44, 0.02);
-    margin: 0 -8px;
-    padding-right: 8px;
+    margin: 0 -12px;
+    padding-left: 12px;
+    padding-right: 12px;
     border-radius: 6px;
   }
 
-  .nutrition-facts__item:last-child {
+  .nutrition-facts-card__item:last-child {
     border-bottom: none;
   }
 
-  .nutrition-facts__loading {
+  .nutrition-facts-card__loading {
     opacity: 0.6;
     font-style: italic;
   }
 
-  .nutrition-facts__label {
+  .nutrition-facts-card__label {
     font-weight: 500;
     color: var(--text);
     font-size: 15px;
     flex: 1;
   }
 
-  .nutrition-facts__value {
+  .nutrition-facts-card__value {
     font-weight: 700;
     color: var(--forest-green);
     font-size: 15px;
@@ -312,79 +162,22 @@
     font-family: var(--font-heading);
   }
 
-  .ingredients-list h3 {
-    font-family: var(--font-heading);
-    font-size: 24px;
-    color: var(--forest-green);
-    margin-bottom: 20px;
-    font-weight: 600;
-  }
-
-  .ingredients-list__content {
-    font-size: 15px;
-    line-height: 1.7;
-    color: rgba(26, 26, 26, 0.7);
-    font-weight: 300;
-  }
-
-  .ingredients-list__items {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-
-  .ingredients-list__items li {
-    padding: 10px 0;
-    border-bottom: 1px solid rgba(26, 26, 26, 0.08);
-    position: relative;
-    padding-left: 24px;
-  }
-
-  .ingredients-list__items li:last-child {
-    border-bottom: none;
-  }
-
-  .ingredients-list__items li::before {
-    content: '•';
-    position: absolute;
-    left: 0;
-    color: var(--forest-green);
-    font-weight: bold;
-    font-size: 20px;
-  }
-
   @media (max-width: 768px) {
-    .product-nutrition {
-      padding: 60px 20px;
+    .product-nutrition-facts {
+      padding: 40px 20px;
     }
 
-    .product-nutrition__title {
-      font-size: 36px;
-      margin-bottom: 40px;
+    .product-nutrition-facts__title {
+      font-size: 28px;
+      margin-bottom: 32px;
     }
 
-    .product-nutrition__tabs {
-      flex-direction: column;
-      border-bottom: none;
-      gap: 8px;
+    .nutrition-facts-card {
+      padding: 28px 20px;
     }
 
-    .product-nutrition__tab {
-      border-bottom: 1px solid var(--border-color);
-      border-left: 3px solid transparent;
-      text-align: left;
-      padding: 16px 24px;
-    }
-
-    .product-nutrition__tab.active {
-      border-left-color: var(--forest-green);
-      border-bottom-color: var(--border-color);
-      background: rgba(74, 124, 44, 0.05);
-    }
-
-    .nutrition-facts,
-    .ingredients-list {
-      padding: 32px 24px;
+    .nutrition-facts-card__heading {
+      font-size: 20px;
     }
   }
 {% endstylesheet %}
@@ -393,21 +186,14 @@
   (function() {
     'use strict';
     
-    // Parse and render nutrition facts from JSON array - optimized for speed
     function initNutritionFacts() {
       const nutritionList = document.getElementById('nutrition-facts-list');
-      if (!nutritionList) {
-        return;
-      }
+      if (!nutritionList) return;
       
-      // Check if it has data attribute (JSON string)
       const nutritionData = nutritionList.getAttribute('data-nutrition-data');
-      if (!nutritionData || nutritionData.trim() === '') {
-        return; // Already rendered server-side
-      }
+      if (!nutritionData || nutritionData.trim() === '') return;
       
       try {
-        // Unescape HTML entities and parse JSON
         let dataString = nutritionData
           .replace(/&quot;/g, '"')
           .replace(/&#39;/g, "'")
@@ -417,33 +203,25 @@
         const nutritionArray = JSON.parse(dataString);
         
         if (Array.isArray(nutritionArray) && nutritionArray.length > 0) {
-          // Use DocumentFragment for faster DOM manipulation
           const fragment = document.createDocumentFragment();
           
           nutritionArray.forEach(function(item) {
             if (typeof item === 'string' && item.trim() !== '') {
               const colonIndex = item.indexOf(':');
-              let label, value;
-              
-              if (colonIndex > -1) {
-                label = item.substring(0, colonIndex).trim();
-                value = item.substring(colonIndex + 1).trim();
-              } else {
-                label = item.trim();
-                value = '';
-              }
+              let label = colonIndex > -1 ? item.substring(0, colonIndex).trim() : item.trim();
+              let value = colonIndex > -1 ? item.substring(colonIndex + 1).trim() : '';
               
               const listItem = document.createElement('li');
-              listItem.className = 'nutrition-facts__item';
+              listItem.className = 'nutrition-facts-card__item';
               
               const labelSpan = document.createElement('span');
-              labelSpan.className = 'nutrition-facts__label';
+              labelSpan.className = 'nutrition-facts-card__label';
               labelSpan.textContent = label;
               listItem.appendChild(labelSpan);
               
               if (value) {
                 const valueSpan = document.createElement('span');
-                valueSpan.className = 'nutrition-facts__value';
+                valueSpan.className = 'nutrition-facts-card__value';
                 valueSpan.textContent = value;
                 listItem.appendChild(valueSpan);
               }
@@ -473,16 +251,16 @@
                 let value = colonIndex > -1 ? item.substring(colonIndex + 1).trim() : '';
                 
                 const listItem = document.createElement('li');
-                listItem.className = 'nutrition-facts__item';
+                listItem.className = 'nutrition-facts-card__item';
                 
                 const labelSpan = document.createElement('span');
-                labelSpan.className = 'nutrition-facts__label';
+                labelSpan.className = 'nutrition-facts-card__label';
                 labelSpan.textContent = label;
                 listItem.appendChild(labelSpan);
                 
                 if (value) {
                   const valueSpan = document.createElement('span');
-                  valueSpan.className = 'nutrition-facts__value';
+                  valueSpan.className = 'nutrition-facts-card__value';
                   valueSpan.textContent = value;
                   listItem.appendChild(valueSpan);
                 }
@@ -495,95 +273,28 @@
             nutritionList.appendChild(fragment);
           }
         } catch (fallbackError) {
-          // Error already handled, keep loading message
+          // Keep loading message on error
         }
       }
     }
     
-    // Tab functionality - simplified and faster
-    function initTabs() {
-      const tabs = document.querySelectorAll('.product-nutrition__tab');
-      const panels = document.querySelectorAll('.product-nutrition__panel');
-      
-      if (tabs.length === 0 || panels.length === 0) {
-        return;
-      }
-      
-      // Remove existing listeners to prevent duplicates
-      tabs.forEach(function(tab) {
-        const newTab = tab.cloneNode(true);
-        tab.parentNode.replaceChild(newTab, tab);
-      });
-      
-      // Get fresh references after cloning
-      const freshTabs = document.querySelectorAll('.product-nutrition__tab');
-      const freshPanels = document.querySelectorAll('.product-nutrition__panel');
-      
-      freshTabs.forEach(function(tab) {
-        tab.addEventListener('click', function(e) {
-          e.preventDefault();
-          e.stopPropagation();
-          
-          const targetTab = this.getAttribute('data-tab');
-          
-          // Update all tabs
-          freshTabs.forEach(function(t) {
-            t.classList.remove('active');
-            t.setAttribute('aria-selected', 'false');
-          });
-          this.classList.add('active');
-          this.setAttribute('aria-selected', 'true');
-          
-          // Update all panels
-          freshPanels.forEach(function(panel) {
-            const panelTab = panel.getAttribute('data-panel');
-            
-            if (panelTab === targetTab) {
-              // Show this panel - use class only, let CSS handle display
-              panel.classList.add('active');
-              panel.setAttribute('aria-hidden', 'false');
-              panel.removeAttribute('style'); // Remove any inline styles
-            } else {
-              // Hide other panels
-              panel.classList.remove('active');
-              panel.setAttribute('aria-hidden', 'true');
-              panel.removeAttribute('style'); // Remove any inline styles
-            }
-          });
-        });
-      });
-    }
-    
-    // Initialize function
-    function init() {
-      initNutritionFacts();
-      initTabs();
-    }
-    
-    // Run initialization immediately
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', init);
+      document.addEventListener('DOMContentLoaded', initNutritionFacts);
     } else {
-      // DOM already loaded, run immediately
-      init();
+      initNutritionFacts();
     }
-    
-    // Also run once more after a short delay for dynamically loaded content
-    setTimeout(function() {
-      initTabs(); // Re-initialize tabs in case they weren't found initially
-    }, 50);
   })();
 {% endjavascript %}
 
 {% schema %}
 {
-  "name": "Product Nutrition",
+  "name": "Product Nutrition Facts",
   "settings": [
     {
       "type": "text",
       "id": "title",
       "label": "Section Title",
-      "default": "Nutrition Information"
+      "default": "Nutrition Facts"
     },
     {
       "type": "text",
@@ -594,7 +305,7 @@
   ],
   "presets": [
     {
-      "name": "Product Nutrition"
+      "name": "Product Nutrition Facts"
     }
   ]
 }

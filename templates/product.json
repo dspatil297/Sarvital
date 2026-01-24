@@ -41,11 +41,17 @@
         "benefit_3"
       ]
     },
-    "product_nutrition": {
+    "product_nutrition_facts": {
       "type": "product-nutrition",
       "settings": {
-        "title": "Nutrition Information",
+        "title": "Nutrition Facts",
         "serving_size": "1 scoop (10g)"
+      }
+    },
+    "product_ingredients": {
+      "type": "product-ingredients",
+      "settings": {
+        "title": "Ingredients"
       }
     },
     "product_usage": {
@@ -166,7 +172,8 @@
   "order": [
     "product_main",
     "product_benefits",
-    "product_nutrition",
+    "product_nutrition_facts",
+    "product_ingredients",
     "product_usage",
     "product_quality",
     "product_sustainability",

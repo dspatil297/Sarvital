@@ -1,0 +1,169 @@
+{% comment %}
+  Product Ingredients Section
+  Displays ingredients from custom.ingredients metafield
+  Separate section for better conversions - always visible
+{% endcomment %}
+
+<section class="product-ingredients">
+  <div class="product-ingredients__container">
+    {% if section.settings.title != blank %}
+      <h2 class="product-ingredients__title">{{ section.settings.title }}</h2>
+    {% endif %}
+    
+    {% assign ingredients = product.metafields.custom.ingredients %}
+    <div class="ingredients-card">
+      <h3 class="ingredients-card__heading">Ingredients</h3>
+      
+      {% if ingredients != blank %}
+        <div class="ingredients-card__content">
+          {% comment %} Check if it's a list metafield (array) {% endcomment %}
+          {% if ingredients.first %}
+            <ul class="ingredients-card__list">
+              {% for ingredient in ingredients %}
+                <li class="ingredients-card__item">{{ ingredient }}</li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            {% comment %} It's a string or rich text {% endcomment %}
+            <div class="ingredients-card__text">
+              {{ ingredients }}
+            </div>
+          {% endif %}
+        </div>
+      {% else %}
+        <p class="ingredients-card__empty">
+          No ingredients information available. Please add ingredients in product metafields (custom.ingredients).
+        </p>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+  .product-ingredients {
+    width: 100%;
+    padding: 60px 40px;
+    background: var(--bg);
+    box-sizing: border-box;
+  }
+
+  .product-ingredients__container {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .product-ingredients__title {
+    text-align: center;
+    font-family: var(--font-heading);
+    font-size: 32px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 40px;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+
+  .ingredients-card {
+    background: var(--white);
+    padding: 40px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  }
+
+  .ingredients-card__heading {
+    font-family: var(--font-heading);
+    font-size: 24px;
+    color: var(--forest-green);
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+
+  .ingredients-card__content {
+    font-size: 15px;
+    line-height: 1.8;
+    color: rgba(26, 26, 26, 0.8);
+    font-weight: 300;
+  }
+
+  .ingredients-card__list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .ingredients-card__item {
+    padding: 12px 0;
+    padding-left: 24px;
+    border-bottom: 1px solid rgba(26, 26, 26, 0.08);
+    position: relative;
+    transition: padding-left 0.2s ease;
+  }
+
+  .ingredients-card__item:hover {
+    padding-left: 32px;
+  }
+
+  .ingredients-card__item:last-child {
+    border-bottom: none;
+  }
+
+  .ingredients-card__item::before {
+    content: '•';
+    position: absolute;
+    left: 0;
+    color: var(--forest-green);
+    font-weight: bold;
+    font-size: 20px;
+    line-height: 1.5;
+  }
+
+  .ingredients-card__text {
+    line-height: 1.8;
+  }
+
+  .ingredients-card__empty {
+    color: rgba(26, 26, 26, 0.5);
+    font-style: italic;
+    margin: 0;
+  }
+
+  @media (max-width: 768px) {
+    .product-ingredients {
+      padding: 40px 20px;
+    }
+
+    .product-ingredients__title {
+      font-size: 28px;
+      margin-bottom: 32px;
+    }
+
+    .ingredients-card {
+      padding: 28px 20px;
+    }
+
+    .ingredients-card__heading {
+      font-size: 20px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Product Ingredients",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Section Title",
+      "default": "Ingredients"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product Ingredients"
+    }
+  ]
+}
+{% endschema %}
+
