@@ -43,11 +43,41 @@
         {% else %}
           {% comment %} It's a JSON string - parse with JavaScript {% endcomment %}
           {% assign nutrition_string = nutrition_data | string %}
-          <ul class="nutrition-facts-card__list" id="nutrition-facts-list" data-nutrition-data="{{ nutrition_string | escape }}">
-            <li class="nutrition-facts-card__item nutrition-facts-card__loading">
-              <span class="nutrition-facts-card__label">Loading nutrition facts...</span>
-            </li>
-          </ul>
+          {% assign has_brackets = false %}
+          {% if nutrition_string contains '[' %}
+            {% assign has_brackets = true %}
+          {% endif %}
+          {% if has_brackets %}
+            <ul class="nutrition-facts-card__list" id="nutrition-facts-list" data-nutrition-data="{{ nutrition_string | escape }}">
+              <li class="nutrition-facts-card__item nutrition-facts-card__loading">
+                <span class="nutrition-facts-card__label">Loading nutrition facts...</span>
+              </li>
+            </ul>
+          {% else %}
+            {% comment %} Plain text - try to split by newlines or commas {% endcomment %}
+            <ul class="nutrition-facts-card__list" id="nutrition-facts-list">
+              {% assign items = nutrition_string | split: '\n' %}
+              {% if items.size == 1 %}
+                {% assign items = nutrition_string | split: ',' %}
+              {% endif %}
+              {% for item in items %}
+                {% assign item_string = item | string | strip %}
+                {% if item_string != blank %}
+                  {% assign item_parts = item_string | split: ':' %}
+                  {% if item_parts.size > 1 %}
+                    <li class="nutrition-facts-card__item">
+                      <span class="nutrition-facts-card__label">{{ item_parts.first | strip }}</span>
+                      <span class="nutrition-facts-card__value">{{ item_parts.last | strip }}</span>
+                    </li>
+                  {% else %}
+                    <li class="nutrition-facts-card__item">
+                      <span class="nutrition-facts-card__label">{{ item_string }}</span>
+                    </li>
+                  {% endif %}
+                {% endif %}
+              {% endfor %}
+            </ul>
+          {% endif %}
         {% endif %}
       {% else %}
         <ul class="nutrition-facts-card__list" id="nutrition-facts-list">
@@ -186,7 +216,7 @@
   (function() {
     'use strict';
     
-    function initNutritionFacts() {
+    function parseNutritionFacts() {
       const nutritionList = document.getElementById('nutrition-facts-list');
       if (!nutritionList) return;
       
@@ -194,13 +224,31 @@
       if (!nutritionData || nutritionData.trim() === '') return;
       
       try {
+        // Unescape HTML entities
         let dataString = nutritionData
           .replace(/&quot;/g, '"')
           .replace(/&#39;/g, "'")
           .replace(/&amp;/g, '&')
+          .replace(/&lt;/g, '<')
+          .replace(/&gt;/g, '>')
           .trim();
         
-        const nutritionArray = JSON.parse(dataString);
+        // Try JSON parse first
+        let nutritionArray;
+        try {
+          nutritionArray = JSON.parse(dataString);
+        } catch (jsonError) {
+          // If JSON parse fails, try regex extraction
+          const match = dataString.match(/\[(.*?)\]/);
+          if (match && match[1]) {
+            const items = match[1].split(',').map(function(item) {
+              return item.trim().replace(/^["']+|["']+$/g, '');
+            });
+            nutritionArray = items;
+          } else {
+            throw new Error('Could not parse');
+          }
+        }
         
         if (Array.isArray(nutritionArray) && nutritionArray.length > 0) {
           const fragment = document.createDocumentFragment();
@@ -234,54 +282,17 @@
           nutritionList.appendChild(fragment);
         }
       } catch (e) {
-        // Try fallback parsing
-        try {
-          let dataString = nutritionData.replace(/&quot;/g, '"').replace(/&#39;/g, "'");
-          const match = dataString.match(/\[(.*?)\]/);
-          if (match && match[1]) {
-            const items = match[1].split(',').map(function(item) {
-              return item.trim().replace(/^["']|["']$/g, '');
-            });
-            
-            const fragment = document.createDocumentFragment();
-            items.forEach(function(item) {
-              if (item.trim() !== '') {
-                const colonIndex = item.indexOf(':');
-                let label = colonIndex > -1 ? item.substring(0, colonIndex).trim() : item.trim();
-                let value = colonIndex > -1 ? item.substring(colonIndex + 1).trim() : '';
-                
-                const listItem = document.createElement('li');
-                listItem.className = 'nutrition-facts-card__item';
-                
-                const labelSpan = document.createElement('span');
-                labelSpan.className = 'nutrition-facts-card__label';
-                labelSpan.textContent = label;
-                listItem.appendChild(labelSpan);
-                
-                if (value) {
-                  const valueSpan = document.createElement('span');
-                  valueSpan.className = 'nutrition-facts-card__value';
-                  valueSpan.textContent = value;
-                  listItem.appendChild(valueSpan);
-                }
-                
-                fragment.appendChild(listItem);
-              }
-            });
-            
-            nutritionList.innerHTML = '';
-            nutritionList.appendChild(fragment);
-          }
-        } catch (fallbackError) {
-          // Keep loading message on error
-        }
+        console.error('Error parsing nutrition facts:', e);
+        nutritionList.innerHTML = '<li class="nutrition-facts-card__item"><span class="nutrition-facts-card__label" style="color: rgba(26, 26, 26, 0.5); font-style: italic;">Unable to parse nutrition data. Please check the metafield format.</span></li>';
       }
     }
     
+    // Run immediately if DOM is ready, otherwise wait
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initNutritionFacts);
+      document.addEventListener('DOMContentLoaded', parseNutritionFacts);
     } else {
-      initNutritionFacts();
+      // Use setTimeout to ensure DOM is fully rendered
+      setTimeout(parseNutritionFacts, 0);
     }
   })();
 {% endjavascript %}
