@@ -13,6 +13,10 @@
       "type": "product-main",
       "settings": {}
     },
+    "product_ingredients_nutrition": {
+      "type": "product-ingredients-nutrition",
+      "settings": {}
+    },
     "product_benefits": {
       "type": "product-benefits",
       "blocks": {
@@ -171,6 +175,7 @@
   },
   "order": [
     "product_main",
+    "product_ingredients_nutrition",
     "product_benefits",
     "product_usage",
     "product_quality",

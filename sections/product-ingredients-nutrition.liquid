@@ -8,7 +8,19 @@
   <div class="product-ingredients-nutrition__container">
     
     <!-- Ingredients Section -->
-    {% if product.metafields.custom.ingredients != blank %}
+    {% assign has_ingredients = false %}
+    {% assign ingredients_value = product.metafields.custom.ingredients %}
+    {% if ingredients_value != blank %}
+      {% if ingredients_value.value and ingredients_value.value.size > 0 %}
+        {% assign has_ingredients = true %}
+      {% elsif ingredients_value.first %}
+        {% assign has_ingredients = true %}
+      {% elsif ingredients_value != blank %}
+        {% assign has_ingredients = true %}
+      {% endif %}
+    {% endif %}
+    
+    {% if has_ingredients %}
       <div class="ingredients-section">
         <div class="section-header">
           <div class="section-icon">
@@ -21,8 +33,6 @@
         </div>
         
         <div class="ingredients-list">
-          {% assign ingredients_value = product.metafields.custom.ingredients %}
-          
           {% comment %} Handle list metafield (list.single_line_text_field) - try .value first {% endcomment %}
           {% if ingredients_value.value %}
             {% for item in ingredients_value.value %}
@@ -84,7 +94,19 @@
     {% endif %}
 
     <!-- Nutrition Facts Section -->
-    {% if product.metafields.custom.nutrition_facts != blank %}
+    {% assign has_nutrition = false %}
+    {% assign nutrition_value = product.metafields.custom.nutrition_facts %}
+    {% if nutrition_value != blank %}
+      {% if nutrition_value.value and nutrition_value.value.size > 0 %}
+        {% assign has_nutrition = true %}
+      {% elsif nutrition_value.first %}
+        {% assign has_nutrition = true %}
+      {% elsif nutrition_value != blank %}
+        {% assign has_nutrition = true %}
+      {% endif %}
+    {% endif %}
+    
+    {% if has_nutrition %}
       <div class="nutrition-section">
         <div class="section-header">
           <div class="section-icon">
@@ -98,8 +120,6 @@
         </div>
         
         <div class="nutrition-list">
-          {% assign nutrition_value = product.metafields.custom.nutrition_facts %}
-          
           {% comment %} Handle list metafield (list.single_line_text_field) - try .value first {% endcomment %}
           {% if nutrition_value.value %}
             {% for item in nutrition_value.value %}
