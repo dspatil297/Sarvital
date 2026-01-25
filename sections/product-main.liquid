@@ -159,9 +159,18 @@
       
       <!-- Product Description (Short) -->
       {% if product.description != blank %}
-        <div class="product-description-short">
-          {{ product.description | truncatewords: 30 }}
-          <button class="read-more-btn" data-target="full-description">Read More</button>
+        <div class="product-description-wrapper">
+          <div class="product-description-content">
+            <div class="product-description-short" id="product-description-short">
+              {{ product.description | strip_html | truncatewords: 30 }}
+            </div>
+            <div class="product-description-full" id="product-description-full" style="display: none;">
+              {{ product.description }}
+            </div>
+          </div>
+          <button class="read-more-btn" id="read-more-btn" data-expanded="false" type="button">
+            <span class="read-more-text">Read More</span>
+          </button>
         </div>
       {% endif %}
       
@@ -588,10 +597,48 @@
   }
 
   /* Description */
+  .product-description-wrapper {
+    position: relative;
+    margin-bottom: 24px;
+  }
+
+  .product-description-content {
+    margin-bottom: 8px;
+  }
+
   .product-description-short {
     font-size: 15px;
     line-height: 1.7;
     color: rgba(26, 26, 26, 0.7);
+    display: block;
+  }
+
+  .product-description-short.hidden {
+    display: none !important;
+  }
+
+  .product-description-full {
+    font-size: 15px;
+    line-height: 1.7;
+    color: rgba(26, 26, 26, 0.7);
+    display: none;
+    animation: fadeIn 0.3s ease-in;
+  }
+
+  .product-description-full.visible {
+    display: block !important;
+    animation: fadeIn 0.3s ease-in;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 
   .read-more-btn {
@@ -599,11 +646,35 @@
     background: none;
     border: none;
     font-size: 15px;
-    font-weight: 500;
+    font-weight: 600;
     cursor: pointer;
-    padding: 0;
-    margin-left: 4px;
-    text-decoration: underline;
+    padding: 4px 0;
+    margin-top: 4px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .read-more-btn:hover {
+    color: var(--sage-green);
+    gap: 8px;
+  }
+
+  .read-more-btn::after {
+    content: '→';
+    transition: transform 0.3s ease;
+    display: inline-block;
+  }
+
+  .read-more-btn[data-expanded="true"]::after {
+    transform: rotate(-90deg);
+    content: '↑';
+  }
+
+  .read-more-text {
+    display: inline-block;
   }
 
   /* Variants */
@@ -1076,6 +1147,70 @@
       });
     }
 
+    // Read More button functionality
+    function initReadMore() {
+      // Use setTimeout to ensure DOM is fully ready
+      setTimeout(function() {
+        const readMoreBtn = document.getElementById('read-more-btn');
+        const descriptionShort = document.getElementById('product-description-short');
+        const descriptionFull = document.getElementById('product-description-full');
+        
+        if (!readMoreBtn || !descriptionShort || !descriptionFull) {
+          console.log('Read More elements not found');
+          return;
+        }
+        
+        const readMoreText = readMoreBtn.querySelector('.read-more-text');
+        
+        // Remove any existing event listeners by cloning
+        const newBtn = readMoreBtn.cloneNode(true);
+        readMoreBtn.parentNode.replaceChild(newBtn, readMoreBtn);
+        
+        // Add click event to the new button
+        newBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          
+          const isExpanded = this.getAttribute('data-expanded') === 'true';
+          const shortEl = document.getElementById('product-description-short');
+          const fullEl = document.getElementById('product-description-full');
+          const textEl = this.querySelector('.read-more-text');
+          
+          if (isExpanded) {
+            // Collapse: show short, hide full
+            if (shortEl) {
+              shortEl.classList.remove('hidden');
+              shortEl.style.display = 'block';
+            }
+            if (fullEl) {
+              fullEl.classList.remove('visible');
+              fullEl.style.display = 'none';
+            }
+            if (textEl) {
+              textEl.textContent = 'Read More';
+            }
+            this.setAttribute('data-expanded', 'false');
+          } else {
+            // Expand: hide short, show full
+            if (shortEl) {
+              shortEl.classList.add('hidden');
+              shortEl.style.display = 'none';
+            }
+            if (fullEl) {
+              fullEl.classList.add('visible');
+              fullEl.style.display = 'block';
+            }
+            if (textEl) {
+              textEl.textContent = 'Read Less';
+            }
+            this.setAttribute('data-expanded', 'true');
+          }
+        });
+        
+        console.log('Read More button initialized');
+      }, 200);
+    }
+
     // Quantity selector
     const quantityInput = document.getElementById('quantity-select');
     const quantityButtons = document.querySelectorAll('.quantity-btn');
@@ -1225,6 +1360,8 @@
       if (variantSelect) {
         variantSelect.dispatchEvent(new Event('change'));
       }
+      // Initialize Read More functionality
+      initReadMore();
     }
   })();
 {% endjavascript %}
