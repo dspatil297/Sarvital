@@ -57,6 +57,11 @@
         "subtitle": "Discover what makes our products special"
       }
     },
+    "product_ingredients_nutrition_y7n8pk": {
+      "type": "product-ingredients-nutrition",
+      "name": "Ingredients & Nutrition",
+      "settings": {}
+    },
     "product_usage": {
       "type": "product-usage",
       "blocks": {
@@ -172,6 +177,7 @@
   "order": [
     "product_main",
     "product_benefits",
+    "product_ingredients_nutrition_y7n8pk",
     "product_usage",
     "product_quality",
     "product_reviews",
