@@ -41,73 +41,113 @@
             {% endfor %}
           </ul>
         {% else %}
-          {% comment %} It's a JSON string - parse with JavaScript {% endcomment %}
+          {% comment %} It's a JSON string - try to parse server-side first {% endcomment %}
           {% assign nutrition_string = nutrition_data | string %}
-          {% assign has_brackets = false %}
-          {% if nutrition_string contains '[' %}
-            {% assign has_brackets = true %}
+          {% assign is_json = false %}
+          {% if nutrition_string contains '[' and nutrition_string contains ']' %}
+            {% assign is_json = true %}
           {% endif %}
-          {% if has_brackets %}
-            <ul class="nutrition-facts-card__list" id="nutrition-facts-list" data-nutrition-data="{{ nutrition_string | escape }}"></ul>
-            <script>
-              (function() {
-                var listEl = document.getElementById('nutrition-facts-list');
-                if (!listEl) return;
-                var data = listEl.getAttribute('data-nutrition-data');
-                if (!data) return;
-                
-                try {
-                  var dataString = data.replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, '&').trim();
-                  var items = JSON.parse(dataString);
-                  
-                  if (Array.isArray(items) && items.length > 0) {
-                    var html = '';
-                    items.forEach(function(item) {
-                      if (typeof item === 'string' && item.trim() !== '') {
-                        var colonIndex = item.indexOf(':');
-                        var label = colonIndex > -1 ? item.substring(0, colonIndex).trim() : item.trim();
-                        var value = colonIndex > -1 ? item.substring(colonIndex + 1).trim() : '';
-                        
-                        html += '<li class="nutrition-facts-card__item">';
-                        html += '<span class="nutrition-facts-card__label">' + label + '</span>';
-                        if (value) {
-                          html += '<span class="nutrition-facts-card__value">' + value + '</span>';
-                        }
-                        html += '</li>';
-                      }
-                    });
-                    listEl.innerHTML = html;
-                  }
-                } catch(e) {
-                  try {
-                    var match = data.match(/\[(.*?)\]/);
-                    if (match && match[1]) {
-                      var items = match[1].split(',').map(function(item) {
-                        return item.trim().replace(/^["']+|["']+$/g, '');
-                      });
-                      var html = '';
-                      items.forEach(function(item) {
-                        if (item.trim() !== '') {
-                          var colonIndex = item.indexOf(':');
-                          var label = colonIndex > -1 ? item.substring(0, colonIndex).trim() : item.trim();
-                          var value = colonIndex > -1 ? item.substring(colonIndex + 1).trim() : '';
-                          
-                          html += '<li class="nutrition-facts-card__item">';
-                          html += '<span class="nutrition-facts-card__label">' + label + '</span>';
-                          if (value) {
-                            html += '<span class="nutrition-facts-card__value">' + value + '</span>';
-                          }
-                          html += '</li>';
-                        }
-                      });
-                      listEl.innerHTML = html;
+          
+          {% if is_json %}
+            {% comment %} Try server-side parsing using Liquid string manipulation {% endcomment %}
+            {% assign cleaned_string = nutrition_string | remove_first: '[' | remove_last: ']' | strip %}
+            {% assign items_array = cleaned_string | split: ',' %}
+            
+            {% if items_array.size > 0 %}
+              {% comment %} Successfully parsed - render directly {% endcomment %}
+              <ul class="nutrition-facts-card__list">
+                {% for item in items_array %}
+                  {% assign clean_item = item | remove: '"' | remove: "'" | strip %}
+                  {% if clean_item != blank %}
+                    {% assign item_parts = clean_item | split: ':' %}
+                    {% if item_parts.size > 1 %}
+                      <li class="nutrition-facts-card__item">
+                        <span class="nutrition-facts-card__label">{{ item_parts.first | strip }}</span>
+                        <span class="nutrition-facts-card__value">{{ item_parts.last | strip }}</span>
+                      </li>
+                    {% else %}
+                      <li class="nutrition-facts-card__item">
+                        <span class="nutrition-facts-card__label">{{ clean_item }}</span>
+                      </li>
+                    {% endif %}
+                  {% endif %}
+                {% endfor %}
+              </ul>
+            {% else %}
+              {% comment %} Fallback to JavaScript parsing {% endcomment %}
+              <ul class="nutrition-facts-card__list" id="nutrition-facts-list" data-nutrition-data="{{ nutrition_string | escape }}"></ul>
+              <script>
+                (function() {
+                  function parseNutritionFacts() {
+                    var listEl = document.getElementById('nutrition-facts-list');
+                    if (!listEl) {
+                      setTimeout(parseNutritionFacts, 50);
+                      return;
                     }
-                  } catch(e2) {
-                    listEl.innerHTML = '<li class="nutrition-facts-card__item"><span class="nutrition-facts-card__label" style="color: rgba(26, 26, 26, 0.5); font-style: italic;">Error parsing nutrition facts</span></li>';
+                    
+                    var data = listEl.getAttribute('data-nutrition-data');
+                    if (!data) return;
+                    
+                    try {
+                      var dataString = data.replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, '&').trim();
+                      var items = JSON.parse(dataString);
+                      
+                      if (Array.isArray(items) && items.length > 0) {
+                        var html = '';
+                        items.forEach(function(item) {
+                          if (typeof item === 'string' && item.trim() !== '') {
+                            var colonIndex = item.indexOf(':');
+                            var label = colonIndex > -1 ? item.substring(0, colonIndex).trim() : item.trim();
+                            var value = colonIndex > -1 ? item.substring(colonIndex + 1).trim() : '';
+                            
+                            html += '<li class="nutrition-facts-card__item">';
+                            html += '<span class="nutrition-facts-card__label">' + label.replace(/"/g, '&quot;') + '</span>';
+                            if (value) {
+                              html += '<span class="nutrition-facts-card__value">' + value.replace(/"/g, '&quot;') + '</span>';
+                            }
+                            html += '</li>';
+                          }
+                        });
+                        listEl.innerHTML = html;
+                      }
+                    } catch(e) {
+                      try {
+                        var match = data.match(/\[(.*?)\]/);
+                        if (match && match[1]) {
+                          var items = match[1].split(',').map(function(item) {
+                            return item.trim().replace(/^["']+|["']+$/g, '');
+                          });
+                          var html = '';
+                          items.forEach(function(item) {
+                            if (item.trim() !== '') {
+                              var colonIndex = item.indexOf(':');
+                              var label = colonIndex > -1 ? item.substring(0, colonIndex).trim() : item.trim();
+                              var value = colonIndex > -1 ? item.substring(colonIndex + 1).trim() : '';
+                              
+                              html += '<li class="nutrition-facts-card__item">';
+                              html += '<span class="nutrition-facts-card__label">' + label.replace(/"/g, '&quot;') + '</span>';
+                              if (value) {
+                                html += '<span class="nutrition-facts-card__value">' + value.replace(/"/g, '&quot;') + '</span>';
+                              }
+                              html += '</li>';
+                            }
+                          });
+                          listEl.innerHTML = html;
+                        }
+                      } catch(e2) {
+                        listEl.innerHTML = '<li class="nutrition-facts-card__item"><span class="nutrition-facts-card__label" style="color: rgba(26, 26, 26, 0.5); font-style: italic;">Error parsing nutrition facts</span></li>';
+                      }
+                    }
                   }
-                }
-              })();
-            </script>
+                  
+                  if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', parseNutritionFacts);
+                  } else {
+                    parseNutritionFacts();
+                  }
+                })();
+              </script>
+            {% endif %}
           {% else %}
             {% comment %} Plain text - try to split by newlines or commas {% endcomment %}
             <ul class="nutrition-facts-card__list" id="nutrition-facts-list">

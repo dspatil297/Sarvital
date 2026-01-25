@@ -25,56 +25,85 @@
               {% endfor %}
             </ul>
           {% else %}
-            {% comment %} It might be a JSON string - check and parse {% endcomment %}
+            {% comment %} It might be a JSON string - try to parse server-side first {% endcomment %}
             {% assign ingredients_string = ingredients | string %}
-            {% assign has_brackets = false %}
-            {% if ingredients_string contains '[' %}
-              {% assign has_brackets = true %}
+            {% assign is_json = false %}
+            {% if ingredients_string contains '[' and ingredients_string contains ']' %}
+              {% assign is_json = true %}
             {% endif %}
-            {% if has_brackets %}
-              {% comment %} It's a JSON string - parse with JavaScript {% endcomment %}
-              <ul class="ingredients-card__list" id="ingredients-list" data-ingredients-data="{{ ingredients_string | escape }}"></ul>
-              <script>
-                (function() {
-                  var listEl = document.getElementById('ingredients-list');
-                  if (!listEl) return;
-                  var data = listEl.getAttribute('data-ingredients-data');
-                  if (!data) return;
-                  
-                  try {
-                    var dataString = data.replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, '&').trim();
-                    var items = JSON.parse(dataString);
-                    
-                    if (Array.isArray(items) && items.length > 0) {
-                      var html = '';
-                      items.forEach(function(item) {
-                        if (typeof item === 'string' && item.trim() !== '') {
-                          html += '<li class="ingredients-card__item">' + item.trim() + '</li>';
-                        }
-                      });
-                      listEl.innerHTML = html;
-                    }
-                  } catch(e) {
-                    try {
-                      var match = data.match(/\[(.*?)\]/);
-                      if (match && match[1]) {
-                        var items = match[1].split(',').map(function(item) {
-                          return item.trim().replace(/^["']+|["']+$/g, '');
-                        });
-                        var html = '';
-                        items.forEach(function(item) {
-                          if (item.trim() !== '') {
-                            html += '<li class="ingredients-card__item">' + item.trim() + '</li>';
-                          }
-                        });
-                        listEl.innerHTML = html;
+            
+            {% if is_json %}
+              {% comment %} Try server-side parsing using Liquid string manipulation {% endcomment %}
+              {% assign cleaned_string = ingredients_string | remove_first: '[' | remove_last: ']' | strip %}
+              {% assign items_array = cleaned_string | split: ',' %}
+              
+              {% if items_array.size > 0 %}
+                {% comment %} Successfully parsed - render directly {% endcomment %}
+                <ul class="ingredients-card__list">
+                  {% for item in items_array %}
+                    {% assign clean_item = item | remove: '"' | remove: "'" | strip %}
+                    {% if clean_item != blank %}
+                      <li class="ingredients-card__item">{{ clean_item }}</li>
+                    {% endif %}
+                  {% endfor %}
+                </ul>
+              {% else %}
+                {% comment %} Fallback to JavaScript parsing {% endcomment %}
+                <ul class="ingredients-card__list" id="ingredients-list" data-ingredients-data="{{ ingredients_string | escape }}"></ul>
+                <script>
+                  (function() {
+                    function parseIngredients() {
+                      var listEl = document.getElementById('ingredients-list');
+                      if (!listEl) {
+                        setTimeout(parseIngredients, 50);
+                        return;
                       }
-                    } catch(e2) {
-                      listEl.innerHTML = '<li class="ingredients-card__item" style="color: rgba(26, 26, 26, 0.5); font-style: italic;">Error parsing ingredients</li>';
+                      
+                      var data = listEl.getAttribute('data-ingredients-data');
+                      if (!data) return;
+                      
+                      try {
+                        var dataString = data.replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, '&').trim();
+                        var items = JSON.parse(dataString);
+                        
+                        if (Array.isArray(items) && items.length > 0) {
+                          var html = '';
+                          items.forEach(function(item) {
+                            if (typeof item === 'string' && item.trim() !== '') {
+                              html += '<li class="ingredients-card__item">' + item.trim().replace(/"/g, '&quot;') + '</li>';
+                            }
+                          });
+                          listEl.innerHTML = html;
+                        }
+                      } catch(e) {
+                        try {
+                          var match = data.match(/\[(.*?)\]/);
+                          if (match && match[1]) {
+                            var items = match[1].split(',').map(function(item) {
+                              return item.trim().replace(/^["']+|["']+$/g, '');
+                            });
+                            var html = '';
+                            items.forEach(function(item) {
+                              if (item.trim() !== '') {
+                                html += '<li class="ingredients-card__item">' + item.trim().replace(/"/g, '&quot;') + '</li>';
+                              }
+                            });
+                            listEl.innerHTML = html;
+                          }
+                        } catch(e2) {
+                          listEl.innerHTML = '<li class="ingredients-card__item" style="color: rgba(26, 26, 26, 0.5); font-style: italic;">Error parsing ingredients</li>';
+                        }
+                      }
                     }
-                  }
-                })();
-              </script>
+                    
+                    if (document.readyState === 'loading') {
+                      document.addEventListener('DOMContentLoaded', parseIngredients);
+                    } else {
+                      parseIngredients();
+                    }
+                  })();
+                </script>
+              {% endif %}
             {% else %}
               {% comment %} It's plain text - display as-is {% endcomment %}
               <div class="ingredients-card__text">
