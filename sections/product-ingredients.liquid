@@ -25,85 +25,69 @@
               {% endfor %}
             </ul>
           {% else %}
-            {% comment %} It might be a JSON string - try to parse server-side first {% endcomment %}
+            {% comment %} It's a string - check if it's JSON {% endcomment %}
             {% assign ingredients_string = ingredients | string %}
-            {% assign is_json = false %}
             {% if ingredients_string contains '[' and ingredients_string contains ']' %}
-              {% assign is_json = true %}
-            {% endif %}
-            
-            {% if is_json %}
-              {% comment %} Try server-side parsing using Liquid string manipulation {% endcomment %}
-              {% assign cleaned_string = ingredients_string | remove_first: '[' | remove_last: ']' | strip %}
-              {% assign items_array = cleaned_string | split: ',' %}
-              
-              {% if items_array.size > 0 %}
-                {% comment %} Successfully parsed - render directly {% endcomment %}
-                <ul class="ingredients-card__list">
-                  {% for item in items_array %}
-                    {% assign clean_item = item | remove: '"' | remove: "'" | strip %}
-                    {% if clean_item != blank %}
-                      <li class="ingredients-card__item">{{ clean_item }}</li>
-                    {% endif %}
-                  {% endfor %}
-                </ul>
-              {% else %}
-                {% comment %} Fallback to JavaScript parsing {% endcomment %}
-                <ul class="ingredients-card__list" id="ingredients-list" data-ingredients-data="{{ ingredients_string | escape }}"></ul>
-                <script>
-                  (function() {
-                    function parseIngredients() {
-                      var listEl = document.getElementById('ingredients-list');
-                      if (!listEl) {
-                        setTimeout(parseIngredients, 50);
-                        return;
-                      }
-                      
-                      var data = listEl.getAttribute('data-ingredients-data');
-                      if (!data) return;
-                      
-                      try {
-                        var dataString = data.replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, '&').trim();
-                        var items = JSON.parse(dataString);
-                        
-                        if (Array.isArray(items) && items.length > 0) {
-                          var html = '';
-                          items.forEach(function(item) {
-                            if (typeof item === 'string' && item.trim() !== '') {
-                              html += '<li class="ingredients-card__item">' + item.trim().replace(/"/g, '&quot;') + '</li>';
-                            }
-                          });
-                          listEl.innerHTML = html;
-                        }
-                      } catch(e) {
-                        try {
-                          var match = data.match(/\[(.*?)\]/);
-                          if (match && match[1]) {
-                            var items = match[1].split(',').map(function(item) {
-                              return item.trim().replace(/^["']+|["']+$/g, '');
-                            });
-                            var html = '';
-                            items.forEach(function(item) {
-                              if (item.trim() !== '') {
-                                html += '<li class="ingredients-card__item">' + item.trim().replace(/"/g, '&quot;') + '</li>';
-                              }
-                            });
-                            listEl.innerHTML = html;
-                          }
-                        } catch(e2) {
-                          listEl.innerHTML = '<li class="ingredients-card__item" style="color: rgba(26, 26, 26, 0.5); font-style: italic;">Error parsing ingredients</li>';
-                        }
-                      }
+              {% comment %} It's a JSON string - parse with JavaScript {% endcomment %}
+              <ul class="ingredients-card__list" id="ingredients-list-{{ section.id }}"></ul>
+              <script>
+                (function() {
+                  var listId = 'ingredients-list-{{ section.id }}';
+                  var ingredientsData = {{ ingredients_string | json }};
+                  
+                  function renderIngredients() {
+                    var listEl = document.getElementById(listId);
+                    if (!listEl) {
+                      setTimeout(renderIngredients, 50);
+                      return;
                     }
                     
-                    if (document.readyState === 'loading') {
-                      document.addEventListener('DOMContentLoaded', parseIngredients);
-                    } else {
-                      parseIngredients();
+                    try {
+                      var items = [];
+                      
+                      // If it's already an array, use it directly
+                      if (Array.isArray(ingredientsData)) {
+                        items = ingredientsData;
+                      }
+                      // If it's a string, try to parse it
+                      else if (typeof ingredientsData === 'string') {
+                        try {
+                          items = JSON.parse(ingredientsData);
+                        } catch(e) {
+                          // Try regex extraction
+                          var match = ingredientsData.match(/\[(.*?)\]/);
+                          if (match && match[1]) {
+                            items = match[1].split(',').map(function(item) {
+                              return item.trim().replace(/^["']+|["']+$/g, '');
+                            });
+                          }
+                        }
+                      }
+                      
+                      if (Array.isArray(items) && items.length > 0) {
+                        var html = '';
+                        items.forEach(function(item) {
+                          if (item && item.toString().trim() !== '') {
+                            var text = item.toString().trim();
+                            html += '<li class="ingredients-card__item">' + text + '</li>';
+                          }
+                        });
+                        listEl.innerHTML = html;
+                      } else {
+                        listEl.innerHTML = '<li class="ingredients-card__item" style="color: rgba(26, 26, 26, 0.5); font-style: italic;">No ingredients found</li>';
+                      }
+                    } catch(e) {
+                      listEl.innerHTML = '<li class="ingredients-card__item" style="color: rgba(26, 26, 26, 0.5); font-style: italic;">Error loading ingredients</li>';
                     }
-                  })();
-                </script>
-              {% endif %}
+                  }
+                  
+                  if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', renderIngredients);
+                  } else {
+                    renderIngredients();
+                  }
+                })();
+              </script>
             {% else %}
               {% comment %} It's plain text - display as-is {% endcomment %}
               <div class="ingredients-card__text">
@@ -210,11 +194,6 @@
     margin: 0;
   }
 
-  .ingredients-card__loading {
-    opacity: 0.6;
-    font-style: italic;
-  }
-
   @media (max-width: 768px) {
     .product-ingredients {
       padding: 40px 20px;
@@ -235,7 +214,6 @@
   }
 {% endstylesheet %}
 
-
 {% schema %}
 {
   "name": "Product Ingredients",
@@ -254,4 +232,3 @@
   ]
 }
 {% endschema %}
-
