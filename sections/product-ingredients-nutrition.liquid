@@ -187,104 +187,226 @@
   .product-ingredients-nutrition {
     width: 100%;
     max-width: 100%;
-    padding: 80px 40px;
-    background: linear-gradient(180deg, var(--white) 0%, rgba(74, 124, 44, 0.02) 100%);
+    padding: 100px 40px;
+    background: linear-gradient(135deg, rgba(45, 80, 22, 0.03) 0%, rgba(74, 124, 44, 0.05) 50%, rgba(212, 175, 55, 0.02) 100%);
     box-sizing: border-box;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .product-ingredients-nutrition::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--forest-green), var(--sage-green), var(--gold));
+    opacity: 0.3;
   }
 
   .product-ingredients-nutrition__container {
-    max-width: 1000px;
+    max-width: 1200px;
     margin: 0 auto;
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 60px;
+    gap: 40px;
     align-items: start;
   }
 
   .ingredients-section,
   .nutrition-section {
-    background: var(--white);
-    border-radius: 16px;
-    padding: 40px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-    border: 1px solid rgba(74, 124, 44, 0.1);
-    transition: all 0.3s ease;
+    background: linear-gradient(145deg, var(--white) 0%, rgba(255, 255, 255, 0.95) 100%);
+    border-radius: 24px;
+    padding: 48px 40px;
+    box-shadow: 
+      0 10px 40px rgba(45, 80, 22, 0.08),
+      0 4px 12px rgba(0, 0, 0, 0.04),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    border: 2px solid rgba(74, 124, 44, 0.12);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ingredients-section::before,
+  .nutrition-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--forest-green), var(--sage-green));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .ingredients-section:hover::before,
+  .nutrition-section:hover::before {
+    transform: scaleX(1);
   }
 
   .ingredients-section:hover,
   .nutrition-section:hover {
-    box-shadow: 0 8px 32px rgba(74, 124, 44, 0.12);
-    transform: translateY(-4px);
+    box-shadow: 
+      0 20px 60px rgba(45, 80, 22, 0.15),
+      0 8px 24px rgba(0, 0, 0, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    transform: translateY(-8px) scale(1.01);
+    border-color: rgba(74, 124, 44, 0.25);
   }
 
   .section-header {
     display: flex;
     align-items: center;
-    gap: 16px;
-    margin-bottom: 32px;
-    padding-bottom: 24px;
-    border-bottom: 2px solid rgba(74, 124, 44, 0.15);
+    gap: 20px;
+    margin-bottom: 36px;
+    padding-bottom: 28px;
+    border-bottom: 3px solid;
+    border-image: linear-gradient(90deg, var(--forest-green), var(--sage-green), transparent) 1;
+    position: relative;
+  }
+
+  .section-header::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 0;
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, var(--gold), rgba(212, 175, 55, 0.3));
+    border-radius: 2px;
   }
 
   .section-icon {
-    width: 48px;
-    height: 48px;
+    width: 64px;
+    height: 64px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, rgba(74, 124, 44, 0.1), rgba(74, 124, 44, 0.05));
-    border-radius: 12px;
-    color: var(--forest-green);
+    background: linear-gradient(135deg, var(--forest-green) 0%, var(--sage-green) 100%);
+    border-radius: 18px;
+    color: var(--white);
     flex-shrink: 0;
+    box-shadow: 
+      0 8px 20px rgba(45, 80, 22, 0.25),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .section-icon::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transform: rotate(45deg);
+    transition: all 0.6s;
+  }
+
+  .ingredients-section:hover .section-icon::before,
+  .nutrition-section:hover .section-icon::before {
+    animation: shine 1.5s ease-in-out;
+  }
+
+  @keyframes shine {
+    0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+    100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
   }
 
   .section-icon svg {
-    width: 24px;
-    height: 24px;
+    width: 28px;
+    height: 28px;
+    position: relative;
+    z-index: 1;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+  }
+
+  .ingredients-section:hover .section-icon,
+  .nutrition-section:hover .section-icon {
+    transform: rotate(5deg) scale(1.1);
+    box-shadow: 
+      0 12px 30px rgba(45, 80, 22, 0.35),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
   }
 
   .section-title {
     font-family: var(--font-heading);
-    font-size: 28px;
-    font-weight: 600;
-    color: var(--text);
+    font-size: 32px;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--forest-green) 0%, var(--sage-green) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
     margin: 0;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.02em;
     line-height: 1.2;
+    text-shadow: 0 2px 4px rgba(45, 80, 22, 0.1);
   }
 
   .ingredients-list,
   .nutrition-list {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 20px;
   }
 
   .list-item {
     display: flex;
     align-items: flex-start;
-    gap: 14px;
-    padding: 12px 0;
-    border-bottom: 1px solid rgba(26, 26, 26, 0.06);
-    transition: all 0.2s ease;
+    gap: 16px;
+    padding: 16px 20px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(250, 250, 250, 0.6) 100%);
+    border-radius: 12px;
+    border: 1px solid rgba(74, 124, 44, 0.1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
   }
 
-  .list-item:last-child {
-    border-bottom: none;
+  .list-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(180deg, var(--forest-green), var(--sage-green));
+    transform: scaleY(0);
+    transform-origin: bottom;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .list-item:hover::before {
+    transform: scaleY(1);
   }
 
   .list-item:hover {
-    padding-left: 8px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 1) 0%, rgba(250, 250, 250, 0.9) 100%);
+    border-color: rgba(74, 124, 44, 0.25);
+    box-shadow: 
+      0 4px 16px rgba(45, 80, 22, 0.1),
+      0 2px 8px rgba(0, 0, 0, 0.05);
+    transform: translateX(8px);
   }
 
   .list-bullet {
-    width: 8px;
-    height: 8px;
+    width: 12px;
+    height: 12px;
     border-radius: 50%;
-    background: var(--forest-green);
-    margin-top: 8px;
+    background: linear-gradient(135deg, var(--forest-green) 0%, var(--sage-green) 100%);
+    margin-top: 6px;
     flex-shrink: 0;
     position: relative;
+    box-shadow: 
+      0 2px 8px rgba(45, 80, 22, 0.3),
+      inset 0 1px 2px rgba(255, 255, 255, 0.3);
   }
 
   .list-bullet::after {
@@ -293,77 +415,142 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 12px;
-    height: 12px;
+    width: 20px;
+    height: 20px;
     border-radius: 50%;
-    background: rgba(74, 124, 44, 0.15);
-    animation: pulse 2s ease-in-out infinite;
+    background: linear-gradient(135deg, rgba(45, 80, 22, 0.2), rgba(74, 124, 44, 0.15));
+    animation: pulse-ring 2s ease-in-out infinite;
   }
 
-  @keyframes pulse {
+  @keyframes pulse-ring {
     0%, 100% {
-      opacity: 1;
+      opacity: 0.6;
       transform: translate(-50%, -50%) scale(1);
     }
     50% {
-      opacity: 0.5;
-      transform: translate(-50%, -50%) scale(1.2);
+      opacity: 0.3;
+      transform: translate(-50%, -50%) scale(1.4);
     }
   }
 
+  .list-item:hover .list-bullet {
+    background: linear-gradient(135deg, var(--sage-green) 0%, var(--gold) 100%);
+    box-shadow: 
+      0 4px 12px rgba(212, 175, 55, 0.4),
+      inset 0 1px 2px rgba(255, 255, 255, 0.4);
+    transform: scale(1.2);
+  }
+
   .list-text {
-    font-size: 16px;
-    line-height: 1.7;
-    color: rgba(26, 26, 26, 0.85);
-    font-weight: 400;
+    font-size: 17px;
+    line-height: 1.8;
+    color: rgba(26, 26, 26, 0.9);
+    font-weight: 500;
     flex: 1;
     word-wrap: break-word;
+    transition: all 0.3s ease;
   }
 
   .list-item:hover .list-text {
-    color: var(--text);
-    font-weight: 500;
+    color: var(--forest-green);
+    font-weight: 600;
+    transform: translateX(4px);
   }
 
   /* Responsive Design */
   @media (max-width: 968px) {
     .product-ingredients-nutrition {
-      padding: 60px 30px;
+      padding: 80px 30px;
     }
 
     .product-ingredients-nutrition__container {
       grid-template-columns: 1fr;
-      gap: 40px;
+      gap: 32px;
     }
 
     .ingredients-section,
     .nutrition-section {
-      padding: 32px;
+      padding: 40px 32px;
     }
 
     .section-title {
-      font-size: 24px;
+      font-size: 28px;
+    }
+
+    .section-icon {
+      width: 56px;
+      height: 56px;
+    }
+
+    .section-icon svg {
+      width: 24px;
+      height: 24px;
     }
   }
 
   @media (max-width: 768px) {
     .product-ingredients-nutrition {
-      padding: 50px 20px;
+      padding: 60px 20px;
     }
 
     .ingredients-section,
     .nutrition-section {
-      padding: 28px 24px;
+      padding: 32px 24px;
+      border-radius: 20px;
     }
 
     .section-header {
+      margin-bottom: 28px;
+      padding-bottom: 24px;
+      gap: 16px;
+    }
+
+    .section-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+    }
+
+    .section-icon svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    .section-title {
+      font-size: 26px;
+    }
+
+    .list-item {
+      gap: 14px;
+      padding: 14px 18px;
+    }
+
+    .list-text {
+      font-size: 16px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .product-ingredients-nutrition {
+      padding: 50px 16px;
+    }
+
+    .ingredients-section,
+    .nutrition-section {
+      padding: 28px 20px;
+      border-radius: 16px;
+    }
+
+    .section-header {
+      gap: 12px;
       margin-bottom: 24px;
       padding-bottom: 20px;
     }
 
     .section-icon {
-      width: 40px;
-      height: 40px;
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
     }
 
     .section-icon svg {
@@ -375,43 +562,24 @@
       font-size: 22px;
     }
 
+    .ingredients-list,
+    .nutrition-list {
+      gap: 16px;
+    }
+
     .list-item {
-      gap: 12px;
-      padding: 10px 0;
+      padding: 12px 16px;
+      border-radius: 10px;
+    }
+
+    .list-bullet {
+      width: 10px;
+      height: 10px;
     }
 
     .list-text {
       font-size: 15px;
-    }
-  }
-
-  @media (max-width: 480px) {
-    .product-ingredients-nutrition {
-      padding: 40px 16px;
-    }
-
-    .ingredients-section,
-    .nutrition-section {
-      padding: 24px 20px;
-    }
-
-    .section-header {
-      gap: 12px;
-      margin-bottom: 20px;
-      padding-bottom: 16px;
-    }
-
-    .section-title {
-      font-size: 20px;
-    }
-
-    .ingredients-list,
-    .nutrition-list {
-      gap: 12px;
-    }
-
-    .list-item {
-      padding: 8px 0;
+      line-height: 1.7;
     }
   }
 {% endstylesheet %}
