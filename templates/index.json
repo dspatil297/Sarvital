@@ -1,3 +1,12 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "hero_banner": {
@@ -13,9 +22,6 @@
     },
     "usp_icons": {
       "type": "usp-icons",
-      "settings": {
-        "title": "Why Choose Sarvital"
-      },
       "blocks": {
         "usp_1": {
           "type": "usp_item",
@@ -55,26 +61,24 @@
         "usp_2",
         "usp_3",
         "usp_4"
-      ]
+      ],
+      "settings": {
+        "title": "Why Choose Sarvital"
+      }
     },
     "featured_products": {
       "type": "product-grid",
       "settings": {
         "title": "Our Premium Powders",
         "description": "Discover our range of premium fruit and vegetable powders, carefully crafted for your wellness journey.",
-        "products_to_show": 4,
+        "collection": "frontpage",
+        "products_to_show": 3,
         "show_view_all": true,
         "view_all_text": "View All Products"
       }
     },
     "lifestyle_usage": {
       "type": "lifestyle-usage",
-      "settings": {
-        "title": "Transform Your Daily Routine",
-        "description": "Our premium powders seamlessly integrate into your lifestyle, whether you're starting your day with a nutritious smoothie or adding a health boost to your favorite recipes.",
-        "cta_text": "Discover Your Perfect Match",
-        "cta_link": "/collections/all"
-      },
       "blocks": {
         "feature_1": {
           "type": "feature",
@@ -114,15 +118,16 @@
         "feature_2",
         "feature_3",
         "feature_4"
-      ]
+      ],
+      "settings": {
+        "title": "Transform Your Daily Routine",
+        "description": "Our premium powders seamlessly integrate into your lifestyle, whether you're starting your day with a nutritious smoothie or adding a health boost to your favorite recipes.",
+        "cta_text": "Discover Your Perfect Match",
+        "cta_link": "/collections/all"
+      }
     },
     "quality_assurance": {
       "type": "quality-assurance",
-      "settings": {
-        "title": "Quality You Can Trust",
-        "description": "We're committed to delivering the highest quality products through rigorous testing and quality assurance.",
-        "promise_text": "Every product is lab-tested, certified, and guaranteed to meet our premium quality standards."
-      },
       "blocks": {
         "badge_1": {
           "type": "badge",
@@ -162,14 +167,15 @@
         "badge_2",
         "badge_3",
         "badge_4"
-      ]
+      ],
+      "settings": {
+        "title": "Quality You Can Trust",
+        "description": "We're committed to delivering the highest quality products through rigorous testing and quality assurance.",
+        "promise_text": "Every product is lab-tested, certified, and guaranteed to meet our premium quality standards."
+      }
     },
     "testimonials": {
       "type": "testimonials",
-      "settings": {
-        "title": "What Our Customers Say",
-        "auto_rotate": true
-      },
       "blocks": {
         "testimonial_1": {
           "type": "testimonial",
@@ -203,8 +209,12 @@
         "testimonial_1",
         "testimonial_2",
         "testimonial_3"
-      ]
-    },
+      ],
+      "settings": {
+        "title": "What Our Customers Say",
+        "auto_rotate": true
+      }
+    }
   },
   "order": [
     "hero_banner",
