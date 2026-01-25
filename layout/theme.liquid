@@ -53,6 +53,6 @@
     {% render 'cart-drawer' %}
 
     {%- comment -%} Base JavaScript - Load with defer for better performance {%- endcomment -%}
-    {{ 'application.js' | asset_url | script_tag: defer: true }}
+    <script src="{{ 'application.js' | asset_url }}" defer></script>
   </body>
 </html>
