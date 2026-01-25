@@ -1,0 +1,410 @@
+{% comment %}
+  Product Ingredients & Nutrition Facts Section
+  Conversion-Optimized Design - Displays custom.ingredients and custom.nutrition_facts metafields
+  Each item displayed on its own row with clean formatting (no quotes, brackets, commas)
+{% endcomment %}
+
+<section class="product-ingredients-nutrition" id="product-ingredients-nutrition">
+  <div class="product-ingredients-nutrition__container">
+    
+    <!-- Ingredients Section -->
+    {% if product.metafields.custom.ingredients != blank %}
+      <div class="ingredients-section">
+        <div class="section-header">
+          <div class="section-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+              <path d="M2 17l10 5 10-5M2 12l10 5 10-5"/>
+            </svg>
+          </div>
+          <h2 class="section-title">Ingredients</h2>
+        </div>
+        
+        <div class="ingredients-list">
+          {% assign ingredients_value = product.metafields.custom.ingredients %}
+          
+          {% comment %} Handle list metafield (list.single_line_text_field) - try .value first {% endcomment %}
+          {% if ingredients_value.value %}
+            {% for item in ingredients_value.value %}
+              {% assign clean_item = item | strip | remove: '"' | remove: '[' | remove: ']' | remove: ',' %}
+              {% if clean_item != blank %}
+                <div class="list-item">
+                  <span class="list-bullet"></span>
+                  <span class="list-text">{{ clean_item }}</span>
+                </div>
+              {% endif %}
+            {% endfor %}
+          {% comment %} Handle direct array iteration for list metafields {% endcomment %}
+          {% elsif ingredients_value.first %}
+            {% for item in ingredients_value %}
+              {% assign clean_item = item | strip | remove: '"' | remove: '[' | remove: ']' | remove: ',' %}
+              {% if clean_item != blank %}
+                <div class="list-item">
+                  <span class="list-bullet"></span>
+                  <span class="list-text">{{ clean_item }}</span>
+                </div>
+              {% endif %}
+            {% endfor %}
+          {% elsif ingredients_value contains ',' %}
+            {% comment %} Handle comma-separated string {% endcomment %}
+            {% assign ingredients_array = ingredients_value | split: ',' %}
+            {% for item in ingredients_array %}
+              {% assign clean_item = item | strip | remove: '"' | remove: '[' | remove: ']' %}
+              {% if clean_item != blank %}
+                <div class="list-item">
+                  <span class="list-bullet"></span>
+                  <span class="list-text">{{ clean_item }}</span>
+                </div>
+              {% endif %}
+            {% endfor %}
+          {% elsif ingredients_value contains '\n' or ingredients_value contains '<br' %}
+            {% comment %} Handle newline-separated values {% endcomment %}
+            {% assign ingredients_array = ingredients_value | newline_to_br | split: '<br />' %}
+            {% for item in ingredients_array %}
+              {% assign clean_item = item | strip | remove: '"' | remove: '[' | remove: ']' | remove: ',' %}
+              {% if clean_item != blank %}
+                <div class="list-item">
+                  <span class="list-bullet"></span>
+                  <span class="list-text">{{ clean_item }}</span>
+                </div>
+              {% endif %}
+            {% endfor %}
+          {% else %}
+            {% comment %} Handle single value {% endcomment %}
+            {% assign clean_item = ingredients_value | strip | remove: '"' | remove: '[' | remove: ']' | remove: ',' %}
+            {% if clean_item != blank %}
+              <div class="list-item">
+                <span class="list-bullet"></span>
+                <span class="list-text">{{ clean_item }}</span>
+              </div>
+            {% endif %}
+          {% endif %}
+        </div>
+      </div>
+    {% endif %}
+
+    <!-- Nutrition Facts Section -->
+    {% if product.metafields.custom.nutrition_facts != blank %}
+      <div class="nutrition-section">
+        <div class="section-header">
+          <div class="section-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M6 9H4a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V11a2 2 0 0 0-2-2h-2"/>
+              <rect x="6" y="1" width="12" height="8" rx="1" ry="1"/>
+              <path d="M8 13h8M8 17h8M8 21h4"/>
+            </svg>
+          </div>
+          <h2 class="section-title">Nutrition Facts</h2>
+        </div>
+        
+        <div class="nutrition-list">
+          {% assign nutrition_value = product.metafields.custom.nutrition_facts %}
+          
+          {% comment %} Handle list metafield (list.single_line_text_field) - try .value first {% endcomment %}
+          {% if nutrition_value.value %}
+            {% for item in nutrition_value.value %}
+              {% assign clean_item = item | strip | remove: '"' | remove: '[' | remove: ']' | remove: ',' %}
+              {% if clean_item != blank %}
+                <div class="list-item">
+                  <span class="list-bullet"></span>
+                  <span class="list-text">{{ clean_item }}</span>
+                </div>
+              {% endif %}
+            {% endfor %}
+          {% comment %} Handle direct array iteration for list metafields {% endcomment %}
+          {% elsif nutrition_value.first %}
+            {% for item in nutrition_value %}
+              {% assign clean_item = item | strip | remove: '"' | remove: '[' | remove: ']' | remove: ',' %}
+              {% if clean_item != blank %}
+                <div class="list-item">
+                  <span class="list-bullet"></span>
+                  <span class="list-text">{{ clean_item }}</span>
+                </div>
+              {% endif %}
+            {% endfor %}
+          {% elsif nutrition_value contains ',' %}
+            {% comment %} Handle comma-separated string {% endcomment %}
+            {% assign nutrition_array = nutrition_value | split: ',' %}
+            {% for item in nutrition_array %}
+              {% assign clean_item = item | strip | remove: '"' | remove: '[' | remove: ']' %}
+              {% if clean_item != blank %}
+                <div class="list-item">
+                  <span class="list-bullet"></span>
+                  <span class="list-text">{{ clean_item }}</span>
+                </div>
+              {% endif %}
+            {% endfor %}
+          {% elsif nutrition_value contains '\n' or nutrition_value contains '<br' %}
+            {% comment %} Handle newline-separated values {% endcomment %}
+            {% assign nutrition_array = nutrition_value | newline_to_br | split: '<br />' %}
+            {% for item in nutrition_array %}
+              {% assign clean_item = item | strip | remove: '"' | remove: '[' | remove: ']' | remove: ',' %}
+              {% if clean_item != blank %}
+                <div class="list-item">
+                  <span class="list-bullet"></span>
+                  <span class="list-text">{{ clean_item }}</span>
+                </div>
+              {% endif %}
+            {% endfor %}
+          {% else %}
+            {% comment %} Handle single value {% endcomment %}
+            {% assign clean_item = nutrition_value | strip | remove: '"' | remove: '[' | remove: ']' | remove: ',' %}
+            {% if clean_item != blank %}
+              <div class="list-item">
+                <span class="list-bullet"></span>
+                <span class="list-text">{{ clean_item }}</span>
+              </div>
+            {% endif %}
+          {% endif %}
+        </div>
+      </div>
+    {% endif %}
+
+  </div>
+</section>
+
+{% stylesheet %}
+  .product-ingredients-nutrition {
+    width: 100%;
+    max-width: 100%;
+    padding: 80px 40px;
+    background: linear-gradient(180deg, var(--white) 0%, rgba(74, 124, 44, 0.02) 100%);
+    box-sizing: border-box;
+  }
+
+  .product-ingredients-nutrition__container {
+    max-width: 1000px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 60px;
+    align-items: start;
+  }
+
+  .ingredients-section,
+  .nutrition-section {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 40px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(74, 124, 44, 0.1);
+    transition: all 0.3s ease;
+  }
+
+  .ingredients-section:hover,
+  .nutrition-section:hover {
+    box-shadow: 0 8px 32px rgba(74, 124, 44, 0.12);
+    transform: translateY(-4px);
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+    border-bottom: 2px solid rgba(74, 124, 44, 0.15);
+  }
+
+  .section-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, rgba(74, 124, 44, 0.1), rgba(74, 124, 44, 0.05));
+    border-radius: 12px;
+    color: var(--forest-green);
+    flex-shrink: 0;
+  }
+
+  .section-icon svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .section-title {
+    font-family: var(--font-heading);
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--text);
+    margin: 0;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+  }
+
+  .ingredients-list,
+  .nutrition-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .list-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(26, 26, 26, 0.06);
+    transition: all 0.2s ease;
+  }
+
+  .list-item:last-child {
+    border-bottom: none;
+  }
+
+  .list-item:hover {
+    padding-left: 8px;
+  }
+
+  .list-bullet {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--forest-green);
+    margin-top: 8px;
+    flex-shrink: 0;
+    position: relative;
+  }
+
+  .list-bullet::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(74, 124, 44, 0.15);
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+    50% {
+      opacity: 0.5;
+      transform: translate(-50%, -50%) scale(1.2);
+    }
+  }
+
+  .list-text {
+    font-size: 16px;
+    line-height: 1.7;
+    color: rgba(26, 26, 26, 0.85);
+    font-weight: 400;
+    flex: 1;
+    word-wrap: break-word;
+  }
+
+  .list-item:hover .list-text {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 968px) {
+    .product-ingredients-nutrition {
+      padding: 60px 30px;
+    }
+
+    .product-ingredients-nutrition__container {
+      grid-template-columns: 1fr;
+      gap: 40px;
+    }
+
+    .ingredients-section,
+    .nutrition-section {
+      padding: 32px;
+    }
+
+    .section-title {
+      font-size: 24px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .product-ingredients-nutrition {
+      padding: 50px 20px;
+    }
+
+    .ingredients-section,
+    .nutrition-section {
+      padding: 28px 24px;
+    }
+
+    .section-header {
+      margin-bottom: 24px;
+      padding-bottom: 20px;
+    }
+
+    .section-icon {
+      width: 40px;
+      height: 40px;
+    }
+
+    .section-icon svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .section-title {
+      font-size: 22px;
+    }
+
+    .list-item {
+      gap: 12px;
+      padding: 10px 0;
+    }
+
+    .list-text {
+      font-size: 15px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .product-ingredients-nutrition {
+      padding: 40px 16px;
+    }
+
+    .ingredients-section,
+    .nutrition-section {
+      padding: 24px 20px;
+    }
+
+    .section-header {
+      gap: 12px;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+    }
+
+    .section-title {
+      font-size: 20px;
+    }
+
+    .ingredients-list,
+    .nutrition-list {
+      gap: 12px;
+    }
+
+    .list-item {
+      padding: 8px 0;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Product Ingredients & Nutrition",
+  "settings": [],
+  "presets": [
+    {
+      "name": "Product Ingredients & Nutrition"
+    }
+  ]
+}
+{% endschema %}
+
