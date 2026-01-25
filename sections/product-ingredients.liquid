@@ -33,9 +33,48 @@
             {% endif %}
             {% if has_brackets %}
               {% comment %} It's a JSON string - parse with JavaScript {% endcomment %}
-              <ul class="ingredients-card__list" id="ingredients-list" data-ingredients-data="{{ ingredients_string | escape }}">
-                <li class="ingredients-card__item ingredients-card__loading">Loading ingredients...</li>
-              </ul>
+              <ul class="ingredients-card__list" id="ingredients-list" data-ingredients-data="{{ ingredients_string | escape }}"></ul>
+              <script>
+                (function() {
+                  var listEl = document.getElementById('ingredients-list');
+                  if (!listEl) return;
+                  var data = listEl.getAttribute('data-ingredients-data');
+                  if (!data) return;
+                  
+                  try {
+                    var dataString = data.replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, '&').trim();
+                    var items = JSON.parse(dataString);
+                    
+                    if (Array.isArray(items) && items.length > 0) {
+                      var html = '';
+                      items.forEach(function(item) {
+                        if (typeof item === 'string' && item.trim() !== '') {
+                          html += '<li class="ingredients-card__item">' + item.trim() + '</li>';
+                        }
+                      });
+                      listEl.innerHTML = html;
+                    }
+                  } catch(e) {
+                    try {
+                      var match = data.match(/\[(.*?)\]/);
+                      if (match && match[1]) {
+                        var items = match[1].split(',').map(function(item) {
+                          return item.trim().replace(/^["']+|["']+$/g, '');
+                        });
+                        var html = '';
+                        items.forEach(function(item) {
+                          if (item.trim() !== '') {
+                            html += '<li class="ingredients-card__item">' + item.trim() + '</li>';
+                          }
+                        });
+                        listEl.innerHTML = html;
+                      }
+                    } catch(e2) {
+                      listEl.innerHTML = '<li class="ingredients-card__item" style="color: rgba(26, 26, 26, 0.5); font-style: italic;">Error parsing ingredients</li>';
+                    }
+                  }
+                })();
+              </script>
             {% else %}
               {% comment %} It's plain text - display as-is {% endcomment %}
               <div class="ingredients-card__text">
@@ -167,74 +206,6 @@
   }
 {% endstylesheet %}
 
-{% javascript %}
-  (function() {
-    'use strict';
-    
-    function parseIngredients() {
-      const ingredientsList = document.getElementById('ingredients-list');
-      if (!ingredientsList) return;
-      
-      const ingredientsData = ingredientsList.getAttribute('data-ingredients-data');
-      if (!ingredientsData || ingredientsData.trim() === '') return;
-      
-      try {
-        // Unescape HTML entities
-        let dataString = ingredientsData
-          .replace(/&quot;/g, '"')
-          .replace(/&#39;/g, "'")
-          .replace(/&amp;/g, '&')
-          .replace(/&lt;/g, '<')
-          .replace(/&gt;/g, '>')
-          .trim();
-        
-        // Try JSON parse first
-        let ingredientsArray;
-        try {
-          ingredientsArray = JSON.parse(dataString);
-        } catch (jsonError) {
-          // If JSON parse fails, try regex extraction
-          const match = dataString.match(/\[(.*?)\]/);
-          if (match && match[1]) {
-            const items = match[1].split(',').map(function(item) {
-              return item.trim().replace(/^["']+|["']+$/g, '');
-            });
-            ingredientsArray = items;
-          } else {
-            throw new Error('Could not parse');
-          }
-        }
-        
-        if (Array.isArray(ingredientsArray) && ingredientsArray.length > 0) {
-          const fragment = document.createDocumentFragment();
-          
-          ingredientsArray.forEach(function(ingredient) {
-            if (typeof ingredient === 'string' && ingredient.trim() !== '') {
-              const listItem = document.createElement('li');
-              listItem.className = 'ingredients-card__item';
-              listItem.textContent = ingredient.trim();
-              fragment.appendChild(listItem);
-            }
-          });
-          
-          ingredientsList.innerHTML = '';
-          ingredientsList.appendChild(fragment);
-        }
-      } catch (e) {
-        console.error('Error parsing ingredients:', e);
-        ingredientsList.innerHTML = '<li class="ingredients-card__item"><span style="color: rgba(26, 26, 26, 0.5); font-style: italic;">Unable to parse ingredients data. Please check the metafield format.</span></li>';
-      }
-    }
-    
-    // Run immediately if DOM is ready, otherwise wait
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', parseIngredients);
-    } else {
-      // Use setTimeout to ensure DOM is fully rendered
-      setTimeout(parseIngredients, 0);
-    }
-  })();
-{% endjavascript %}
 
 {% schema %}
 {
