@@ -9,7 +9,7 @@
     {% endif %}
     
     {% if section.settings.collection != blank %}
-      {% assign related_collection = collections[section.settings.collection] %}
+      {% assign related_collection = section.settings.collection %}
     {% else %}
       {% assign related_collection = collections.all %}
     {% endif %}
@@ -33,12 +33,12 @@
         </div>
       {% else %}
         <div class="related-products__empty">
-          <p>No related products found.</p>
+          <p>No related products found. The current product may be the only one in this collection.</p>
         </div>
       {% endif %}
     {% else %}
       <div class="related-products__empty">
-        <p>No products available.</p>
+        <p>No products available in the selected collection.</p>
       </div>
     {% endif %}
   </div>
