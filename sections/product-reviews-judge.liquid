@@ -1,0 +1,229 @@
+{% comment %}
+  Product Reviews Section - Judge.me Integration with Premium Design
+{% endcomment %}
+
+<section class="product-reviews-judge" id="product-reviews">
+  <div class="product-reviews-judge__container">
+    <h2 class="reviews-title">Customer Reviews</h2>
+    
+    {% comment %} Judge.me Product Reviews Widget {% endcomment %}
+    <div class="judge-me-reviews-wrapper">
+      {% comment %} Standard Judge.me integration - widget will load via JavaScript {% endcomment %}
+      <div id="judgeme_product_reviews" data-product-id="{{ product.id }}">
+        {% comment %} Judge.me reviews will populate this automatically {% endcomment %}
+      </div>
+      
+      {% comment %} Alternative: If Judge.me snippet exists {% endcomment %}
+      {% if snippets['judge-me-product-reviews'] %}
+        {% render 'judge-me-product-reviews', product: product %}
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+  .product-reviews-judge {
+    width: 100%;
+    max-width: 100%;
+    padding: 40px 40px;
+    background: linear-gradient(135deg, rgba(45, 80, 22, 0.02) 0%, rgba(74, 124, 44, 0.03) 100%);
+    box-sizing: border-box;
+  }
+
+  .product-reviews-judge__container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .reviews-title {
+    font-family: var(--font-heading);
+    font-size: 32px;
+    font-weight: 700;
+    text-align: center;
+    margin: 0 0 32px 0;
+    background: linear-gradient(135deg, var(--forest-green) 0%, var(--sage-green) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .judge-me-reviews-wrapper {
+    background: var(--white);
+    border-radius: 24px;
+    padding: 40px;
+    box-shadow: 
+      0 10px 40px rgba(45, 80, 22, 0.08),
+      0 4px 12px rgba(0, 0, 0, 0.04),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    border: 2px solid rgba(74, 124, 44, 0.12);
+  }
+
+  {% comment %} Judge.me Widget Styling Overrides {% endcomment %}
+  .judge-me-reviews-wrapper .jdgm-widget,
+  .judge-me-reviews-wrapper .jdgm-review-widget,
+  .judge-me-reviews-wrapper .jdgm-rev-widget {
+    font-family: inherit;
+  }
+
+  .judge-me-reviews-wrapper .jdgm-rev-widget {
+    padding: 0;
+  }
+
+  .judge-me-reviews-wrapper .jdgm-rev__header {
+    padding: 20px 0;
+    border-bottom: 1px solid rgba(74, 124, 44, 0.1);
+  }
+
+  .judge-me-reviews-wrapper .jdgm-rev__body {
+    padding: 20px 0;
+    color: rgba(26, 26, 26, 0.8);
+    line-height: 1.7;
+  }
+
+  .judge-me-reviews-wrapper .jdgm-rev__rating {
+    color: #FFB800;
+  }
+
+  .judge-me-reviews-wrapper .jdgm-rev__author {
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .judge-me-reviews-wrapper .jdgm-rev__timestamp {
+    color: rgba(26, 26, 26, 0.6);
+    font-size: 14px;
+  }
+
+  .judge-me-reviews-wrapper .jdgm-rev__icon {
+    color: var(--forest-green);
+  }
+
+  .judge-me-reviews-wrapper .jdgm-rev-widget {
+    background: transparent;
+  }
+
+  .judge-me-reviews-wrapper .jdgm-rev {
+    padding: 24px 0;
+    border-bottom: 1px solid rgba(74, 124, 44, 0.1);
+  }
+
+  .judge-me-reviews-wrapper .jdgm-rev:last-child {
+    border-bottom: none;
+  }
+
+  .judge-me-reviews-wrapper .jdgm-paginate {
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(74, 124, 44, 0.1);
+  }
+
+  .judge-me-reviews-wrapper .jdgm-paginate__page {
+    color: var(--forest-green);
+    border-color: rgba(74, 124, 44, 0.2);
+  }
+
+  .judge-me-reviews-wrapper .jdgm-paginate__page:hover,
+  .judge-me-reviews-wrapper .jdgm-paginate__page.jdgm-paginate__page--current {
+    background: var(--forest-green);
+    color: var(--white);
+    border-color: var(--forest-green);
+  }
+
+  .judge-me-reviews-wrapper .jdgm-form {
+    margin-top: 32px;
+    padding-top: 32px;
+    border-top: 2px solid rgba(74, 124, 44, 0.15);
+  }
+
+  .judge-me-reviews-wrapper .jdgm-form__title {
+    font-family: var(--font-heading);
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 20px;
+  }
+
+  .judge-me-reviews-wrapper .jdgm-form__field input,
+  .judge-me-reviews-wrapper .jdgm-form__field textarea {
+    border: 2px solid rgba(74, 124, 44, 0.2);
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+  }
+
+  .judge-me-reviews-wrapper .jdgm-form__field input:focus,
+  .judge-me-reviews-wrapper .jdgm-form__field textarea:focus {
+    border-color: var(--forest-green);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(74, 124, 44, 0.1);
+  }
+
+  .judge-me-reviews-wrapper .jdgm-form__submit {
+    background: linear-gradient(135deg, var(--forest-green) 0%, var(--sage-green) 100%);
+    color: var(--white);
+    border: none;
+    border-radius: 8px;
+    padding: 14px 32px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .judge-me-reviews-wrapper .jdgm-form__submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(74, 124, 44, 0.3);
+  }
+
+  @media (max-width: 968px) {
+    .product-reviews-judge {
+      padding: 30px 20px;
+    }
+
+    .judge-me-reviews-wrapper {
+      padding: 32px 24px;
+    }
+
+    .reviews-title {
+      font-size: 28px;
+      margin-bottom: 24px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .product-reviews-judge {
+      padding: 24px 16px;
+    }
+
+    .judge-me-reviews-wrapper {
+      padding: 24px 20px;
+      border-radius: 20px;
+    }
+
+    .reviews-title {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+
+    .judge-me-reviews-wrapper :global(.jdgm-rev) {
+      padding: 20px 0;
+    }
+
+    .judge-me-reviews-wrapper :global(.jdgm-form__title) {
+      font-size: 20px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Reviews (Judge.me)",
+  "settings": [],
+  "presets": [
+    {
+      "name": "Reviews (Judge.me)"
+    }
+  ]
+}
+{% endschema %}
+

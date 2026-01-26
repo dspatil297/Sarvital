@@ -29,6 +29,10 @@
         "products_to_show": 3
       }
     },
+    "product_reviews_judge": {
+      "type": "product-reviews-judge",
+      "settings": {}
+    },
     "product_faq_compact": {
       "type": "product-faq-compact",
       "settings": {}
@@ -41,6 +45,7 @@
     "product_trust_badges_compact",
     "product_how_to_use_compact",
     "related_products",
+    "product_reviews_judge",
     "product_faq_compact"
   ]
 }
