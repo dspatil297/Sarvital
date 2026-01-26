@@ -11,110 +11,110 @@
 {% assign faq_meta = product.metafields.custom.product_faq %}
 {% assign has_faqs = false %}
 {% assign faq_items = '' | split: '' %}
+{% assign faq_text = '' %}
 
+{% comment %} Handle different metafield types - try multiple access methods {% endcomment %}
 {% if faq_meta != blank %}
-  {% assign faq_text = faq_meta | strip %}
+  {% if faq_meta.value != blank %}
+    {% assign faq_text = faq_meta.value | strip %}
+  {% elsif faq_meta != blank %}
+    {% assign faq_text = faq_meta | strip %}
+  {% endif %}
+  
+  {% comment %} Also try metafield_text filter as fallback {% endcomment %}
+  {% if faq_text == blank %}
+    {% assign faq_text = faq_meta | metafield_text | strip %}
+  {% endif %}
+  
   {% if faq_text != blank %}
     {% assign has_faqs = true %}
     
-    {% comment %} Parse the FAQ text into Q&A pairs {% endcomment %}
+    {% comment %} Parse the FAQ text into Q&A pairs - handle multiline text {% endcomment %}
     {% assign lines = faq_text | newline_to_br | split: '<br />' %}
     {% assign current_question = '' %}
     {% assign current_answer = '' %}
     {% assign temp_items = '' | split: '' %}
-    {% assign expecting_answer = false %}
+    {% assign line_count = 0 %}
     
     {% for line in lines %}
       {% assign clean_line = line | strip %}
       {% if clean_line != blank %}
+        {% assign line_count = line_count | plus: 1 %}
         {% assign line_lower = clean_line | downcase %}
+        {% assign is_delimiter = false %}
         
+        {% comment %} Check for delimiter separator {% endcomment %}
+        {% if clean_line == '---' or clean_line == '***' or clean_line == '---' %}
+          {% assign is_delimiter = true %}
+          {% if current_question != blank %}
+            {% assign qa_pair = current_question | append: '|||' | append: current_answer %}
+            {% assign temp_items = temp_items | push: qa_pair %}
+            {% assign current_question = '' %}
+            {% assign current_answer = '' %}
+          {% endif %}
         {% comment %} Check for explicit Q: or Question: prefix {% endcomment %}
-        {% if line_lower contains 'q:' or line_lower contains 'question:' %}
-          {% comment %} Save previous Q&A if exists {% endcomment %}
+        {% elsif line_lower contains 'q:' or line_lower contains 'question:' %}
           {% if current_question != blank %}
             {% assign qa_pair = current_question | append: '|||' | append: current_answer %}
             {% assign temp_items = temp_items | push: qa_pair %}
           {% endif %}
-          {% assign question_parts = clean_line | split: ':' %}
-          {% if question_parts.size > 1 %}
-            {% assign question_text = '' %}
-            {% for part in question_parts %}
+          {% assign question_after_colon = clean_line | split: ':' %}
+          {% if question_after_colon.size > 1 %}
+            {% assign current_question = '' %}
+            {% for part in question_after_colon %}
               {% if forloop.index > 1 %}
-                {% if question_text != blank %}
-                  {% assign question_text = question_text | append: ':' | append: part %}
-                {% else %}
-                  {% assign question_text = part %}
+                {% if current_question != blank %}
+                  {% assign current_question = current_question | append: ':' %}
                 {% endif %}
+                {% assign current_question = current_question | append: part %}
               {% endif %}
             {% endfor %}
-            {% assign current_question = question_text | strip %}
+            {% assign current_question = current_question | strip %}
           {% else %}
-            {% assign current_question = clean_line | remove: 'Q:' | remove: 'q:' | remove: 'Question:' | remove: 'question:' | strip %}
+            {% assign current_question = clean_line | replace: 'Q:', '' | replace: 'q:', '' | replace: 'Question:', '' | replace: 'question:', '' | strip %}
           {% endif %}
           {% assign current_answer = '' %}
-          {% assign expecting_answer = true %}
         {% comment %} Check for explicit A: or Answer: prefix {% endcomment %}
         {% elsif line_lower contains 'a:' or line_lower contains 'answer:' %}
-          {% assign answer_parts = clean_line | split: ':' %}
-          {% if answer_parts.size > 1 %}
+          {% assign answer_after_colon = clean_line | split: ':' %}
+          {% if answer_after_colon.size > 1 %}
             {% assign answer_text = '' %}
-            {% for part in answer_parts %}
+            {% for part in answer_after_colon %}
               {% if forloop.index > 1 %}
                 {% if answer_text != blank %}
-                  {% assign answer_text = answer_text | append: ':' | append: part %}
-                {% else %}
-                  {% assign answer_text = part %}
+                  {% assign answer_text = answer_text | append: ':' %}
                 {% endif %}
+                {% assign answer_text = answer_text | append: part %}
               {% endif %}
             {% endfor %}
             {% assign answer_text = answer_text | strip %}
           {% else %}
-            {% assign answer_text = clean_line | remove: 'A:' | remove: 'a:' | remove: 'Answer:' | remove: 'answer:' | strip %}
+            {% assign answer_text = clean_line | replace: 'A:', '' | replace: 'a:', '' | replace: 'Answer:', '' | replace: 'answer:', '' | strip %}
           {% endif %}
           {% if current_answer != blank %}
             {% assign current_answer = current_answer | append: ' ' | append: answer_text %}
           {% else %}
             {% assign current_answer = answer_text %}
           {% endif %}
-          {% assign expecting_answer = false %}
-        {% comment %} Check for delimiter separator {% endcomment %}
-        {% elsif clean_line == '---' or clean_line == '---' or clean_line == '***' %}
-          {% comment %} Delimiter - save current Q&A {% endcomment %}
-          {% if current_question != blank %}
-            {% assign qa_pair = current_question | append: '|||' | append: current_answer %}
-            {% assign temp_items = temp_items | push: qa_pair %}
-            {% assign current_question = '' %}
-            {% assign current_answer = '' %}
-            {% assign expecting_answer = false %}
-          {% endif %}
         {% else %}
-          {% comment %} No explicit markers - use alternating pattern or question detection {% endcomment %}
-          {% assign is_question = false %}
-          {% if clean_line contains '?' %}
-            {% assign is_question = true %}
-          {% elsif expecting_answer == false %}
-            {% comment %} If we're not expecting an answer, this is likely a new question {% endcomment %}
-            {% assign is_question = true %}
-          {% endif %}
-          
-          {% if is_question %}
-            {% comment %} Save previous Q&A if exists {% endcomment %}
+          {% comment %} No explicit markers - use simple alternating pattern {% endcomment %}
+          {% comment %} Odd line numbers (1, 3, 5...) are questions, even (2, 4, 6...) are answers {% endcomment %}
+          {% assign is_odd_line = line_count | modulo: 2 %}
+          {% if is_odd_line == 1 %}
+            {% comment %} Odd line = Question {% endcomment %}
             {% if current_question != blank %}
               {% assign qa_pair = current_question | append: '|||' | append: current_answer %}
               {% assign temp_items = temp_items | push: qa_pair %}
             {% endif %}
             {% assign current_question = clean_line %}
             {% assign current_answer = '' %}
-            {% assign expecting_answer = true %}
           {% else %}
-            {% comment %} This is part of the answer {% endcomment %}
+            {% comment %} Even line = Answer {% endcomment %}
             {% if current_answer != blank %}
               {% assign current_answer = current_answer | append: ' ' | append: clean_line %}
             {% else %}
               {% assign current_answer = clean_line %}
             {% endif %}
-            {% assign expecting_answer = false %}
           {% endif %}
         {% endif %}
       {% endif %}
@@ -126,6 +126,37 @@
       {% assign temp_items = temp_items | push: qa_pair %}
     {% endif %}
     
+    {% assign faq_items = temp_items %}
+  {% endif %}
+{% endif %}
+
+{% comment %} If parsing resulted in no items but we have text, create a simple fallback {% endcomment %}
+{% if has_faqs and faq_items.size == 0 and faq_text != blank %}
+  {% comment %} Try simple split by double newline as fallback {% endcomment %}
+  {% assign fallback_items = faq_text | split: '
+' %}
+  {% if fallback_items.size > 1 %}
+    {% assign temp_items = '' | split: '' %}
+    {% assign current_q = '' %}
+    {% assign current_a = '' %}
+    {% for item in fallback_items %}
+      {% assign clean_item = item | strip %}
+      {% if clean_item != blank %}
+        {% if current_q == blank %}
+          {% assign current_q = clean_item %}
+        {% else %}
+          {% assign current_a = clean_item %}
+          {% assign qa_pair = current_q | append: '|||' | append: current_a %}
+          {% assign temp_items = temp_items | push: qa_pair %}
+          {% assign current_q = '' %}
+          {% assign current_a = '' %}
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+    {% if current_q != blank %}
+      {% assign qa_pair = current_q | append: '|||' | append: current_a %}
+      {% assign temp_items = temp_items | push: qa_pair %}
+    {% endif %}
     {% assign faq_items = temp_items %}
   {% endif %}
 {% endif %}
