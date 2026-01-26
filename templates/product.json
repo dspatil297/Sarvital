@@ -1,3 +1,12 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "product_main": {
@@ -23,6 +32,7 @@
     },
     "related_products": {
       "type": "related-products",
+      "disabled": true,
       "settings": {
         "title": "You May Also Like",
         "collection": "frontpage",
@@ -31,6 +41,49 @@
     },
     "product_reviews_judge": {
       "type": "product-reviews-judge",
+      "settings": {}
+    },
+    "1769418164e60d6e16": {
+      "type": "apps",
+      "blocks": {
+        "judge_me_reviews_cards_carousel_mmicRK": {
+          "type": "shopify://apps/judge-me-reviews/blocks/cards_carousel/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8",
+          "settings": {
+            "show_sample_reviews": true,
+            "reviews_selection": "all",
+            "products": [
+              "amla-powder",
+              "moringa-powder"
+            ],
+            "star_rating": "4_to_5_star",
+            "show_review_media": false,
+            "display_order": "media_first",
+            "no_image_fallback": "review_text_only",
+            "max_reviews": 30,
+            "review_length": "medium",
+            "text_size": "medium",
+            "image_ratio": "1",
+            "reviews_shown": 4,
+            "show_reviewer_name": true,
+            "show_product_name": true,
+            "hide_arrows_mobile": true,
+            "arrows_position": "sides",
+            "max_width": 1100,
+            "corner_styling": "soft",
+            "header_text_color": "#568e42",
+            "text_color": "#000000",
+            "card_color": "#F9F9F9",
+            "stars_color": "#efd60a",
+            "arrows_color": "#000000",
+            "transition_speed": 5,
+            "header_text": "Customers are saying",
+            "show_average_rating": false
+          }
+        }
+      },
+      "block_order": [
+        "judge_me_reviews_cards_carousel_mmicRK"
+      ],
       "settings": {}
     },
     "product_faq_compact": {
@@ -46,6 +99,7 @@
     "product_how_to_use_compact",
     "related_products",
     "product_reviews_judge",
+    "1769418164e60d6e16",
     "product_faq_compact"
   ]
 }
