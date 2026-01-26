@@ -1,0 +1,185 @@
+{% comment %}
+  How to Use Section - Compact Premium Design
+{% endcomment %}
+
+<section class="product-how-to-use-compact" id="product-how-to-use">
+  <div class="product-how-to-use-compact__container">
+    <h2 class="how-to-use-title">How to Use</h2>
+    <div class="usage-grid">
+      <div class="usage-item">
+        <div class="usage-number">1</div>
+        <div class="usage-content">
+          <h3 class="usage-title">Add to Smoothies</h3>
+          <p class="usage-text">Mix 1-2 teaspoons into your favorite smoothie for a nutrient boost</p>
+        </div>
+      </div>
+      
+      <div class="usage-item">
+        <div class="usage-number">2</div>
+        <div class="usage-content">
+          <h3 class="usage-title">Mix with Water</h3>
+          <p class="usage-text">Stir into a glass of water or juice for a quick daily supplement</p>
+        </div>
+      </div>
+      
+      <div class="usage-item">
+        <div class="usage-number">3</div>
+        <div class="usage-content">
+          <h3 class="usage-title">Cooking & Baking</h3>
+          <p class="usage-text">Incorporate into soups, sauces, or baked goods for added nutrition</p>
+        </div>
+      </div>
+      
+      <div class="usage-item">
+        <div class="usage-number">4</div>
+        <div class="usage-content">
+          <h3 class="usage-title">Daily Routine</h3>
+          <p class="usage-text">Take consistently for best results - recommended once or twice daily</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+  .product-how-to-use-compact {
+    width: 100%;
+    max-width: 100%;
+    padding: 40px 40px;
+    background: linear-gradient(135deg, rgba(45, 80, 22, 0.02) 0%, rgba(74, 124, 44, 0.03) 100%);
+    box-sizing: border-box;
+  }
+
+  .product-how-to-use-compact__container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .how-to-use-title {
+    font-family: var(--font-heading);
+    font-size: 32px;
+    font-weight: 700;
+    text-align: center;
+    margin: 0 0 32px 0;
+    background: linear-gradient(135deg, var(--forest-green) 0%, var(--sage-green) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .usage-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+
+  .usage-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 24px;
+    background: var(--white);
+    border-radius: 16px;
+    border: 1px solid rgba(74, 124, 44, 0.1);
+    transition: all 0.3s ease;
+  }
+
+  .usage-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(45, 80, 22, 0.1);
+    border-color: rgba(74, 124, 44, 0.2);
+  }
+
+  .usage-number {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--forest-green) 0%, var(--sage-green) 100%);
+    border-radius: 12px;
+    color: var(--white);
+    font-size: 20px;
+    font-weight: 700;
+    flex-shrink: 0;
+    font-family: var(--font-heading);
+  }
+
+  .usage-content {
+    flex: 1;
+  }
+
+  .usage-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text);
+    margin: 0 0 8px 0;
+    font-family: var(--font-heading);
+  }
+
+  .usage-text {
+    font-size: 14px;
+    line-height: 1.6;
+    color: rgba(26, 26, 26, 0.7);
+    margin: 0;
+  }
+
+  @media (max-width: 968px) {
+    .product-how-to-use-compact {
+      padding: 30px 20px;
+    }
+
+    .how-to-use-title {
+      font-size: 28px;
+      margin-bottom: 24px;
+    }
+
+    .usage-grid {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .product-how-to-use-compact {
+      padding: 24px 16px;
+    }
+
+    .how-to-use-title {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+
+    .usage-item {
+      padding: 20px;
+      gap: 16px;
+    }
+
+    .usage-number {
+      width: 40px;
+      height: 40px;
+      font-size: 18px;
+    }
+
+    .usage-title {
+      font-size: 16px;
+    }
+
+    .usage-text {
+      font-size: 13px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "How to Use Compact",
+  "settings": [],
+  "presets": [
+    {
+      "name": "How to Use Compact"
+    }
+  ]
+}
+{% endschema %}
+

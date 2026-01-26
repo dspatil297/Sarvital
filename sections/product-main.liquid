@@ -157,23 +157,6 @@
         </div>
       {% endif %}
       
-      <!-- Product Description (Short) -->
-      {% if product.description != blank %}
-        <div class="product-description-wrapper">
-          <div class="product-description-content">
-            <div class="product-description-short" id="product-description-short">
-              {{ product.description | strip_html | truncatewords: 30 }}
-            </div>
-            <div class="product-description-full" id="product-description-full" style="display: none;">
-              {{ product.description }}
-            </div>
-          </div>
-          <button class="read-more-btn" id="read-more-btn" data-expanded="false" type="button">
-            <span class="read-more-text">Read More</span>
-          </button>
-        </div>
-      {% endif %}
-      
       <!-- Product Form -->
       {% form 'product', product, class: 'product-form', id: 'product-form' %}
         <!-- Variant Selector -->
@@ -315,6 +298,20 @@
   </div>
 </section>
 
+<!-- Product Description Section -->
+{% if product and product.description != blank %}
+  <section class="product-description-section" id="product-description">
+    <div class="product-description-section__container">
+      <div class="product-description-content">
+        <h2 class="product-description-title">Product Description</h2>
+        <div class="product-description-text">
+          {{ product.description }}
+        </div>
+      </div>
+    </div>
+  </section>
+{% endif %}
+
 <!-- Sticky Add to Cart Bar (Mobile) -->
 <div class="sticky-cart-bar" id="sticky-cart-bar">
   <div class="sticky-cart-bar__content">
@@ -345,7 +342,7 @@
   .product-hero {
     width: 100%;
     max-width: 100%;
-    padding: 60px 40px;
+    padding: 40px 40px;
     background: var(--white);
     box-sizing: border-box;
   }
@@ -596,87 +593,6 @@
     color: var(--forest-green);
   }
 
-  /* Description */
-  .product-description-wrapper {
-    position: relative;
-    margin-bottom: 24px;
-  }
-
-  .product-description-content {
-    margin-bottom: 8px;
-  }
-
-  .product-description-short {
-    font-size: 15px;
-    line-height: 1.7;
-    color: rgba(26, 26, 26, 0.7);
-    display: block;
-  }
-
-  .product-description-short.hidden {
-    display: none !important;
-  }
-
-  .product-description-full {
-    font-size: 15px;
-    line-height: 1.7;
-    color: rgba(26, 26, 26, 0.7);
-    display: none;
-    animation: fadeIn 0.3s ease-in;
-  }
-
-  .product-description-full.visible {
-    display: block !important;
-    animation: fadeIn 0.3s ease-in;
-  }
-
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(-10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  .read-more-btn {
-    color: var(--forest-green);
-    background: none;
-    border: none;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    padding: 4px 0;
-    margin-top: 4px;
-    text-decoration: none;
-    transition: all 0.3s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-  }
-
-  .read-more-btn:hover {
-    color: var(--sage-green);
-    gap: 8px;
-  }
-
-  .read-more-btn::after {
-    content: '→';
-    transition: transform 0.3s ease;
-    display: inline-block;
-  }
-
-  .read-more-btn[data-expanded="true"]::after {
-    transform: rotate(-90deg);
-    content: '↑';
-  }
-
-  .read-more-text {
-    display: inline-block;
-  }
-
   /* Variants */
   .product-variants {
     display: flex;
@@ -909,6 +825,120 @@
     color: var(--forest-green);
   }
 
+  /* Product Description Section */
+  .product-description-section {
+    width: 100%;
+    max-width: 100%;
+    padding: 40px 40px;
+    background: linear-gradient(135deg, rgba(45, 80, 22, 0.02) 0%, rgba(74, 124, 44, 0.03) 50%, rgba(212, 175, 55, 0.01) 100%);
+    box-sizing: border-box;
+  }
+
+  .product-description-section__container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .product-description-content {
+    background: linear-gradient(145deg, var(--white) 0%, rgba(255, 255, 255, 0.95) 100%);
+    border-radius: 24px;
+    padding: 32px 32px;
+    box-shadow: 
+      0 10px 40px rgba(45, 80, 22, 0.08),
+      0 4px 12px rgba(0, 0, 0, 0.04),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    border: 2px solid rgba(74, 124, 44, 0.12);
+  }
+
+  .product-description-title {
+    font-family: var(--font-heading);
+    font-size: 32px;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--forest-green) 0%, var(--sage-green) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0 0 32px 0;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    padding-bottom: 24px;
+    border-bottom: 3px solid;
+    border-image: linear-gradient(90deg, var(--forest-green), var(--sage-green), transparent) 1;
+    position: relative;
+  }
+
+  .product-description-title::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 0;
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, var(--gold), rgba(212, 175, 55, 0.3));
+    border-radius: 2px;
+  }
+
+  .product-description-text {
+    font-size: 17px;
+    line-height: 1.8;
+    color: rgba(26, 26, 26, 0.9);
+    font-weight: 400;
+  }
+
+  .product-description-text p {
+    margin: 0 0 20px 0;
+  }
+
+  .product-description-text p:last-child {
+    margin-bottom: 0;
+  }
+
+  .product-description-text h1,
+  .product-description-text h2,
+  .product-description-text h3,
+  .product-description-text h4,
+  .product-description-text h5,
+  .product-description-text h6 {
+    font-family: var(--font-heading);
+    color: var(--forest-green);
+    margin-top: 32px;
+    margin-bottom: 16px;
+    font-weight: 600;
+  }
+
+  .product-description-text h1:first-child,
+  .product-description-text h2:first-child,
+  .product-description-text h3:first-child {
+    margin-top: 0;
+  }
+
+  .product-description-text ul,
+  .product-description-text ol {
+    margin: 20px 0;
+    padding-left: 24px;
+  }
+
+  .product-description-text li {
+    margin-bottom: 12px;
+  }
+
+  .product-description-text a {
+    color: var(--forest-green);
+    text-decoration: underline;
+    transition: color 0.3s ease;
+  }
+
+  .product-description-text a:hover {
+    color: var(--sage-green);
+  }
+
+  .product-description-text img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 12px;
+    margin: 24px 0;
+  }
+
   /* Sticky Cart Bar (Mobile) */
   .sticky-cart-bar {
     position: fixed;
@@ -1035,6 +1065,22 @@
     .product-hero {
       padding-bottom: 100px;
     }
+
+    .product-description-section {
+      padding: 30px 20px;
+    }
+
+    .product-description-content {
+      padding: 28px 24px;
+    }
+
+    .product-description-title {
+      font-size: 28px;
+    }
+
+    .product-description-text {
+      font-size: 16px;
+    }
   }
 
   @media (max-width: 480px) {
@@ -1058,6 +1104,26 @@
     .variant-option-btn {
       padding: 10px 20px;
       font-size: 13px;
+    }
+
+    .product-description-section {
+      padding: 24px 16px;
+    }
+
+    .product-description-content {
+      padding: 24px 20px;
+      border-radius: 20px;
+    }
+
+    .product-description-title {
+      font-size: 26px;
+      margin-bottom: 24px;
+      padding-bottom: 20px;
+    }
+
+    .product-description-text {
+      font-size: 15px;
+      line-height: 1.7;
     }
   }
 {% endstylesheet %}
@@ -1145,70 +1211,6 @@
           if (stickyBtn) stickyBtn.disabled = false;
         }
       });
-    }
-
-    // Read More button functionality
-    function initReadMore() {
-      // Use setTimeout to ensure DOM is fully ready
-      setTimeout(function() {
-        const readMoreBtn = document.getElementById('read-more-btn');
-        const descriptionShort = document.getElementById('product-description-short');
-        const descriptionFull = document.getElementById('product-description-full');
-        
-        if (!readMoreBtn || !descriptionShort || !descriptionFull) {
-          console.log('Read More elements not found');
-          return;
-        }
-        
-        const readMoreText = readMoreBtn.querySelector('.read-more-text');
-        
-        // Remove any existing event listeners by cloning
-        const newBtn = readMoreBtn.cloneNode(true);
-        readMoreBtn.parentNode.replaceChild(newBtn, readMoreBtn);
-        
-        // Add click event to the new button
-        newBtn.addEventListener('click', function(e) {
-          e.preventDefault();
-          e.stopPropagation();
-          
-          const isExpanded = this.getAttribute('data-expanded') === 'true';
-          const shortEl = document.getElementById('product-description-short');
-          const fullEl = document.getElementById('product-description-full');
-          const textEl = this.querySelector('.read-more-text');
-          
-          if (isExpanded) {
-            // Collapse: show short, hide full
-            if (shortEl) {
-              shortEl.classList.remove('hidden');
-              shortEl.style.display = 'block';
-            }
-            if (fullEl) {
-              fullEl.classList.remove('visible');
-              fullEl.style.display = 'none';
-            }
-            if (textEl) {
-              textEl.textContent = 'Read More';
-            }
-            this.setAttribute('data-expanded', 'false');
-          } else {
-            // Expand: hide short, show full
-            if (shortEl) {
-              shortEl.classList.add('hidden');
-              shortEl.style.display = 'none';
-            }
-            if (fullEl) {
-              fullEl.classList.add('visible');
-              fullEl.style.display = 'block';
-            }
-            if (textEl) {
-              textEl.textContent = 'Read Less';
-            }
-            this.setAttribute('data-expanded', 'true');
-          }
-        });
-        
-        console.log('Read More button initialized');
-      }, 200);
     }
 
     // Quantity selector
@@ -1360,8 +1362,6 @@
       if (variantSelect) {
         variantSelect.dispatchEvent(new Event('change'));
       }
-      // Initialize Read More functionality
-      initReadMore();
     }
   })();
 {% endjavascript %}

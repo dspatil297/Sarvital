@@ -1,0 +1,171 @@
+{% comment %}
+  Product Benefits Section - Compact Conversion-Focused Design
+{% endcomment %}
+
+<section class="product-benefits-compact" id="product-benefits">
+  <div class="product-benefits-compact__container">
+    <div class="benefits-grid">
+      <div class="benefit-card">
+        <div class="benefit-icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+            <path d="M2 17l10 5 10-5M2 12l10 5 10-5"/>
+          </svg>
+        </div>
+        <h3 class="benefit-title">100% Natural</h3>
+        <p class="benefit-text">Pure, organic ingredients sourced from trusted farms</p>
+      </div>
+      
+      <div class="benefit-card">
+        <div class="benefit-icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+          </svg>
+        </div>
+        <h3 class="benefit-title">Nutrient Rich</h3>
+        <p class="benefit-text">Packed with essential vitamins, minerals & antioxidants</p>
+      </div>
+      
+      <div class="benefit-card">
+        <div class="benefit-icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <path d="M9 12l2 2 4-4"/>
+          </svg>
+        </div>
+        <h3 class="benefit-title">Lab Tested</h3>
+        <p class="benefit-text">Third-party tested for purity and quality assurance</p>
+      </div>
+      
+      <div class="benefit-card">
+        <div class="benefit-icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 6L9 17l-5-5"/>
+          </svg>
+        </div>
+        <h3 class="benefit-title">No Additives</h3>
+        <p class="benefit-text">Free from artificial colors, flavors, and preservatives</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+  .product-benefits-compact {
+    width: 100%;
+    max-width: 100%;
+    padding: 40px 40px;
+    background: var(--white);
+    box-sizing: border-box;
+  }
+
+  .product-benefits-compact__container {
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .benefits-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+  }
+
+  .benefit-card {
+    text-align: center;
+    padding: 32px 24px;
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.95) 0%, rgba(250, 250, 250, 0.8) 100%);
+    border-radius: 16px;
+    border: 1px solid rgba(74, 124, 44, 0.1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .benefit-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(45, 80, 22, 0.12);
+    border-color: rgba(74, 124, 44, 0.2);
+  }
+
+  .benefit-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--forest-green) 0%, var(--sage-green) 100%);
+    border-radius: 16px;
+    color: var(--white);
+  }
+
+  .benefit-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text);
+    margin: 0 0 8px 0;
+    font-family: var(--font-heading);
+  }
+
+  .benefit-text {
+    font-size: 14px;
+    line-height: 1.6;
+    color: rgba(26, 26, 26, 0.7);
+    margin: 0;
+  }
+
+  @media (max-width: 968px) {
+    .product-benefits-compact {
+      padding: 30px 20px;
+    }
+
+    .benefits-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    .benefit-card {
+      padding: 24px 20px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .product-benefits-compact {
+      padding: 24px 16px;
+    }
+
+    .benefits-grid {
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .benefit-card {
+      padding: 20px 16px;
+    }
+
+    .benefit-icon {
+      width: 56px;
+      height: 56px;
+      margin-bottom: 16px;
+    }
+
+    .benefit-title {
+      font-size: 16px;
+    }
+
+    .benefit-text {
+      font-size: 13px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Product Benefits Compact",
+  "settings": [],
+  "presets": [
+    {
+      "name": "Product Benefits Compact"
+    }
+  ]
+}
+{% endschema %}
+

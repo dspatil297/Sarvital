@@ -48,7 +48,7 @@
   .related-products {
     width: 100%;
     max-width: 100%;
-    padding: 100px 40px;
+    padding: 40px 40px;
     background: var(--white);
     box-sizing: border-box;
   }
@@ -61,18 +61,22 @@
   .related-products__title {
     text-align: center;
     font-family: var(--font-heading);
-    font-size: 42px;
-    font-weight: 600;
+    font-size: 32px;
+    font-weight: 700;
     color: var(--text);
-    margin-bottom: 60px;
+    margin-bottom: 32px;
     letter-spacing: -0.02em;
     line-height: 1.2;
+    background: linear-gradient(135deg, var(--forest-green) 0%, var(--sage-green) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 
   .related-products__grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 32px;
+    gap: 24px;
   }
 
   .related-products__empty {
@@ -83,32 +87,9 @@
     font-weight: 300;
   }
 
-  @media (max-width: 1200px) {
-    .related-products__grid {
-      grid-template-columns: repeat(3, 1fr);
-      gap: 28px;
-    }
-  }
-
   @media (max-width: 968px) {
     .related-products {
-      padding: 80px 30px;
-    }
-
-    .related-products__grid {
-      grid-template-columns: repeat(2, 1fr);
-      gap: 24px;
-    }
-  }
-
-  @media (max-width: 768px) {
-    .related-products {
-      padding: 60px 20px;
-    }
-
-    .related-products__title {
-      font-size: 36px;
-      margin-bottom: 40px;
+      padding: 30px 20px;
     }
 
     .related-products__grid {
@@ -117,9 +98,29 @@
     }
   }
 
+  @media (max-width: 768px) {
+    .related-products {
+      padding: 24px 16px;
+    }
+
+    .related-products__title {
+      font-size: 28px;
+      margin-bottom: 24px;
+    }
+
+    .related-products__grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+  }
+
   @media (max-width: 480px) {
     .related-products__grid {
       grid-template-columns: 1fr;
+    }
+
+    .related-products__title {
+      font-size: 24px;
     }
   }
 {% endstylesheet %}

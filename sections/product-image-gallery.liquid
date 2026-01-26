@@ -1,0 +1,123 @@
+{% comment %}
+  Product Image Gallery Section - Compact Design with Product Images
+{% endcomment %}
+
+<section class="product-image-gallery" id="product-image-gallery">
+  <div class="product-image-gallery__container">
+    {% if product.images.size > 0 %}
+      <div class="gallery-grid">
+        {% for image in product.images limit: 5 %}
+          {% if forloop.first %}
+            <div class="gallery-item gallery-item--large">
+              <img 
+                src="{{ image | image_url: width: 800 }}" 
+                alt="{{ image.alt | default: product.title }}"
+                loading="lazy"
+                class="gallery-image"
+                width="800"
+                height="800"
+              >
+            </div>
+          {% else %}
+            <div class="gallery-item">
+              <img 
+                src="{{ image | image_url: width: 600 }}" 
+                alt="{{ image.alt | default: product.title }}"
+                loading="lazy"
+                class="gallery-image"
+                width="600"
+                height="600"
+              >
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+{% stylesheet %}
+  .product-image-gallery {
+    width: 100%;
+    max-width: 100%;
+    padding: 40px 40px;
+    background: var(--white);
+    box-sizing: border-box;
+  }
+
+  .product-image-gallery__container {
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+
+  .gallery-item {
+    position: relative;
+    overflow: hidden;
+    border-radius: 12px;
+    aspect-ratio: 1;
+    background: var(--bg);
+  }
+
+  .gallery-item--large {
+    grid-row: span 2;
+    grid-column: span 2;
+  }
+
+  .gallery-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .gallery-item:hover .gallery-image {
+    transform: scale(1.05);
+  }
+
+  /* Responsive */
+  @media (max-width: 968px) {
+    .product-image-gallery {
+      padding: 30px 20px;
+    }
+
+    .gallery-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .gallery-item--large {
+      grid-row: span 1;
+      grid-column: span 1;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .product-image-gallery {
+      padding: 20px 16px;
+    }
+
+    .gallery-grid {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Product Image Gallery",
+  "settings": [],
+  "presets": [
+    {
+      "name": "Product Image Gallery"
+    }
+  ]
+}
+{% endschema %}
+
