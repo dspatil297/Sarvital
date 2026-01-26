@@ -1,115 +1,126 @@
 {% comment %}
   Product FAQ Section
   Displays FAQs from product.metafields.custom.product_faq
-  Multiline format: Questions and answers can be separated by newlines
-  Format options:
-    - Alternating lines (odd = question, even = answer)
-    - Lines starting with "Q:" and "A:"
-    - Lines separated by "---"
+  Multiline format: Questions and answers separated by newlines
+  Format: Each question on its own line, followed by answer(s) on next line(s)
 {% endcomment %}
 
 {% assign faq_meta = product.metafields.custom.product_faq %}
-{% assign has_faqs = false %}
 {% assign faq_items = '' | split: '' %}
 {% assign faq_text = '' %}
 
-{% comment %} Handle different metafield types - try multiple access methods {% endcomment %}
+{% comment %} Get the metafield value - handle different metafield types {% endcomment %}
 {% if faq_meta != blank %}
+  {% comment %} Try different ways to access the metafield value {% endcomment %}
   {% if faq_meta.value != blank %}
-    {% assign faq_text = faq_meta.value | strip %}
+    {% assign faq_text = faq_meta.value %}
   {% elsif faq_meta != blank %}
-    {% assign faq_text = faq_meta | strip %}
+    {% assign faq_text = faq_meta %}
   {% endif %}
   
-  {% comment %} Also try metafield_text filter as fallback {% endcomment %}
-  {% if faq_text == blank %}
-    {% assign faq_text = faq_meta | metafield_text | strip %}
+  {% comment %} Try metafield_text filter if still blank {% endcomment %}
+  {% if faq_text == blank or faq_text == null %}
+    {% assign faq_text = faq_meta | metafield_text %}
   {% endif %}
   
-  {% if faq_text != blank %}
-    {% assign has_faqs = true %}
+  {% comment %} Strip whitespace {% endcomment %}
+  {% if faq_text != blank and faq_text != null %}
+    {% assign faq_text = faq_text | strip %}
+  {% endif %}
+  
+  {% if faq_text != blank and faq_text.size > 0 %}
+    {% assign faq_text = faq_text | strip %}
     
-    {% comment %} Parse the FAQ text into Q&A pairs - handle multiline text {% endcomment %}
-    {% assign lines = faq_text | newline_to_br | split: '<br />' %}
+    {% comment %} Parse FAQ text - process lines directly without building array {% endcomment %}
+    {% assign all_lines = faq_text | newline_to_br | split: '<br />' %}
     {% assign current_question = '' %}
     {% assign current_answer = '' %}
-    {% assign temp_items = '' | split: '' %}
-    {% assign line_count = 0 %}
+    {% assign faq_items_string = '' %}
+    {% assign non_empty_line_count = 0 %}
     
-    {% for line in lines %}
+    {% comment %} Process lines directly {% endcomment %}
+    {% for line in all_lines %}
       {% assign clean_line = line | strip %}
       {% if clean_line != blank %}
-        {% assign line_count = line_count | plus: 1 %}
-        {% assign line_lower = clean_line | downcase %}
-        {% assign is_delimiter = false %}
+        {% assign non_empty_line_count = non_empty_line_count | plus: 1 %}
+        {% assign line_lower = clean_line | downcase | strip %}
+        {% assign line_type = '' %}
         
-        {% comment %} Check for delimiter separator {% endcomment %}
-        {% if clean_line == '---' or clean_line == '***' or clean_line == '---' %}
-          {% assign is_delimiter = true %}
-          {% if current_question != blank %}
-            {% assign qa_pair = current_question | append: '|||' | append: current_answer %}
-            {% assign temp_items = temp_items | push: qa_pair %}
-            {% assign current_question = '' %}
-            {% assign current_answer = '' %}
+        {% comment %} Simple check: if line contains Q: or A: pattern, treat it as such {% endcomment %}
+        {% if line_lower contains 'q:' %}
+          {% assign line_type = 'question' %}
+        {% elsif line_lower contains 'a:' %}
+          {% assign line_type = 'answer' %}
+        {% endif %}
+      
+        {% if line_type == 'question' %}
+        {% comment %} Save previous Q&A {% endcomment %}
+        {% if current_question != blank %}
+          {% assign qa_pair = current_question | append: '|||' | append: current_answer %}
+          {% if faq_items_string != blank %}
+            {% assign faq_items_string = faq_items_string | append: '###FAQ###' %}
           {% endif %}
-        {% comment %} Check for explicit Q: or Question: prefix {% endcomment %}
-        {% elsif line_lower contains 'q:' or line_lower contains 'question:' %}
-          {% if current_question != blank %}
-            {% assign qa_pair = current_question | append: '|||' | append: current_answer %}
-            {% assign temp_items = temp_items | push: qa_pair %}
-          {% endif %}
-          {% assign question_after_colon = clean_line | split: ':' %}
-          {% if question_after_colon.size > 1 %}
-            {% assign current_question = '' %}
-            {% for part in question_after_colon %}
-              {% if forloop.index > 1 %}
-                {% if current_question != blank %}
-                  {% assign current_question = current_question | append: ':' %}
-                {% endif %}
-                {% assign current_question = current_question | append: part %}
+          {% assign faq_items_string = faq_items_string | append: qa_pair %}
+        {% endif %}
+        {% comment %} Extract question - get text after colon {% endcomment %}
+        {% assign parts = clean_line | split: ':' %}
+        {% if parts.size >= 2 %}
+          {% assign current_question = '' %}
+          {% for part in parts %}
+            {% if forloop.index > 1 %}
+              {% if current_question != blank %}
+                {% assign current_question = current_question | append: ':' %}
               {% endif %}
-            {% endfor %}
-            {% assign current_question = current_question | strip %}
-          {% else %}
-            {% assign current_question = clean_line | replace: 'Q:', '' | replace: 'q:', '' | replace: 'Question:', '' | replace: 'question:', '' | strip %}
-          {% endif %}
-          {% assign current_answer = '' %}
-        {% comment %} Check for explicit A: or Answer: prefix {% endcomment %}
-        {% elsif line_lower contains 'a:' or line_lower contains 'answer:' %}
-          {% assign answer_after_colon = clean_line | split: ':' %}
-          {% if answer_after_colon.size > 1 %}
-            {% assign answer_text = '' %}
-            {% for part in answer_after_colon %}
-              {% if forloop.index > 1 %}
-                {% if answer_text != blank %}
-                  {% assign answer_text = answer_text | append: ':' %}
-                {% endif %}
-                {% assign answer_text = answer_text | append: part %}
-              {% endif %}
-            {% endfor %}
-            {% assign answer_text = answer_text | strip %}
-          {% else %}
-            {% assign answer_text = clean_line | replace: 'A:', '' | replace: 'a:', '' | replace: 'Answer:', '' | replace: 'answer:', '' | strip %}
-          {% endif %}
-          {% if current_answer != blank %}
-            {% assign current_answer = current_answer | append: ' ' | append: answer_text %}
-          {% else %}
-            {% assign current_answer = answer_text %}
-          {% endif %}
+              {% assign current_question = current_question | append: part %}
+            {% endif %}
+          {% endfor %}
+          {% assign current_question = current_question | strip %}
         {% else %}
-          {% comment %} No explicit markers - use simple alternating pattern {% endcomment %}
-          {% comment %} Odd line numbers (1, 3, 5...) are questions, even (2, 4, 6...) are answers {% endcomment %}
-          {% assign is_odd_line = line_count | modulo: 2 %}
-          {% if is_odd_line == 1 %}
-            {% comment %} Odd line = Question {% endcomment %}
+          {% assign current_question = clean_line | replace: 'Q:', '' | replace: 'q:', '' | strip %}
+        {% endif %}
+        {% assign current_answer = '' %}
+      
+        {% elsif line_type == 'answer' %}
+        {% comment %} Extract answer - get text after colon {% endcomment %}
+        {% assign parts = clean_line | split: ':' %}
+        {% if parts.size >= 2 %}
+          {% assign answer_text = '' %}
+          {% for part in parts %}
+            {% if forloop.index > 1 %}
+              {% if answer_text != blank %}
+                {% assign answer_text = answer_text | append: ':' %}
+              {% endif %}
+              {% assign answer_text = answer_text | append: part %}
+            {% endif %}
+          {% endfor %}
+          {% assign answer_text = answer_text | strip %}
+        {% else %}
+          {% assign answer_text = clean_line | replace: 'A:', '' | replace: 'a:', '' | strip %}
+        {% endif %}
+        
+        {% if current_answer != blank %}
+          {% assign current_answer = current_answer | append: ' ' | append: answer_text %}
+        {% else %}
+          {% assign current_answer = answer_text %}
+        {% endif %}
+      
+        {% comment %} Default: alternating pattern {% endcomment %}
+        {% else %}
+          {% assign is_question_line = non_empty_line_count | modulo: 2 %}
+          
+          {% if is_question_line == 1 %}
+            {% comment %} Odd count (1, 3, 5...) = Question {% endcomment %}
             {% if current_question != blank %}
               {% assign qa_pair = current_question | append: '|||' | append: current_answer %}
-              {% assign temp_items = temp_items | push: qa_pair %}
+              {% if faq_items_string != blank %}
+                {% assign faq_items_string = faq_items_string | append: '###FAQ###' %}
+              {% endif %}
+              {% assign faq_items_string = faq_items_string | append: qa_pair %}
             {% endif %}
             {% assign current_question = clean_line %}
             {% assign current_answer = '' %}
           {% else %}
-            {% comment %} Even line = Answer {% endcomment %}
+            {% comment %} Even count (2, 4, 6...) = Answer {% endcomment %}
             {% if current_answer != blank %}
               {% assign current_answer = current_answer | append: ' ' | append: clean_line %}
             {% else %}
@@ -123,45 +134,23 @@
     {% comment %} Save the last Q&A pair {% endcomment %}
     {% if current_question != blank %}
       {% assign qa_pair = current_question | append: '|||' | append: current_answer %}
-      {% assign temp_items = temp_items | push: qa_pair %}
+      {% if faq_items_string != blank %}
+        {% assign faq_items_string = faq_items_string | append: '###FAQ###' %}
+      {% endif %}
+      {% assign faq_items_string = faq_items_string | append: qa_pair %}
     {% endif %}
     
-    {% assign faq_items = temp_items %}
-  {% endif %}
-{% endif %}
-
-{% comment %} If parsing resulted in no items but we have text, create a simple fallback {% endcomment %}
-{% if has_faqs and faq_items.size == 0 and faq_text != blank %}
-  {% comment %} Try simple split by double newline as fallback {% endcomment %}
-  {% assign fallback_items = faq_text | split: '
-' %}
-  {% if fallback_items.size > 1 %}
-    {% assign temp_items = '' | split: '' %}
-    {% assign current_q = '' %}
-    {% assign current_a = '' %}
-    {% for item in fallback_items %}
-      {% assign clean_item = item | strip %}
-      {% if clean_item != blank %}
-        {% if current_q == blank %}
-          {% assign current_q = clean_item %}
-        {% else %}
-          {% assign current_a = clean_item %}
-          {% assign qa_pair = current_q | append: '|||' | append: current_a %}
-          {% assign temp_items = temp_items | push: qa_pair %}
-          {% assign current_q = '' %}
-          {% assign current_a = '' %}
-        {% endif %}
-      {% endif %}
-    {% endfor %}
-    {% if current_q != blank %}
-      {% assign qa_pair = current_q | append: '|||' | append: current_a %}
-      {% assign temp_items = temp_items | push: qa_pair %}
+    {% comment %} Convert string back to array {% endcomment %}
+    {% if faq_items_string != blank %}
+      {% assign faq_items = faq_items_string | split: '###FAQ###' %}
+    {% else %}
+      {% assign faq_items = '' | split: '' %}
     {% endif %}
-    {% assign faq_items = temp_items %}
   {% endif %}
 {% endif %}
 
-{% if has_faqs and faq_items.size > 0 %}
+{% comment %} Display FAQ section only if we have parsed items {% endcomment %}
+{% if faq_items.size > 0 %}
 <section class="product-faq" id="product-faq">
   <div class="product-faq__container">
     <div class="product-faq__header">
@@ -193,7 +182,11 @@
             </button>
             <div class="faq-item__content" id="faq-answer-{{ forloop.index0 }}" role="region">
               <div class="faq-item__answer">
-                {{ answer | newline_to_br }}
+                {% if answer != blank %}
+                  {{ answer | newline_to_br }}
+                {% else %}
+                  <p>No answer provided.</p>
+                {% endif %}
               </div>
             </div>
           </div>
@@ -203,6 +196,78 @@
   </div>
 </section>
 {% endif %}
+
+<script>
+(function() {
+  function initFAQ() {
+    var buttons = document.querySelectorAll('.faq-item__button');
+    
+    for (var i = 0; i < buttons.length; i++) {
+      var btn = buttons[i];
+      
+      // Check if already initialized
+      if (btn.getAttribute('data-initialized') === 'true') {
+        continue;
+      }
+      
+      btn.setAttribute('data-initialized', 'true');
+      
+      // Use closure to capture the button
+      (function(button) {
+        button.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          
+          var item = button.parentElement;
+          
+          // Find faq-item parent
+          while (item && item !== document.body) {
+            if (item.classList && item.classList.contains('faq-item')) {
+              break;
+            }
+            item = item.parentElement;
+          }
+          
+          if (!item || !item.classList.contains('faq-item')) {
+            return;
+          }
+          
+          var isOpen = item.classList.contains('active');
+          
+          // Close all items
+          var allItems = document.querySelectorAll('.faq-item');
+          for (var j = 0; j < allItems.length; j++) {
+            allItems[j].classList.remove('active');
+            var b = allItems[j].querySelector('.faq-item__button');
+            if (b) b.setAttribute('aria-expanded', 'false');
+          }
+          
+          // Toggle current item
+          if (!isOpen) {
+            item.classList.add('active');
+            button.setAttribute('aria-expanded', 'true');
+          }
+        });
+      })(btn);
+    }
+  }
+  
+  // Initialize multiple times to catch dynamic content
+  function runInit() {
+    initFAQ();
+  }
+  
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', runInit);
+  } else {
+    runInit();
+  }
+  
+  setTimeout(runInit, 500);
+  setTimeout(runInit, 1000);
+  setTimeout(runInit, 2000);
+})();
+</script>
 
 {% stylesheet %}
   .product-faq {
@@ -581,44 +646,6 @@
   }
 {% endstylesheet %}
 
-{% javascript %}
-  (function() {
-    'use strict';
-    
-    const faqItems = document.querySelectorAll('.faq-item');
-    
-    faqItems.forEach(item => {
-      const button = item.querySelector('.faq-item__button');
-      
-      if (button) {
-        button.addEventListener('click', function() {
-          const isExpanded = this.getAttribute('aria-expanded') === 'true';
-          
-          // Close all other items (optional - remove if you want multiple open)
-          faqItems.forEach(otherItem => {
-            if (otherItem !== item) {
-              otherItem.classList.remove('active');
-              const otherButton = otherItem.querySelector('.faq-item__button');
-              if (otherButton) {
-                otherButton.setAttribute('aria-expanded', 'false');
-              }
-            }
-          });
-          
-          // Toggle current item
-          if (isExpanded) {
-            item.classList.remove('active');
-            this.setAttribute('aria-expanded', 'false');
-          } else {
-            item.classList.add('active');
-            this.setAttribute('aria-expanded', 'true');
-          }
-        });
-      }
-    });
-  })();
-{% endjavascript %}
-
 {% schema %}
 {
   "name": "Product FAQ",
@@ -630,4 +657,3 @@
   ]
 }
 {% endschema %}
-
