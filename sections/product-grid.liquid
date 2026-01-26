@@ -8,19 +8,32 @@
       <p class="product-grid-section__description">{{ section.settings.description }}</p>
     {% endif %}
     
+    {% comment %} Auto-detect collection on product pages if no collection is manually selected {% endcomment %}
+    {% assign selected_collection = null %}
     {% if section.settings.collection != blank %}
-      {% assign collection = collections[section.settings.collection] %}
-      
-      {% if collection.products.size > 0 %}
+      {% assign selected_collection = collections[section.settings.collection] %}
+    {% elsif product and product.collections.size > 0 %}
+      {% assign selected_collection = product.collections.first %}
+    {% endif %}
+    
+    {% if selected_collection != null %}
+      {% if selected_collection.products.size > 0 %}
         <div class="product-grid-section__grid">
-          {% for product in collection.products limit: section.settings.products_to_show %}
-            {% render 'product-card', product: product %}
+          {% assign products_shown = 0 %}
+          {% for product_item in selected_collection.products %}
+            {% comment %} Skip current product if on product page {% endcomment %}
+            {% unless product and product_item.id == product.id %}
+              {% if products_shown < section.settings.products_to_show %}
+                {% render 'product-card', product: product_item %}
+                {% assign products_shown = products_shown | plus: 1 %}
+              {% endif %}
+            {% endunless %}
           {% endfor %}
         </div>
-        
+          
         {% if section.settings.show_view_all %}
           <div class="product-grid-section__footer">
-            <a href="{{ collection.url }}" class="btn btn-outline btn-large">
+            <a href="{{ selected_collection.url }}" class="btn btn-outline btn-large">
               {{ section.settings.view_all_text | default: 'View All Products' }}
             </a>
           </div>
@@ -195,7 +208,8 @@
     {
       "type": "collection",
       "id": "collection",
-      "label": "Collection"
+      "label": "Collection",
+      "info": "Leave empty on product pages to automatically use the product's collection"
     },
     {
       "type": "range",
