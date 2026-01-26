@@ -1,5 +1,4 @@
-<<<<<<< HEAD
-<section class="product-grid-section">
+<section class="product-grid-section fade-in-up" style="animation-delay: 0.8s;">
   <div class="product-grid-section__container">
     {% if section.settings.title != blank %}
       <h2 class="product-grid-section__title">{{ section.settings.title }}</h2>
@@ -26,6 +25,7 @@
             {% unless product and product_item.id == product.id %}
               {% if products_shown < section.settings.products_to_show %}
                 {% render 'product-card', product: product_item %}
+                {% render 'quick-view', product: product_item %}
                 {% assign products_shown = products_shown | plus: 1 %}
               {% endif %}
             {% endunless %}
@@ -53,10 +53,27 @@
 </section>
 
 {% stylesheet %}
+  /* Animations */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .fade-in-up {
+    animation: fadeInUp 0.6s ease-out forwards;
+    opacity: 0;
+  }
+
   .product-grid-section {
     width: 100%;
     max-width: 100%;
-    padding: 60px var(--spacing-lg);
+    padding: 50px var(--spacing-lg);
     background: linear-gradient(180deg, var(--white) 0%, rgba(250, 250, 250, 0.3) 50%, var(--white) 100%);
     position: relative;
     overflow: hidden;
@@ -215,223 +232,3 @@
   ]
 }
 {% endschema %}
-
-=======
-<section class="product-grid-section">
-  <div class="product-grid-section__container">
-    {% if section.settings.title != blank %}
-      <h2 class="product-grid-section__title">{{ section.settings.title }}</h2>
-    {% endif %}
-    
-    {% if section.settings.description != blank %}
-      <p class="product-grid-section__description">{{ section.settings.description }}</p>
-    {% endif %}
-    
-    {% comment %} Auto-detect collection on product pages if no collection is manually selected {% endcomment %}
-    {% assign selected_collection = null %}
-    {% if section.settings.collection != blank %}
-      {% assign selected_collection = collections[section.settings.collection] %}
-    {% elsif product and product.collections.size > 0 %}
-      {% assign selected_collection = product.collections.first %}
-    {% endif %}
-    
-    {% if selected_collection != null %}
-      {% if selected_collection.products.size > 0 %}
-        <div class="product-grid-section__grid">
-          {% assign products_shown = 0 %}
-          {% for product_item in selected_collection.products %}
-            {% comment %} Skip current product if on product page {% endcomment %}
-            {% unless product and product_item.id == product.id %}
-              {% if products_shown < section.settings.products_to_show %}
-                {% render 'product-card', product: product_item %}
-                {% assign products_shown = products_shown | plus: 1 %}
-              {% endif %}
-            {% endunless %}
-          {% endfor %}
-        </div>
-          
-        {% if section.settings.show_view_all %}
-          <div class="product-grid-section__footer">
-            <a href="{{ selected_collection.url }}" class="btn btn-outline btn-large">
-              {{ section.settings.view_all_text | default: 'View All Products' }}
-            </a>
-          </div>
-        {% endif %}
-      {% else %}
-        <div class="product-grid-section__empty">
-          <p>No products found in this collection.</p>
-        </div>
-      {% endif %}
-    {% else %}
-      <div class="product-grid-section__empty">
-        <p>Please select a collection to display products.</p>
-      </div>
-    {% endif %}
-  </div>
-</section>
-
-{% stylesheet %}
-  .product-grid-section {
-    width: 100%;
-    max-width: 100%;
-    padding: 60px var(--spacing-lg);
-    background: linear-gradient(180deg, var(--white) 0%, rgba(250, 250, 250, 0.3) 50%, var(--white) 100%);
-    position: relative;
-    overflow: hidden;
-    box-sizing: border-box;
-  }
-
-  .product-grid-section__container {
-    max-width: 1400px;
-    margin: 0 auto;
-  }
-
-  .product-grid-section__title {
-    text-align: center;
-    font-family: var(--font-heading);
-    font-size: clamp(28px, 4vw, 36px);
-    font-weight: 600;
-    color: var(--forest-green);
-    margin-bottom: 12px;
-    margin-top: 0;
-    letter-spacing: -0.02em;
-    position: relative;
-    display: inline-block;
-    width: 100%;
-    line-height: 1.3;
-    padding: 0;
-  }
-
-
-  .product-grid-section__description {
-    text-align: center;
-    font-size: 16px;
-    font-weight: 400;
-    color: rgba(26, 26, 26, 0.7);
-    margin-top: 8px;
-    margin-bottom: 32px;
-    max-width: 650px;
-    margin-left: auto;
-    margin-right: auto;
-    line-height: 1.6;
-  }
-
-  .product-grid-section__grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: var(--spacing-lg);
-    margin-bottom: 24px;
-  }
-
-  @media (min-width: 1400px) {
-    .product-grid-section__grid {
-      gap: var(--spacing-2xl);
-    }
-  }
-
-  .product-grid-section__footer {
-    text-align: center;
-    margin-top: 24px;
-  }
-
-  .product-grid-section__footer .btn {
-    background: linear-gradient(135deg, var(--forest-green) 0%, var(--sage-green) 100%);
-    color: var(--white);
-    border: none;
-    padding: var(--spacing-md) var(--spacing-3xl);
-    font-weight: 700;
-    font-size: var(--body-large);
-    box-shadow: 0 8px 25px rgba(74, 124, 44, 0.3);
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  .product-grid-section__footer .btn:hover {
-    transform: translateY(-3px) scale(1.05);
-    box-shadow: 0 12px 35px rgba(74, 124, 44, 0.4);
-    background: linear-gradient(135deg, var(--sage-green) 0%, var(--forest-green) 100%);
-  }
-
-  .product-grid-section__empty {
-    text-align: center;
-    padding: var(--spacing-4xl) var(--spacing-lg);
-    color: #999;
-  }
-
-  @media (max-width: 1024px) {
-    .product-grid-section__grid {
-      grid-template-columns: repeat(3, 1fr);
-      gap: var(--spacing-lg);
-    }
-  }
-
-  @media (max-width: 768px) {
-    .product-grid-section {
-      padding: 40px var(--spacing-md);
-    }
-
-    .product-grid-section__grid {
-      grid-template-columns: repeat(2, 1fr);
-      gap: var(--spacing-md);
-    }
-  }
-
-  @media (max-width: 480px) {
-    .product-grid-section__grid {
-      grid-template-columns: 1fr;
-    }
-  }
-{% endstylesheet %}
-
-{% schema %}
-{
-  "name": "Product Grid",
-  "settings": [
-    {
-      "type": "text",
-      "id": "title",
-      "label": "Section Title",
-      "default": "Our Premium Powders"
-    },
-    {
-      "type": "textarea",
-      "id": "description",
-      "label": "Description",
-      "default": "Discover our range of premium fruit and vegetable powders, carefully crafted for your wellness journey."
-    },
-    {
-      "type": "collection",
-      "id": "collection",
-      "label": "Collection",
-      "info": "Leave empty on product pages to automatically use the product's collection"
-    },
-    {
-      "type": "range",
-      "id": "products_to_show",
-      "label": "Products to Show",
-      "min": 2,
-      "max": 12,
-      "step": 1,
-      "default": 4
-    },
-    {
-      "type": "checkbox",
-      "id": "show_view_all",
-      "label": "Show View All Button",
-      "default": true
-    },
-    {
-      "type": "text",
-      "id": "view_all_text",
-      "label": "View All Button Text",
-      "default": "View All Products"
-    }
-  ],
-  "presets": [
-    {
-      "name": "Product Grid"
-    }
-  ]
-}
-{% endschema %}
-
->>>>>>> 2752f91f55f60be20b53a50033bea6682cc41737

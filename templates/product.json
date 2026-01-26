@@ -36,7 +36,7 @@
         "title": "Related Products",
         "description": "You may also like these products from our collection.",
         "products_to_show": 4,
-        "show_view_all": true,
+        "show_view_all": false,
         "view_all_text": "View All Products"
       }
     },
@@ -82,10 +82,6 @@
         "judge_me_reviews_cards_carousel_mmicRK"
       ],
       "settings": {}
-    },
-    "product_faq_compact": {
-      "type": "product-faq-compact",
-      "settings": {}
     }
   },
   "order": [
@@ -95,7 +91,6 @@
     "product_trust_badges_compact",
     "product_how_to_use_compact",
     "related_products",
-    "1769418164e60d6e16",
-    "product_faq_compact"
+    "1769418164e60d6e16"
   ]
 }

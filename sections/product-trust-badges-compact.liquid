@@ -2,7 +2,7 @@
   Trust Badges Section - Compact Premium Design
 {% endcomment %}
 
-<section class="product-trust-badges-compact" id="product-trust">
+<section class="product-trust-badges-compact fade-in-up" id="product-trust" style="animation-delay: 0.5s;">
   <div class="product-trust-badges-compact__container">
     <div class="trust-badges-grid">
       <div class="trust-badge-item">
@@ -59,6 +59,23 @@
 </section>
 
 {% stylesheet %}
+  /* Animations */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .fade-in-up {
+    animation: fadeInUp 0.6s ease-out forwards;
+    opacity: 0;
+  }
+
   .product-trust-badges-compact {
     width: 100%;
     max-width: 100%;
@@ -86,12 +103,30 @@
     background: var(--white);
     border-radius: 12px;
     border: 1px solid rgba(74, 124, 44, 0.1);
-    transition: all 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .trust-badge-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(74, 124, 44, 0.05), transparent);
+    transition: left 0.5s ease;
+  }
+
+  .trust-badge-item:hover::before {
+    left: 100%;
   }
 
   .trust-badge-item:hover {
+    transform: translateY(-3px);
     border-color: rgba(74, 124, 44, 0.25);
-    box-shadow: 0 4px 12px rgba(45, 80, 22, 0.08);
+    box-shadow: 0 6px 20px rgba(45, 80, 22, 0.12);
   }
 
   .trust-badge-icon {

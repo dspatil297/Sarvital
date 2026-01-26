@@ -6,7 +6,7 @@
 <section class="product-hero" id="product-hero">
   <div class="product-hero__container">
     <!-- Left Column - Product Images -->
-    <div class="product-images">
+    <div class="product-images fade-in-up" style="animation-delay: 0.1s;">
       {% if product.featured_image %}
         <div class="product-image-main">
           <img 
@@ -58,7 +58,7 @@
     </div>
     
     <!-- Right Column - Product Info & CTA -->
-    <div class="product-info">
+    <div class="product-info fade-in-up" style="animation-delay: 0.2s;">
       <!-- Trust Badge -->
       <div class="product-trust-badges">
         {% if product.metafields.custom.certificates %}
@@ -338,11 +338,28 @@
 </div>
 
 {% stylesheet %}
+  /* Animations */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .fade-in-up {
+    animation: fadeInUp 0.6s ease-out forwards;
+    opacity: 0;
+  }
+
   /* Main Container */
   .product-hero {
     width: 100%;
     max-width: 100%;
-    padding: 40px 40px;
+    padding: 30px 40px;
     background: var(--white);
     box-sizing: border-box;
   }
@@ -352,7 +369,7 @@
     margin: 0 auto;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 80px;
+    gap: 60px;
     align-items: start;
   }
 
@@ -366,10 +383,17 @@
     position: relative;
     width: 100%;
     aspect-ratio: 1;
-    border-radius: 12px;
+    border-radius: 16px;
     overflow: hidden;
     background: var(--bg);
     margin-bottom: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .product-image-main:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
   }
 
   .product-image-main__img {
@@ -829,7 +853,7 @@
   .product-description-section {
     width: 100%;
     max-width: 100%;
-    padding: 40px 40px;
+    padding: 30px 40px;
     background: linear-gradient(135deg, rgba(45, 80, 22, 0.02) 0%, rgba(74, 124, 44, 0.03) 50%, rgba(212, 175, 55, 0.01) 100%);
     box-sizing: border-box;
   }

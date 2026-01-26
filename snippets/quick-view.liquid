@@ -307,14 +307,19 @@
     document.addEventListener('click', function(e) {
       const quickViewBtn = e.target.closest('[data-quick-view]');
       if (quickViewBtn) {
-        const productId = quickViewBtn.dataset.quickView;
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        const productId = quickViewBtn.getAttribute('data-quick-view');
         const modal = document.getElementById('quick-view-' + productId);
         if (modal) {
           modal.classList.add('active');
           document.body.style.overflow = 'hidden';
+        } else {
+          console.warn('Quick view modal not found for product:', productId);
         }
       }
-    });
+    }, true);
 
     // Close quick view
     document.addEventListener('click', function(e) {
