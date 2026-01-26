@@ -30,14 +30,6 @@
       "type": "product-how-to-use-compact",
       "settings": {}
     },
-    "related_products": {
-      "type": "related-products",
-      "settings": {
-        "title": "You May Also Like",
-        "collection": "frontpage",
-        "products_to_show": 2
-      }
-    },
     "1769418164e60d6e16": {
       "type": "apps",
       "blocks": {
@@ -92,7 +84,6 @@
     "product_ingredients_nutrition_y7n8pk",
     "product_trust_badges_compact",
     "product_how_to_use_compact",
-    "related_products",
     "1769418164e60d6e16",
     "product_faq_compact"
   ]
