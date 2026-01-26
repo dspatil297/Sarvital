@@ -174,46 +174,45 @@
         "promise_text": "Every product is lab-tested, certified, and guaranteed to meet our premium quality standards."
       }
     },
-    "testimonials": {
-      "type": "testimonials",
+    "176943494681be9f0a": {
+      "type": "apps",
       "blocks": {
-        "testimonial_1": {
-          "type": "testimonial",
+        "judge_me_reviews_cards_carousel_V4bCgm": {
+          "type": "shopify://apps/judge-me-reviews/blocks/cards_carousel/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8",
           "settings": {
-            "rating": 5,
-            "text": "These powders have transformed my morning routine. The quality is exceptional and I love knowing I'm supporting sustainable farming.",
-            "name": "Sarah Johnson",
-            "location": "New York, NY"
-          }
-        },
-        "testimonial_2": {
-          "type": "testimonial",
-          "settings": {
-            "rating": 5,
-            "text": "Best quality fruit powders I've ever tried. They're so versatile - I use them in smoothies, baking, and even my morning oatmeal!",
-            "name": "Michael Chen",
-            "location": "Los Angeles, CA"
-          }
-        },
-        "testimonial_3": {
-          "type": "testimonial",
-          "settings": {
-            "rating": 5,
-            "text": "The sustainability aspect really drew me in, and the products exceeded my expectations. Highly recommend!",
-            "name": "Emily Rodriguez",
-            "location": "Austin, TX"
+            "show_sample_reviews": true,
+            "reviews_selection": "all",
+            "products": [],
+            "star_rating": "4_to_5_star",
+            "show_review_media": false,
+            "display_order": "media_first",
+            "no_image_fallback": "review_text_only",
+            "max_reviews": 20,
+            "review_length": "medium",
+            "text_size": "medium",
+            "image_ratio": "1",
+            "reviews_shown": 3,
+            "show_reviewer_name": true,
+            "show_product_name": false,
+            "hide_arrows_mobile": true,
+            "arrows_position": "sides",
+            "max_width": 1100,
+            "corner_styling": "soft",
+            "header_text_color": "#329232",
+            "text_color": "#000000",
+            "card_color": "#F9F9F9",
+            "stars_color": "#e0da3d",
+            "arrows_color": "#000000",
+            "transition_speed": 5,
+            "header_text": "What Our Customers Say",
+            "show_average_rating": false
           }
         }
       },
       "block_order": [
-        "testimonial_1",
-        "testimonial_2",
-        "testimonial_3"
+        "judge_me_reviews_cards_carousel_V4bCgm"
       ],
-      "settings": {
-        "title": "What Our Customers Say",
-        "auto_rotate": true
-      }
+      "settings": {}
     }
   },
   "order": [
@@ -222,6 +221,6 @@
     "featured_products",
     "lifestyle_usage",
     "quality_assurance",
-    "testimonials"
+    "176943494681be9f0a"
   ]
 }
