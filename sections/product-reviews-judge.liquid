@@ -1,22 +1,26 @@
 {% comment %}
-  Product Reviews Section - Judge.me Integration with Premium Design
+  Product Reviews Section - Judge.me Review Widget Integration
+  Shows star ratings and text reviews with basic user info
 {% endcomment %}
 
 <section class="product-reviews-judge" id="product-reviews">
   <div class="product-reviews-judge__container">
     <h2 class="reviews-title">Customer Reviews</h2>
     
-    {% comment %} Judge.me Product Reviews Widget {% endcomment %}
+    {% comment %} Judge.me Review Widget - Standard Integration {% endcomment %}
     <div class="judge-me-reviews-wrapper">
-      {% comment %} Standard Judge.me integration - widget will load via JavaScript {% endcomment %}
+      {% comment %} Method 1: Standard Judge.me Review Widget {% endcomment %}
       <div id="judgeme_product_reviews" data-product-id="{{ product.id }}">
-        {% comment %} Judge.me reviews will populate this automatically {% endcomment %}
+        {% comment %} Judge.me will populate this automatically {% endcomment %}
       </div>
       
-      {% comment %} Alternative: If Judge.me snippet exists {% endcomment %}
+      {% comment %} Method 2: If Judge.me snippet exists {% endcomment %}
       {% if snippets['judge-me-product-reviews'] %}
         {% render 'judge-me-product-reviews', product: product %}
       {% endif %}
+      
+      {% comment %} Method 3: Alternative widget container {% endcomment %}
+      <div class="jdgm-widget jdgm-review-widget" data-id="{{ product.id }}"></div>
     </div>
   </div>
 </section>
