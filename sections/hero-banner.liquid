@@ -10,7 +10,7 @@
       >
     {% else %}
       <img 
-        src="https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=1920&q=80" 
+        src="https://images.unsplash.com/photo-1542838132-92c53300491e?w=1920&q=80" 
         alt="Fresh organic fruits and vegetables"
         loading="eager"
       >
@@ -200,16 +200,16 @@
   .hero-banner__heading {
     font-family: var(--font-heading);
     font-size: clamp(38px, 5.5vw, 72px);
-    font-weight: 900;
+    font-weight: 700;
     color: var(--white);
-    margin-bottom: var(--spacing-lg);
-    line-height: 1.1;
-    letter-spacing: -0.03em;
+    margin-bottom: var(--spacing-md);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
     text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
     word-wrap: break-word;
     overflow-wrap: break-word;
     hyphens: auto;
-    padding: 10px;
+    padding: 0;
   }
 
   .hero-banner__heading-line {
@@ -226,11 +226,11 @@
   }
 
   .hero-banner__subheading {
-    font-size: clamp(18px, 2.2vw, 26px);
-    font-weight: 300;
+    font-size: clamp(18px, 2.2vw, 24px);
+    font-weight: 400;
     color: rgba(255, 255, 255, 0.95);
-    margin-bottom: var(--spacing-xl);
-    line-height: 1.6;
+    margin-bottom: var(--spacing-lg);
+    line-height: 1.7;
     max-width: 600px;
     width: 100%;
     animation: fadeInUp 1s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both;
@@ -242,7 +242,7 @@
     display: flex;
     align-items: center;
     gap: var(--spacing-md);
-    margin-bottom: var(--spacing-3xl);
+    margin-bottom: var(--spacing-xl);
     flex-wrap: wrap;
     animation: fadeInUp 1s cubic-bezier(0.16, 1, 0.3, 1) 0.5s both;
     width: 100%;
@@ -282,7 +282,7 @@
     color: var(--text);
     border: none;
     padding: var(--spacing-md) var(--spacing-2xl);
-    font-weight: 800;
+    font-weight: 600;
     font-size: clamp(15px, 1.4vw, 18px);
     display: inline-flex;
     align-items: center;
@@ -291,8 +291,8 @@
     box-shadow: 0 8px 30px rgba(212, 175, 55, 0.5), 0 0 0 0 rgba(212, 175, 55, 0.7);
     position: relative;
     overflow: hidden;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+    text-transform: none;
+    letter-spacing: 0.02em;
     animation: pulse-glow 2s ease-in-out infinite;
     white-space: nowrap;
     max-width: 100%;
@@ -456,8 +456,8 @@
 
     .hero-banner__heading {
       font-size: clamp(32px, 8vw, 48px);
-      margin-bottom: var(--spacing-md);
-      padding: 10px;
+      margin-bottom: var(--spacing-sm);
+      padding: 0;
     }
 
     .hero-banner__subheading {
