@@ -39,10 +39,6 @@
         "products_to_show": 3
       }
     },
-    "product_reviews_judge": {
-      "type": "product-reviews-judge",
-      "settings": {}
-    },
     "1769418164e60d6e16": {
       "type": "apps",
       "blocks": {
@@ -98,7 +94,6 @@
     "product_trust_badges_compact",
     "product_how_to_use_compact",
     "related_products",
-    "product_reviews_judge",
     "1769418164e60d6e16",
     "product_faq_compact"
   ]
