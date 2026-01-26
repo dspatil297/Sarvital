@@ -1,0 +1,602 @@
+{% comment %}
+  Product FAQ Section
+  Displays FAQs from product.metafields.custom.product_faq
+  Multiline format: Questions and answers can be separated by newlines
+  Format options:
+    - Alternating lines (odd = question, even = answer)
+    - Lines starting with "Q:" and "A:"
+    - Lines separated by "---"
+{% endcomment %}
+
+{% assign faq_meta = product.metafields.custom.product_faq %}
+{% assign has_faqs = false %}
+{% assign faq_items = '' | split: '' %}
+
+{% if faq_meta != blank %}
+  {% assign faq_text = faq_meta | strip %}
+  {% if faq_text != blank %}
+    {% assign has_faqs = true %}
+    
+    {% comment %} Parse the FAQ text into Q&A pairs {% endcomment %}
+    {% assign lines = faq_text | newline_to_br | split: '<br />' %}
+    {% assign current_question = '' %}
+    {% assign current_answer = '' %}
+    {% assign temp_items = '' | split: '' %}
+    {% assign expecting_answer = false %}
+    
+    {% for line in lines %}
+      {% assign clean_line = line | strip %}
+      {% if clean_line != blank %}
+        {% assign line_lower = clean_line | downcase %}
+        
+        {% comment %} Check for explicit Q: or Question: prefix {% endcomment %}
+        {% if line_lower contains 'q:' or line_lower contains 'question:' %}
+          {% comment %} Save previous Q&A if exists {% endcomment %}
+          {% if current_question != blank %}
+            {% assign qa_pair = current_question | append: '|||' | append: current_answer %}
+            {% assign temp_items = temp_items | push: qa_pair %}
+          {% endif %}
+          {% assign question_parts = clean_line | split: ':' %}
+          {% if question_parts.size > 1 %}
+            {% assign question_text = '' %}
+            {% for part in question_parts %}
+              {% if forloop.index > 1 %}
+                {% if question_text != blank %}
+                  {% assign question_text = question_text | append: ':' | append: part %}
+                {% else %}
+                  {% assign question_text = part %}
+                {% endif %}
+              {% endif %}
+            {% endfor %}
+            {% assign current_question = question_text | strip %}
+          {% else %}
+            {% assign current_question = clean_line | remove: 'Q:' | remove: 'q:' | remove: 'Question:' | remove: 'question:' | strip %}
+          {% endif %}
+          {% assign current_answer = '' %}
+          {% assign expecting_answer = true %}
+        {% comment %} Check for explicit A: or Answer: prefix {% endcomment %}
+        {% elsif line_lower contains 'a:' or line_lower contains 'answer:' %}
+          {% assign answer_parts = clean_line | split: ':' %}
+          {% if answer_parts.size > 1 %}
+            {% assign answer_text = '' %}
+            {% for part in answer_parts %}
+              {% if forloop.index > 1 %}
+                {% if answer_text != blank %}
+                  {% assign answer_text = answer_text | append: ':' | append: part %}
+                {% else %}
+                  {% assign answer_text = part %}
+                {% endif %}
+              {% endif %}
+            {% endfor %}
+            {% assign answer_text = answer_text | strip %}
+          {% else %}
+            {% assign answer_text = clean_line | remove: 'A:' | remove: 'a:' | remove: 'Answer:' | remove: 'answer:' | strip %}
+          {% endif %}
+          {% if current_answer != blank %}
+            {% assign current_answer = current_answer | append: ' ' | append: answer_text %}
+          {% else %}
+            {% assign current_answer = answer_text %}
+          {% endif %}
+          {% assign expecting_answer = false %}
+        {% comment %} Check for delimiter separator {% endcomment %}
+        {% elsif clean_line == '---' or clean_line == '---' or clean_line == '***' %}
+          {% comment %} Delimiter - save current Q&A {% endcomment %}
+          {% if current_question != blank %}
+            {% assign qa_pair = current_question | append: '|||' | append: current_answer %}
+            {% assign temp_items = temp_items | push: qa_pair %}
+            {% assign current_question = '' %}
+            {% assign current_answer = '' %}
+            {% assign expecting_answer = false %}
+          {% endif %}
+        {% else %}
+          {% comment %} No explicit markers - use alternating pattern or question detection {% endcomment %}
+          {% assign is_question = false %}
+          {% if clean_line contains '?' %}
+            {% assign is_question = true %}
+          {% elsif expecting_answer == false %}
+            {% comment %} If we're not expecting an answer, this is likely a new question {% endcomment %}
+            {% assign is_question = true %}
+          {% endif %}
+          
+          {% if is_question %}
+            {% comment %} Save previous Q&A if exists {% endcomment %}
+            {% if current_question != blank %}
+              {% assign qa_pair = current_question | append: '|||' | append: current_answer %}
+              {% assign temp_items = temp_items | push: qa_pair %}
+            {% endif %}
+            {% assign current_question = clean_line %}
+            {% assign current_answer = '' %}
+            {% assign expecting_answer = true %}
+          {% else %}
+            {% comment %} This is part of the answer {% endcomment %}
+            {% if current_answer != blank %}
+              {% assign current_answer = current_answer | append: ' ' | append: clean_line %}
+            {% else %}
+              {% assign current_answer = clean_line %}
+            {% endif %}
+            {% assign expecting_answer = false %}
+          {% endif %}
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+    
+    {% comment %} Save the last Q&A pair {% endcomment %}
+    {% if current_question != blank %}
+      {% assign qa_pair = current_question | append: '|||' | append: current_answer %}
+      {% assign temp_items = temp_items | push: qa_pair %}
+    {% endif %}
+    
+    {% assign faq_items = temp_items %}
+  {% endif %}
+{% endif %}
+
+{% if has_faqs and faq_items.size > 0 %}
+<section class="product-faq" id="product-faq">
+  <div class="product-faq__container">
+    <div class="product-faq__header">
+      <div class="product-faq__icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+          <line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+      </div>
+      <h2 class="product-faq__title">Frequently Asked Questions</h2>
+    </div>
+    
+    <div class="product-faq__accordion">
+      {% for item in faq_items %}
+        {% assign qa_parts = item | split: '|||' %}
+        {% assign question = qa_parts[0] | strip %}
+        {% assign answer = qa_parts[1] | strip %}
+        
+        {% if question != blank %}
+          <div class="faq-item" data-faq-index="{{ forloop.index0 }}">
+            <button class="faq-item__button" type="button" aria-expanded="false" aria-controls="faq-answer-{{ forloop.index0 }}">
+              <span class="faq-item__question">{{ question }}</span>
+              <span class="faq-item__icon" aria-hidden="true">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M5 7.5l5 5 5-5"/>
+                </svg>
+              </span>
+            </button>
+            <div class="faq-item__content" id="faq-answer-{{ forloop.index0 }}" role="region">
+              <div class="faq-item__answer">
+                {{ answer | newline_to_br }}
+              </div>
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{% stylesheet %}
+  .product-faq {
+    width: 100%;
+    max-width: 100%;
+    padding: 50px 40px;
+    background: linear-gradient(135deg, rgba(45, 80, 22, 0.03) 0%, rgba(74, 124, 44, 0.05) 50%, rgba(212, 175, 55, 0.02) 100%);
+    box-sizing: border-box;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .product-faq::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--forest-green), var(--sage-green), var(--gold));
+    opacity: 0.3;
+  }
+
+  .product-faq__container {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .product-faq__header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 40px;
+    padding-bottom: 28px;
+    border-bottom: 3px solid;
+    border-image: linear-gradient(90deg, var(--forest-green), var(--sage-green), transparent) 1;
+    position: relative;
+  }
+
+  .product-faq__header::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 0;
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, var(--gold), rgba(212, 175, 55, 0.3));
+    border-radius: 2px;
+  }
+
+  .product-faq__icon {
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--forest-green) 0%, var(--sage-green) 100%);
+    border-radius: 18px;
+    color: var(--white);
+    flex-shrink: 0;
+    box-shadow: 
+      0 8px 20px rgba(45, 80, 22, 0.25),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  }
+
+  .product-faq__icon svg {
+    width: 28px;
+    height: 28px;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+  }
+
+  .product-faq__title {
+    font-family: var(--font-heading);
+    font-size: 32px;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--forest-green) 0%, var(--sage-green) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+
+  .product-faq__accordion {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .faq-item {
+    background: linear-gradient(145deg, var(--white) 0%, rgba(255, 255, 255, 0.95) 100%);
+    border-radius: 16px;
+    border: 2px solid rgba(74, 124, 44, 0.12);
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 
+      0 4px 12px rgba(45, 80, 22, 0.06),
+      0 2px 4px rgba(0, 0, 0, 0.04);
+  }
+
+  .faq-item:hover {
+    border-color: rgba(74, 124, 44, 0.25);
+    box-shadow: 
+      0 8px 24px rgba(45, 80, 22, 0.12),
+      0 4px 8px rgba(0, 0, 0, 0.06);
+  }
+
+  .faq-item.active {
+    border-color: rgba(74, 124, 44, 0.35);
+    box-shadow: 
+      0 12px 32px rgba(45, 80, 22, 0.15),
+      0 6px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  .faq-item__button {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 24px 28px;
+    background: transparent;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+  }
+
+  .faq-item__button:hover {
+    background: rgba(74, 124, 44, 0.03);
+  }
+
+  .faq-item__button:focus {
+    outline: 2px solid var(--forest-green);
+    outline-offset: -2px;
+  }
+
+  .faq-item__button[aria-expanded="true"] {
+    background: rgba(74, 124, 44, 0.05);
+  }
+
+  .faq-item__question {
+    font-family: var(--font-heading);
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--forest-green);
+    line-height: 1.5;
+    flex: 1;
+    transition: color 0.3s ease;
+  }
+
+  .faq-item.active .faq-item__question {
+    color: var(--sage-green);
+  }
+
+  .faq-item__icon {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, rgba(74, 124, 44, 0.1) 0%, rgba(45, 80, 22, 0.1) 100%);
+    border-radius: 8px;
+    color: var(--forest-green);
+    flex-shrink: 0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .faq-item__icon svg {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .faq-item.active .faq-item__icon {
+    background: linear-gradient(135deg, var(--forest-green) 0%, var(--sage-green) 100%);
+    color: var(--white);
+    transform: rotate(180deg);
+  }
+
+  .faq-item.active .faq-item__icon svg {
+    transform: rotate(180deg);
+  }
+
+  .faq-item__content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), padding 0.3s ease;
+    padding: 0 28px;
+  }
+
+  .faq-item.active .faq-item__content {
+    max-height: 1000px;
+    padding: 0 28px 24px 28px;
+  }
+
+  .faq-item__answer {
+    font-size: 16px;
+    line-height: 1.8;
+    color: rgba(26, 26, 26, 0.85);
+    padding-top: 8px;
+  }
+
+  .faq-item__answer p {
+    margin: 0 0 12px 0;
+  }
+
+  .faq-item__answer p:last-child {
+    margin-bottom: 0;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 968px) {
+    .product-faq {
+      padding: 40px 20px;
+    }
+
+    .product-faq__header {
+      margin-bottom: 32px;
+      padding-bottom: 24px;
+      gap: 16px;
+    }
+
+    .product-faq__icon {
+      width: 56px;
+      height: 56px;
+    }
+
+    .product-faq__icon svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    .product-faq__title {
+      font-size: 28px;
+    }
+
+    .faq-item__button {
+      padding: 20px 24px;
+    }
+
+    .faq-item__question {
+      font-size: 17px;
+    }
+
+    .faq-item__content {
+      padding: 0 24px;
+    }
+
+    .faq-item.active .faq-item__content {
+      padding: 0 24px 20px 24px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .product-faq {
+      padding: 30px 16px;
+    }
+
+    .product-faq__header {
+      gap: 14px;
+      margin-bottom: 28px;
+      padding-bottom: 20px;
+    }
+
+    .product-faq__icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+    }
+
+    .product-faq__icon svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    .product-faq__title {
+      font-size: 26px;
+    }
+
+    .product-faq__accordion {
+      gap: 12px;
+    }
+
+    .faq-item {
+      border-radius: 14px;
+    }
+
+    .faq-item__button {
+      padding: 18px 20px;
+      gap: 16px;
+    }
+
+    .faq-item__question {
+      font-size: 16px;
+    }
+
+    .faq-item__icon {
+      width: 28px;
+      height: 28px;
+    }
+
+    .faq-item__content {
+      padding: 0 20px;
+    }
+
+    .faq-item.active .faq-item__content {
+      padding: 0 20px 18px 20px;
+    }
+
+    .faq-item__answer {
+      font-size: 15px;
+      line-height: 1.7;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .product-faq {
+      padding: 24px 16px;
+    }
+
+    .product-faq__header {
+      gap: 12px;
+      margin-bottom: 24px;
+      padding-bottom: 18px;
+    }
+
+    .product-faq__icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+    }
+
+    .product-faq__icon svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .product-faq__title {
+      font-size: 22px;
+    }
+
+    .product-faq__accordion {
+      gap: 10px;
+    }
+
+    .faq-item {
+      border-radius: 12px;
+    }
+
+    .faq-item__button {
+      padding: 16px 18px;
+      gap: 12px;
+    }
+
+    .faq-item__question {
+      font-size: 15px;
+    }
+
+    .faq-item__icon {
+      width: 26px;
+      height: 26px;
+    }
+
+    .faq-item__content {
+      padding: 0 18px;
+    }
+
+    .faq-item.active .faq-item__content {
+      padding: 0 18px 16px 18px;
+    }
+
+    .faq-item__answer {
+      font-size: 14px;
+    }
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  (function() {
+    'use strict';
+    
+    const faqItems = document.querySelectorAll('.faq-item');
+    
+    faqItems.forEach(item => {
+      const button = item.querySelector('.faq-item__button');
+      
+      if (button) {
+        button.addEventListener('click', function() {
+          const isExpanded = this.getAttribute('aria-expanded') === 'true';
+          
+          // Close all other items (optional - remove if you want multiple open)
+          faqItems.forEach(otherItem => {
+            if (otherItem !== item) {
+              otherItem.classList.remove('active');
+              const otherButton = otherItem.querySelector('.faq-item__button');
+              if (otherButton) {
+                otherButton.setAttribute('aria-expanded', 'false');
+              }
+            }
+          });
+          
+          // Toggle current item
+          if (isExpanded) {
+            item.classList.remove('active');
+            this.setAttribute('aria-expanded', 'false');
+          } else {
+            item.classList.add('active');
+            this.setAttribute('aria-expanded', 'true');
+          }
+        });
+      }
+    });
+  })();
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Product FAQ",
+  "settings": [],
+  "presets": [
+    {
+      "name": "Product FAQ"
+    }
+  ]
+}
+{% endschema %}
+
