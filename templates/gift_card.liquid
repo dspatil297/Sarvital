@@ -45,10 +45,11 @@
             {{ settings.logo | image_url: width: 300 | image_tag: alt: shop.name }}
           {% else %}
             <img
-              src="{{ 'gift-card/card.svg' | shopify_asset_url }}"
-              alt="{{ 'gift_card.card' | t }}"
+              src="{{ 'Logo.png' | asset_url }}"
+              alt="{{ shop.name }}"
               width="300"
-              height="200"
+              height=""
+              style="height: auto; max-height: 120px;"
             >
           {% endif %}
         </p>

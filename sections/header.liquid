@@ -12,7 +12,14 @@
             loading="eager"
           >
         {% else %}
-          <span class="logo-text">{{ shop.name }}</span>
+          <img 
+            src="{{ 'Logo.png' | asset_url }}" 
+            alt="{{ shop.name }}"
+            width="200"
+            height=""
+            loading="eager"
+            style="height: auto; max-height: 50px; width: auto;"
+          >
         {% endif %}
       </a>
     </div>
