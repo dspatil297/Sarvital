@@ -13,7 +13,7 @@
       "type": "hero-banner",
       "settings": {
         "heading": "Transform Your Health with Nature's Finest",
-        "subheading": "Premium organic fruit & vegetable powders. Lab-tested, sustainably sourced, and packed with natural goodness.",
+        "subheading": "Premium natural fruit & vegetable powders. Lab-tested, sustainably sourced, and packed with natural goodness.",
         "cta_text": "Shop Now",
         "cta_link": "/collections/all",
         "secondary_cta_text": "Learn More",
@@ -141,14 +141,14 @@
           "type": "badge",
           "settings": {
             "icon_name": "certified",
-            "title": "Certified Organic",
-            "description": "Certified organic ingredients sourced from trusted suppliers."
+            "title": "100% Natural",
+            "description": "Natural ingredients sourced from trusted suppliers."
           }
         },
         "badge_3": {
           "type": "badge",
           "settings": {
-            "icon_name": "organic",
+            "icon_name": "natural",
             "title": "100% Natural",
             "description": "No artificial additives, preservatives, or fillers."
           }

@@ -183,7 +183,7 @@
     "name": {{ shop.name | json }},
     "url": {{ shop.url | json }},
     "logo": "https:{{ shop.brand.logo | default: shop.brand.image | image_url: width: 200 }}",
-    "description": {{ shop.description | default: 'Premium organic fruit & vegetable powders. Lab-tested, sustainably sourced, and packed with natural goodness.' | json }},
+    "description": {{ shop.description | default: 'Premium natural fruit & vegetable powders. Lab-tested, sustainably sourced, and packed with natural goodness.' | json }},
     "sameAs": [
       {%- if shop.social_networks.facebook -%}"{{ shop.social_networks.facebook }}"{%- endif -%}
       {%- if shop.social_networks.twitter -%},"{{ shop.social_networks.twitter }}"{%- endif -%}

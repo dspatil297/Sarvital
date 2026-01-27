@@ -262,7 +262,6 @@
       - Root Vegetables
     - Dietary Tags filter (checkboxes)
       - Vegan
-      - Organic
       - Gluten-Free
       - 100% Natural
     - Price range slider
@@ -804,7 +803,7 @@
 
 ### Visual Design
 - **Premium & Modern**: Clean layouts, generous whitespace, high-quality imagery
-- **Nature-Inspired**: Green palette, organic shapes, natural textures
+- **Nature-Inspired**: Green palette, natural shapes, natural textures
 - **Product-Focused**: Products are the hero - large images, clear information
 - **Trustworthy**: Professional photography, clear typography, consistent branding
 

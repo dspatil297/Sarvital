@@ -17,7 +17,7 @@
         <div class="product-filters__active">
           {% for tag in current_tags %}
             <span class="active-filter-chip">
-              {{ tag | remove: 'health-' | remove: 'usage-' | remove: 'ingredient-' | remove: 'diet-' | capitalize }}
+              {{ tag | remove: 'health-' | remove: 'usage-' | remove: 'ingredient-' | remove: 'diet-' | capitalize | replace: 'Organic', 'Natural' }}
               <a href="{{ tag | link_to_remove_tag: tag }}" class="remove-filter" aria-label="Remove filter">
                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M10 4L4 10M4 4L10 10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -167,11 +167,6 @@
                 <input type="checkbox" name="filter" value="diet-vegan" {% if current_tags contains 'diet-vegan' %}checked{% endif %}>
                 <span class="checkmark"></span>
                 <span class="filter-label">Vegan</span>
-              </label>
-              <label class="filter-checkbox">
-                <input type="checkbox" name="filter" value="diet-organic" {% if current_tags contains 'diet-organic' %}checked{% endif %}>
-                <span class="checkmark"></span>
-                <span class="filter-label">Organic</span>
               </label>
               <label class="filter-checkbox">
                 <input type="checkbox" name="filter" value="diet-glutenfree" {% if current_tags contains 'diet-glutenfree' %}checked{% endif %}>
