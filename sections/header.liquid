@@ -91,18 +91,27 @@
         </div>
       </div>
 
-      <!-- Account -->
+      <!-- Account / Login -->
       {% if shop.customer_accounts_enabled %}
-        <a href="{{ routes.account_url }}" class="header__account" aria-label="Account">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M10 10C12.7614 10 15 7.76142 15 5C15 2.23858 12.7614 0 10 0C7.23858 0 5 2.23858 5 5C5 7.76142 7.23858 10 10 10Z" fill="currentColor"/>
-            <path d="M10 12C5.58172 12 2 14.2386 2 17V20H18V17C18 14.2386 14.4183 12 10 12Z" fill="currentColor"/>
-          </svg>
-        </a>
+        {% if customer %}
+          <a href="{{ routes.account_url }}" class="header__account" aria-label="Account">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M10 10C12.7614 10 15 7.76142 15 5C15 2.23858 12.7614 0 10 0C7.23858 0 5 2.23858 5 5C5 7.76142 7.23858 10 10 10Z" fill="currentColor"/>
+              <path d="M10 12C5.58172 12 2 14.2386 2 17V20H18V17C18 14.2386 14.4183 12 10 12Z" fill="currentColor"/>
+            </svg>
+          </a>
+        {% else %}
+          <a href="{{ routes.account_login_url }}" class="header__account" aria-label="Login">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M10 10C12.7614 10 15 7.76142 15 5C15 2.23858 12.7614 0 10 0C7.23858 0 5 2.23858 5 5C5 7.76142 7.23858 10 10 10Z" fill="currentColor"/>
+              <path d="M10 12C5.58172 12 2 14.2386 2 17V20H18V17C18 14.2386 14.4183 12 10 12Z" fill="currentColor"/>
+            </svg>
+          </a>
+        {% endif %}
       {% endif %}
 
-      <!-- Cart -->
-      <button type="button" class="header__cart" aria-label="Shopping cart" data-cart-toggle>
+      <!-- Cart: link so it works without JS; JS opens drawer and prevents navigation -->
+      <a href="{{ routes.cart_url }}" class="header__cart" aria-label="Shopping cart" data-cart-toggle>
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M2 2H4L4.4 4M6 14H16L20 4H4.4M6 14L4.4 4M6 14L3.29289 16.7071C3.10536 16.8946 3 17.149 3 17.4142V18C3 18.5523 3.44772 19 4 19H17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           <circle cx="8" cy="19" r="1" fill="currentColor"/>
@@ -111,7 +120,7 @@
         {% if cart.item_count > 0 %}
           <span class="cart-count" data-cart-count>{{ cart.item_count }}</span>
         {% endif %}
-      </button>
+      </a>
 
       <!-- Mobile Menu Toggle -->
       <button 
@@ -170,7 +179,11 @@
       </nav>
       {% if shop.customer_accounts_enabled %}
         <div class="mobile-menu-footer">
-          <a href="{{ routes.account_url }}" class="btn btn-outline">Account</a>
+          {% if customer %}
+            <a href="{{ routes.account_url }}" class="btn btn-outline">Account</a>
+          {% else %}
+            <a href="{{ routes.account_login_url }}" class="btn btn-outline">Login</a>
+          {% endif %}
         </div>
       {% endif %}
     </div>
@@ -282,7 +295,7 @@
     left: var(--spacing-md);
     right: var(--spacing-md);
     height: 2px;
-    background-color: var(--gold);
+    background: linear-gradient(90deg, var(--forest-green), var(--sage-green));
   }
 
   /* Dropdown Menu */
@@ -376,8 +389,8 @@
     min-width: 18px;
     height: 18px;
     padding: 0 4px;
-    background-color: var(--gold);
-    color: var(--text);
+    background: linear-gradient(135deg, var(--sage-green), var(--forest-green));
+    color: var(--white);
     font-size: var(--body-xs);
     font-weight: 700;
     line-height: 18px;

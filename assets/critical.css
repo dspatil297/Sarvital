@@ -225,13 +225,14 @@ p {
 
 .btn-primary {
   background-color: var(--primary-cta);
-  color: var(--text);
+  color: var(--white);
   border-color: var(--primary-cta);
 }
 
 .btn-primary:hover:not(:disabled) {
-  background-color: #c19d2f;
-  border-color: #c19d2f;
+  background-color: #3d6824;
+  border-color: #3d6824;
+  color: var(--white);
   transform: translateY(-1px);
   box-shadow: var(--shadow-md);
 }
@@ -245,6 +246,7 @@ p {
 .btn-secondary:hover:not(:disabled) {
   background-color: #3d6824;
   border-color: #3d6824;
+  color: var(--white);
   transform: translateY(-1px);
   box-shadow: var(--shadow-md);
 }
@@ -310,7 +312,7 @@ select:focus {
 
 input::placeholder,
 textarea::placeholder {
-  color: #999;
+  color: rgba(26, 26, 26, 0.5);
 }
 
 label {
@@ -350,7 +352,7 @@ label {
   padding: var(--spacing-lg);
   padding-top: var(--spacing-md);
   border-top: 1px solid var(--border-color);
-  background-color: #fafafa;
+  background-color: var(--bg);
 }
 
 /** Badge Components */
@@ -379,8 +381,8 @@ label {
 }
 
 .badge-accent {
-  background-color: var(--gold);
-  color: var(--text);
+  background: linear-gradient(135deg, var(--sage-green) 0%, var(--forest-green) 100%);
+  color: var(--white);
 }
 
 .badge-outline {
@@ -496,7 +498,7 @@ label {
 }
 
 .text-gold {
-  color: var(--gold);
+  color: var(--sage-green);
 }
 
 /** Visibility Utilities */
@@ -976,7 +978,7 @@ textarea,
 
 /* Improve color contrast for text */
 .text-muted {
-  color: #555;
+  color: rgba(26, 26, 26, 0.7);
 }
 
 /* Ensure sufficient color contrast for links */
@@ -991,6 +993,14 @@ a:focus {
   text-decoration: none;
 }
 
+/* Keep button text visible on hover when link is styled as primary/secondary */
+a.btn-primary:hover,
+a.btn-primary:focus,
+a.btn-secondary:hover,
+a.btn-secondary:focus {
+  color: var(--white);
+}
+
 /* Loading states for screen readers */
 .loading[aria-busy="true"]::after {
   content: "Loading...";
@@ -1003,11 +1013,11 @@ a:focus {
 
 /* Error states */
 .error {
-  border-color: #d32f2f;
+  border-color: var(--forest-green);
 }
 
 .error-message {
-  color: #d32f2f;
+  color: var(--text);
   font-size: var(--body-small);
   margin-top: var(--spacing-xs);
   display: block;

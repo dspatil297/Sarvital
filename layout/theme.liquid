@@ -49,10 +49,27 @@
 
     {% sections 'footer-group' %}
 
-    {%- comment -%} Cart Drawer {%- endcomment -%}
+    {%- comment -%} Cart Drawer (markup + script runs after layout so [data-cart-toggle] exists) {%- endcomment -%}
     {% render 'cart-drawer' %}
 
     {%- comment -%} Base JavaScript - Load with defer for better performance {%- endcomment -%}
     <script src="{{ 'application.js' | asset_url }}" defer></script>
+    {%- comment -%} Cart toggle: inline, runs last; uses global window.openCartDrawer (set by cart-drawer) or fallback to /cart {%- endcomment -%}
+    <script>
+      (function() {
+        document.addEventListener('click', function(e) {
+          var el = e.target;
+          var toggle = el && el.closest ? el.closest('[data-cart-toggle]') : null;
+          if (!toggle) return;
+          e.preventDefault();
+          e.stopPropagation();
+          if (typeof window.openCartDrawer === 'function') {
+            window.openCartDrawer();
+          } else if (toggle.href) {
+            window.location.href = toggle.href;
+          }
+        }, true);
+      })();
+    </script>
   </body>
 </html>

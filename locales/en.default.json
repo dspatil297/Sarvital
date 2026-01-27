@@ -24,7 +24,14 @@
       "email": "Email",
       "password": "Password",
       "submit": "Sign in",
-      "title": "Login"
+      "title": "Login",
+      "forgot_password": "Forgot your password?",
+      "remember_me": "Remember me",
+      "create_account": "Create account",
+      "new_customer": "Don't have an account?",
+      "or": "Or",
+      "google_note": "Sign in with Google — enable in Shopify Admin: Settings → Customer accounts → Login with Google (connect your Google OAuth app there).",
+      "continue_guest": "Continue as guest"
     }
   },
   "collections": {

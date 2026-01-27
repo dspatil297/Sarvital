@@ -374,17 +374,20 @@
   (function() {
     'use strict';
 
-    const cartDrawer = document.getElementById('cart-drawer');
-    const cartDrawerClose = document.querySelectorAll('[data-cart-drawer-close]');
-    const cartDrawerBody = document.querySelector('[data-cart-drawer-body]');
-    const cartItems = document.querySelector('[data-cart-items]');
-    const cartEmpty = document.querySelector('[data-cart-empty]');
-    const cartLoading = document.querySelector('[data-cart-loading]');
-    const cartFooter = document.querySelector('[data-cart-footer]');
-    const cartSubtotal = document.querySelector('[data-cart-subtotal]');
-    const cartTotal = document.querySelector('[data-cart-total]');
-    const cartCheckout = document.querySelector('[data-cart-checkout]');
-    const cartToggle = document.querySelector('[data-cart-toggle]');
+    function initCartDrawer() {
+      const cartDrawer = document.getElementById('cart-drawer');
+      if (!cartDrawer) return;
+
+      const cartDrawerClose = document.querySelectorAll('[data-cart-drawer-close]');
+      const cartDrawerBody = document.querySelector('[data-cart-drawer-body]');
+      const cartItems = document.querySelector('[data-cart-items]');
+      const cartEmpty = document.querySelector('[data-cart-empty]');
+      const cartLoading = document.querySelector('[data-cart-loading]');
+      const cartFooter = document.querySelector('[data-cart-footer]');
+      const cartSubtotal = document.querySelector('[data-cart-subtotal]');
+      const cartTotal = document.querySelector('[data-cart-total]');
+      const cartCheckout = document.querySelector('[data-cart-checkout]');
+      const cartToggle = document.querySelector('[data-cart-toggle]');
 
     // Open cart drawer
     function openCartDrawer() {
@@ -568,13 +571,18 @@
       }).format(cents / 100);
     }
 
-    // Event listeners
-    if (cartToggle) {
-      cartToggle.addEventListener('click', (e) => {
+    // Listen for open from theme.liquid inline script (handles [data-cart-toggle] click)
+    document.addEventListener('open-cart-drawer', openCartDrawer);
+
+    // Backup: direct click delegation in case inline script is blocked
+    document.addEventListener('click', (e) => {
+      const toggle = e.target.closest('[data-cart-toggle]');
+      if (toggle) {
         e.preventDefault();
+        e.stopPropagation();
         openCartDrawer();
-      });
-    }
+      }
+    });
 
     cartDrawerClose.forEach(btn => {
       btn.addEventListener('click', closeCartDrawer);
@@ -600,6 +608,17 @@
         loadCart();
       }
     });
+
+      // Expose globally so theme.liquid inline script can call it (works regardless of load order)
+      window.openCartDrawer = openCartDrawer;
+    }
+
+    // Run when DOM is ready; event delegation on document means cart button works whenever it exists
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initCartDrawer);
+    } else {
+      initCartDrawer();
+    }
   })();
 {% endjavascript %}
 
