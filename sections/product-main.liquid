@@ -70,9 +70,10 @@
             {{ product.metafields.custom.certificates }}
           </span>
         {% endif %}
-        <span class="trust-badge">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M20 7h-4M8 7H4M16 7v14M8 7v14M12 3v4M6 3h12"/>
+        <span class="trust-badge trust-badge--shipping">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1 3h15v13H1V3zm16 8h4l3 3v4h-7v-7z"/>
+            <path d="M5 21a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm12 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/>
           </svg>
           Free Shipping above ₹500
         </span>
@@ -255,37 +256,6 @@
           </div>
         </div>
       {% endform %}
-      
-      <!-- Key Benefits (Quick) -->
-      <div class="product-key-benefits">
-        <h3 class="benefits-title">Why You'll Love This Product</h3>
-        <ul class="benefits-list">
-          {% if product.metafields.custom.key_benefit_1 %}
-            <li>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="20 6 9 17 4 12"/>
-              </svg>
-              {{ product.metafields.custom.key_benefit_1 }}
-            </li>
-          {% endif %}
-          {% if product.metafields.custom.key_benefit_2 %}
-            <li>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="20 6 9 17 4 12"/>
-              </svg>
-              {{ product.metafields.custom.key_benefit_2 }}
-            </li>
-          {% endif %}
-          {% if product.metafields.custom.key_benefit_3 %}
-            <li>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="20 6 9 17 4 12"/>
-              </svg>
-              {{ product.metafields.custom.key_benefit_3 }}
-            </li>
-          {% endif %}
-        </ul>
-      </div>
     </div>
   </div>
 </section>
@@ -491,6 +461,15 @@
 
   .trust-badge svg {
     flex-shrink: 0;
+  }
+
+  .trust-badge--shipping {
+    background: linear-gradient(135deg, rgba(74, 124, 44, 0.12) 0%, rgba(74, 124, 44, 0.06) 100%);
+    color: var(--forest-green);
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: 1px solid rgba(74, 124, 44, 0.25);
+    font-weight: 600;
   }
 
   /* Product Title */
@@ -808,45 +787,6 @@
 
   .product-trust-message strong {
     font-size: 14px;
-  }
-
-  /* Key Benefits */
-  .product-key-benefits {
-    padding: 24px;
-    background: rgba(74, 124, 44, 0.03);
-    border-radius: 12px;
-    margin-top: 8px;
-  }
-
-  .benefits-title {
-    font-size: 18px;
-    font-weight: 600;
-    margin: 0 0 16px 0;
-    color: var(--text);
-  }
-
-  .benefits-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .benefits-list li {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    font-size: 14px;
-    color: rgba(26, 26, 26, 0.8);
-    line-height: 1.6;
-  }
-
-  .benefits-list svg {
-    flex-shrink: 0;
-    margin-top: 2px;
-    color: var(--forest-green);
   }
 
   /* Product Description Section */

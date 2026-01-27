@@ -148,7 +148,7 @@
         "badge_3": {
           "type": "badge",
           "settings": {
-            "icon_name": "recycle",
+            "icon_name": "vegan",
             "title": "Vegan | Gluten Free",
             "description": "Suitable for vegan and gluten-free lifestyles. Free from animal products and gluten."
           }
@@ -156,7 +156,7 @@
         "badge_4": {
           "type": "badge",
           "settings": {
-            "icon_name": "package",
+            "icon_name": "certified",
             "title": "Premium Quality",
             "description": "Rigorous quality control ensures consistent premium standards."
           }
