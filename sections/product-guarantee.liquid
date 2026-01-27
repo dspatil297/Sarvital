@@ -26,25 +26,13 @@
               <path d="M20 7h-4M8 7H4M16 7v14M8 7v14M12 3v4M6 3h12"/>
             </svg>
             <div>
-              <strong>Free Shipping</strong>
-              <span>{{ section.settings.free_shipping_text | default: "On orders over ₹500" }}</span>
+              <strong>Free Shipping above ₹500</strong>
+              <span>{{ section.settings.free_shipping_text | default: "On qualifying orders" }}</span>
             </div>
           </div>
         {% endif %}
         
-        {% if section.settings.show_returns %}
-          <div class="guarantee-feature">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M3 7v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2z"/>
-              <polyline points="3 7 12 13 21 7"/>
-            </svg>
-            <div>
-              <strong>{{ section.settings.returns_title | default: "30-Day Returns" }}</strong>
-              <span>{{ section.settings.returns_text | default: "No questions asked" }}</span>
-            </div>
-          </div>
-        {% endif %}
-        
+                
         {% if section.settings.show_secure_payment %}
           <div class="guarantee-feature">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -260,8 +248,8 @@
     {
       "type": "text",
       "id": "free_shipping_text",
-      "label": "Free Shipping Text",
-      "default": "On orders over ₹500"
+      "label": "Free Shipping Subtext",
+      "default": "On qualifying orders"
     },
     {
       "type": "checkbox",

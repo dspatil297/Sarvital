@@ -140,7 +140,7 @@
         "badge_2": {
           "type": "badge",
           "settings": {
-            "icon_name": "certified",
+            "icon_name": "natural",
             "title": "100% Natural",
             "description": "Natural ingredients sourced from trusted suppliers."
           }
@@ -148,15 +148,15 @@
         "badge_3": {
           "type": "badge",
           "settings": {
-            "icon_name": "natural",
-            "title": "100% Natural",
-            "description": "No artificial additives, preservatives, or fillers."
+            "icon_name": "recycle",
+            "title": "Vegan | Gluten Free",
+            "description": "Suitable for vegan and gluten-free lifestyles. Free from animal products and gluten."
           }
         },
         "badge_4": {
           "type": "badge",
           "settings": {
-            "icon_name": "premium",
+            "icon_name": "package",
             "title": "Premium Quality",
             "description": "Rigorous quality control ensures consistent premium standards."
           }

@@ -74,15 +74,7 @@
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M20 7h-4M8 7H4M16 7v14M8 7v14M12 3v4M6 3h12"/>
           </svg>
-          Free Shipping
-        </span>
-        <span class="trust-badge">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
-            <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
-            <line x1="12" y1="22.08" x2="12" y2="12"/>
-          </svg>
-          30-Day Returns
+          Free Shipping above ₹500
         </span>
       </div>
       
@@ -681,6 +673,13 @@
     display: none;
   }
 
+  /* Product Form – consistent spacing between quantity, buttons, trust message */
+  .product-form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
   /* Quantity */
   .product-quantity {
     display: flex;
@@ -773,6 +772,7 @@
     background: transparent;
     color: var(--forest-green);
     border: 2px solid var(--forest-green);
+    margin-top: 8px;
   }
 
   .cta-button--secondary:hover {
