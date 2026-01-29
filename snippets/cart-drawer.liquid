@@ -620,6 +620,10 @@
 
       // Expose globally so theme.liquid inline script can call it (works regardless of load order)
       window.openCartDrawer = openCartDrawer;
+      // If drawer was already opened by the theme stub before this script ran, load cart now
+      if (cartDrawer.classList.contains('active')) {
+        loadCart();
+      }
     }
 
     // Run when DOM is ready; event delegation on document means cart button works whenever it exists

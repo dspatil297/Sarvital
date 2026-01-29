@@ -50,36 +50,126 @@
 
     {% sections 'footer-group' %}
 
-    {%- comment -%} Cart Drawer (markup + script runs after layout so [data-cart-toggle] exists) {%- endcomment -%}
+    {%- comment -%} Cart Drawer (markup + script runs after layout) {%- endcomment -%}
     {% render 'cart-drawer' %}
 
-    {%- comment -%} Base JavaScript - Load with defer for better performance {%- endcomment -%}
-    <script src="{{ 'application.js' | asset_url }}" defer></script>
-    {%- comment -%} Cart toggle: register on DOMContentLoaded so cart-drawer has set window.openCartDrawer first {%- endcomment -%}
+    {%- comment -%} Header + Cart: single inline script so hamburger and cart work (runs after header/cart in DOM) {%- endcomment -%}
     <script>
       (function() {
-        function handleCartToggle(e) {
-          var el = e.target;
-          var toggle = el && el.closest ? el.closest('[data-cart-toggle]') : null;
-          if (!toggle) return;
-          e.preventDefault();
-          e.stopPropagation();
-          if (typeof window.openCartDrawer === 'function') {
-            window.openCartDrawer();
-          } else if (toggle.href) {
-            window.location.href = toggle.href;
+        var cartListenerAdded = false;
+        var menuAttached = false;
+        function initHeaderAndCart() {
+          var doc = document;
+
+          // --- Cart: run once; open drawer directly so it always works, fallback to cart page ---
+          if (!cartListenerAdded) {
+            cartListenerAdded = true;
+            if (typeof window.openCartDrawer !== 'function') {
+              window.openCartDrawer = function() {
+                var d = doc.getElementById('cart-drawer');
+                if (d) {
+                  d.classList.add('active');
+                  doc.body.style.overflow = 'hidden';
+                }
+              };
+            }
+            doc.addEventListener('click', function(e) {
+              var toggle = e.target && e.target.closest ? e.target.closest('a[data-cart-toggle], [data-cart-toggle]') : null;
+              if (!toggle) return;
+              e.preventDefault();
+              e.stopPropagation();
+              var drawer = doc.getElementById('cart-drawer');
+              if (drawer) {
+                drawer.classList.add('active');
+                doc.body.style.overflow = 'hidden';
+                if (typeof window.openCartDrawer === 'function') {
+                  try { window.openCartDrawer(); } catch (err) { /* stub already did the work */ }
+                }
+              } else if (toggle.href) {
+                window.location.href = toggle.href;
+              }
+              return false;
+            }, true);
+          }
+
+          // --- Hamburger / Mobile menu: use event delegation so it works even if header loads late ---
+          if (!menuAttached) {
+            var menuDrawer = doc.querySelector('[data-mobile-menu]');
+            if (menuDrawer) {
+              menuAttached = true;
+              var menuToggle = doc.querySelector('[data-mobile-menu-toggle]');
+              function openMenu(toggle, drawer) {
+                if (toggle) {
+                  toggle.classList.add('active');
+                  toggle.setAttribute('aria-expanded', 'true');
+                  toggle.setAttribute('aria-label', 'Close menu');
+                }
+                drawer.classList.add('active');
+                drawer.setAttribute('aria-hidden', 'false');
+                doc.body.style.overflow = 'hidden';
+              }
+              function closeMenu(toggle, drawer) {
+                if (toggle) {
+                  toggle.classList.remove('active');
+                  toggle.setAttribute('aria-expanded', 'false');
+                  toggle.setAttribute('aria-label', 'Open menu');
+                }
+                drawer.classList.remove('active');
+                drawer.setAttribute('aria-hidden', 'true');
+                doc.body.style.overflow = '';
+              }
+              doc.addEventListener('click', function(e) {
+                var toggle = e.target && e.target.closest ? e.target.closest('[data-mobile-menu-toggle]') : null;
+                if (toggle) {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  var drawer = doc.querySelector('[data-mobile-menu]');
+                  if (drawer) {
+                    if (drawer.classList.contains('active')) {
+                      closeMenu(toggle, drawer);
+                    } else {
+                      openMenu(toggle, drawer);
+                    }
+                  }
+                }
+                var closeBtn = e.target && e.target.closest ? e.target.closest('[data-mobile-menu-close]') : null;
+                if (closeBtn) {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  var d = doc.querySelector('[data-mobile-menu]');
+                  var t = doc.querySelector('[data-mobile-menu-toggle]');
+                  if (d) closeMenu(t, d);
+                }
+              }, true);
+              menuDrawer.addEventListener('click', function(e) {
+                if (e.target.classList.contains('mobile-menu-overlay')) {
+                  e.preventDefault();
+                  var d = doc.querySelector('[data-mobile-menu]');
+                  var t = doc.querySelector('[data-mobile-menu-toggle]');
+                  if (d) closeMenu(t, d);
+                }
+                var subToggle = e.target && e.target.closest ? e.target.closest('.mobile-nav-toggle') : null;
+                if (subToggle) {
+                  e.preventDefault();
+                  var item = subToggle.closest('.mobile-nav-item');
+                  if (item) {
+                    item.classList.toggle('active');
+                    subToggle.setAttribute('aria-expanded', item.classList.contains('active'));
+                  }
+                }
+              });
+            }
           }
         }
-        function attachCartToggle() {
-          document.addEventListener('click', handleCartToggle, true);
-        }
+        initHeaderAndCart();
         if (document.readyState === 'loading') {
-          document.addEventListener('DOMContentLoaded', attachCartToggle);
-        } else {
-          setTimeout(attachCartToggle, 0);
+          document.addEventListener('DOMContentLoaded', initHeaderAndCart);
         }
       })();
     </script>
+
+    {%- comment -%} Base JavaScript - Load with defer for better performance {%- endcomment -%}
+    <script src="{{ 'application.js' | asset_url }}" defer></script>
     {%- comment -%} Cart page +/- and remove: event delegation in capture phase so it runs before other handlers {%- endcomment -%}
     <script>
       (function() {

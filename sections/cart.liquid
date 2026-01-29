@@ -685,6 +685,11 @@
   }
 
   @media (max-width: 480px) {
+    .cart-page__container {
+      padding-left: var(--container-padding);
+      padding-right: var(--container-padding);
+    }
+
     .cart-item-row {
       grid-template-columns: 80px 1fr;
       padding: var(--spacing-md);
@@ -692,6 +697,15 @@
 
     .cart-page__recommended-grid {
       grid-template-columns: 1fr;
+    }
+
+    .cart-summary__checkout,
+    .cart-summary__continue {
+      width: 100%;
+      min-height: var(--touch-target-min);
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
   }
 {% endstylesheet %}

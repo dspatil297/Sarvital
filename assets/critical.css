@@ -1030,3 +1030,85 @@ a.btn-secondary:focus {
   margin-top: var(--spacing-xs);
   display: block;
 }
+
+/** ============================================
+    MOBILE RESPONSIVE & CONVERSION (CRO)
+    Desktop design unchanged; mobile-optimized for conversion
+    ============================================ */
+
+/* Prevent horizontal overflow from 100vw (scrollbar on some browsers) */
+html {
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* Safe area for notched devices (e.g. iPhone X+) */
+@supports (padding: env(safe-area-inset-left)) {
+  body {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+}
+
+/* Containers: consistent horizontal padding on mobile */
+@media (max-width: 768px) {
+  .container,
+  .footer-container,
+  [class*="__container"],
+  [class*="-container"] {
+    padding-left: var(--container-padding);
+    padding-right: var(--container-padding);
+    box-sizing: border-box;
+  }
+
+  /* Touch-friendly targets (min 44px) for primary actions */
+  .btn,
+  .btn-primary,
+  .btn-secondary,
+  button[type="submit"],
+  a.btn {
+    min-height: var(--touch-target-min);
+    padding: var(--spacing-sm) var(--spacing-lg);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Full-width primary CTAs on mobile for higher conversion */
+  main .btn-primary:not(.btn-small):not(.footer__newsletter-submit),
+  main .cta-button--primary,
+  main .cta-button--secondary,
+  #add-to-cart-btn,
+  #buy-now-btn {
+    width: 100%;
+    max-width: 100%;
+    justify-content: center;
+  }
+
+  /* Tables: allow horizontal scroll instead of layout break */
+  .table-wrapper,
+  table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Prevent tiny text on mobile */
+  .text-small,
+  .text-xs {
+    font-size: var(--body-small);
+  }
+}
+
+@media (max-width: 480px) {
+  .container,
+  .footer-container,
+  [class*="__container"],
+  [class*="-container"] {
+    padding-left: var(--container-padding);
+    padding-right: var(--container-padding);
+  }
+
+  .btn-large {
+    min-height: 52px;
+    font-size: var(--body-large);
+  }
+}

@@ -159,6 +159,25 @@
       min-width: 100%;
     }
   }
+
+  @media (max-width: 480px) {
+    .collection-toolbar {
+      padding: 12px var(--container-padding);
+    }
+
+    .collection-toolbar__right {
+      flex-direction: column;
+    }
+
+    .toolbar-item {
+      min-width: 100%;
+      width: 100%;
+    }
+
+    .toolbar-select {
+      min-height: var(--touch-target-min);
+    }
+  }
 {% endstylesheet %}
 
 {% javascript %}

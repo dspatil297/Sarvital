@@ -2,18 +2,18 @@
   <div class="header-container">
     <!-- Logo -->
     <div class="header__logo">
-      <a href="{{ routes.root_url }}" class="logo-link" aria-label="{{ shop.name }}">
+      <a href="{{ routes.root_url }}" class="logo-link" aria-label="{{ shop.name }} - Home">
         {% if section.settings.logo %}
-          <img 
-            src="{{ section.settings.logo | image_url: width: 200 }}" 
+          <img
+            src="{{ section.settings.logo | image_url: width: 200 }}"
             alt="{{ shop.name }}"
             width="{{ section.settings.logo.width }}"
             height="{{ section.settings.logo.height }}"
             loading="eager"
           >
         {% else %}
-          <img 
-            src="{{ 'Logo.png' | asset_url }}" 
+          <img
+            src="{{ 'Logo.png' | asset_url }}"
             alt="{{ shop.name }}"
             width="200"
             height=""
@@ -24,8 +24,8 @@
       </a>
     </div>
 
-    <!-- Desktop Navigation -->
-    <nav class="header__nav hide-mobile" aria-label="Main navigation">
+    <!-- Desktop Navigation (hidden on mobile via CSS) -->
+    <nav class="header__nav header__nav--desktop" aria-label="Main navigation">
       <ul class="nav-menu">
         {% for link in section.settings.menu.links %}
           <li class="nav-item {% if link.links != blank %}has-dropdown{% endif %}">
@@ -48,13 +48,13 @@
       </ul>
     </nav>
 
-    <!-- Header Actions -->
+    <!-- Header Actions: Search, Account, Cart -->
     <div class="header__actions">
       <!-- Search -->
       <div class="header__search">
-        <button 
-          type="button" 
-          class="search-toggle" 
+        <button
+          type="button"
+          class="search-toggle"
           aria-label="Search"
           data-search-toggle
         >
@@ -65,11 +65,11 @@
         </button>
         <div class="search-overlay" data-search-overlay>
           <div class="search-container">
-            <form action="{{ routes.search_url }}" method="get" class="search-form">
-              <input 
-                type="search" 
-                name="q" 
-                placeholder="Search products..." 
+            <form action="{{ routes.search_url }}" method="get" class="search-form" role="search">
+              <input
+                type="search"
+                name="q"
+                placeholder="Search products..."
                 class="search-input"
                 autocomplete="off"
                 data-search-input
@@ -110,7 +110,7 @@
         {% endif %}
       {% endif %}
 
-      <!-- Cart: link so it works without JS; JS opens drawer and prevents navigation -->
+      <!-- Cart (link works without JS; JS opens drawer and prevents default) -->
       <a href="{{ routes.cart_url }}" class="header__cart" aria-label="Shopping cart" data-cart-toggle>
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M2 2H4L4.4 4M6 14H16L20 4H4.4M6 14L4.4 4M6 14L3.29289 16.7071C3.10536 16.8946 3 17.149 3 17.4142V18C3 18.5523 3.44772 19 4 19H17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -122,14 +122,16 @@
         {% endif %}
       </a>
 
-      <!-- Mobile Menu Toggle -->
-      <button 
-        type="button" 
-        class="mobile-menu-toggle show-mobile" 
-        aria-label="Toggle menu"
+      <!-- Hamburger: visible only on mobile (via CSS) -->
+      <button
+        type="button"
+        class="header__hamburger mobile-menu-toggle"
+        aria-label="Open menu"
+        aria-expanded="false"
+        aria-controls="mobile-menu-drawer"
         data-mobile-menu-toggle
       >
-        <span class="hamburger">
+        <span class="hamburger" aria-hidden="true">
           <span></span>
           <span></span>
           <span></span>
@@ -139,7 +141,7 @@
   </div>
 
   <!-- Mobile Menu Drawer -->
-  <div class="mobile-menu-drawer" data-mobile-menu>
+  <div class="mobile-menu-drawer" id="mobile-menu-drawer" data-mobile-menu aria-hidden="true">
     <div class="mobile-menu-overlay" data-mobile-menu-close></div>
     <div class="mobile-menu-content">
       <div class="mobile-menu-header">
@@ -158,7 +160,7 @@
                 {{ link.title }}
               </a>
               {% if link.links != blank %}
-                <button type="button" class="mobile-nav-toggle" aria-label="Toggle submenu">
+                <button type="button" class="mobile-nav-toggle" aria-label="Toggle {{ link.title }} submenu" aria-expanded="false">
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M6 12L10 8L6 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                   </svg>
@@ -191,10 +193,9 @@
 </header>
 
 {% stylesheet %}
-  /* Header Styles */
   .site-header {
-    width: 100vw;
-    max-width: 100vw;
+    width: 100%;
+    max-width: 100%;
     margin: 0;
     padding: 0;
     background-color: var(--white);
@@ -222,7 +223,6 @@
     margin: 0;
   }
 
-  /* Logo */
   .header__logo {
     flex-shrink: 0;
   }
@@ -242,12 +242,8 @@
     width: auto;
   }
 
-  .logo-text {
-    color: var(--forest-green);
-  }
-
-  /* Navigation */
-  .header__nav {
+  /* Desktop nav: visible on desktop only */
+  .header__nav--desktop {
     flex: 1;
     display: flex;
     justify-content: center;
@@ -298,7 +294,6 @@
     background: linear-gradient(90deg, var(--forest-green), var(--sage-green));
   }
 
-  /* Dropdown Menu */
   .nav-item.has-dropdown:hover .nav-dropdown {
     opacity: 1;
     visibility: visible;
@@ -342,7 +337,7 @@
     font-weight: 600;
   }
 
-  /* Header Actions */
+  /* Header actions */
   .header__actions {
     display: flex;
     align-items: center;
@@ -351,17 +346,25 @@
 
   .header__search,
   .header__account,
-  .header__cart {
+  .header__cart,
+  .mobile-menu-toggle {
     display: flex;
     align-items: center;
     justify-content: center;
     width: 40px;
     height: 40px;
+    min-width: 40px;
+    min-height: 40px;
     color: var(--text);
     text-decoration: none;
     border-radius: var(--radius-md);
     transition: all var(--transition-base);
     position: relative;
+    border: none;
+    background: none;
+    cursor: pointer;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
   }
 
   .header__search:hover,
@@ -371,17 +374,53 @@
     color: var(--sage-green);
   }
 
-  .search-toggle {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  /* Hamburger: hidden on desktop, shown only on mobile */
+  .mobile-menu-toggle {
+    display: none;
   }
 
-  /* Cart Count Badge */
+  .mobile-menu-toggle:hover {
+    background-color: rgba(45, 80, 22, 0.05);
+    color: var(--sage-green);
+  }
+
+  .hamburger {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    width: 24px;
+    pointer-events: none;
+  }
+
+  .hamburger span {
+    display: block;
+    width: 100%;
+    height: 3px;
+    background-color: currentColor;
+    border-radius: 2px;
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+
+  .mobile-menu-toggle.active .hamburger span:nth-child(1) {
+    transform: rotate(45deg) translate(7px, 7px);
+  }
+
+  .mobile-menu-toggle.active .hamburger span:nth-child(2) {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+
+  .mobile-menu-toggle.active .hamburger span:nth-child(3) {
+    transform: rotate(-45deg) translate(7px, -7px);
+  }
+
+  .search-toggle {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    min-height: 40px;
+  }
+
   .cart-count {
     position: absolute;
     top: -4px;
@@ -398,7 +437,6 @@
     border-radius: var(--radius-full);
   }
 
-  /* Search Overlay */
   .search-overlay {
     position: fixed;
     top: 0;
@@ -487,52 +525,6 @@
     display: block;
   }
 
-  /* Mobile Menu Toggle - Enhanced Touch Targets */
-  .mobile-menu-toggle {
-    display: none;
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: var(--spacing-sm);
-    min-width: 44px;
-    min-height: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    -webkit-tap-highlight-color: transparent;
-  }
-
-  .hamburger {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    width: 24px;
-    position: relative;
-  }
-
-  .hamburger span {
-    display: block;
-    width: 100%;
-    height: 3px;
-    background-color: var(--text);
-    border-radius: 2px;
-    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-  }
-
-  .mobile-menu-toggle.active .hamburger span:nth-child(1) {
-    transform: rotate(45deg) translate(7px, 7px);
-  }
-
-  .mobile-menu-toggle.active .hamburger span:nth-child(2) {
-    opacity: 0;
-    transform: translateX(-10px);
-  }
-
-  .mobile-menu-toggle.active .hamburger span:nth-child(3) {
-    transform: rotate(-45deg) translate(7px, -7px);
-  }
-
-  /* Mobile Menu Drawer */
   .mobile-menu-drawer {
     position: fixed;
     top: 0;
@@ -543,11 +535,13 @@
     opacity: 0;
     visibility: hidden;
     transition: all var(--transition-base);
+    pointer-events: none;
   }
 
   .mobile-menu-drawer.active {
     opacity: 1;
     visibility: visible;
+    pointer-events: auto;
   }
 
   .mobile-menu-overlay {
@@ -605,10 +599,9 @@
     align-items: center;
     justify-content: center;
     -webkit-tap-highlight-color: transparent;
-    transition: background-color 0.2s ease;
   }
 
-  .mobile-menu-close:active {
+  .mobile-menu-close:hover {
     background-color: rgba(74, 124, 44, 0.05);
     border-radius: var(--radius-sm);
   }
@@ -627,6 +620,7 @@
 
   .mobile-nav-item {
     border-bottom: 1px solid var(--border-color);
+    position: relative;
   }
 
   .mobile-nav-link {
@@ -639,11 +633,11 @@
     color: var(--text);
     text-decoration: none;
     -webkit-tap-highlight-color: rgba(74, 124, 44, 0.1);
-    transition: color 0.2s ease, background-color 0.2s ease;
   }
 
+  .mobile-nav-link:hover,
   .mobile-nav-link:active {
-    background-color: rgba(74, 124, 44, 0.05);
+    color: var(--sage-green);
   }
 
   .mobile-nav-link.active {
@@ -652,7 +646,9 @@
   }
 
   .mobile-nav-item.has-children {
-    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
   }
 
   .mobile-nav-toggle {
@@ -673,11 +669,6 @@
     -webkit-tap-highlight-color: transparent;
   }
 
-  .mobile-nav-toggle:active {
-    background-color: rgba(74, 124, 44, 0.05);
-    border-radius: var(--radius-sm);
-  }
-
   .mobile-nav-item.active .mobile-nav-toggle {
     transform: rotate(90deg);
   }
@@ -686,6 +677,7 @@
     list-style: none;
     margin: 0;
     padding: 0 0 var(--spacing-md) var(--spacing-lg);
+    width: 100%;
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -705,12 +697,11 @@
     color: var(--text);
     text-decoration: none;
     -webkit-tap-highlight-color: rgba(74, 124, 44, 0.1);
-    transition: color 0.2s ease, background-color 0.2s ease;
   }
 
+  .mobile-nav-sublink:hover,
   .mobile-nav-sublink:active {
-    background-color: rgba(74, 124, 44, 0.05);
-    padding-left: var(--spacing-xs);
+    color: var(--sage-green);
   }
 
   .mobile-nav-sublink.active {
@@ -723,14 +714,14 @@
     border-top: 1px solid var(--border-color);
   }
 
-  /* Responsive - Mobile Optimizations */
+  /* Mobile: hide desktop nav, show hamburger */
   @media (max-width: 768px) {
     .header-container {
       height: 70px;
       padding: 0 var(--spacing-md);
     }
 
-    .header__nav {
+    .header__nav--desktop {
       display: none;
     }
 
@@ -744,7 +735,8 @@
 
     .header__search,
     .header__account,
-    .header__cart {
+    .header__cart,
+    .mobile-menu-toggle {
       width: 44px;
       height: 44px;
       min-width: 44px;
@@ -763,12 +755,10 @@
 
     .mobile-nav-link {
       font-size: var(--body-large);
-      padding: var(--spacing-md) 0;
     }
 
     .mobile-nav-sublink {
       font-size: var(--body-normal);
-      padding: var(--spacing-md) 0;
     }
   }
 
@@ -786,10 +776,6 @@
       width: 100%;
       max-width: 100%;
     }
-
-    .mobile-nav-link {
-      font-size: var(--h5-size);
-    }
   }
 {% endstylesheet %}
 
@@ -797,170 +783,169 @@
   ;(function() {
     'use strict';
 
-    const header = document.getElementById('site-header');
-    const mobileMenuToggle = document.querySelector('[data-mobile-menu-toggle]');
-    const mobileMenu = document.querySelector('[data-mobile-menu]');
-    const mobileMenuClose = document.querySelectorAll('[data-mobile-menu-close]');
-    const mobileNavItems = document.querySelectorAll('.mobile-nav-item.has-children');
-    const searchToggle = document.querySelector('[data-search-toggle]');
-    const searchOverlay = document.querySelector('[data-search-overlay]');
-    const searchClose = document.querySelector('[data-search-close]');
-    const searchInput = document.querySelector('[data-search-input]');
-    const searchResults = document.querySelector('[data-search-results]');
+    function initHeader() {
+      var header = document.getElementById('site-header');
+      var mobileMenuToggle = document.querySelector('[data-mobile-menu-toggle]');
+      var mobileMenu = document.querySelector('[data-mobile-menu]');
+      var mobileMenuClose = document.querySelectorAll('[data-mobile-menu-close]');
+      var mobileNavItems = document.querySelectorAll('.mobile-nav-item.has-children');
+      var searchToggle = document.querySelector('[data-search-toggle]');
+      var searchOverlay = document.querySelector('[data-search-overlay]');
+      var searchClose = document.querySelector('[data-search-close]');
+      var searchInput = document.querySelector('[data-search-input]');
+      var searchResults = document.querySelector('[data-search-results]');
 
-    // Sticky Header
-    if (header.dataset.stickyHeader === 'true') {
-      let lastScroll = 0;
-      window.addEventListener('scroll', () => {
-        const currentScroll = window.pageYOffset;
-        if (currentScroll > 100) {
+    function debounce(fn, wait) {
+      var t;
+      return function() {
+        var args = arguments;
+        clearTimeout(t);
+        t = setTimeout(function() { fn.apply(null, args); }, wait);
+      };
+    }
+
+    if (header && header.dataset.stickyHeader === 'true') {
+      window.addEventListener('scroll', function() {
+        if (window.pageYOffset > 100) {
           header.classList.add('sticky');
         } else {
           header.classList.remove('sticky');
         }
-        lastScroll = currentScroll;
       });
     }
 
-    // Mobile Menu Toggle
-    if (mobileMenuToggle) {
-      mobileMenuToggle.addEventListener('click', (e) => {
-        e.stopPropagation();
-        mobileMenuToggle.classList.toggle('active');
-        mobileMenu.classList.toggle('active');
-        document.body.style.overflow = mobileMenu.classList.contains('active') ? 'hidden' : '';
-      });
+    function openMobileMenu() {
+      if (!mobileMenuToggle || !mobileMenu) return;
+      mobileMenuToggle.classList.add('active');
+      mobileMenu.classList.add('active');
+      mobileMenu.setAttribute('aria-hidden', 'false');
+      mobileMenuToggle.setAttribute('aria-expanded', 'true');
+      mobileMenuToggle.setAttribute('aria-label', 'Close menu');
+      document.body.style.overflow = 'hidden';
     }
 
-    // Mobile Menu Close
     function closeMobileMenu() {
+      if (!mobileMenuToggle || !mobileMenu) return;
       mobileMenuToggle.classList.remove('active');
       mobileMenu.classList.remove('active');
+      mobileMenu.setAttribute('aria-hidden', 'true');
+      mobileMenuToggle.setAttribute('aria-expanded', 'false');
+      mobileMenuToggle.setAttribute('aria-label', 'Open menu');
       document.body.style.overflow = '';
     }
 
-    mobileMenuClose.forEach(btn => {
-      btn.addEventListener('click', closeMobileMenu);
-    });
-
-    // Swipe to close mobile menu
-    if (mobileMenu) {
-      let touchStartX = 0;
-      let touchEndX = 0;
-      const menuContent = mobileMenu.querySelector('.mobile-menu-content');
-      
-      menuContent.addEventListener('touchstart', (e) => {
-        touchStartX = e.changedTouches[0].screenX;
-      }, { passive: true });
-      
-      menuContent.addEventListener('touchend', (e) => {
-        touchEndX = e.changedTouches[0].screenX;
-        const swipeDistance = touchEndX - touchStartX;
-        
-        // Swipe right to close (minimum 50px swipe)
-        if (swipeDistance > 50 && mobileMenu.classList.contains('active')) {
+    if (mobileMenuToggle && mobileMenu) {
+      mobileMenuToggle.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (mobileMenu.classList.contains('active')) {
           closeMobileMenu();
+        } else {
+          openMobileMenu();
         }
-      }, { passive: true });
+      });
     }
 
-    // Mobile Nav Submenu Toggle
-    mobileNavItems.forEach(item => {
-      const toggle = item.querySelector('.mobile-nav-toggle');
-      if (toggle) {
-        toggle.addEventListener('click', () => {
-          item.classList.toggle('active');
-        });
+    if (mobileMenuClose && mobileMenuClose.length) {
+      mobileMenuClose.forEach(function(btn) {
+        btn.addEventListener('click', closeMobileMenu);
+      });
+    }
+
+    if (mobileMenu) {
+      var overlay = mobileMenu.querySelector('.mobile-menu-overlay');
+      if (overlay) {
+        overlay.addEventListener('click', closeMobileMenu);
       }
-    });
+    }
 
-    // Search Toggle
-    if (searchToggle) {
-      searchToggle.addEventListener('click', () => {
+    if (mobileNavItems && mobileNavItems.length) {
+      mobileNavItems.forEach(function(item) {
+        var toggle = item.querySelector('.mobile-nav-toggle');
+        if (toggle) {
+          toggle.addEventListener('click', function() {
+            item.classList.toggle('active');
+            var expanded = item.classList.contains('active');
+            toggle.setAttribute('aria-expanded', expanded);
+          });
+        }
+      });
+    }
+
+    if (searchToggle && searchOverlay) {
+      searchToggle.addEventListener('click', function() {
         searchOverlay.classList.add('active');
-        setTimeout(() => searchInput?.focus(), 100);
+        if (searchInput) setTimeout(function() { searchInput.focus(); }, 100);
       });
     }
 
-    // Search Close
     if (searchClose) {
-      searchClose.addEventListener('click', () => {
+      searchClose.addEventListener('click', function() {
         searchOverlay.classList.remove('active');
-        searchInput.value = '';
-        searchResults.classList.remove('active');
+        if (searchInput) searchInput.value = '';
+        if (searchResults) searchResults.classList.remove('active');
       });
     }
 
-    // Close search on overlay click
     if (searchOverlay) {
-      searchOverlay.addEventListener('click', (e) => {
+      searchOverlay.addEventListener('click', function(e) {
         if (e.target === searchOverlay) {
           searchOverlay.classList.remove('active');
-          searchInput.value = '';
-          searchResults.classList.remove('active');
+          if (searchInput) searchInput.value = '';
+          if (searchResults) searchResults.classList.remove('active');
         }
       });
     }
 
-    // Search Autocomplete (basic implementation)
-    if (searchInput) {
-      const debouncedSearch = window.SarvitalTheme?.debounce((query) => {
+    if (searchInput && searchResults) {
+      var debouncedSearch = debounce(function(query) {
         if (query.length < 2) {
           searchResults.classList.remove('active');
           return;
         }
-
-        // Basic search - can be enhanced with AJAX
-        fetch(`/search/suggest.json?q=${encodeURIComponent(query)}&resources[type]=product&resources[limit]=5`)
-          .then(response => response.json())
-          .then(data => {
-            if (data.resources && data.resources.results && data.resources.results.products) {
-              const products = data.resources.results.products;
-              if (products.length > 0) {
-                searchResults.innerHTML = products.map(product => `
-                  <a href="${product.url}" class="search-result-item">
-                    <img src="${product.image}" alt="${product.title}" width="50" height="50">
-                    <div>
-                      <div class="search-result-title">${product.title}</div>
-                      <div class="search-result-price">${product.price}</div>
-                    </div>
-                  </a>
-                `).join('');
-                searchResults.classList.add('active');
-              } else {
-                searchResults.classList.remove('active');
-              }
+        fetch('/search/suggest.json?q=' + encodeURIComponent(query) + '&resources[type]=product&resources[limit]=5')
+          .then(function(r) { return r.json(); })
+          .then(function(data) {
+            if (data.resources && data.resources.results && data.resources.results.products && data.resources.results.products.length > 0) {
+              var products = data.resources.results.products;
+              searchResults.innerHTML = products.map(function(p) {
+                return '<a href="' + p.url + '" class="search-result-item">' +
+                  '<img src="' + (p.image || '') + '" alt="" width="50" height="50">' +
+                  '<div><div class="search-result-title">' + (p.title || '') + '</div><div class="search-result-price">' + (p.price || '') + '</div></div></a>';
+              }).join('');
+              searchResults.classList.add('active');
+            } else {
+              searchResults.classList.remove('active');
             }
           })
-          .catch(() => {
-            searchResults.classList.remove('active');
-          });
+          .catch(function() { searchResults.classList.remove('active'); });
       }, 300);
-
-      searchInput.addEventListener('input', (e) => {
-        debouncedSearch(e.target.value);
+      searchInput.addEventListener('input', function() {
+        debouncedSearch(this.value);
       });
     }
 
-    // Update cart count
     function updateCartCount() {
-      fetch('/cart.js')
-        .then(response => response.json())
-        .then(cart => {
-          const cartCount = document.querySelector('[data-cart-count]');
-          if (cartCount) {
-            if (cart.item_count > 0) {
-              cartCount.textContent = cart.item_count;
-              cartCount.style.display = 'block';
-            } else {
-              cartCount.style.display = 'none';
-            }
+      fetch('/cart.js').then(function(r) { return r.json(); }).then(function(cart) {
+        var el = document.querySelector('[data-cart-count]');
+        if (el) {
+          if (cart.item_count > 0) {
+            el.textContent = cart.item_count;
+            el.style.display = 'block';
+          } else {
+            el.style.display = 'none';
           }
-        });
+        }
+      });
+    }
+    document.addEventListener('cart:updated', updateCartCount);
     }
 
-    // Listen for cart updates
-    document.addEventListener('cart:updated', updateCartCount);
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initHeader);
+    } else {
+      initHeader();
+    }
   })();
 {% endjavascript %}
 

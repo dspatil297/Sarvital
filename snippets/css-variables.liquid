@@ -60,6 +60,7 @@
     --spacing-2xl: 56px;          /* XL spacing - major sections */
     --spacing-3xl: 72px;          /* XXL spacing - page sections */
     --spacing-4xl: 96px;          /* XXXL spacing - hero sections */
+    --spacing-5xl: 120px;         /* Section spacing (used in sections) */
     
     /* Layout */
     --page-width: {{ settings.max_page_width | default: '1200px' }};
@@ -86,6 +87,9 @@
     --transition-base: 250ms ease;
     --transition-slow: 350ms ease;
     
+    /* Mobile / Touch (conversion best practices) */
+    --touch-target-min: 44px;    /* Min size for tap targets (WCAG 2.5.5) */
+    
     /* Z-Index Scale */
     --z-dropdown: 1000;
     --z-sticky: 1020;
@@ -96,7 +100,7 @@
     --z-tooltip: 1070;
   }
   
-  /* Mobile Typography Adjustments */
+  /* Mobile Typography & Layout */
   @media (max-width: 768px) {
     :root {
       --h1-size: 32px;
@@ -104,6 +108,14 @@
       --h3-size: 24px;
       --h4-size: 20px;
       --container-padding: 20px;
+      --spacing-5xl: 72px;       /* Reduce section padding on mobile */
+    }
+  }
+  
+  @media (max-width: 480px) {
+    :root {
+      --container-padding: 16px;
+      --spacing-5xl: 56px;
     }
   }
   

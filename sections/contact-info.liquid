@@ -236,12 +236,38 @@
   }
 
   @media (max-width: 768px) {
+    .contact-info {
+      padding: var(--spacing-3xl) var(--container-padding);
+    }
+
+    .contact-info__title {
+      margin-bottom: var(--spacing-2xl);
+      padding: 0;
+    }
+
     .contact-info__grid {
       grid-template-columns: 1fr;
+      gap: var(--spacing-lg);
+      margin-bottom: var(--spacing-2xl);
     }
 
     .contact-info-card {
       padding: var(--spacing-xl);
+    }
+  }
+
+  @media (max-width: 480px) {
+    .contact-info {
+      padding: var(--spacing-2xl) var(--container-padding);
+    }
+
+    .contact-info-card {
+      padding: var(--spacing-lg);
+    }
+
+    .social-link {
+      min-width: var(--touch-target-min);
+      min-height: var(--touch-target-min);
     }
   }
 {% endstylesheet %}
