@@ -700,78 +700,11 @@
   ;(function() {
     'use strict';
     document.addEventListener('DOMContentLoaded', function() {
-      // Quantity controls: find row from button, update span + hidden input, then call API
-      document.querySelectorAll('[data-cart-decrease]').forEach(function(btn) {
-        btn.addEventListener('click', function(e) {
-          e.preventDefault();
-          var row = this.closest('.cart-item-row');
-          if (!row) return;
-          var key = this.getAttribute('data-cart-decrease');
-          var valueEl = row.querySelector('[data-cart-quantity-value]');
-          var inputEl = row.querySelector('[data-cart-quantity]');
-          var current = valueEl ? (parseInt(valueEl.textContent, 10) || 1) : 1;
-          if (current <= 1) return;
-          var next = current - 1;
-          if (valueEl) valueEl.textContent = next;
-          if (inputEl) inputEl.value = next;
-          updateCartItem(key, next);
-        });
-      });
-      
-      document.querySelectorAll('[data-cart-increase]').forEach(function(btn) {
-        btn.addEventListener('click', function(e) {
-          e.preventDefault();
-          var row = this.closest('.cart-item-row');
-          if (!row) return;
-          var key = this.getAttribute('data-cart-increase');
-          var valueEl = row.querySelector('[data-cart-quantity-value]');
-          var inputEl = row.querySelector('[data-cart-quantity]');
-          var current = valueEl ? (parseInt(valueEl.textContent, 10) || 1) : 1;
-          var next = current + 1;
-          if (valueEl) valueEl.textContent = next;
-          if (inputEl) inputEl.value = next;
-          updateCartItem(key, next);
-        });
-      });
-      
-      document.querySelectorAll('[data-cart-remove]').forEach(function(btn) {
-        btn.addEventListener('click', function(e) {
-          e.preventDefault();
-          var key = this.getAttribute('data-cart-remove');
-          if (key && confirm('Are you sure you want to remove this item?')) {
-            updateCartItem(key, 0);
-          }
-        });
-      });
-      
       var discountToggle = document.querySelector('[data-discount-toggle]');
       var discountForm = document.querySelector('[data-discount-form]');
       if (discountToggle && discountForm) {
         discountToggle.addEventListener('click', function() {
           discountForm.classList.toggle('active');
-        });
-      }
-      
-      function updateCartItem(key, quantity) {
-        var qty = Math.max(0, parseInt(quantity, 10) || 1);
-        fetch('/cart/change.js', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-          },
-          body: JSON.stringify({ id: String(key), quantity: qty })
-        })
-        .then(function(response) {
-          if (!response.ok) return response.json().then(function(err) { throw new Error(err.description || 'Cart update failed'); });
-          return response.json();
-        })
-        .then(function() {
-          window.location.reload();
-        })
-        .catch(function(err) {
-          console.error('Error updating cart:', err);
-          window.location.reload();
         });
       }
     });
