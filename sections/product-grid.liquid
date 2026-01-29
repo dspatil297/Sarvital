@@ -255,6 +255,7 @@
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
     scroll-behavior: smooth;
+    scroll-snap-type: x mandatory;
     margin: 0 calc(-1 * var(--spacing-lg));
     padding: 0 var(--spacing-lg);
     box-sizing: border-box;
@@ -317,7 +318,7 @@
   .product-grid-section__carousel-track {
     display: flex;
     align-items: stretch;
-    gap: var(--spacing-xl);
+    gap: 28px;
     width: max-content;
     min-width: 100%;
     box-sizing: border-box;
@@ -327,11 +328,12 @@
     flex: 0 0 280px;
     width: 280px;
     min-width: 280px;
-    max-width: calc(100vw - 2 * var(--spacing-lg) - 24px);
     display: flex;
     align-items: stretch;
     overflow: hidden;
     box-sizing: border-box;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
   }
 
   .product-grid-section__carousel-slide .product-card {
@@ -396,30 +398,26 @@
         var totalSlides = slides.length;
         if (totalSlides < 2) return;
 
-        var slideWidth = (slides[0] && slides[0].offsetWidth) || 280;
-        var gap = 28;
-        try {
-          var g = getComputedStyle(track).gap || '';
-          gap = parseFloat(g) || parseFloat(g.split(' ')[0]) || 28;
-        } catch (e) {}
+        var slideWidthPx = 280;
+        var gapPx = 28;
+        var slideStep = slideWidthPx + gapPx;
         var half = Math.floor(totalSlides / 2);
-        var setWidth = half * (slideWidth + gap);
-        if (scrollEl.scrollWidth > 0) {
-          setWidth = Math.floor(scrollEl.scrollWidth / 2);
-        }
-        if (setWidth <= 0) setWidth = half * (slideWidth + gap);
-        var slideStep = slideWidth + gap;
+        var setWidth = half * slideStep;
         var autoInterval = null;
         var cardIntervalMs = 1500;
 
+        function snapToStep(pos) {
+          return Math.round(pos / slideStep) * slideStep;
+        }
+
         function slideToNext() {
           var current = scrollEl.scrollLeft;
-          var target = current + slideStep;
-          if (target >= setWidth - 1) {
+          var target = snapToStep(current) + slideStep;
+          if (target >= setWidth) {
             scrollEl.style.scrollBehavior = 'auto';
             scrollEl.scrollLeft = 0;
             scrollEl.style.scrollBehavior = 'smooth';
-            scrollEl.scrollLeft = Math.min(slideStep, target - setWidth);
+            scrollEl.scrollLeft = target - setWidth;
           } else {
             scrollEl.scrollLeft = target;
           }
@@ -442,9 +440,14 @@
         if (prevBtn) {
           prevBtn.addEventListener('click', function() {
             stopAutoScroll();
-            scrollEl.scrollLeft -= slideStep;
-            if (scrollEl.scrollLeft < 0) {
+            var cur = scrollEl.scrollLeft;
+            var targetPrev = snapToStep(cur) - slideStep;
+            if (targetPrev < 0) {
+              scrollEl.style.scrollBehavior = 'auto';
               scrollEl.scrollLeft = setWidth - slideStep;
+              scrollEl.style.scrollBehavior = 'smooth';
+            } else {
+              scrollEl.scrollLeft = targetPrev;
             }
             if (autoScroll) setTimeout(startAutoScroll, 3000);
           });
@@ -452,9 +455,15 @@
         if (nextBtn) {
           nextBtn.addEventListener('click', function() {
             stopAutoScroll();
-            scrollEl.scrollLeft += slideStep;
-            if (scrollEl.scrollLeft >= setWidth - 1) {
+            var cur = scrollEl.scrollLeft;
+            var next = snapToStep(cur) + slideStep;
+            if (next >= setWidth) {
+              scrollEl.style.scrollBehavior = 'auto';
               scrollEl.scrollLeft = 0;
+              scrollEl.style.scrollBehavior = 'smooth';
+              scrollEl.scrollLeft = next - setWidth;
+            } else {
+              scrollEl.scrollLeft = next;
             }
             if (autoScroll) setTimeout(startAutoScroll, 3000);
           });
