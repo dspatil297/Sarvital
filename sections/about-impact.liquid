@@ -208,6 +208,7 @@
 {% endstylesheet %}
 
 {% javascript %}
+  ;(function() {
   // Animated counter for impact metrics
   document.addEventListener('DOMContentLoaded', function() {
     const counters = document.querySelectorAll('[data-count]');
@@ -244,6 +245,7 @@
     
     counters.forEach(animateCounter);
   });
+  })();
 {% endjavascript %}
 
 {% schema %}

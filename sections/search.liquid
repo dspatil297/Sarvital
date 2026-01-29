@@ -462,6 +462,7 @@
 {% endstylesheet %}
 
 {% javascript %}
+  ;(function() {
   document.addEventListener('DOMContentLoaded', function() {
     const sortSelect = document.querySelector('[data-search-sort]');
     
@@ -473,6 +474,7 @@
       });
     }
   });
+  })();
 {% endjavascript %}
 
 {% schema %}
