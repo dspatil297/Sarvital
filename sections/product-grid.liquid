@@ -110,6 +110,13 @@
     opacity: 0;
   }
 
+  @media (prefers-reduced-motion: reduce) {
+    .product-grid-section.fade-in-up {
+      opacity: 1;
+      animation: none;
+    }
+  }
+
   .product-grid-section {
     width: 100%;
     max-width: 100%;
@@ -259,6 +266,13 @@
     margin: 0 calc(-1 * var(--spacing-lg));
     padding: 0 var(--spacing-lg);
     box-sizing: border-box;
+    min-height: 420px;
+  }
+
+  @media (min-width: 769px) {
+    .product-grid-section__carousel-scroll {
+      min-height: 0;
+    }
   }
 
   .product-grid-section__carousel-scroll::-webkit-scrollbar {

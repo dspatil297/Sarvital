@@ -210,6 +210,7 @@
     align-self: flex-start;
   }
 
+  /* Tablet: single column, image first — desktop layout unchanged above 968px */
   @media (max-width: 968px) {
     .lifestyle-usage__content {
       grid-template-columns: 1fr;
@@ -221,9 +222,110 @@
     }
   }
 
+  /* Mobile: spacing, typography, and layout optimisations */
   @media (max-width: 768px) {
     .lifestyle-usage {
-      padding: var(--spacing-3xl) var(--spacing-md);
+      padding: var(--spacing-2xl) var(--spacing-md);
+    }
+
+    .lifestyle-usage__content {
+      gap: var(--spacing-xl);
+    }
+
+    .lifestyle-usage__title {
+      font-size: clamp(28px, 7vw, 36px);
+      line-height: 1.25;
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .lifestyle-usage__description {
+      font-size: 16px;
+      line-height: 1.65;
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .lifestyle-usage__features {
+      gap: var(--spacing-lg);
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .lifestyle-feature {
+      gap: var(--spacing-md);
+      align-items: flex-start;
+    }
+
+    .lifestyle-feature__icon {
+      width: 44px;
+      height: 44px;
+      min-width: 44px;
+      min-height: 44px;
+    }
+
+    .lifestyle-feature__title {
+      font-size: 1rem;
+      margin-bottom: 2px;
+    }
+
+    .lifestyle-feature__description {
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    .lifestyle-usage__cta {
+      width: 100%;
+      min-height: 48px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 14px var(--spacing-lg);
+      text-align: center;
+    }
+  }
+
+  /* Small phones: tighter padding, constrained image, touch-friendly */
+  @media (max-width: 480px) {
+    .lifestyle-usage {
+      padding: var(--spacing-xl) 16px;
+    }
+
+    .lifestyle-usage__image {
+      border-radius: var(--radius-lg);
+      aspect-ratio: 16 / 10;
+      overflow: hidden;
+    }
+
+    .lifestyle-usage__image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
+
+    .lifestyle-usage__title {
+      font-size: clamp(26px, 6.5vw, 32px);
+    }
+
+    .lifestyle-usage__features {
+      gap: var(--spacing-md);
+    }
+
+    .lifestyle-feature__icon {
+      width: 40px;
+      height: 40px;
+      min-width: 40px;
+      min-height: 40px;
+    }
+  }
+
+  /* Disable hover effects on touch devices to avoid sticky states */
+  @media (max-width: 968px) and (hover: none) {
+    .lifestyle-usage__image:hover {
+      transform: none;
+      box-shadow: 0 20px 60px rgba(45, 80, 22, 0.15);
+    }
+
+    .lifestyle-usage__image:hover img {
+      transform: none;
     }
   }
 {% endstylesheet %}
