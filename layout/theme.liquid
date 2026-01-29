@@ -54,10 +54,10 @@
 
     {%- comment -%} Base JavaScript - Load with defer for better performance {%- endcomment -%}
     <script src="{{ 'application.js' | asset_url }}" defer></script>
-    {%- comment -%} Cart toggle: inline, runs last; uses global window.openCartDrawer (set by cart-drawer) or fallback to /cart {%- endcomment -%}
+    {%- comment -%} Cart toggle: register on DOMContentLoaded so cart-drawer has set window.openCartDrawer first {%- endcomment -%}
     <script>
       (function() {
-        document.addEventListener('click', function(e) {
+        function handleCartToggle(e) {
           var el = e.target;
           var toggle = el && el.closest ? el.closest('[data-cart-toggle]') : null;
           if (!toggle) return;
@@ -68,7 +68,15 @@
           } else if (toggle.href) {
             window.location.href = toggle.href;
           }
-        }, true);
+        }
+        function attachCartToggle() {
+          document.addEventListener('click', handleCartToggle, true);
+        }
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', attachCartToggle);
+        } else {
+          setTimeout(attachCartToggle, 0);
+        }
       })();
     </script>
   </body>

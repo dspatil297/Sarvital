@@ -466,12 +466,12 @@
         cartTotal.textContent = formatMoney(cart.total_price);
       }
 
-      // Attach event listeners
-      attachCartListeners();
+      // Attach event listeners (pass cart so decrease handler can check quantity)
+      attachCartListeners(cart);
     }
 
     // Attach cart item listeners
-    function attachCartListeners() {
+    function attachCartListeners(cartData) {
       // Quantity increase
       document.querySelectorAll('[data-cart-increase]').forEach(btn => {
         btn.addEventListener('click', (e) => {
@@ -484,7 +484,7 @@
       document.querySelectorAll('[data-cart-decrease]').forEach(btn => {
         btn.addEventListener('click', (e) => {
           const key = e.target.dataset.cartDecrease;
-          const item = cart.items.find(i => i.key === key);
+          const item = cartData && cartData.items ? cartData.items.find(i => i.key === key) : null;
           if (item && item.quantity > 1) {
             updateCartItem(key, -1);
           }
