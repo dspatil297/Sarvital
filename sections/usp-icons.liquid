@@ -122,9 +122,15 @@
 
   .usp-item {
     position: relative;
+    display: flex;
+    height: 100%;
   }
 
   .usp-item__inner {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
     text-align: center;
     padding: var(--spacing-2xl) var(--spacing-lg);
     background: linear-gradient(135deg, var(--white) 0%, rgba(250, 250, 250, 0.8) 100%);
@@ -255,6 +261,8 @@
     line-height: 1.8;
     margin: 0;
     font-weight: 400;
+    flex: 1;
+    min-height: 0;
   }
 
   @media (max-width: 1024px) {
@@ -266,12 +274,65 @@
 
   @media (max-width: 768px) {
     .usp-icons {
-      padding: var(--spacing-3xl) var(--spacing-md);
+      padding: var(--spacing-2xl) var(--spacing-md);
+    }
+
+    .usp-icons__header {
+      margin-bottom: var(--spacing-2xl);
+    }
+
+    .usp-icons__title {
+      font-size: clamp(24px, 6vw, 32px);
     }
 
     .usp-icons__grid {
-      grid-template-columns: 1fr;
-      gap: var(--spacing-lg);
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--spacing-sm);
+    }
+
+    .usp-item__inner {
+      padding: var(--spacing-md) var(--spacing-sm);
+    }
+
+    .usp-item__icon-wrapper {
+      width: 56px;
+      height: 56px;
+      margin: 0 auto var(--spacing-sm);
+    }
+
+    .usp-item__icon {
+      width: 56px;
+      height: 56px;
+    }
+
+    .usp-item__icon--svg svg {
+      width: 28px;
+      height: 28px;
+    }
+
+    .usp-item__icon-glow {
+      width: 72px;
+      height: 72px;
+    }
+
+    .usp-item__title {
+      font-size: var(--body-small);
+      font-weight: 700;
+      margin-bottom: var(--spacing-xs);
+      line-height: 1.3;
+    }
+
+    .usp-item__description {
+      font-size: 11px;
+      line-height: 1.5;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .usp-item:hover .usp-item__inner {
+      transform: none;
     }
   }
 {% endstylesheet %}

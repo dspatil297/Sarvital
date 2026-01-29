@@ -48,49 +48,8 @@
       </ul>
     </nav>
 
-    <!-- Header Actions: Search, Account, Cart -->
+    <!-- Header Actions: Account, Cart -->
     <div class="header__actions">
-      <!-- Search -->
-      <div class="header__search">
-        <button
-          type="button"
-          class="search-toggle"
-          aria-label="Search"
-          data-search-toggle
-        >
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M9 17C13.4183 17 17 13.4183 17 9C17 4.58172 13.4183 1 9 1C4.58172 1 1 4.58172 1 9C1 13.4183 4.58172 17 9 17Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M19 19L14.65 14.65" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>
-        <div class="search-overlay" data-search-overlay>
-          <div class="search-container">
-            <form action="{{ routes.search_url }}" method="get" class="search-form" role="search">
-              <input
-                type="search"
-                name="q"
-                placeholder="Search products..."
-                class="search-input"
-                autocomplete="off"
-                data-search-input
-              >
-              <button type="submit" class="search-submit" aria-label="Submit search">
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M9 17C13.4183 17 17 13.4183 17 9C17 4.58172 13.4183 1 9 1C4.58172 1 1 4.58172 1 9C1 13.4183 4.58172 17 9 17Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  <path d="M19 19L14.65 14.65" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-              </button>
-            </form>
-            <div class="search-results" data-search-results></div>
-            <button type="button" class="search-close" data-search-close aria-label="Close search">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </button>
-          </div>
-        </div>
-      </div>
-
       <!-- Account / Login -->
       {% if shop.customer_accounts_enabled %}
         {% if customer %}
@@ -110,8 +69,8 @@
         {% endif %}
       {% endif %}
 
-      <!-- Cart (link works without JS; JS opens drawer and prevents default) -->
-      <a href="{{ routes.cart_url }}" class="header__cart" aria-label="Shopping cart" data-cart-toggle>
+      <!-- Cart: link to cart page -->
+      <a href="{{ routes.cart_url }}" class="header__cart" aria-label="Shopping cart">
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M2 2H4L4.4 4M6 14H16L20 4H4.4M6 14L4.4 4M6 14L3.29289 16.7071C3.10536 16.8946 3 17.149 3 17.4142V18C3 18.5523 3.44772 19 4 19H17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           <circle cx="8" cy="19" r="1" fill="currentColor"/>
@@ -344,7 +303,6 @@
     gap: var(--spacing-md);
   }
 
-  .header__search,
   .header__account,
   .header__cart,
   .mobile-menu-toggle {
@@ -367,7 +325,6 @@
     -webkit-tap-highlight-color: transparent;
   }
 
-  .header__search:hover,
   .header__account:hover,
   .header__cart:hover {
     background-color: rgba(45, 80, 22, 0.05);
@@ -414,13 +371,6 @@
     transform: rotate(-45deg) translate(7px, -7px);
   }
 
-  .search-toggle {
-    width: 40px;
-    height: 40px;
-    min-width: 40px;
-    min-height: 40px;
-  }
-
   .cart-count {
     position: absolute;
     top: -4px;
@@ -435,94 +385,6 @@
     line-height: 18px;
     text-align: center;
     border-radius: var(--radius-full);
-  }
-
-  .search-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: var(--z-modal);
-    opacity: 0;
-    visibility: hidden;
-    transition: all var(--transition-base);
-  }
-
-  .search-overlay.active {
-    opacity: 1;
-    visibility: visible;
-  }
-
-  .search-container {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    background-color: var(--white);
-    padding: var(--spacing-xl);
-    box-shadow: var(--shadow-xl);
-  }
-
-  .search-form {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-md);
-    max-width: 800px;
-    margin: 0 auto;
-  }
-
-  .search-input {
-    flex: 1;
-    padding: var(--spacing-md);
-    font-size: var(--body-large);
-    border: 2px solid var(--border-color);
-    border-radius: var(--radius-md);
-  }
-
-  .search-input:focus {
-    border-color: var(--sage-green);
-    outline: none;
-  }
-
-  .search-submit {
-    padding: var(--spacing-md);
-    background-color: var(--sage-green);
-    color: var(--white);
-    border: none;
-    border-radius: var(--radius-md);
-    cursor: pointer;
-    transition: background-color var(--transition-base);
-  }
-
-  .search-submit:hover {
-    background-color: var(--forest-green);
-  }
-
-  .search-close {
-    position: absolute;
-    top: var(--spacing-xl);
-    right: var(--spacing-xl);
-    background: none;
-    border: none;
-    color: var(--text);
-    cursor: pointer;
-    padding: var(--spacing-sm);
-  }
-
-  .search-results {
-    max-width: 800px;
-    margin: var(--spacing-lg) auto 0;
-    padding: var(--spacing-lg);
-    background-color: var(--white);
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-md);
-    display: none;
-  }
-
-  .search-results.active {
-    display: block;
   }
 
   .mobile-menu-drawer {
@@ -733,7 +595,6 @@
       gap: var(--spacing-xs);
     }
 
-    .header__search,
     .header__account,
     .header__cart,
     .mobile-menu-toggle {
@@ -789,20 +650,6 @@
       var mobileMenu = document.querySelector('[data-mobile-menu]');
       var mobileMenuClose = document.querySelectorAll('[data-mobile-menu-close]');
       var mobileNavItems = document.querySelectorAll('.mobile-nav-item.has-children');
-      var searchToggle = document.querySelector('[data-search-toggle]');
-      var searchOverlay = document.querySelector('[data-search-overlay]');
-      var searchClose = document.querySelector('[data-search-close]');
-      var searchInput = document.querySelector('[data-search-input]');
-      var searchResults = document.querySelector('[data-search-results]');
-
-    function debounce(fn, wait) {
-      var t;
-      return function() {
-        var args = arguments;
-        clearTimeout(t);
-        t = setTimeout(function() { fn.apply(null, args); }, wait);
-      };
-    }
 
     if (header && header.dataset.stickyHeader === 'true') {
       window.addEventListener('scroll', function() {
@@ -869,59 +716,6 @@
             toggle.setAttribute('aria-expanded', expanded);
           });
         }
-      });
-    }
-
-    if (searchToggle && searchOverlay) {
-      searchToggle.addEventListener('click', function() {
-        searchOverlay.classList.add('active');
-        if (searchInput) setTimeout(function() { searchInput.focus(); }, 100);
-      });
-    }
-
-    if (searchClose) {
-      searchClose.addEventListener('click', function() {
-        searchOverlay.classList.remove('active');
-        if (searchInput) searchInput.value = '';
-        if (searchResults) searchResults.classList.remove('active');
-      });
-    }
-
-    if (searchOverlay) {
-      searchOverlay.addEventListener('click', function(e) {
-        if (e.target === searchOverlay) {
-          searchOverlay.classList.remove('active');
-          if (searchInput) searchInput.value = '';
-          if (searchResults) searchResults.classList.remove('active');
-        }
-      });
-    }
-
-    if (searchInput && searchResults) {
-      var debouncedSearch = debounce(function(query) {
-        if (query.length < 2) {
-          searchResults.classList.remove('active');
-          return;
-        }
-        fetch('/search/suggest.json?q=' + encodeURIComponent(query) + '&resources[type]=product&resources[limit]=5')
-          .then(function(r) { return r.json(); })
-          .then(function(data) {
-            if (data.resources && data.resources.results && data.resources.results.products && data.resources.results.products.length > 0) {
-              var products = data.resources.results.products;
-              searchResults.innerHTML = products.map(function(p) {
-                return '<a href="' + p.url + '" class="search-result-item">' +
-                  '<img src="' + (p.image || '') + '" alt="" width="50" height="50">' +
-                  '<div><div class="search-result-title">' + (p.title || '') + '</div><div class="search-result-price">' + (p.price || '') + '</div></div></a>';
-              }).join('');
-              searchResults.classList.add('active');
-            } else {
-              searchResults.classList.remove('active');
-            }
-          })
-          .catch(function() { searchResults.classList.remove('active'); });
-      }, 300);
-      searchInput.addEventListener('input', function() {
-        debouncedSearch(this.value);
       });
     }
 

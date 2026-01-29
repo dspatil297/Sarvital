@@ -29,8 +29,8 @@
       {{ settings.type_primary_font | font_url | preload_tag: as: 'font', crossorigin: 'anonymous' }}
     {% endunless %}
 
-    {%- comment -%} Critical CSS - Load with preload {%- endcomment -%}
-    {{ 'critical.css' | asset_url | stylesheet_tag: preload: true }}
+    {%- comment -%} Critical CSS - load normally to avoid "preloaded but not used" console warning {%- endcomment -%}
+    {{ 'critical.css' | asset_url | stylesheet_tag }}
 
     {%- comment -%} SEO Meta Tags {%- endcomment -%}
     {% render 'meta-tags' %}
@@ -61,7 +61,7 @@
         function initHeaderAndCart() {
           var doc = document;
 
-          // --- Cart: run once; open drawer directly so it always works, fallback to cart page ---
+          // --- Cart: run once; open drawer and trigger load (capture phase so it runs first) ---
           if (!cartListenerAdded) {
             cartListenerAdded = true;
             if (typeof window.openCartDrawer !== 'function') {
@@ -74,7 +74,7 @@
               };
             }
             doc.addEventListener('click', function(e) {
-              var toggle = e.target && e.target.closest ? e.target.closest('a[data-cart-toggle], [data-cart-toggle]') : null;
+              var toggle = e.target && e.target.closest ? e.target.closest('[data-cart-toggle]') : null;
               if (!toggle) return;
               e.preventDefault();
               e.stopPropagation();
@@ -83,12 +83,11 @@
                 drawer.classList.add('active');
                 doc.body.style.overflow = 'hidden';
                 if (typeof window.openCartDrawer === 'function') {
-                  try { window.openCartDrawer(); } catch (err) { /* stub already did the work */ }
+                  try { window.openCartDrawer(); } catch (err) { /* ignore */ }
+                } else {
+                  doc.dispatchEvent(new CustomEvent('open-cart-drawer'));
                 }
-              } else if (toggle.href) {
-                window.location.href = toggle.href;
               }
-              return false;
             }, true);
           }
 

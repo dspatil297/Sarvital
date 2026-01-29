@@ -325,10 +325,11 @@
   ;(function() {
     'use strict';
 
-    // Open quick view
+    // Open quick view (disabled on mobile)
     document.addEventListener('click', function(e) {
       const quickViewBtn = e.target.closest('[data-quick-view]');
       if (quickViewBtn) {
+        if (window.innerWidth <= 767) return;
         e.preventDefault();
         e.stopPropagation();
         e.stopImmediatePropagation();

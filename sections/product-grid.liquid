@@ -1,4 +1,11 @@
-<section class="product-grid-section fade-in-up" style="animation-delay: 0.8s;">
+{% assign selected_collection = null %}
+{% if section.settings.collection != blank %}
+  {% assign selected_collection = collections[section.settings.collection] %}
+{% elsif product and product.collections.size > 0 %}
+  {% assign selected_collection = product.collections.first %}
+{% endif %}
+
+<section class="product-grid-section fade-in-up {% if section.settings.layout == 'carousel' %}product-grid-section--carousel{% endif %}" style="animation-delay: 0.8s;" data-layout="{{ section.settings.layout }}" data-auto-scroll="{% if section.settings.carousel_auto_scroll %}true{% else %}false{% endif %}" data-auto-scroll-interval="{{ section.settings.carousel_auto_scroll_interval | default: 4 }}">
   <div class="product-grid-section__container">
     {% if section.settings.title != blank %}
       <h2 class="product-grid-section__title">{{ section.settings.title }}</h2>
@@ -8,42 +15,75 @@
       <p class="product-grid-section__description">{{ section.settings.description }}</p>
     {% endif %}
     
-    {% comment %} Auto-detect collection on product pages if no collection is manually selected {% endcomment %}
-    {% assign selected_collection = null %}
-    {% if section.settings.collection != blank %}
-      {% assign selected_collection = collections[section.settings.collection] %}
-    {% elsif product and product.collections.size > 0 %}
-      {% assign selected_collection = product.collections.first %}
-    {% endif %}
-    
-    {% if selected_collection != null %}
-      {% if selected_collection.products.size > 0 %}
-        <div class="product-grid-section__grid">
+    {% if selected_collection != null and selected_collection.products.size > 0 %}
+      {% if section.settings.layout == 'carousel' %}
+        {% comment %} Desktop: grid of cards (hidden on mobile) {% endcomment %}
+        <div class="product-grid-section__grid product-grid-section__grid--desktop">
           {% assign products_shown = 0 %}
           {% for product_item in selected_collection.products %}
-            {% comment %} Skip current product if on product page {% endcomment %}
+            {% if products_shown >= section.settings.products_to_show %}{% break %}{% endif %}
             {% unless product and product_item.id == product.id %}
-              {% if products_shown < section.settings.products_to_show %}
-                {% render 'product-card', product: product_item %}
-                {% render 'quick-view', product: product_item %}
-                {% assign products_shown = products_shown | plus: 1 %}
-              {% endif %}
+              {% assign products_shown = products_shown | plus: 1 %}
+              {% render 'product-card', product: product_item %}
+              {% render 'quick-view', product: product_item %}
             {% endunless %}
           {% endfor %}
         </div>
-          
-        {% if section.settings.show_view_all %}
-          <div class="product-grid-section__footer">
-            <a href="{{ selected_collection.url }}" class="btn btn-outline btn-large">
-              {{ section.settings.view_all_text | default: 'View All Products' }}
-            </a>
+        {% comment %} Mobile: carousel only (hidden on desktop) {% endcomment %}
+        <div class="product-grid-section__carousel-wrap product-grid-section__carousel-wrap--mobile" id="product-carousel-{{ section.id }}" data-carousel-wrap data-auto-scroll="{% if section.settings.carousel_auto_scroll %}true{% else %}false{% endif %}" data-scroll-interval="{{ section.settings.carousel_auto_scroll_interval | default: 6 }}">
+          <button type="button" class="product-grid-section__carousel-arrow product-grid-section__carousel-arrow--prev" data-carousel-prev aria-label="Previous products">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <button type="button" class="product-grid-section__carousel-arrow product-grid-section__carousel-arrow--next" data-carousel-next aria-label="Next products">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <div class="product-grid-section__carousel-scroll" data-carousel-scroll tabindex="0">
+            <div class="product-grid-section__carousel-track" data-carousel-track>
+              {% for loop_index in (1..2) %}
+                {% assign products_shown = 0 %}
+                {% for product_item in selected_collection.products %}
+                  {% if products_shown >= section.settings.products_to_show %}{% break %}{% endif %}
+                  {% unless product and product_item.id == product.id %}
+                    {% assign products_shown = products_shown | plus: 1 %}
+                    <div class="product-grid-section__carousel-slide">
+                      {% render 'product-card', product: product_item %}
+                      {% render 'quick-view', product: product_item %}
+                    </div>
+                  {% endunless %}
+                {% endfor %}
+              {% endfor %}
+            </div>
           </div>
-        {% endif %}
+        </div>
       {% else %}
-        <div class="product-grid-section__empty">
-          <p>No products found in this collection.</p>
+        <div class="product-grid-section__grid">
+          {% assign products_shown = 0 %}
+          {% for product_item in selected_collection.products %}
+            {% if products_shown >= section.settings.products_to_show %}{% break %}{% endif %}
+            {% unless product and product_item.id == product.id %}
+              {% assign products_shown = products_shown | plus: 1 %}
+              {% render 'product-card', product: product_item %}
+              {% render 'quick-view', product: product_item %}
+            {% endunless %}
+          {% endfor %}
         </div>
       {% endif %}
+          
+      {% if section.settings.show_view_all %}
+        <div class="product-grid-section__footer">
+          <a href="{{ selected_collection.url }}" class="btn btn-outline btn-large">
+            {{ section.settings.view_all_text | default: 'View All Products' }}
+          </a>
+        </div>
+      {% endif %}
+    {% elsif selected_collection != null %}
+      <div class="product-grid-section__empty">
+        <p>No products found in this collection.</p>
+      </div>
     {% else %}
       <div class="product-grid-section__empty">
         <p>Please select a collection to display products.</p>
@@ -180,7 +220,232 @@
       grid-template-columns: 1fr;
     }
   }
+
+  /* When layout is Carousel: grid on desktop (769px+), carousel on mobile */
+  .product-grid-section__grid--desktop {
+    display: none;
+  }
+
+  .product-grid-section__carousel-wrap--mobile {
+    display: block;
+  }
+
+  @media (min-width: 769px) {
+    .product-grid-section__grid--desktop {
+      display: grid;
+    }
+
+    .product-grid-section__carousel-wrap--mobile {
+      display: none !important;
+    }
+  }
+
+  /* Carousel layout - native scroll (mobile only) */
+  .product-grid-section__carousel-wrap {
+    position: relative;
+    margin-bottom: var(--spacing-xl);
+    padding: 0 var(--spacing-lg);
+  }
+
+  .product-grid-section__carousel-scroll {
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    scroll-behavior: smooth;
+    margin: 0 calc(-1 * var(--spacing-lg));
+    padding: 0 var(--spacing-lg);
+  }
+
+  .product-grid-section__carousel-scroll::-webkit-scrollbar {
+    display: none;
+  }
+
+  .product-grid-section__carousel-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 2px solid rgba(74, 124, 44, 0.2);
+    background: var(--white);
+    color: var(--forest-green);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .product-grid-section__carousel-arrow:hover {
+    background: linear-gradient(135deg, var(--forest-green) 0%, var(--sage-green) 100%);
+    color: var(--white);
+    border-color: transparent;
+    box-shadow: 0 6px 20px rgba(74, 124, 44, 0.35);
+  }
+
+  .product-grid-section__carousel-arrow--prev {
+    left: 0;
+  }
+
+  .product-grid-section__carousel-arrow--next {
+    right: 0;
+  }
+
+  @media (max-width: 768px) {
+    .product-grid-section__carousel-arrow {
+      width: 40px;
+      height: 40px;
+    }
+
+    .product-grid-section__carousel-arrow--prev {
+      left: -4px;
+    }
+
+    .product-grid-section__carousel-arrow--next {
+      right: -4px;
+    }
+  }
+
+  .product-grid-section__carousel-track {
+    display: flex;
+    gap: var(--spacing-xl);
+    width: max-content;
+    min-width: 100%;
+  }
+
+  .product-grid-section__carousel-slide {
+    flex: 0 0 280px;
+    width: 280px;
+    min-width: 280px;
+  }
+
+  .product-grid-section__carousel-slide .product-card {
+    height: 100%;
+  }
+
+  @media (min-width: 769px) {
+    .product-grid-section__carousel-slide {
+      flex: 0 0 300px;
+      width: 300px;
+      min-width: 300px;
+    }
+  }
+
+  @media (min-width: 1025px) {
+    .product-grid-section__carousel-slide {
+      flex: 0 0 320px;
+      width: 320px;
+      min-width: 320px;
+    }
+  }
 {% endstylesheet %}
+
+<script>
+  (function() {
+    function initCarousels() {
+      var wraps = document.querySelectorAll('[data-carousel-wrap]');
+      wraps.forEach(function(wrap) {
+        if (wrap.dataset.carouselInited === 'yes') return;
+        var scrollEl = wrap.querySelector('[data-carousel-scroll]');
+        var track = wrap.querySelector('[data-carousel-track]');
+        if (!scrollEl || !track) return;
+        wrap.dataset.carouselInited = 'yes';
+
+        var autoScroll = wrap.dataset.autoScroll === 'true';
+        var intervalSec = parseInt(wrap.dataset.scrollInterval, 10) || 6;
+        var slides = track.querySelectorAll('.product-grid-section__carousel-slide');
+        var totalSlides = slides.length;
+        if (totalSlides < 2) return;
+
+        var slideWidth = (slides[0] && slides[0].offsetWidth) || 280;
+        var gap = 28;
+        try {
+          var g = getComputedStyle(track).gap || '';
+          gap = parseFloat(g) || parseFloat(g.split(' ')[0]) || 28;
+        } catch (e) {}
+        var half = Math.floor(totalSlides / 2);
+        var setWidth = half * (slideWidth + gap);
+        if (scrollEl.scrollWidth > 0) {
+          setWidth = Math.floor(scrollEl.scrollWidth / 2);
+        }
+        if (setWidth <= 0) setWidth = half * (slideWidth + gap);
+        var slideStep = slideWidth + gap;
+        var autoInterval = null;
+        var cardIntervalMs = 1500;
+
+        function slideToNext() {
+          var current = scrollEl.scrollLeft;
+          var target = current + slideStep;
+          if (target >= setWidth - 1) {
+            scrollEl.style.scrollBehavior = 'auto';
+            scrollEl.scrollLeft = 0;
+            scrollEl.style.scrollBehavior = 'smooth';
+            scrollEl.scrollLeft = Math.min(slideStep, target - setWidth);
+          } else {
+            scrollEl.scrollLeft = target;
+          }
+        }
+
+        function startAutoScroll() {
+          if (!autoScroll || autoInterval) return;
+          autoInterval = setInterval(slideToNext, cardIntervalMs);
+        }
+
+        function stopAutoScroll() {
+          if (autoInterval) {
+            clearInterval(autoInterval);
+            autoInterval = null;
+          }
+        }
+
+        var prevBtn = wrap.querySelector('[data-carousel-prev]');
+        var nextBtn = wrap.querySelector('[data-carousel-next]');
+        if (prevBtn) {
+          prevBtn.addEventListener('click', function() {
+            stopAutoScroll();
+            scrollEl.scrollLeft -= slideStep;
+            if (scrollEl.scrollLeft < 0) {
+              scrollEl.scrollLeft = setWidth - slideStep;
+            }
+            if (autoScroll) setTimeout(startAutoScroll, 3000);
+          });
+        }
+        if (nextBtn) {
+          nextBtn.addEventListener('click', function() {
+            stopAutoScroll();
+            scrollEl.scrollLeft += slideStep;
+            if (scrollEl.scrollLeft >= setWidth - 1) {
+              scrollEl.scrollLeft = 0;
+            }
+            if (autoScroll) setTimeout(startAutoScroll, 3000);
+          });
+        }
+
+        wrap.addEventListener('mouseenter', stopAutoScroll);
+        wrap.addEventListener('mouseleave', function() {
+          if (autoScroll) startAutoScroll();
+        });
+
+        if (autoScroll) {
+          setTimeout(startAutoScroll, 300);
+        }
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initCarousels);
+    } else {
+      initCarousels();
+    }
+    setTimeout(initCarousels, 500);
+    setTimeout(initCarousels, 1500);
+  })();
+</script>
 
 {% schema %}
 {
@@ -197,6 +462,33 @@
       "id": "description",
       "label": "Description",
       "default": "Discover our range of premium fruit and vegetable powders, carefully crafted for your wellness journey."
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Layout",
+      "options": [
+        { "value": "grid", "label": "Grid" },
+        { "value": "carousel", "label": "Carousel" }
+      ],
+      "default": "carousel"
+    },
+    {
+      "type": "checkbox",
+      "id": "carousel_auto_scroll",
+      "label": "Auto scroll carousel",
+      "info": "When layout is Carousel, scroll automatically in a loop",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "carousel_auto_scroll_interval",
+      "label": "Auto scroll speed (seconds per loop)",
+      "min": 3,
+      "max": 15,
+      "step": 1,
+      "default": 6,
+      "info": "Time to scroll through one full set of products"
     },
     {
       "type": "collection",
