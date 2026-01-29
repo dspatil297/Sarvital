@@ -265,12 +265,16 @@
     background-color: var(--bg);
   }
 
-  .cart-item-quantity input {
+  .cart-item-quantity__value {
+    display: inline-block;
+    min-width: 32px;
     width: 40px;
     text-align: center;
-    border: none;
-    padding: 0;
     font-size: var(--body-small);
+    font-weight: 700;
+    color: var(--text);
+    line-height: 24px;
+    height: 24px;
   }
 
   .cart-item-remove {
@@ -447,7 +451,7 @@
             <div class="cart-item-actions">
               <div class="cart-item-quantity">
                 <button type="button" data-cart-decrease="${item.key}" aria-label="Decrease quantity">-</button>
-                <input type="number" value="${item.quantity}" min="1" data-cart-quantity="${item.key}" readonly>
+                <span class="cart-item-quantity__value" data-cart-quantity-value="${item.key}" aria-label="Quantity">${Number(item.quantity) || 1}</span>
                 <button type="button" data-cart-increase="${item.key}" aria-label="Increase quantity">+</button>
               </div>
               <button type="button" class="cart-item-remove" data-cart-remove="${item.key}" aria-label="Remove item">Remove</button>
@@ -476,7 +480,10 @@
       document.querySelectorAll('[data-cart-increase]').forEach(btn => {
         btn.addEventListener('click', (e) => {
           const key = e.target.dataset.cartIncrease;
-          updateCartItem(key, 1);
+          const container = e.target.closest('.cart-item-quantity');
+          const valueEl = container && container.querySelector('[data-cart-quantity-value]');
+          const current = valueEl ? (parseInt(valueEl.textContent, 10) || 1) : 1;
+          updateCartItem(key, current + 1);
         });
       });
 
@@ -484,9 +491,11 @@
       document.querySelectorAll('[data-cart-decrease]').forEach(btn => {
         btn.addEventListener('click', (e) => {
           const key = e.target.dataset.cartDecrease;
-          const item = cartData && cartData.items ? cartData.items.find(i => i.key === key) : null;
-          if (item && item.quantity > 1) {
-            updateCartItem(key, -1);
+          const container = e.target.closest('.cart-item-quantity');
+          const valueEl = container && container.querySelector('[data-cart-quantity-value]');
+          const current = valueEl ? (parseInt(valueEl.textContent, 10) || 1) : 1;
+          if (current > 1) {
+            updateCartItem(key, current - 1);
           }
         });
       });
@@ -500,8 +509,8 @@
       });
     }
 
-    // Update cart item quantity
-    function updateCartItem(key, change) {
+    // Update cart item quantity (newQuantity = absolute quantity to set)
+    function updateCartItem(key, newQuantity) {
       fetch('/cart/change.js', {
         method: 'POST',
         headers: {
@@ -509,7 +518,7 @@
         },
         body: JSON.stringify({
           id: key,
-          quantity: change
+          quantity: Math.max(0, parseInt(newQuantity, 10) || 1)
         })
       })
       .then(response => response.json())

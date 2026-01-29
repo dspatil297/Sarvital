@@ -17,13 +17,18 @@
               <div class="cart-item-row" data-cart-item="{{ item.key }}">
                 <div class="cart-item-row__image">
                   <a href="{{ item.url }}">
-                    <img 
-                      src="{{ item.image | image_url: width: 200 }}" 
-                      alt="{{ item.product.title }}"
-                      loading="lazy"
-                      width="200"
-                      height="200"
-                    >
+                    {% assign cart_item_img = item.image | default: item.product.featured_image %}
+                    {% if cart_item_img %}
+                      <img 
+                        src="{{ cart_item_img | image_url: width: 200 }}" 
+                        alt="{{ item.product.title | escape }}"
+                        loading="lazy"
+                        width="200"
+                        height="200"
+                      >
+                    {% else %}
+                      {{ 'product-1' | placeholder_svg_tag: 'cart-item-row__image-placeholder' }}
+                    {% endif %}
                   </a>
                 </div>
                 
@@ -64,14 +69,13 @@
                       aria-label="Decrease quantity"
                     >-</button>
                     <input 
-                      type="number" 
+                      type="hidden" 
                       id="quantity-{{ item.key }}"
                       name="updates[]" 
                       value="{{ item.quantity }}" 
-                      min="0"
-                      class="cart-item-row__quantity-input"
                       data-cart-quantity="{{ item.key }}"
                     >
+                    <span class="cart-item-row__quantity-value" data-cart-quantity-value="{{ item.key }}" aria-live="polite">{{ item.quantity }}</span>
                     <button 
                       type="button" 
                       class="cart-item-row__quantity-btn" 
@@ -298,6 +302,14 @@
     transform: scale(1.05);
   }
 
+  .cart-item-row__image-placeholder {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    background: var(--bg);
+  }
+
   .cart-item-row__details {
     display: flex;
     flex-direction: column;
@@ -403,14 +415,14 @@
     background: rgba(74, 124, 44, 0.1);
   }
 
-  .cart-item-row__quantity-input {
-    flex: 1;
-    border: none;
+  .cart-item-row__quantity-value {
+    display: inline-block;
+    min-width: 32px;
     text-align: center;
     font-size: var(--body-normal);
-    font-weight: 600;
-    padding: var(--spacing-xs);
-    max-width: 50px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 32px;
   }
 
   .cart-item-row__total {
@@ -686,48 +698,46 @@
 
 {% javascript %}
   document.addEventListener('DOMContentLoaded', function() {
-    // Quantity controls
-    const decreaseBtns = document.querySelectorAll('[data-cart-decrease]');
-    const increaseBtns = document.querySelectorAll('[data-cart-increase]');
-    const quantityInputs = document.querySelectorAll('[data-cart-quantity]');
-    
-    decreaseBtns.forEach(btn => {
-      btn.addEventListener('click', function() {
-        const key = this.dataset.cartDecrease;
-        const input = document.querySelector(`[data-cart-quantity="${key}"]`);
-        const currentValue = parseInt(input.value) || 1;
-        if (currentValue > 1) {
-          input.value = currentValue - 1;
-          updateCartItem(key, currentValue - 1);
-        }
+    // Quantity controls: find row from button, update span + hidden input, then call API
+    document.querySelectorAll('[data-cart-decrease]').forEach(btn => {
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        var row = this.closest('.cart-item-row');
+        if (!row) return;
+        var key = this.getAttribute('data-cart-decrease');
+        var valueEl = row.querySelector('[data-cart-quantity-value]');
+        var inputEl = row.querySelector('[data-cart-quantity]');
+        var current = valueEl ? (parseInt(valueEl.textContent, 10) || 1) : 1;
+        if (current <= 1) return;
+        var next = current - 1;
+        if (valueEl) valueEl.textContent = next;
+        if (inputEl) inputEl.value = next;
+        updateCartItem(key, next);
       });
     });
     
-    increaseBtns.forEach(btn => {
-      btn.addEventListener('click', function() {
-        const key = this.dataset.cartIncrease;
-        const input = document.querySelector(`[data-cart-quantity="${key}"]`);
-        const currentValue = parseInt(input.value) || 1;
-        input.value = currentValue + 1;
-        updateCartItem(key, currentValue + 1);
-      });
-    });
-    
-    quantityInputs.forEach(input => {
-      input.addEventListener('change', function() {
-        const key = this.dataset.cartQuantity;
-        const value = parseInt(this.value) || 1;
-        updateCartItem(key, value);
+    document.querySelectorAll('[data-cart-increase]').forEach(btn => {
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        var row = this.closest('.cart-item-row');
+        if (!row) return;
+        var key = this.getAttribute('data-cart-increase');
+        var valueEl = row.querySelector('[data-cart-quantity-value]');
+        var inputEl = row.querySelector('[data-cart-quantity]');
+        var current = valueEl ? (parseInt(valueEl.textContent, 10) || 1) : 1;
+        var next = current + 1;
+        if (valueEl) valueEl.textContent = next;
+        if (inputEl) inputEl.value = next;
+        updateCartItem(key, next);
       });
     });
     
     // Remove items
-    const removeBtns = document.querySelectorAll('[data-cart-remove]');
-    removeBtns.forEach(btn => {
+    document.querySelectorAll('[data-cart-remove]').forEach(btn => {
       btn.addEventListener('click', function(e) {
         e.preventDefault();
-        const key = this.dataset.cartRemove;
-        if (confirm('Are you sure you want to remove this item?')) {
+        var key = this.getAttribute('data-cart-remove');
+        if (key && confirm('Are you sure you want to remove this item?')) {
           updateCartItem(key, 0);
         }
       });
@@ -743,38 +753,26 @@
       });
     }
     
-    // Update cart item
     function updateCartItem(key, quantity) {
-      const form = document.getElementById('cart-form');
-      const formData = new FormData(form);
-      const updates = {};
-      
-      document.querySelectorAll('[data-cart-quantity]').forEach(input => {
-        const itemKey = input.dataset.cartQuantity;
-        if (itemKey === key) {
-          updates[itemKey] = quantity;
-        } else {
-          updates[itemKey] = parseInt(input.value) || 0;
-        }
-      });
-      
-      fetch('/cart/update.js', {
+      var qty = Math.max(0, parseInt(quantity, 10) || 1);
+      fetch('/cart/change.js', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json'
         },
-        body: JSON.stringify({ updates: updates })
+        body: JSON.stringify({ id: String(key), quantity: qty })
       })
-      .then(response => response.json())
-      .then(cart => {
-        if (cart.item_count === 0) {
-          window.location.reload();
-        } else {
-          window.location.reload();
-        }
+      .then(function(response) {
+        if (!response.ok) return response.json().then(function(err) { throw new Error(err.description || 'Cart update failed'); });
+        return response.json();
       })
-      .catch(error => {
-        console.error('Error updating cart:', error);
+      .then(function() {
+        window.location.reload();
+      })
+      .catch(function(err) {
+        console.error('Error updating cart:', err);
+        window.location.reload();
       });
     }
   });
