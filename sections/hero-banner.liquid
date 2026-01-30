@@ -222,9 +222,13 @@
     overflow: hidden;
   }
 
+  .hero-banner__slide:not(.hero-banner__slide--empty) {
+    z-index: 0;
+  }
+
   .hero-banner__slide--active {
     opacity: 1;
-    z-index: 1;
+    z-index: 2;
   }
 
   .hero-banner__slide--empty {
@@ -245,19 +249,22 @@
     max-height: 100%;
     object-fit: cover;
     object-position: center;
+  }
+
+  .hero-banner__slide .hero-banner__slide-img--desktop {
     display: block;
   }
 
-  .hero-banner__slide-img--mobile {
-    display: none;
+  .hero-banner__slide .hero-banner__slide-img--mobile {
+    display: none !important;
   }
 
   @media (max-width: 768px) {
-    .hero-banner__slide-img--desktop {
-      display: none;
+    .hero-banner__slide .hero-banner__slide-img--desktop {
+      display: none !important;
     }
-    .hero-banner__slide-img--mobile {
-      display: block;
+    .hero-banner__slide .hero-banner__slide-img--mobile {
+      display: block !important;
     }
   }
 
