@@ -195,27 +195,34 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    isolation: isolate;
   }
 
   .hero-banner__image {
     position: absolute;
     top: 0;
     left: 0;
+    right: 0;
+    bottom: 0;
     width: 100%;
     height: 100%;
     z-index: 1;
     overflow: hidden;
+    pointer-events: none;
   }
 
   .hero-banner__slide {
     position: absolute;
     top: 0;
     left: 0;
+    right: 0;
+    bottom: 0;
     width: 100%;
     height: 100%;
     opacity: 0;
     transition: opacity var(--hero-transition-duration, 800ms) ease-in-out;
     pointer-events: none;
+    overflow: hidden;
   }
 
   .hero-banner__slide--active {
@@ -233,9 +240,14 @@
 
   .hero-banner__image img,
   .hero-banner__slide img {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
+    max-width: 100%;
+    max-height: 100%;
     object-fit: cover;
+    object-position: center;
     display: block;
   }
 
@@ -913,7 +925,7 @@
       "settings": [
         {
           "type": "paragraph",
-          "content": "Upload or select an image for this slide. It will appear as the background."
+          "content": "Recommended size: 1920 × 900 px (aspect ratio 2.13:1). This matches the hero on desktop so nothing is cropped. Keep important content in the center 70% for smaller screens."
         },
         {
           "type": "image_picker",
