@@ -17,10 +17,17 @@
           "settings": {
             "image": "shopify://shop_images/Hero1.jpg"
           }
+        },
+        "slide_FYyHQn": {
+          "type": "slide",
+          "settings": {
+            "image": "shopify://shop_images/WhatsApp_Image_2026-01-30_at_11.50.09.jpg"
+          }
         }
       },
       "block_order": [
-        "slide_ADNn8V"
+        "slide_ADNn8V",
+        "slide_FYyHQn"
       ],
       "settings": {
         "heading": "Transform Your Health with Nature's Finest",
