@@ -22,13 +22,16 @@
 >
   <div class="hero-banner__image">
     {% if has_carousel_slides %}
+      {%- assign first_image_done = false -%}
       {%- for block in slide_blocks -%}
-        {%- if block.settings.image != blank -%}
-          <div
-            class="hero-banner__slide{% if forloop.first %} hero-banner__slide--active{% endif %}"
-            data-slide-index="{{ forloop.index0 }}"
-            {{ block.shopify_attributes }}
-          >
+        {%- assign has_image = false -%}
+        {%- if block.settings.image != blank -%}{%- assign has_image = true -%}{%- endif -%}
+        <div
+          class="hero-banner__slide{% unless has_image %} hero-banner__slide--empty{% endunless %}{% if has_image %}{% unless first_image_done %} hero-banner__slide--active{% assign first_image_done = true %}{% endunless %}{% endif %}"
+          data-slide-index="{{ forloop.index0 }}"
+          {{ block.shopify_attributes }}
+        >
+          {%- if block.settings.image != blank -%}
             <img
               src="{{ block.settings.image | image_url: width: 1920 }}"
               srcset="
@@ -44,8 +47,10 @@
               loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
               fetchpriority="{% if forloop.first %}high{% else %}low{% endif %}"
             >
-          </div>
-        {%- endif -%}
+          {%- else -%}
+            <span class="hero-banner__slide-placeholder">Select image in Theme Customizer → click this slide → Slide image</span>
+          {%- endif -%}
+        </div>
       {%- endfor -%}
     {% else %}
       {% if section.settings.hero_image %}
@@ -216,6 +221,14 @@
   .hero-banner__slide--active {
     opacity: 1;
     z-index: 1;
+  }
+
+  .hero-banner__slide--empty {
+    display: none;
+  }
+
+  .hero-banner__slide--empty .hero-banner__slide-placeholder {
+    display: none;
   }
 
   .hero-banner__image img,
@@ -753,7 +766,7 @@
     const section = document.getElementById('hero-banner-{{ section.id }}');
     if (!section || !section.classList.contains('hero-banner--carousel')) return;
 
-    const slides = Array.from(section.querySelectorAll('.hero-banner__slide'));
+    const slides = Array.from(section.querySelectorAll('.hero-banner__slide:not(.hero-banner__slide--empty)'));
     const dots = Array.from(section.querySelectorAll('.hero-banner__carousel-dot'));
     const btnPrev = section.querySelector('[data-action="prev"]');
     const btnNext = section.querySelector('[data-action="next"]');
@@ -906,11 +919,16 @@
     {
       "type": "slide",
       "name": "Slide",
+      "limit": 10,
       "settings": [
+        {
+          "type": "paragraph",
+          "content": "Upload or select an image for this slide. It will appear as the background."
+        },
         {
           "type": "image_picker",
           "id": "image",
-          "label": "Background image"
+          "label": "Slide image"
         }
       ]
     }
