@@ -12,22 +12,22 @@
     "hero_banner": {
       "type": "hero-banner",
       "blocks": {
-        "slide_ADNn8V": {
-          "type": "slide",
-          "settings": {
-            "image": "shopify://shop_images/Hero1.jpg"
-          }
-        },
-        "slide_bwCz6c": {
+        "slide_knjxEJ": {
           "type": "slide",
           "settings": {
             "image": "shopify://shop_images/WhatsApp_Image_2026-01-30_at_11.50.09.jpg"
           }
+        },
+        "slide_Nq893k": {
+          "type": "slide",
+          "settings": {
+            "image": "shopify://shop_images/relaxing-in-nature.jpg"
+          }
         }
       },
       "block_order": [
-        "slide_ADNn8V",
-        "slide_bwCz6c"
+        "slide_knjxEJ",
+        "slide_Nq893k"
       ],
       "settings": {
         "hero_image": "shopify://shop_images/WhatsApp_Image_2026-01-30_at_11.50.09.jpg",
