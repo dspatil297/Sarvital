@@ -32,38 +32,34 @@
           {{ block.shopify_attributes }}
         >
           {%- if block.settings.image != blank -%}
-            <img
-              class="hero-banner__slide-img hero-banner__slide-img--desktop"
-              src="{{ block.settings.image | image_url: width: 1920 }}"
-              srcset="
-                {{ block.settings.image | image_url: width: 960 }} 960w,
-                {{ block.settings.image | image_url: width: 1280 }} 1280w,
-                {{ block.settings.image | image_url: width: 1920 }} 1920w,
-                {{ block.settings.image | image_url: width: 2560 }} 2560w
-              "
-              sizes="100vw"
-              alt="{{ block.settings.image.alt | default: '' }}"
-              width="{{ block.settings.image.width }}"
-              height="{{ block.settings.image.height }}"
-              loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
-              fetchpriority="{% if forloop.first %}high{% else %}low{% endif %}"
-            >
             {%- assign mobile_img = block.settings.mobile_image | default: block.settings.image -%}
-            <img
-              class="hero-banner__slide-img hero-banner__slide-img--mobile"
-              src="{{ mobile_img | image_url: width: 768 }}"
-              srcset="
-                {{ mobile_img | image_url: width: 480 }} 480w,
-                {{ mobile_img | image_url: width: 768 }} 768w,
-                {{ mobile_img | image_url: width: 1024 }} 1024w
-              "
-              sizes="100vw"
-              alt="{{ mobile_img.alt | default: block.settings.image.alt | default: '' }}"
-              width="{{ mobile_img.width }}"
-              height="{{ mobile_img.height }}"
-              loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
-              fetchpriority="{% if forloop.first %}high{% else %}low{% endif %}"
-            >
+            <picture class="hero-banner__slide-picture">
+              <source
+                media="(max-width: 768px)"
+                srcset="
+                  {{ mobile_img | image_url: width: 480 }} 480w,
+                  {{ mobile_img | image_url: width: 768 }} 768w,
+                  {{ mobile_img | image_url: width: 1024 }} 1024w
+                "
+                sizes="100vw"
+              >
+              <img
+                class="hero-banner__slide-img"
+                src="{{ block.settings.image | image_url: width: 1920 }}"
+                srcset="
+                  {{ block.settings.image | image_url: width: 960 }} 960w,
+                  {{ block.settings.image | image_url: width: 1280 }} 1280w,
+                  {{ block.settings.image | image_url: width: 1920 }} 1920w,
+                  {{ block.settings.image | image_url: width: 2560 }} 2560w
+                "
+                sizes="100vw"
+                alt="{{ block.settings.image.alt | default: '' }}"
+                width="{{ block.settings.image.width }}"
+                height="{{ block.settings.image.height }}"
+                loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
+                fetchpriority="{% if forloop.first %}high{% else %}low{% endif %}"
+              >
+            </picture>
           {%- else -%}
             <span class="hero-banner__slide-placeholder">Select image in Theme Customizer → click this slide → Slide image</span>
           {%- endif -%}
@@ -228,7 +224,7 @@
 
   .hero-banner__slide--active {
     opacity: 1;
-    z-index: 2;
+    z-index: 10;
   }
 
   .hero-banner__slide--empty {
@@ -239,6 +235,16 @@
     display: none;
   }
 
+  .hero-banner__slide-picture {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  .hero-banner__slide-picture img,
   .hero-banner__image img,
   .hero-banner__slide img {
     position: absolute;
@@ -249,23 +255,7 @@
     max-height: 100%;
     object-fit: cover;
     object-position: center;
-  }
-
-  .hero-banner__slide .hero-banner__slide-img--desktop {
     display: block;
-  }
-
-  .hero-banner__slide .hero-banner__slide-img--mobile {
-    display: none !important;
-  }
-
-  @media (max-width: 768px) {
-    .hero-banner__slide .hero-banner__slide-img--desktop {
-      display: none !important;
-    }
-    .hero-banner__slide .hero-banner__slide-img--mobile {
-      display: block !important;
-    }
   }
 
   .hero-banner__overlay {
@@ -918,7 +908,7 @@
       "settings": [
         {
           "type": "paragraph",
-          "content": "Desktop: 1920 × 900 px recommended. Mobile: optional; use same or 768 × 1024 px for portrait."
+          "content": "Set 'Slide image (desktop)' for every slide so the carousel can advance (Slide 1 and Slide 2 both need an image). Desktop: 1920×900 px. Mobile: optional; 768×1024 px."
         },
         {
           "type": "image_picker",
