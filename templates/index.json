@@ -37,7 +37,7 @@
         "cta_link": "/collections/all",
         "secondary_cta_text": "Learn More",
         "secondary_cta_link": "/pages/about",
-        "carousel_speed": 1,
+        "carousel_speed": 3,
         "transition_duration": 800,
         "overlay_opacity": 85
       }
