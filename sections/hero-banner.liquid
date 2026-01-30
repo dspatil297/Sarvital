@@ -711,86 +711,85 @@
 
 <script>
   (function () {
-    function initHeroCarousel() {
-      const section = document.getElementById('hero-banner-{{ section.id }}');
-      if (!section || !section.classList.contains('hero-banner--carousel')) return;
+    var section = null;
+    if (document.currentScript && document.currentScript.closest) {
+      section = document.currentScript.closest('.hero-banner');
+    }
+    if (!section) {
+      section = document.getElementById('hero-banner-{{ section.id }}');
+    }
+    if (!section) {
+      section = document.querySelector('.hero-banner--carousel');
+    }
+    if (!section || !section.classList.contains('hero-banner--carousel')) return;
 
-      const slides = Array.from(section.querySelectorAll('.hero-banner__slide:not(.hero-banner__slide--empty)'));
-      const dots = Array.from(section.querySelectorAll('.hero-banner__carousel-dot'));
+    var slides = section.querySelectorAll('.hero-banner__slide:not(.hero-banner__slide--empty)');
+    var dots = section.querySelectorAll('.hero-banner__carousel-dot');
+    slides = Array.prototype.slice.call(slides);
+    dots = Array.prototype.slice.call(dots);
 
-      if (slides.length <= 1) return;
+    if (slides.length < 2) return;
 
-      var speedRaw = section.getAttribute('data-autoplay-speed');
-      var speed = speedRaw ? parseInt(speedRaw, 10) : 1500;
-      if (isNaN(speed) || speed <= 0) speed = 1500;
+    var speed = 1500;
+    var raw = section.getAttribute('data-autoplay-speed');
+    if (raw) { var n = parseInt(raw, 10); if (!isNaN(n) && n > 0) speed = n; }
 
-      var durationRaw = section.getAttribute('data-transition-duration');
-      var duration = durationRaw ? parseInt(durationRaw, 10) : 800;
-      if (isNaN(duration) || duration <= 0) duration = 800;
-      section.style.setProperty('--hero-transition-duration', duration + 'ms');
+    var duration = 800;
+    var rawDur = section.getAttribute('data-transition-duration');
+    if (rawDur) { var d = parseInt(rawDur, 10); if (!isNaN(d) && d > 0) duration = d; }
+    section.style.setProperty('--hero-transition-duration', duration + 'ms');
 
-      var currentIndex = 0;
-      var timer = null;
+    var currentIndex = 0;
+    var timer = null;
 
-      function goToSlide(index) {
-        index = ((index % slides.length) + slides.length) % slides.length;
-        currentIndex = index;
-        slides.forEach(function (slide, i) {
-          slide.classList.toggle('hero-banner__slide--active', i === index);
-        });
-        dots.forEach(function (dot, i) {
-          dot.classList.toggle('hero-banner__carousel-dot--active', i === index);
-          dot.setAttribute('aria-selected', i === index);
-        });
+    function goToSlide(index) {
+      currentIndex = (index % slides.length + slides.length) % slides.length;
+      for (var i = 0; i < slides.length; i++) {
+        slides[i].classList.toggle('hero-banner__slide--active', i === currentIndex);
       }
-
-      function next() { goToSlide(currentIndex + 1); }
-      function prev() { goToSlide(currentIndex - 1); }
-
-      function startAutoplay() {
-        if (timer) clearInterval(timer);
-        timer = null;
-        if (section.getAttribute('data-paused') === 'true') return;
-        timer = setInterval(next, speed);
+      for (var j = 0; j < dots.length; j++) {
+        dots[j].classList.toggle('hero-banner__carousel-dot--active', j === currentIndex);
+        dots[j].setAttribute('aria-selected', j === currentIndex);
       }
-      function stopAutoplay() {
-        if (timer) { clearInterval(timer); timer = null; }
-      }
-
-      function setPaused(paused) {
-        section.setAttribute('data-paused', paused ? 'true' : 'false');
-        if (paused) stopAutoplay();
-        else startAutoplay();
-      }
-
-      section.addEventListener('mouseenter', function () { setPaused(true); });
-      section.addEventListener('mouseleave', function () { setPaused(false); });
-      section.addEventListener('focusin', function () { setPaused(true); });
-      section.addEventListener('focusout', function () {
-        if (!section.contains(document.activeElement)) setPaused(false);
-      });
-
-      document.addEventListener('keydown', function (e) {
-        if (!section.contains(document.activeElement)) return;
-        if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
-        else if (e.key === 'ArrowRight') { e.preventDefault(); next(); }
-      });
-
-      dots.forEach(function (dot, i) {
-        dot.addEventListener('click', function () { goToSlide(i); startAutoplay(); });
-        dot.addEventListener('keydown', function (e) {
-          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); goToSlide(i); startAutoplay(); }
-        });
-      });
-
-      startAutoplay();
     }
 
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initHeroCarousel);
-    } else {
-      initHeroCarousel();
+    function next() { goToSlide(currentIndex + 1); }
+
+    function startAutoplay() {
+      if (timer) clearInterval(timer);
+      if (section.getAttribute('data-paused') === 'true') return;
+      timer = setInterval(next, speed);
     }
+
+    function stopAutoplay() {
+      if (timer) { clearInterval(timer); timer = null; }
+    }
+
+    function setPaused(paused) {
+      section.setAttribute('data-paused', paused ? 'true' : 'false');
+      if (paused) stopAutoplay(); else startAutoplay();
+    }
+
+    section.addEventListener('mouseenter', function () { setPaused(true); });
+    section.addEventListener('mouseleave', function () { setPaused(false); });
+    section.addEventListener('focusin', function () { setPaused(true); });
+    section.addEventListener('focusout', function () {
+      if (!section.contains(document.activeElement)) setPaused(false);
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (!section.contains(document.activeElement)) return;
+      if (e.key === 'ArrowLeft') { e.preventDefault(); goToSlide(currentIndex - 1); }
+      if (e.key === 'ArrowRight') { e.preventDefault(); next(); }
+    });
+
+    for (var k = 0; k < dots.length; k++) {
+      (function (idx) {
+        dots[idx].addEventListener('click', function () { goToSlide(idx); startAutoplay(); });
+      })(k);
+    }
+
+    startAutoplay();
   })();
 </script>
 
