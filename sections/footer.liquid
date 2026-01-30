@@ -1,419 +1,461 @@
-<footer class="site-footer">
+{%- comment -%} CTA Bar (optional) - above footer {%- endcomment -%}
+{% if section.settings.show_cta_bar %}
+  <section class="footer-cta" aria-label="Call to action">
+    <div class="footer-cta__bg"></div>
+    <div class="footer-cta__inner">
+      <h2 class="footer-cta__title">{{ section.settings.cta_headline | default: "Start Your Wellness Journey Today" }}</h2>
+      <p class="footer-cta__subtitle">{{ section.settings.cta_subtitle | default: "Join thousands who have transformed their health with SARVITAL" }}</p>
+      <a href="{{ section.settings.cta_button_url | default: routes.root_url }}" class="footer-cta__btn">{{ section.settings.cta_button_text | default: "Order Now" }}</a>
+      <div class="footer-cta__trust">
+        <span class="footer-cta__trust-item">✓ Secure Checkout</span>
+        <span class="footer-cta__trust-item">✓ Fast Delivery</span>
+      </div>
+    </div>
+  </section>
+{% endif %}
+
+<footer class="site-footer" role="contentinfo">
   <div class="footer-container">
-    <!-- Footer Top -->
-    <div class="footer__top">
-      <!-- Company Info -->
-      <div class="footer__column footer__company">
-        <h3 class="footer__title">{{ shop.name }}</h3>
-        <p class="footer__description">
-          {{ section.settings.company_description | default: "Premium fruit & vegetable powders for your wellness journey. Natural, sustainable, and lab-tested quality." }}
-        </p>
-        {% if section.settings.show_social_icons %}
-          <div class="footer__social">
-            {% if section.settings.social_facebook != blank %}
-              <a href="{{ section.settings.social_facebook }}" target="_blank" rel="noopener" aria-label="Facebook" class="social-link">
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                  <path d="M18 10C18 5.58 14.42 2 10 2S2 5.58 2 10c0 4.08 2.99 7.45 6.91 8.07v-5.71H6.91v-2.36h2.09V8.5c0-2.07 1.23-3.21 3.12-3.21.9 0 1.84.16 1.84.16v2.02h-1.04c-1.02 0-1.34.64-1.34 1.29v1.54h2.28l-.36 2.36h-1.92v5.71C15.01 17.45 18 14.08 18 10z"/>
-                </svg>
-              </a>
-            {% endif %}
-            {% if section.settings.social_instagram != blank %}
-              <a href="{{ section.settings.social_instagram }}" target="_blank" rel="noopener" aria-label="Instagram" class="social-link">
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                  <path d="M10 2.16c2.65 0 2.97.01 4.01.06 1.01.05 1.56.23 1.93.38.47.2.81.44 1.16.79.35.35.59.69.79 1.16.15.37.33.92.38 1.93.05 1.04.06 1.36.06 4.01s-.01 2.97-.06 4.01c-.05 1.01-.23 1.56-.38 1.93-.2.47-.44.81-.79 1.16-.35.35-.69.59-1.16.79-.37.15-.92.33-1.93.38-1.04.05-1.36.06-4.01.06s-2.97-.01-4.01-.06c-1.01-.05-1.56-.23-1.93-.38-.47-.2-.81-.44-1.16-.79-.35-.35-.59-.69-.79-1.16-.15-.37-.33-.92-.38-1.93C2.17 12.97 2.16 12.65 2.16 10s.01-2.97.06-4.01c.05-1.01.23-1.56.38-1.93.2-.47.44-.81.79-1.16.35-.35.69-.59 1.16-.79.37-.15.92-.33 1.93-.38 1.04-.05 1.36-.06 4.01-.06zm0-2.16c-2.7 0-3.03.01-4.09.06C3.8.16 2.95.35 2.25.66c-.72.31-1.33.72-1.94 1.33S.31 3.53 0 4.25C-.31 4.95-.5 5.8-.55 6.91-.6 7.97-.61 8.3-.61 11s.01 3.03.06 4.09c.05 1.11.24 1.96.55 2.66.31.72.72 1.33 1.33 1.94s1.22 1.02 1.94 1.33c.7.31 1.55.5 2.66.55 1.06.05 1.39.06 4.09.06s3.03-.01 4.09-.06c1.11-.05 1.96-.24 2.66-.55.72-.31 1.33-.72 1.94-1.33s1.02-1.22 1.33-1.94c.31-.7.5-1.55.55-2.66.05-1.06.06-1.39.06-4.09s-.01-3.03-.06-4.09c-.05-1.11-.24-1.96-.55-2.66-.31-.72-.72-1.33-1.33-1.94S17.47.97 16.75.66c-.7-.31-1.55-.5-2.66-.55C13.03.06 12.7.05 10 .05z"/>
-                  <path d="M10 4.87c-2.84 0-5.13 2.29-5.13 5.13S7.16 15.13 10 15.13 15.13 12.84 15.13 10 12.84 4.87 10 4.87zm0 8.45c-1.83 0-3.32-1.49-3.32-3.32S8.17 6.68 10 6.68s3.32 1.49 3.32 3.32-1.49 3.32-3.32 3.32z"/>
-                  <circle cx="15.38" cy="4.62" r="1.2"/>
-                </svg>
-              </a>
-            {% endif %}
-            {% if section.settings.social_twitter != blank %}
-              <a href="{{ section.settings.social_twitter }}" target="_blank" rel="noopener" aria-label="Twitter" class="social-link">
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                  <path d="M18.9 4.74c-.68.3-1.41.5-2.18.59.78-.47 1.38-1.21 1.66-2.09-.73.43-1.54.74-2.4.91-.69-.73-1.67-1.19-2.76-1.19-2.09 0-3.78 1.69-3.78 3.78 0 .3.03.59.1.87-3.14-.16-5.93-1.66-7.79-3.95-.33.56-.52 1.21-.52 1.9 0 1.31.67 2.47 1.68 3.15-.62-.02-1.2-.19-1.71-.47v.05c0 1.83 1.3 3.36 3.03 3.71-.32.08-.65.13-.99.13-.24 0-.48-.02-.71-.07.48 1.5 1.87 2.59 3.52 2.62-1.29 1.01-2.91 1.61-4.67 1.61-.3 0-.6-.02-.9-.05 1.67 1.07 3.65 1.69 5.78 1.69 6.93 0 10.72-5.74 10.72-10.72 0-.16 0-.33-.01-.49.74-.53 1.38-1.2 1.89-1.96z"/>
-                </svg>
-              </a>
-            {% endif %}
-            {% if section.settings.social_youtube != blank %}
-              <a href="{{ section.settings.social_youtube }}" target="_blank" rel="noopener" aria-label="YouTube" class="social-link">
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                  <path d="M19.6 5.2c-.23-.85-.91-1.52-1.76-1.75C16.24 3 10 3 10 3S3.76 3 2.16 3.45c-.85.23-1.53.9-1.76 1.75C0 6.8 0 10 0 10s0 3.2.4 4.8c.23.85.91 1.52 1.76 1.75C3.76 17 10 17 10 17s6.24 0 7.84-.45c.85-.23 1.53-.9 1.76-1.75C20 13.2 20 10 20 10s0-3.2-.4-4.8zM8 13V7l5.5 3L8 13z"/>
-                </svg>
-              </a>
-            {% endif %}
-          </div>
-        {% endif %}
+    {%- comment -%} Four columns: About, Policies, Contact Us, Legal {%- endcomment -%}
+    <div class="footer__grid">
+      <div class="footer__col footer__about">
+        <h4 class="footer__col-title">About {{ shop.name | upcase }}</h4>
+        <p class="footer__about-text">{{ section.settings.company_description | default: "Premium Moringa Leaf Powder crafted with care to bring you nature's most powerful superfood. Committed to quality, purity, and your wellness." }}</p>
       </div>
 
-      <!-- Quick Links -->
-      <div class="footer__column footer__links">
-        <h4 class="footer__subtitle">Quick Links</h4>
-        <ul class="footer__menu">
-          {% for link in linklists[section.settings.quick_links_menu].links %}
-            <li>
-              <a href="{{ link.url }}">{{ link.title }}</a>
+      <div class="footer__col footer__policies">
+        <h4 class="footer__col-title">Policies</h4>
+        <ul class="footer__list">
+          {% if section.settings.policies_menu != blank %}
+            {% for link in linklists[section.settings.policies_menu].links %}
+              <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+            {% endfor %}
+          {% else %}
+            <li><a href="{{ routes.root_url }}">Home</a></li>
+            <li><a href="/policies/terms-of-service">Terms and Conditions</a></li>
+            <li><a href="/policies/privacy-policy">Privacy Policy</a></li>
+            <li><a href="/policies/shipping-policy">Shipping Policy</a></li>
+            <li><a href="/policies/refund-policy">Cancellation and Refunds</a></li>
+            <li><a href="/pages/contact">Contact Us</a></li>
+          {% endif %}
+        </ul>
+      </div>
+
+      <div class="footer__col footer__contact">
+        <h4 class="footer__col-title">Contact Us</h4>
+        <ul class="footer__contact-list">
+          {% if section.settings.email != blank %}
+            <li class="footer__contact-row">
+              <span class="footer__contact-icon footer__contact-icon--email" aria-hidden="true">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><path d="M22 6l-10 7L2 6"/></svg>
+              </span>
+              <a href="mailto:{{ section.settings.email }}">{{ section.settings.email }}</a>
             </li>
-          {% endfor %}
-        </ul>
-      </div>
-
-      <!-- Product Discovery -->
-      <div class="footer__column footer__discovery">
-        <h4 class="footer__subtitle">Shop By</h4>
-        <ul class="footer__menu">
-          {% if section.settings.show_health_benefits %}
-            <li><a href="/collections/all?filter=health-immunity">Immunity Support</a></li>
-            <li><a href="/collections/all?filter=health-digestion">Digestive Health</a></li>
-            <li><a href="/collections/all?filter=health-energy">Energy & Vitality</a></li>
-            <li><a href="/collections/all?filter=health-skin">Skin Health</a></li>
+          {% endif %}
+          {% if section.settings.address != blank %}
+            <li class="footer__contact-row">
+              <span class="footer__contact-icon footer__contact-icon--location" aria-hidden="true">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+              </span>
+              <span>{{ section.settings.address }}</span>
+            </li>
+          {% endif %}
+          {% if section.settings.working_hours != blank %}
+            <li class="footer__contact-row">
+              <span class="footer__contact-icon footer__contact-icon--clock" aria-hidden="true">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+              </span>
+              <span class="footer__contact-value">{{ section.settings.working_hours }}</span>
+            </li>
           {% endif %}
         </ul>
       </div>
 
-      <!-- Newsletter -->
-      <div class="footer__column footer__newsletter">
-        <h4 class="footer__subtitle">Stay Connected</h4>
-        <p class="footer__newsletter-text">
-          {{ section.settings.newsletter_text | default: "Subscribe to our newsletter for wellness tips, new products, and exclusive offers." }}
-        </p>
-        {% form 'customer', class: 'footer__newsletter-form' %}
-          <input 
-            type="email" 
-            name="contact[email]" 
-            placeholder="Your email address" 
-            class="footer__newsletter-input"
-            required
-            aria-label="Email address"
-          >
-          <button type="submit" class="btn btn-primary footer__newsletter-submit">
-            Subscribe
-          </button>
-          {% if form.posted_successfully? %}
-            <p class="footer__newsletter-success">Thank you for subscribing!</p>
+      <div class="footer__col footer__legal-col">
+        <h4 class="footer__col-title">Legal</h4>
+        <dl class="footer__legal-list">
+          {% if section.settings.legal_manufacturer != blank %}
+            <div class="footer__legal-row">
+              <dt>Manufacturer:</dt>
+              <dd>{{ section.settings.legal_manufacturer }}</dd>
+            </div>
           {% endif %}
-          {% if form.errors %}
-            <p class="footer__newsletter-error">{{ form.errors | default_errors }}</p>
+          {% if section.settings.legal_mfg != blank %}
+            <div class="footer__legal-row">
+              <dt>MFG:</dt>
+              <dd>{{ section.settings.legal_mfg }}</dd>
+            </div>
           {% endif %}
-        {% endform %}
+          {% if section.settings.legal_origin != blank %}
+            <div class="footer__legal-row">
+              <dt>Origin:</dt>
+              <dd>{{ section.settings.legal_origin }}</dd>
+            </div>
+          {% endif %}
+          {% if section.settings.legal_expiry != blank %}
+            <div class="footer__legal-row">
+              <dt>Expiry:</dt>
+              <dd>{{ section.settings.legal_expiry }}</dd>
+            </div>
+          {% endif %}
+        </dl>
       </div>
     </div>
 
-    <!-- Footer Bottom -->
-    <div class="footer__bottom">
-      <div class="footer__bottom-content">
-        <!-- Copyright -->
-        <div class="footer__copyright">
-          <p>&copy; {{ 'now' | date: '%Y' }} {{ shop.name }}. All rights reserved.</p>
-        </div>
-
-        <!-- Legal Links -->
-        <div class="footer__legal">
-          {% for link in linklists[section.settings.legal_menu].links %}
-            <a href="{{ link.url }}">{{ link.title }}</a>
-            {% unless forloop.last %}<span class="footer__separator">|</span>{% endunless %}
-          {% endfor %}
-        </div>
-
-        <!-- Payment Icons -->
-        {% if section.settings.show_payment_icons %}
-          <div class="footer__payments">
-            {% for type in shop.enabled_payment_types %}
-              {{ type | payment_type_svg_tag }}
-            {% endfor %}
-          </div>
-        {% endif %}
+    {%- comment -%} Disclaimer strip {%- endcomment -%}
+    {% if section.settings.disclaimer_text != blank %}
+      <div class="footer__disclaimer">
+        <p>{{ section.settings.disclaimer_text }}</p>
       </div>
+    {% endif %}
 
-      <!-- Trust Badges -->
-      {% if section.settings.show_trust_badges %}
-        <div class="footer__trust">
-          <span class="trust-badge">🔒 Secure Checkout</span>
-          <span class="trust-badge">🚚 Free Shipping above ₹500</span>
-          <span class="trust-badge">✓ Lab Tested</span>
-        </div>
-      {% endif %}
+    {%- comment -%} Copyright {%- endcomment -%}
+    <div class="footer__copyright-bar">
+      <p class="footer__copyright-text">
+        © {{ 'now' | date: '%Y' }} {{ shop.name | upcase }}{% if section.settings.company_legal_name != blank %} - {{ section.settings.company_legal_name }}{% endif %}. All rights reserved.
+      </p>
     </div>
   </div>
 </footer>
 
+{%- comment -%} Floating action buttons {%- endcomment -%}
+{% if section.settings.show_scroll_top %}
+  <button type="button" class="footer-fab footer-fab--scroll" aria-label="Scroll to top" id="footer-scroll-top">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 15l-6-6-6 6"/></svg>
+  </button>
+{% endif %}
+{% if section.settings.show_chat and section.settings.chat_url != blank %}
+  <a href="{{ section.settings.chat_url }}" class="footer-fab footer-fab--chat" aria-label="Chat" target="_blank" rel="noopener noreferrer">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+  </a>
+{% endif %}
+
+<script>
+  (function() {
+    var btn = document.getElementById('footer-scroll-top');
+    if (btn) {
+      btn.addEventListener('click', function() {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    }
+  })();
+</script>
+
 {% stylesheet %}
-  /* Footer Styles */
-  .site-footer {
-    width: 100%;
-    max-width: 100%;
-    margin: 0;
-    margin-top: var(--spacing-4xl);
-    padding: var(--spacing-4xl) 0 var(--spacing-xl);
-    background-color: var(--forest-green);
-    color: var(--white);
+  :root {
+    --footer-bg: #1a1f1a;
+    --footer-text: rgba(255, 255, 255, 0.9);
+    --footer-text-muted: rgba(255, 255, 255, 0.75);
+    --footer-cta-bg: #2d3d2d;
+    --footer-disclaimer-bg: #222a22;
+    --footer-disclaimer-border: rgba(255, 255, 255, 0.25);
   }
 
-  .footer-container {
-    width: 100%;
-    max-width: 100%;
-    padding: 0 var(--spacing-lg);
-    margin: 0;
-    box-sizing: border-box;
+  /* CTA Bar */
+  .footer-cta {
+    position: relative;
+    padding: var(--spacing-2xl) var(--container-padding);
+    background: var(--footer-cta-bg);
+    overflow: hidden;
   }
 
-  /* Footer Top */
-  .footer__top {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: var(--spacing-2xl);
-    margin-bottom: var(--spacing-3xl);
-    padding-bottom: var(--spacing-3xl);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  .footer-cta__bg {
+    position: absolute;
+    inset: 0;
+    background-image: repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 20px,
+      rgba(0, 0, 0, 0.03) 20px,
+      rgba(0, 0, 0, 0.03) 40px
+    );
+    pointer-events: none;
   }
 
-  .footer__column {
-    display: flex;
-    flex-direction: column;
+  .footer-cta__inner {
+    position: relative;
+    max-width: var(--container-max-width);
+    margin: 0 auto;
+    text-align: center;
   }
 
-  /* Company Column */
-  .footer__company {
-    grid-column: span 1;
-  }
-
-  .footer__title {
+  .footer-cta__title {
     font-family: var(--font-heading);
-    font-size: var(--h3-size);
+    font-size: clamp(1.5rem, 4vw, 2rem);
     font-weight: 700;
-    color: var(--white);
-    margin-bottom: var(--spacing-md);
+    color: #ffffff;
+    margin: 0 0 var(--spacing-sm);
   }
 
-  .footer__description {
-    font-size: var(--body-small);
-    line-height: 1.7;
+  .footer-cta__subtitle {
+    font-size: var(--body-normal);
     color: rgba(255, 255, 255, 0.9);
-    margin-bottom: var(--spacing-lg);
+    margin: 0 0 var(--spacing-lg);
   }
 
-  .footer__social {
-    display: flex;
-    gap: var(--spacing-md);
-  }
-
-  .social-link {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    background-color: rgba(255, 255, 255, 0.1);
-    border-radius: var(--radius-md);
+  .footer-cta__btn {
+    display: inline-block;
+    padding: var(--spacing-sm) var(--spacing-xl);
+    font-size: var(--body-normal);
+    font-weight: 600;
     color: var(--white);
-    transition: all var(--transition-base);
+    background: var(--sage-green);
+    border-radius: var(--radius-full);
+    text-decoration: none;
+    transition: background 0.2s, transform 0.2s;
   }
 
-  .social-link:hover {
-    background: linear-gradient(135deg, var(--sage-green), rgba(255, 255, 255, 0.2));
-    color: var(--white);
+  .footer-cta__btn:hover {
+    background: #5a9340;
     transform: translateY(-2px);
   }
 
-  /* Links Columns */
-  .footer__subtitle {
-    font-family: var(--font-heading);
-    font-size: var(--h5-size);
-    font-weight: 600;
-    color: var(--white);
-    margin-bottom: var(--spacing-md);
+  .footer-cta__trust {
+    display: flex;
+    justify-content: center;
+    gap: var(--spacing-lg);
+    margin-top: var(--spacing-lg);
+    font-size: var(--body-small);
+    color: rgba(255, 255, 255, 0.85);
   }
 
-  .footer__menu {
+  .footer-cta__trust-item {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+  }
+
+  /* Main footer */
+  .site-footer {
+    margin-top: 0;
+    padding: 0;
+    background: var(--footer-bg);
+    color: var(--footer-text);
+  }
+
+  .footer-container {
+    max-width: var(--container-max-width);
+    margin: 0 auto;
+    padding: var(--spacing-2xl) var(--container-padding) var(--spacing-lg);
+  }
+
+  .footer__grid {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr 1fr 1fr;
+    gap: var(--spacing-2xl);
+    align-items: start;
+    padding-bottom: var(--spacing-2xl);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .footer__col-title {
+    font-family: var(--font-heading);
+    font-size: var(--h5-size);
+    font-weight: 700;
+    color: var(--white);
+    margin: 0 0 var(--spacing-md);
+    letter-spacing: 0.02em;
+  }
+
+  .footer__about-text {
+    font-size: var(--body-small);
+    line-height: 1.65;
+    color: var(--footer-text-muted);
+    margin: 0;
+  }
+
+  .footer__list,
+  .footer__contact-list {
     list-style: none;
     margin: 0;
     padding: 0;
   }
 
-  .footer__menu li {
-    margin-bottom: var(--spacing-sm);
+  .footer__list li {
+    margin-bottom: var(--spacing-xs);
   }
 
-  .footer__menu a {
+  .footer__list a {
     font-size: var(--body-small);
-    color: rgba(255, 255, 255, 0.8);
+    color: var(--footer-text-muted);
     text-decoration: none;
-    transition: color var(--transition-base);
+    transition: color 0.2s;
   }
 
-  .footer__menu a:hover {
-    color: rgba(255, 255, 255, 1);
-    padding-left: var(--spacing-xs);
+  .footer__list a:hover {
+    color: var(--footer-text);
   }
 
-  /* Newsletter Column */
-  .footer__newsletter-text {
-    font-size: var(--body-small);
-    line-height: 1.7;
-    color: rgba(255, 255, 255, 0.9);
-    margin-bottom: var(--spacing-lg);
-  }
-
-  .footer__newsletter-form {
+  .footer__contact-list {
     display: flex;
     flex-direction: column;
     gap: var(--spacing-sm);
   }
 
-  .footer__newsletter-input {
-    padding: var(--spacing-sm) var(--spacing-md);
-    font-size: var(--body-normal);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: var(--radius-md);
-    background-color: rgba(255, 255, 255, 0.1);
+  .footer__contact-row {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-sm);
+    font-size: var(--body-small);
+    color: var(--footer-text-muted);
+  }
+
+  .footer__contact-row a {
+    color: var(--footer-text-muted);
+    text-decoration: none;
+  }
+
+  .footer__contact-row a:hover {
+    color: var(--footer-text);
+  }
+
+  .footer__contact-icon {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-sm);
+  }
+
+  .footer__contact-icon--email {
+    background: var(--sage-green);
     color: var(--white);
   }
 
-  .footer__newsletter-input::placeholder {
-    color: rgba(255, 255, 255, 0.6);
+  .footer__contact-icon--location {
+    background: var(--white);
+    color: var(--forest-green);
   }
 
-  .footer__newsletter-input:focus {
-    outline: none;
-    border-color: var(--sage-green);
-    background-color: rgba(255, 255, 255, 0.15);
+  .footer__contact-icon--clock {
+    background: var(--sage-green);
+    color: var(--white);
   }
 
-  .footer__newsletter-submit {
-    width: 100%;
+  .footer__contact-icon svg {
+    width: 16px;
+    height: 16px;
   }
 
-  .footer__newsletter-success,
-  .footer__newsletter-error {
+  .footer__legal-list {
+    margin: 0;
+    padding: 0;
     font-size: var(--body-small);
-    margin-top: var(--spacing-sm);
+    color: var(--footer-text-muted);
   }
 
-  .footer__newsletter-success {
-    color: var(--sage-green);
+  .footer__legal-row {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: var(--spacing-xs) var(--spacing-sm);
+    margin-bottom: var(--spacing-xs);
   }
 
-  .footer__newsletter-error {
-    color: rgba(255, 255, 255, 0.9);
+  .footer__legal-row dt {
+    margin: 0;
+    font-weight: 500;
+    color: var(--footer-text);
   }
 
-  /* Footer Bottom */
-  .footer__bottom {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-lg);
-  }
-
-  .footer__bottom-content {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: var(--spacing-lg);
-  }
-
-  .footer__copyright p {
-    font-size: var(--body-small);
-    color: rgba(255, 255, 255, 0.8);
+  .footer__legal-row dd {
     margin: 0;
   }
 
-  .footer__legal {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-    flex-wrap: wrap;
+  /* Disclaimer */
+  .footer__disclaimer {
+    margin: 0 calc(-1 * var(--container-padding));
+    padding: var(--spacing-lg) var(--container-padding);
+    border-top: 1px solid var(--footer-disclaimer-border);
+    border-bottom: 1px solid var(--footer-disclaimer-border);
+    background: var(--footer-disclaimer-bg);
   }
 
-  .footer__legal a {
-    font-size: var(--body-small);
-    color: rgba(255, 255, 255, 0.8);
-    text-decoration: none;
-    transition: color var(--transition-base);
+  .footer__disclaimer p {
+    max-width: var(--container-max-width);
+    margin: 0 auto;
+    font-size: var(--body-xs);
+    line-height: 1.6;
+    color: var(--footer-text-muted);
+    text-align: center;
   }
 
-  .footer__legal a:hover {
-    color: var(--white);
-  }
-
-  .footer__separator {
-    color: rgba(255, 255, 255, 0.4);
-  }
-
-  .footer__payments {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-    flex-wrap: wrap;
-  }
-
-  .footer__payments svg {
-    height: 24px;
-    width: auto;
-    opacity: 0.8;
-  }
-
-  /* Trust Badges */
-  .footer__trust {
-    display: flex;
-    justify-content: center;
-    gap: var(--spacing-lg);
-    flex-wrap: wrap;
+  /* Copyright */
+  .footer__copyright-bar {
     padding-top: var(--spacing-lg);
-    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    text-align: center;
   }
 
-  .trust-badge {
-    display: inline-flex;
+  .footer__copyright-text {
+    font-size: var(--body-xs);
+    color: var(--footer-text-muted);
+    margin: 0;
+  }
+
+  /* Floating action buttons */
+  .footer-fab {
+    position: fixed;
+    right: var(--spacing-lg);
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: none;
+    display: flex;
     align-items: center;
-    gap: var(--spacing-xs);
-    font-size: var(--body-small);
-    color: rgba(255, 255, 255, 0.9);
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    z-index: 100;
+    transition: transform 0.2s, box-shadow 0.2s;
+    text-decoration: none;
+    color: #fff;
   }
 
-  /* Responsive */
+  .footer-fab:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+  }
+
+  .footer-fab--scroll {
+    bottom: 80px;
+    background: var(--sage-green);
+  }
+
+  .footer-fab--chat {
+    bottom: var(--spacing-lg);
+    background: var(--sage-green);
+  }
+
+  .footer-fab svg {
+    width: 24px;
+    height: 24px;
+  }
+
   @media (max-width: 1024px) {
-    .footer__top {
-      grid-template-columns: repeat(2, 1fr);
+    .footer__grid {
+      grid-template-columns: 1fr 1fr;
       gap: var(--spacing-xl);
     }
   }
 
-  @media (max-width: 768px) {
-    .site-footer {
-      padding: var(--spacing-2xl) var(--container-padding) var(--spacing-lg);
-    }
-
+  @media (max-width: 767px) {
     .footer-container {
       padding-left: var(--container-padding);
       padding-right: var(--container-padding);
     }
-
-    .footer__top {
+    .footer__grid {
       grid-template-columns: 1fr;
       gap: var(--spacing-xl);
-      margin-bottom: var(--spacing-2xl);
-      padding-bottom: var(--spacing-2xl);
+      padding-bottom: var(--spacing-xl);
     }
-
-    .footer__bottom-content {
-      flex-direction: column;
-      align-items: flex-start;
-      text-align: left;
+    .footer-fab {
+      right: var(--spacing-md);
+      width: 44px;
+      height: 44px;
     }
-
-    .footer__legal {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: var(--spacing-xs);
-    }
-
-    .footer__separator {
-      display: none;
-    }
-
-    .footer__trust {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: var(--spacing-md);
+    .footer-fab--scroll {
+      bottom: 72px;
     }
   }
 {% endstylesheet %}
@@ -423,82 +465,143 @@
   "name": "Footer",
   "settings": [
     {
+      "type": "header",
+      "content": "CTA Bar (above footer)"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cta_bar",
+      "label": "Show CTA bar",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "cta_headline",
+      "label": "Headline",
+      "default": "Start Your Wellness Journey Today"
+    },
+    {
+      "type": "text",
+      "id": "cta_subtitle",
+      "label": "Subtitle",
+      "default": "Join thousands who have transformed their health with SARVITAL"
+    },
+    {
+      "type": "text",
+      "id": "cta_button_text",
+      "label": "Button text",
+      "default": "Order Now"
+    },
+    {
+      "type": "url",
+      "id": "cta_button_url",
+      "label": "Button link"
+    },
+    {
+      "type": "header",
+      "content": "About"
+    },
+    {
       "type": "textarea",
       "id": "company_description",
-      "label": "Company Description",
-      "default": "Premium fruit & vegetable powders for your wellness journey. Natural, sustainable, and lab-tested quality."
-    },
-    {
-      "type": "link_list",
-      "id": "quick_links_menu",
-      "label": "Quick Links Menu"
-    },
-    {
-      "type": "link_list",
-      "id": "legal_menu",
-      "label": "Legal Links Menu"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_health_benefits",
-      "label": "Show Health Benefits Links",
-      "default": true
+      "label": "About text",
+      "default": "Premium Moringa Leaf Powder crafted with care to bring you nature's most powerful superfood. Committed to quality, purity, and your wellness."
     },
     {
       "type": "header",
-      "content": "Newsletter"
+      "content": "Policies"
+    },
+    {
+      "type": "link_list",
+      "id": "policies_menu",
+      "label": "Policies menu (blank = default links)"
+    },
+    {
+      "type": "header",
+      "content": "Contact Us"
+    },
+    {
+      "type": "text",
+      "id": "email",
+      "label": "Email"
     },
     {
       "type": "textarea",
-      "id": "newsletter_text",
-      "label": "Newsletter Text",
-      "default": "Subscribe to our newsletter for wellness tips, new products, and exclusive offers."
+      "id": "address",
+      "label": "Address"
+    },
+    {
+      "type": "text",
+      "id": "working_hours",
+      "label": "Working hours",
+      "default": "Mon-Sat: 9AM - 6PM"
     },
     {
       "type": "header",
-      "content": "Social Media"
+      "content": "Legal"
     },
     {
-      "type": "checkbox",
-      "id": "show_social_icons",
-      "label": "Show Social Icons",
-      "default": true
+      "type": "text",
+      "id": "legal_manufacturer",
+      "label": "Manufacturer",
+      "default": "Sarvital Sarvadnya Foodtech Pvt Ltd"
     },
     {
-      "type": "url",
-      "id": "social_facebook",
-      "label": "Facebook URL"
+      "type": "text",
+      "id": "legal_mfg",
+      "label": "MFG"
     },
     {
-      "type": "url",
-      "id": "social_instagram",
-      "label": "Instagram URL"
+      "type": "text",
+      "id": "legal_origin",
+      "label": "Origin",
+      "default": "India"
     },
     {
-      "type": "url",
-      "id": "social_twitter",
-      "label": "Twitter URL"
-    },
-    {
-      "type": "url",
-      "id": "social_youtube",
-      "label": "YouTube URL"
+      "type": "text",
+      "id": "legal_expiry",
+      "label": "Expiry"
     },
     {
       "type": "header",
-      "content": "Payment & Trust"
+      "content": "Disclaimer"
+    },
+    {
+      "type": "textarea",
+      "id": "disclaimer_text",
+      "label": "Disclaimer text",
+      "default": "Disclaimer: This product is a health supplement and is not for medicinal use. Not intended to diagnose, treat, cure, or prevent any disease. Consult your healthcare provider if pregnant, nursing, or on medication."
+    },
+    {
+      "type": "header",
+      "content": "Copyright"
+    },
+    {
+      "type": "text",
+      "id": "company_legal_name",
+      "label": "Company legal name (after ©)",
+      "default": "Sarvital Sarvadnya Foodtech Pvt Ltd"
+    },
+    {
+      "type": "header",
+      "content": "Floating buttons"
     },
     {
       "type": "checkbox",
-      "id": "show_payment_icons",
-      "label": "Show Payment Icons",
+      "id": "show_scroll_top",
+      "label": "Show scroll to top button",
       "default": true
     },
     {
       "type": "checkbox",
-      "id": "show_trust_badges",
-      "label": "Show Trust Badges",
+      "id": "show_chat",
+      "label": "Show chat button",
       "default": true
+    },
+    {
+      "type": "url",
+      "id": "chat_url",
+      "label": "Chat link (WhatsApp, live chat, etc.)"
     }
   ]
 }
