@@ -11,13 +11,27 @@
   "sections": {
     "hero_banner": {
       "type": "hero-banner",
+      "blocks": {
+        "slide_ADNn8V": {
+          "type": "slide",
+          "settings": {
+            "image": "shopify://shop_images/Hero1.jpg"
+          }
+        }
+      },
+      "block_order": [
+        "slide_ADNn8V"
+      ],
       "settings": {
         "heading": "Transform Your Health with Nature's Finest",
         "subheading": "Premium natural fruit & vegetable powders. Lab-tested, sustainably sourced, and packed with natural goodness.",
         "cta_text": "Shop Now",
         "cta_link": "/collections/all",
         "secondary_cta_text": "Learn More",
-        "secondary_cta_link": "/pages/about"
+        "secondary_cta_link": "/pages/about",
+        "carousel_speed": 5,
+        "transition_duration": 800,
+        "overlay_opacity": 85
       }
     },
     "usp_icons": {
@@ -71,6 +85,9 @@
       "settings": {
         "title": "Our Premium Powders",
         "description": "Discover our range of premium fruit and vegetable powders, carefully crafted for your wellness journey.",
+        "layout": "carousel",
+        "carousel_auto_scroll": true,
+        "carousel_auto_scroll_interval": 6,
         "collection": "frontpage",
         "products_to_show": 3,
         "show_view_all": true,
