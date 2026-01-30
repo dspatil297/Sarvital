@@ -33,6 +33,7 @@
         >
           {%- if block.settings.image != blank -%}
             <img
+              class="hero-banner__slide-img hero-banner__slide-img--desktop"
               src="{{ block.settings.image | image_url: width: 1920 }}"
               srcset="
                 {{ block.settings.image | image_url: width: 960 }} 960w,
@@ -44,6 +45,22 @@
               alt="{{ block.settings.image.alt | default: '' }}"
               width="{{ block.settings.image.width }}"
               height="{{ block.settings.image.height }}"
+              loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
+              fetchpriority="{% if forloop.first %}high{% else %}low{% endif %}"
+            >
+            {%- assign mobile_img = block.settings.mobile_image | default: block.settings.image -%}
+            <img
+              class="hero-banner__slide-img hero-banner__slide-img--mobile"
+              src="{{ mobile_img | image_url: width: 768 }}"
+              srcset="
+                {{ mobile_img | image_url: width: 480 }} 480w,
+                {{ mobile_img | image_url: width: 768 }} 768w,
+                {{ mobile_img | image_url: width: 1024 }} 1024w
+              "
+              sizes="100vw"
+              alt="{{ mobile_img.alt | default: block.settings.image.alt | default: '' }}"
+              width="{{ mobile_img.width }}"
+              height="{{ mobile_img.height }}"
               loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
               fetchpriority="{% if forloop.first %}high{% else %}low{% endif %}"
             >
@@ -229,6 +246,19 @@
     object-fit: cover;
     object-position: center;
     display: block;
+  }
+
+  .hero-banner__slide-img--mobile {
+    display: none;
+  }
+
+  @media (max-width: 768px) {
+    .hero-banner__slide-img--desktop {
+      display: none;
+    }
+    .hero-banner__slide-img--mobile {
+      display: block;
+    }
   }
 
   .hero-banner__overlay {
@@ -881,12 +911,17 @@
       "settings": [
         {
           "type": "paragraph",
-          "content": "Recommended size: 1920 × 900 px (aspect ratio 2.13:1). This matches the hero on desktop so nothing is cropped. Keep important content in the center 70% for smaller screens."
+          "content": "Desktop: 1920 × 900 px recommended. Mobile: optional; use same or 768 × 1024 px for portrait."
         },
         {
           "type": "image_picker",
           "id": "image",
-          "label": "Slide image"
+          "label": "Slide image (desktop)"
+        },
+        {
+          "type": "image_picker",
+          "id": "mobile_image",
+          "label": "Slide image (mobile)"
         }
       ]
     }
