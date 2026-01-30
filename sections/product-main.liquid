@@ -999,45 +999,91 @@
     background: var(--sage-green);
   }
 
-  /* Responsive */
+  /* Responsive – mobile only (desktop unchanged) */
   @media (max-width: 968px) {
     .product-hero {
-      padding: 40px 20px;
+      padding: 24px 20px;
+      padding-bottom: 100px;
     }
 
     .product-hero__container {
       grid-template-columns: 1fr;
-      gap: 40px;
+      gap: 28px; /* Tighter gap so price + CTA appear above fold */
     }
 
     .product-images {
       position: static;
     }
 
+    .product-info {
+      gap: 18px; /* Tighter for above-fold CTA */
+    }
+
+    .product-form {
+      gap: 18px;
+    }
+
     .product-title {
-      font-size: 32px;
+      font-size: 28px;
+      line-height: 1.25;
     }
 
     .price-value {
-      font-size: 28px;
+      font-size: 26px;
+    }
+
+    .product-price-section {
+      padding: 16px 0;
     }
 
     .sticky-cart-bar {
-      display: block;
+      display: flex;
+      align-items: center;
+      padding: 10px 20px;
+      padding-bottom: max(10px, env(safe-area-inset-bottom));
     }
 
     .sticky-cart-bar__content {
-      padding-left: var(--container-padding);
-      padding-right: var(--container-padding);
+      padding-left: 0;
+      padding-right: 0;
+      width: 100%;
+      flex-direction: row;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .sticky-cart-bar__info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .sticky-cart-bar__image {
+      width: 52px;
+      height: 52px;
+      flex-shrink: 0;
+    }
+
+    .sticky-cart-bar__details {
+      min-width: 0;
+    }
+
+    .sticky-cart-bar__title {
+      font-size: 13px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .sticky-cart-bar__price .price-current {
+      font-size: 15px;
     }
 
     .sticky-cart-bar__button {
-      min-height: var(--touch-target-min);
-      padding: var(--spacing-md) var(--spacing-xl);
-    }
-
-    .product-hero {
-      padding-bottom: 100px;
+      min-height: 48px; /* High-conversion touch target */
+      padding: 12px 20px;
+      flex-shrink: 0;
+      font-size: 15px;
+      font-weight: 600;
     }
 
     .product-description-section {
@@ -1055,45 +1101,98 @@
     .product-description-text {
       font-size: 16px;
     }
+
+    .cta-button,
+    .cta-button--primary,
+    .cta-button--secondary {
+      min-height: 48px;
+    }
+
+    .quantity-btn {
+      min-width: 48px;
+      min-height: 48px;
+    }
   }
 
   @media (max-width: 480px) {
     .product-hero {
-      padding: 30px 16px;
+      padding: 20px 16px;
+      padding-bottom: 88px; /* Space for sticky bar + safe area */
     }
 
     .product-hero__container {
       padding-left: var(--container-padding);
       padding-right: var(--container-padding);
+      gap: 22px;
+    }
+
+    .product-info {
+      gap: 16px;
+    }
+
+    .product-form {
+      gap: 16px;
+    }
+
+    /* Sticky bar: single compact row (high-conversion pattern) */
+    .sticky-cart-bar {
+      padding: 8px 16px;
+      padding-bottom: max(8px, env(safe-area-inset-bottom));
     }
 
     .sticky-cart-bar__content {
-      flex-direction: column;
-      align-items: stretch;
-      gap: var(--spacing-md);
+      flex-direction: row;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .sticky-cart-bar__image {
+      width: 48px;
+      height: 48px;
+    }
+
+    .sticky-cart-bar__title {
+      font-size: 12px;
+    }
+
+    .sticky-cart-bar__price .price-current {
+      font-size: 14px;
     }
 
     .sticky-cart-bar__button {
-      width: 100%;
-      min-height: 52px;
-      font-size: var(--body-normal);
+      min-height: 48px;
+      min-width: 120px;
+      padding: 12px 16px;
+      font-size: 14px;
+      width: auto;
     }
 
     .cta-button,
     .cta-button--primary,
     .cta-button--secondary {
       width: 100%;
-      min-height: var(--touch-target-min);
+      min-height: 48px;
       justify-content: center;
+      padding: 16px 24px;
     }
 
     .product-title {
-      font-size: 28px;
+      font-size: 24px;
     }
 
+    /* Trust badges: compact single line to save vertical space */
     .product-trust-badges {
-      flex-direction: column;
+      flex-direction: row;
+      flex-wrap: wrap;
       gap: 8px;
+    }
+
+    .trust-badge {
+      font-size: 12px;
+    }
+
+    .trust-badge--shipping {
+      padding: 6px 12px;
     }
 
     .variant-options-grid {
@@ -1101,7 +1200,8 @@
     }
 
     .variant-option-btn {
-      padding: 10px 20px;
+      padding: 12px 16px;
+      min-height: 44px;
       font-size: 13px;
     }
 
@@ -1123,6 +1223,11 @@
     .product-description-text {
       font-size: 15px;
       line-height: 1.7;
+    }
+
+    .product-trust-message {
+      padding: 12px 14px;
+      font-size: 12px;
     }
   }
 {% endstylesheet %}
