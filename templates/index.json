@@ -12,24 +12,24 @@
     "hero_banner": {
       "type": "hero-banner",
       "blocks": {
-        "slide_Nq893k": {
-          "type": "slide",
-          "settings": {
-            "image": "shopify://shop_images/relaxing-in-nature.jpg",
-            "mobile_image": "shopify://shop_images/WhatsApp_Image_2026-01-30_at_11.50.09_1f4d78e9-90f0-40ab-8e56-190e431adecf.jpg"
-          }
-        },
         "slide_knjxEJ": {
           "type": "slide",
           "settings": {
             "image": "shopify://shop_images/WhatsApp_Image_2026-01-30_at_11.50.09.jpg",
             "mobile_image": "shopify://shop_images/WhatsApp_Image_2026-01-30_at_11.50.09_1f4d78e9-90f0-40ab-8e56-190e431adecf.jpg"
           }
+        },
+        "slide_Nq893k": {
+          "type": "slide",
+          "settings": {
+            "image": "shopify://shop_images/relaxing-in-nature.jpg",
+            "mobile_image": "shopify://shop_images/WhatsApp_Image_2026-01-30_at_11.50.09_1f4d78e9-90f0-40ab-8e56-190e431adecf.jpg"
+          }
         }
       },
       "block_order": [
-        "slide_Nq893k",
-        "slide_knjxEJ"
+        "slide_knjxEJ",
+        "slide_Nq893k"
       ],
       "settings": {
         "hero_image": "shopify://shop_images/WhatsApp_Image_2026-01-30_at_11.50.09.jpg",
