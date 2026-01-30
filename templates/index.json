@@ -17,10 +17,17 @@
           "settings": {
             "image": "shopify://shop_images/Hero1.jpg"
           }
+        },
+        "slide_bwCz6c": {
+          "type": "slide",
+          "settings": {
+            "image": "shopify://shop_images/WhatsApp_Image_2026-01-30_at_11.50.09.jpg"
+          }
         }
       },
       "block_order": [
-        "slide_ADNn8V"
+        "slide_ADNn8V",
+        "slide_bwCz6c"
       ],
       "settings": {
         "hero_image": "shopify://shop_images/WhatsApp_Image_2026-01-30_at_11.50.09.jpg",
