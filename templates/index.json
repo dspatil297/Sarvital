@@ -22,7 +22,8 @@
         "slide_Nq893k": {
           "type": "slide",
           "settings": {
-            "image": "shopify://shop_images/relaxing-in-nature.jpg"
+            "image": "shopify://shop_images/relaxing-in-nature.jpg",
+            "mobile_image": "shopify://shop_images/relaxing-in-nature.jpg"
           }
         }
       },
