@@ -71,9 +71,6 @@
       "settings": {
         "title": "Our Premium Powders",
         "description": "Discover our range of premium fruit and vegetable powders, carefully crafted for your wellness journey.",
-        "layout": "carousel",
-        "carousel_auto_scroll": true,
-        "carousel_auto_scroll_interval": 6,
         "collection": "frontpage",
         "products_to_show": 3,
         "show_view_all": true,

@@ -1,21 +1,77 @@
-<section class="hero-banner" id="hero-banner">
+{%- liquid
+  assign slide_blocks = section.blocks | where: 'type', 'slide'
+  assign has_carousel_slides = false
+  for block in slide_blocks
+    if block.settings.image != blank
+      assign has_carousel_slides = true
+      break
+    endif
+  endfor
+-%}
+
+<section
+  class="hero-banner{% if has_carousel_slides %} hero-banner--carousel{% endif %}"
+  id="hero-banner-{{ section.id }}"
+  role="region"
+  aria-label="{{ section.settings.heading | default: 'Hero' }}"
+  {% if has_carousel_slides %}
+    data-autoplay-speed="{{ section.settings.carousel_speed | times: 1000 }}"
+    data-transition-duration="{{ section.settings.transition_duration }}"
+    data-paused="false"
+  {% endif %}
+>
   <div class="hero-banner__image">
-    {% if section.settings.hero_image %}
-      <img 
-        src="{{ section.settings.hero_image | image_url: width: 1920 }}" 
-        alt="{{ section.settings.hero_image.alt | default: section.settings.heading }}"
-        width="{{ section.settings.hero_image.width }}"
-        height="{{ section.settings.hero_image.height }}"
-        loading="eager"
-      >
+    {% if has_carousel_slides %}
+      {%- for block in slide_blocks -%}
+        {%- if block.settings.image != blank -%}
+          <div
+            class="hero-banner__slide{% if forloop.first %} hero-banner__slide--active{% endif %}"
+            data-slide-index="{{ forloop.index0 }}"
+            {{ block.shopify_attributes }}
+          >
+            <img
+              src="{{ block.settings.image | image_url: width: 1920 }}"
+              srcset="
+                {{ block.settings.image | image_url: width: 960 }} 960w,
+                {{ block.settings.image | image_url: width: 1280 }} 1280w,
+                {{ block.settings.image | image_url: width: 1920 }} 1920w,
+                {{ block.settings.image | image_url: width: 2560 }} 2560w
+              "
+              sizes="100vw"
+              alt="{{ block.settings.image.alt | default: '' }}"
+              width="{{ block.settings.image.width }}"
+              height="{{ block.settings.image.height }}"
+              loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
+              fetchpriority="{% if forloop.first %}high{% else %}low{% endif %}"
+            >
+          </div>
+        {%- endif -%}
+      {%- endfor -%}
     {% else %}
-      <img 
-        src="https://images.unsplash.com/photo-1542838132-92c53300491e?w=1920&q=80" 
-        alt="Fresh natural fruits and vegetables"
-        loading="eager"
-      >
+      {% if section.settings.hero_image %}
+        <div class="hero-banner__slide hero-banner__slide--active">
+          <img
+            src="{{ section.settings.hero_image | image_url: width: 1920 }}"
+            alt="{{ section.settings.hero_image.alt | default: section.settings.heading }}"
+            width="{{ section.settings.hero_image.width }}"
+            height="{{ section.settings.hero_image.height }}"
+            loading="eager"
+          >
+        </div>
+      {% else %}
+        <div class="hero-banner__slide hero-banner__slide--active">
+          <img
+            src="https://images.unsplash.com/photo-1542838132-92c53300491e?w=1920&q=80"
+            alt="Fresh natural fruits and vegetables"
+            loading="eager"
+          >
+        </div>
+      {% endif %}
     {% endif %}
-    <div class="hero-banner__overlay"></div>
+    <div
+      class="hero-banner__overlay"
+      style="--overlay-opacity: {{ section.settings.overlay_opacity | default: 85 | divided_by: 100.0 }};"
+    ></div>
     <div class="hero-banner__gradient-ornament"></div>
   </div>
   
@@ -77,6 +133,45 @@
         <path d="M7 10L12 15L17 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </div>
+
+    {%- if has_carousel_slides and slide_blocks.size > 1 -%}
+      <div class="hero-banner__carousel-controls" role="group" aria-label="Carousel controls">
+        <button
+          type="button"
+          class="hero-banner__carousel-prev"
+          aria-label="Previous slide"
+          data-action="prev"
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <button
+          type="button"
+          class="hero-banner__carousel-next"
+          aria-label="Next slide"
+          data-action="next"
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <div class="hero-banner__carousel-dots" role="tablist" aria-label="Slide navigation">
+          {%- for block in slide_blocks -%}
+            {%- if block.settings.image != blank -%}
+              <button
+                type="button"
+                class="hero-banner__carousel-dot{% if forloop.first %} hero-banner__carousel-dot--active{% endif %}"
+                role="tab"
+                aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
+                aria-label="Slide {{ forloop.index }}"
+                data-slide-index="{{ forloop.index0 }}"
+              ></button>
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+      </div>
+    {%- endif -%}
   </div>
 </section>
 
@@ -107,7 +202,24 @@
     overflow: hidden;
   }
 
-  .hero-banner__image img {
+  .hero-banner__slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity var(--hero-transition-duration, 800ms) ease-in-out;
+    pointer-events: none;
+  }
+
+  .hero-banner__slide--active {
+    opacity: 1;
+    z-index: 1;
+  }
+
+  .hero-banner__image img,
+  .hero-banner__slide img {
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -126,6 +238,7 @@
       rgba(45, 80, 22, 0.7) 40%,
       rgba(74, 124, 44, 0.5) 100%
     );
+    opacity: var(--overlay-opacity, 1);
     z-index: 2;
     overflow: hidden;
   }
@@ -368,6 +481,76 @@
     animation: bounceArrow 1.5s infinite;
   }
 
+  .hero-banner__carousel-controls {
+    position: absolute;
+    bottom: var(--spacing-xl);
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    z-index: 4;
+  }
+
+  .hero-banner__carousel-prev,
+  .hero-banner__carousel-next {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.15);
+    color: var(--white);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, border-color 0.2s, transform 0.2s;
+  }
+
+  .hero-banner__carousel-prev:hover,
+  .hero-banner__carousel-next:hover {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.8);
+    transform: scale(1.05);
+  }
+
+  .hero-banner__carousel-prev:focus-visible,
+  .hero-banner__carousel-next:focus-visible {
+    outline: 2px solid var(--white);
+    outline-offset: 2px;
+  }
+
+  .hero-banner__carousel-dots {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+  }
+
+  .hero-banner__carousel-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.6);
+    background: transparent;
+    cursor: pointer;
+    padding: 0;
+    transition: background 0.2s, transform 0.2s;
+  }
+
+  .hero-banner__carousel-dot:hover {
+    background: rgba(255, 255, 255, 0.4);
+  }
+
+  .hero-banner__carousel-dot--active {
+    background: var(--white);
+    transform: scale(1.2);
+  }
+
+  .hero-banner__carousel-dot:focus-visible {
+    outline: 2px solid var(--white);
+    outline-offset: 2px;
+  }
+
   @keyframes fadeInUp {
     from {
       opacity: 0;
@@ -506,6 +689,16 @@
       display: none;
     }
 
+    .hero-banner__carousel-controls {
+      bottom: var(--spacing-lg);
+    }
+
+    .hero-banner__carousel-prev,
+    .hero-banner__carousel-next {
+      width: 44px;
+      height: 44px;
+    }
+
     /* Reduce animations on mobile */
     .hero-banner__overlay::before,
     .hero-banner__overlay::after {
@@ -555,6 +748,82 @@
   }
 {% endstylesheet %}
 
+<script>
+  (function () {
+    const section = document.getElementById('hero-banner-{{ section.id }}');
+    if (!section || !section.classList.contains('hero-banner--carousel')) return;
+
+    const slides = Array.from(section.querySelectorAll('.hero-banner__slide'));
+    const dots = Array.from(section.querySelectorAll('.hero-banner__carousel-dot'));
+    const btnPrev = section.querySelector('[data-action="prev"]');
+    const btnNext = section.querySelector('[data-action="next"]');
+
+    if (slides.length <= 1) return;
+
+    const speed = parseInt(section.dataset.autoplaySpeed, 10) || 5000;
+    const duration = parseInt(section.dataset.transitionDuration, 10) || 800;
+    section.style.setProperty('--hero-transition-duration', duration + 'ms');
+
+    let currentIndex = 0;
+    let timer = null;
+
+    function goToSlide(index) {
+      index = ((index % slides.length) + slides.length) % slides.length;
+      currentIndex = index;
+      slides.forEach(function (slide, i) {
+        slide.classList.toggle('hero-banner__slide--active', i === index);
+      });
+      dots.forEach(function (dot, i) {
+        dot.classList.toggle('hero-banner__carousel-dot--active', i === index);
+        dot.setAttribute('aria-selected', i === index);
+      });
+    }
+
+    function next() { goToSlide(currentIndex + 1); }
+    function prev() { goToSlide(currentIndex - 1); }
+
+    function startAutoplay() {
+      if (timer) clearInterval(timer);
+      if (section.dataset.paused === 'true') return;
+      timer = setInterval(next, speed);
+    }
+    function stopAutoplay() {
+      if (timer) { clearInterval(timer); timer = null; }
+    }
+
+    function setPaused(paused) {
+      section.dataset.paused = paused ? 'true' : 'false';
+      if (paused) stopAutoplay();
+      else startAutoplay();
+    }
+
+    section.addEventListener('mouseenter', function () { setPaused(true); });
+    section.addEventListener('mouseleave', function () { setPaused(false); });
+    section.addEventListener('focusin', function () { setPaused(true); });
+    section.addEventListener('focusout', function () {
+      if (!section.contains(document.activeElement)) setPaused(false);
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (!section.contains(document.activeElement)) return;
+      if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
+      else if (e.key === 'ArrowRight') { e.preventDefault(); next(); }
+    });
+
+    if (btnPrev) btnPrev.addEventListener('click', function () { prev(); startAutoplay(); });
+    if (btnNext) btnNext.addEventListener('click', function () { next(); startAutoplay(); });
+
+    dots.forEach(function (dot, i) {
+      dot.addEventListener('click', function () { goToSlide(i); startAutoplay(); });
+      dot.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); goToSlide(i); startAutoplay(); }
+      });
+    });
+
+    startAutoplay();
+  })();
+</script>
+
 {% schema %}
 {
   "name": "Hero Banner",
@@ -562,7 +831,7 @@
     {
       "type": "image_picker",
       "id": "hero_image",
-      "label": "Hero Image"
+      "label": "Hero image (fallback when no slides)"
     },
     {
       "type": "text",
@@ -597,11 +866,63 @@
       "type": "url",
       "id": "secondary_cta_link",
       "label": "Secondary CTA Link"
+    },
+    {
+      "type": "header",
+      "content": "Background carousel"
+    },
+    {
+      "type": "range",
+      "id": "carousel_speed",
+      "label": "Auto-play speed (seconds)",
+      "min": 3,
+      "max": 10,
+      "step": 1,
+      "default": 5,
+      "unit": "s"
+    },
+    {
+      "type": "range",
+      "id": "transition_duration",
+      "label": "Transition duration (ms)",
+      "min": 400,
+      "max": 1500,
+      "step": 100,
+      "default": 800,
+      "unit": "ms"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "Overlay opacity (text readability)",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "default": 85,
+      "unit": "%"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "slide",
+      "name": "Slide",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Background image"
+        }
+      ]
     }
   ],
   "presets": [
     {
-      "name": "Hero Banner"
+      "name": "Hero Banner",
+      "blocks": [
+        { "type": "slide" },
+        { "type": "slide" },
+        { "type": "slide" }
+      ]
     }
   ]
 }
