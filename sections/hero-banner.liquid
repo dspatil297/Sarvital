@@ -15,8 +15,8 @@
   role="region"
   aria-label="{{ section.settings.heading | default: 'Hero' }}"
   {% if has_carousel_slides %}
-    data-autoplay-speed="{{ section.settings.carousel_speed | times: 1000 }}"
-    data-transition-duration="{{ section.settings.transition_duration }}"
+    data-autoplay-speed="{{ section.settings.carousel_speed | default: 1.5 | times: 1000 | round }}"
+    data-transition-duration="{{ section.settings.transition_duration | default: 800 }}"
     data-paused="false"
   {% endif %}
 >
@@ -711,72 +711,86 @@
 
 <script>
   (function () {
-    const section = document.getElementById('hero-banner-{{ section.id }}');
-    if (!section || !section.classList.contains('hero-banner--carousel')) return;
+    function initHeroCarousel() {
+      const section = document.getElementById('hero-banner-{{ section.id }}');
+      if (!section || !section.classList.contains('hero-banner--carousel')) return;
 
-    const slides = Array.from(section.querySelectorAll('.hero-banner__slide:not(.hero-banner__slide--empty)'));
-    const dots = Array.from(section.querySelectorAll('.hero-banner__carousel-dot'));
+      const slides = Array.from(section.querySelectorAll('.hero-banner__slide:not(.hero-banner__slide--empty)'));
+      const dots = Array.from(section.querySelectorAll('.hero-banner__carousel-dot'));
 
-    if (slides.length <= 1) return;
+      if (slides.length <= 1) return;
 
-    const speed = parseInt(section.dataset.autoplaySpeed, 10) || 1500;
-    const duration = parseInt(section.dataset.transitionDuration, 10) || 800;
-    section.style.setProperty('--hero-transition-duration', duration + 'ms');
+      var speedRaw = section.getAttribute('data-autoplay-speed');
+      var speed = speedRaw ? parseInt(speedRaw, 10) : 1500;
+      if (isNaN(speed) || speed <= 0) speed = 1500;
 
-    let currentIndex = 0;
-    let timer = null;
+      var durationRaw = section.getAttribute('data-transition-duration');
+      var duration = durationRaw ? parseInt(durationRaw, 10) : 800;
+      if (isNaN(duration) || duration <= 0) duration = 800;
+      section.style.setProperty('--hero-transition-duration', duration + 'ms');
 
-    function goToSlide(index) {
-      index = ((index % slides.length) + slides.length) % slides.length;
-      currentIndex = index;
-      slides.forEach(function (slide, i) {
-        slide.classList.toggle('hero-banner__slide--active', i === index);
+      var currentIndex = 0;
+      var timer = null;
+
+      function goToSlide(index) {
+        index = ((index % slides.length) + slides.length) % slides.length;
+        currentIndex = index;
+        slides.forEach(function (slide, i) {
+          slide.classList.toggle('hero-banner__slide--active', i === index);
+        });
+        dots.forEach(function (dot, i) {
+          dot.classList.toggle('hero-banner__carousel-dot--active', i === index);
+          dot.setAttribute('aria-selected', i === index);
+        });
+      }
+
+      function next() { goToSlide(currentIndex + 1); }
+      function prev() { goToSlide(currentIndex - 1); }
+
+      function startAutoplay() {
+        if (timer) clearInterval(timer);
+        timer = null;
+        if (section.getAttribute('data-paused') === 'true') return;
+        timer = setInterval(next, speed);
+      }
+      function stopAutoplay() {
+        if (timer) { clearInterval(timer); timer = null; }
+      }
+
+      function setPaused(paused) {
+        section.setAttribute('data-paused', paused ? 'true' : 'false');
+        if (paused) stopAutoplay();
+        else startAutoplay();
+      }
+
+      section.addEventListener('mouseenter', function () { setPaused(true); });
+      section.addEventListener('mouseleave', function () { setPaused(false); });
+      section.addEventListener('focusin', function () { setPaused(true); });
+      section.addEventListener('focusout', function () {
+        if (!section.contains(document.activeElement)) setPaused(false);
       });
+
+      document.addEventListener('keydown', function (e) {
+        if (!section.contains(document.activeElement)) return;
+        if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
+        else if (e.key === 'ArrowRight') { e.preventDefault(); next(); }
+      });
+
       dots.forEach(function (dot, i) {
-        dot.classList.toggle('hero-banner__carousel-dot--active', i === index);
-        dot.setAttribute('aria-selected', i === index);
+        dot.addEventListener('click', function () { goToSlide(i); startAutoplay(); });
+        dot.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); goToSlide(i); startAutoplay(); }
+        });
       });
+
+      startAutoplay();
     }
 
-    function next() { goToSlide(currentIndex + 1); }
-    function prev() { goToSlide(currentIndex - 1); }
-
-    function startAutoplay() {
-      if (timer) clearInterval(timer);
-      if (section.dataset.paused === 'true') return;
-      timer = setInterval(next, speed);
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initHeroCarousel);
+    } else {
+      initHeroCarousel();
     }
-    function stopAutoplay() {
-      if (timer) { clearInterval(timer); timer = null; }
-    }
-
-    function setPaused(paused) {
-      section.dataset.paused = paused ? 'true' : 'false';
-      if (paused) stopAutoplay();
-      else startAutoplay();
-    }
-
-    section.addEventListener('mouseenter', function () { setPaused(true); });
-    section.addEventListener('mouseleave', function () { setPaused(false); });
-    section.addEventListener('focusin', function () { setPaused(true); });
-    section.addEventListener('focusout', function () {
-      if (!section.contains(document.activeElement)) setPaused(false);
-    });
-
-    document.addEventListener('keydown', function (e) {
-      if (!section.contains(document.activeElement)) return;
-      if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
-      else if (e.key === 'ArrowRight') { e.preventDefault(); next(); }
-    });
-
-    dots.forEach(function (dot, i) {
-      dot.addEventListener('click', function () { goToSlide(i); startAutoplay(); });
-      dot.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); goToSlide(i); startAutoplay(); }
-      });
-    });
-
-    startAutoplay();
   })();
 </script>
 
