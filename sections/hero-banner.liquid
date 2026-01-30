@@ -141,26 +141,6 @@
 
     {%- if has_carousel_slides and slide_blocks.size > 1 -%}
       <div class="hero-banner__carousel-controls" role="group" aria-label="Carousel controls">
-        <button
-          type="button"
-          class="hero-banner__carousel-prev"
-          aria-label="Previous slide"
-          data-action="prev"
-        >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>
-        <button
-          type="button"
-          class="hero-banner__carousel-next"
-          aria-label="Next slide"
-          data-action="next"
-        >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>
         <div class="hero-banner__carousel-dots" role="tablist" aria-label="Slide navigation">
           {%- for block in slide_blocks -%}
             {%- if block.settings.image != blank -%}
@@ -508,36 +488,8 @@
     transform: translateX(-50%);
     display: flex;
     align-items: center;
-    gap: var(--spacing-md);
-    z-index: 4;
-  }
-
-  .hero-banner__carousel-prev,
-  .hero-banner__carousel-next {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    border: 2px solid rgba(255, 255, 255, 0.6);
-    background: rgba(255, 255, 255, 0.2);
-    color: #ffffff;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
     justify-content: center;
-    transition: background 0.2s, border-color 0.2s, transform 0.2s;
-  }
-
-  .hero-banner__carousel-prev:hover,
-  .hero-banner__carousel-next:hover {
-    background: rgba(255, 255, 255, 0.25);
-    border-color: rgba(255, 255, 255, 0.8);
-    transform: scale(1.05);
-  }
-
-  .hero-banner__carousel-prev:focus-visible,
-  .hero-banner__carousel-next:focus-visible {
-    outline: 2px solid #ffffff;
-    outline-offset: 2px;
+    z-index: 4;
   }
 
   .hero-banner__carousel-dots {
@@ -713,12 +665,6 @@
       bottom: var(--spacing-lg);
     }
 
-    .hero-banner__carousel-prev,
-    .hero-banner__carousel-next {
-      width: 44px;
-      height: 44px;
-    }
-
     .hero-banner__overlay::before,
     .hero-banner__overlay::after {
       display: none;
@@ -770,12 +716,10 @@
 
     const slides = Array.from(section.querySelectorAll('.hero-banner__slide:not(.hero-banner__slide--empty)'));
     const dots = Array.from(section.querySelectorAll('.hero-banner__carousel-dot'));
-    const btnPrev = section.querySelector('[data-action="prev"]');
-    const btnNext = section.querySelector('[data-action="next"]');
 
     if (slides.length <= 1) return;
 
-    const speed = parseInt(section.dataset.autoplaySpeed, 10) || 5000;
+    const speed = parseInt(section.dataset.autoplaySpeed, 10) || 1500;
     const duration = parseInt(section.dataset.transitionDuration, 10) || 800;
     section.style.setProperty('--hero-transition-duration', duration + 'ms');
 
@@ -824,9 +768,6 @@
       if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
       else if (e.key === 'ArrowRight') { e.preventDefault(); next(); }
     });
-
-    if (btnPrev) btnPrev.addEventListener('click', function () { prev(); startAutoplay(); });
-    if (btnNext) btnNext.addEventListener('click', function () { next(); startAutoplay(); });
 
     dots.forEach(function (dot, i) {
       dot.addEventListener('click', function () { goToSlide(i); startAutoplay(); });
@@ -890,10 +831,10 @@
       "type": "range",
       "id": "carousel_speed",
       "label": "Auto-play speed (seconds)",
-      "min": 3,
+      "min": 1,
       "max": 10,
-      "step": 1,
-      "default": 5,
+      "step": 0.5,
+      "default": 1.5,
       "unit": "s"
     },
     {
