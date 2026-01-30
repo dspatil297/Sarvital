@@ -244,18 +244,47 @@
             Buy Now
           </button>
         {% endif %}
-        
-        <!-- Trust Message -->
-        <div class="product-trust-message">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-          </svg>
-          <div>
-            <strong>100% Secure Checkout</strong>
-            <span>SSL encrypted & secure payment</span>
-          </div>
-        </div>
       {% endform %}
+
+      <!-- Buy On Amazon: real <a> so redirect works without JavaScript -->
+      {% assign amazon_link_metafield = product.metafields.custom.amazon_link %}
+      {% if amazon_link_metafield != blank %}
+        {% comment %} Support both "url" type (.value = URL string) and "link" type (.value.url) {% endcomment %}
+        {% if amazon_link_metafield.value.url != blank %}
+          {% assign amazon_url = amazon_link_metafield.value.url %}
+        {% elsif amazon_link_metafield.value != blank %}
+          {% assign amazon_url = amazon_link_metafield.value | strip %}
+        {% endif %}
+        {% if amazon_url != blank %}
+          <a
+            href="{{ amazon_url }}"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="cta-button cta-button--secondary cta-button--amazon"
+            aria-label="Buy On Amazon"
+          >
+            <span class="cta-button__icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                <polyline points="15 3 21 3 21 9"/>
+                <line x1="10" y1="14" x2="21" y2="3"/>
+              </svg>
+            </span>
+            <span class="cta-button__text">Buy On Amazon</span>
+          </a>
+        {% endif %}
+      {% endif %}
+
+      <!-- Trust Message -->
+      <div class="product-trust-message">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+        <div>
+          <strong>100% Secure Checkout</strong>
+          <span>SSL encrypted & secure payment</span>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -761,6 +790,26 @@
   .cta-button:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+  }
+
+  /* CTA as link (e.g. Buy on Amazon) - reset link styles so it looks like a button */
+  a.cta-button {
+    text-decoration: none;
+    box-sizing: border-box;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  a.cta-button--secondary {
+    background: transparent;
+    color: var(--forest-green);
+    border: 2px solid var(--forest-green);
+    margin-top: 8px;
+  }
+
+  a.cta-button--secondary:hover {
+    background: rgba(74, 124, 44, 0.05);
+    color: var(--forest-green);
   }
 
   /* Trust Message */
