@@ -35,7 +35,10 @@
         },
         "slide_e6GqMU": {
           "type": "slide",
-          "settings": {}
+          "settings": {
+            "image": "shopify://shop_images/WhatsApp_Image_2026-01-31_at_13.44.35_1.jpg",
+            "mobile_image": "shopify://shop_images/WhatsApp_Image_2026-01-31_at_13.44.35_1_4cb17f7c-1ee6-44e8-ae16-afe36b9bb64e.jpg"
+          }
         }
       },
       "block_order": [
