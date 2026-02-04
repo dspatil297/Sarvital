@@ -1,0 +1,15 @@
+{
+  "sections": {
+    "policy": {
+      "type": "policy-page",
+      "settings": {
+        "title": "Cancellation and Refunds",
+        "last_updated": "January 2024",
+        "policy_type": "cancellation"
+      }
+    }
+  },
+  "order": [
+    "policy"
+  ]
+}

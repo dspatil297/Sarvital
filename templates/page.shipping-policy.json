@@ -1,0 +1,15 @@
+{
+  "sections": {
+    "policy": {
+      "type": "policy-page",
+      "settings": {
+        "title": "Shipping Policy",
+        "last_updated": "January 2024",
+        "policy_type": "shipping"
+      }
+    }
+  },
+  "order": [
+    "policy"
+  ]
+}

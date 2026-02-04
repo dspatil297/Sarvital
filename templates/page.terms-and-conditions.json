@@ -1,0 +1,15 @@
+{
+  "sections": {
+    "policy": {
+      "type": "policy-page",
+      "settings": {
+        "title": "Terms and Conditions",
+        "last_updated": "January 2024",
+        "policy_type": "terms"
+      }
+    }
+  },
+  "order": [
+    "policy"
+  ]
+}
