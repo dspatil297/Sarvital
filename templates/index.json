@@ -12,20 +12,6 @@
     "hero_banner": {
       "type": "hero-banner",
       "blocks": {
-        "slide_XDaV8E": {
-          "type": "slide",
-          "settings": {
-            "image": "shopify://shop_images/WhatsApp_Image_2026-01-31_at_13.44.35.jpg",
-            "mobile_image": "shopify://shop_images/WhatsApp_Image_2026-01-31_at_13.44.35_06cef7b8-8227-4568-a326-2bfd3b461eec.jpg"
-          }
-        },
-        "slide_TYAmfJ": {
-          "type": "slide",
-          "settings": {
-            "image": "shopify://shop_images/WhatsApp_Image_2026-01-31_at_13.44.34.jpg",
-            "mobile_image": "shopify://shop_images/WhatsApp_Image_2026-01-31_at_13.44.34_81636a0b-d116-4848-b962-35e323b6fec7.jpg"
-          }
-        },
         "slide_knjxEJ": {
           "type": "slide",
           "settings": {
@@ -33,19 +19,17 @@
             "mobile_image": "shopify://shop_images/WhatsApp_Image_2026-01-30_at_11.50.09_1f4d78e9-90f0-40ab-8e56-190e431adecf.jpg"
           }
         },
-        "slide_e6GqMU": {
+        "slide_Nq893k": {
           "type": "slide",
           "settings": {
-            "image": "shopify://shop_images/WhatsApp_Image_2026-01-31_at_13.44.35_1.jpg",
-            "mobile_image": "shopify://shop_images/WhatsApp_Image_2026-01-31_at_13.44.35_1_4cb17f7c-1ee6-44e8-ae16-afe36b9bb64e.jpg"
+            "image": "shopify://shop_images/relaxing-in-nature.jpg",
+            "mobile_image": "shopify://shop_images/relaxing-in-nature.jpg"
           }
         }
       },
       "block_order": [
-        "slide_XDaV8E",
-        "slide_TYAmfJ",
         "slide_knjxEJ",
-        "slide_e6GqMU"
+        "slide_Nq893k"
       ],
       "settings": {
         "hero_image": "shopify://shop_images/WhatsApp_Image_2026-01-30_at_11.50.09.jpg",
@@ -58,6 +42,52 @@
         "carousel_speed": 3,
         "transition_duration": 800,
         "overlay_opacity": 85
+      }
+    },
+    "usp_icons": {
+      "type": "usp-icons",
+      "blocks": {
+        "usp_1": {
+          "type": "usp_item",
+          "settings": {
+            "icon_name": "lab-test",
+            "title": "Lab-Tested Quality",
+            "description": "Every product undergoes rigorous lab testing to ensure purity and quality."
+          }
+        },
+        "usp_2": {
+          "type": "usp_item",
+          "settings": {
+            "icon_name": "sustainable",
+            "title": "Sustainable Sourcing",
+            "description": "We partner with local farmers to source the freshest ingredients sustainably."
+          }
+        },
+        "usp_3": {
+          "type": "usp_item",
+          "settings": {
+            "icon_name": "natural",
+            "title": "100% Natural",
+            "description": "Pure, additive-free formulations with no artificial ingredients or preservatives."
+          }
+        },
+        "usp_4": {
+          "type": "usp_item",
+          "settings": {
+            "icon_name": "farmer",
+            "title": "Local Farmer Support",
+            "description": "Supporting local communities and empowering farmers through fair trade practices."
+          }
+        }
+      },
+      "block_order": [
+        "usp_1",
+        "usp_2",
+        "usp_3",
+        "usp_4"
+      ],
+      "settings": {
+        "title": "Why Choose Sarvital"
       }
     },
     "featured_products": {
@@ -214,6 +244,7 @@
   },
   "order": [
     "hero_banner",
+    "usp_icons",
     "featured_products",
     "lifestyle_usage",
     "quality_assurance",
