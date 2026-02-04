@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {% comment %}
   Policy Page Section - Renders Terms, Privacy, Shipping, or Cancellation policy content.
   Content sourced from sarvital.com policy pages.
@@ -128,3 +129,135 @@
   ]
 }
 {% endschema %}
+=======
+{% comment %}
+  Policy Page Section - Renders Terms, Privacy, Shipping, or Cancellation policy content.
+  Content sourced from sarvital.com policy pages.
+{% endcomment %}
+
+{% assign policy_type = section.settings.policy_type | default: 'terms' %}
+
+<section class="policy-page" aria-label="{{ section.settings.title }}">
+  <div class="policy-page__container">
+    <header class="policy-page__header">
+      <h1 class="policy-page__title">{{ section.settings.title }}</h1>
+      {% if section.settings.last_updated != blank %}
+        <p class="policy-page__updated"><strong>Last Updated:</strong> {{ section.settings.last_updated }}</p>
+      {% endif %}
+    </header>
+
+    <div class="policy-page__content rte">
+      {% case policy_type %}
+        {% when 'terms' %}
+          {% render 'policy-content-terms' %}
+        {% when 'privacy' %}
+          {% render 'policy-content-privacy' %}
+        {% when 'shipping' %}
+          {% render 'policy-content-shipping' %}
+        {% when 'cancellation' %}
+          {% render 'policy-content-cancellation' %}
+        {% else %}
+          {% render 'policy-content-terms' %}
+      {% endcase %}
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+  .policy-page {
+    padding: var(--spacing-2xl) var(--container-padding);
+    max-width: var(--container-max-width);
+    margin: 0 auto;
+  }
+  .policy-page__container {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+  .policy-page__header {
+    margin-bottom: var(--spacing-2xl);
+    padding-bottom: var(--spacing-xl);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  }
+  .policy-page__title {
+    font-family: var(--font-heading);
+    font-size: clamp(1.75rem, 4vw, 2.25rem);
+    font-weight: 700;
+    color: var(--forest-green);
+    margin: 0 0 var(--spacing-sm);
+  }
+  .policy-page__updated {
+    font-size: var(--body-small);
+    color: var(--text-muted);
+    margin: 0;
+  }
+  .policy-page__content {
+    font-size: var(--body-normal);
+    line-height: 1.7;
+    color: var(--text);
+  }
+  .policy-page__content h2 {
+    font-family: var(--font-heading);
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--forest-green);
+    margin: var(--spacing-xl) 0 var(--spacing-md);
+  }
+  .policy-page__content h2:first-child {
+    margin-top: 0;
+  }
+  .policy-page__content h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: var(--spacing-lg) 0 var(--spacing-sm);
+  }
+  .policy-page__content p {
+    margin: 0 0 var(--spacing-md);
+  }
+  .policy-page__content ul {
+    margin: 0 0 var(--spacing-md);
+    padding-left: 1.5em;
+  }
+  .policy-page__content li {
+    margin-bottom: var(--spacing-xs);
+  }
+  .policy-page__content a {
+    color: var(--sage-green);
+    text-decoration: underline;
+  }
+  .policy-page__content a:hover {
+    color: var(--forest-green);
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Policy Page",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Page title",
+      "default": "Terms and Conditions"
+    },
+    {
+      "type": "text",
+      "id": "last_updated",
+      "label": "Last updated",
+      "default": "January 2024"
+    },
+    {
+      "type": "select",
+      "id": "policy_type",
+      "label": "Policy type",
+      "options": [
+        { "value": "terms", "label": "Terms and Conditions" },
+        { "value": "privacy", "label": "Privacy Policy" },
+        { "value": "shipping", "label": "Shipping Policy" },
+        { "value": "cancellation", "label": "Cancellation and Refunds" }
+      ],
+      "default": "terms"
+    }
+  ]
+}
+{% endschema %}
+>>>>>>> 9502d270f83694627cc4fdf5dd3ade51c7e270d3

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {
   "sections": {
     "policy": {
@@ -13,3 +14,29 @@
     "policy"
   ]
 }
+=======
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "policy": {
+      "type": "policy-page",
+      "settings": {
+        "title": "Privacy Policy",
+        "last_updated": "January 2024",
+        "policy_type": "privacy"
+      }
+    }
+  },
+  "order": [
+    "policy"
+  ]
+}
+>>>>>>> 9502d270f83694627cc4fdf5dd3ade51c7e270d3
