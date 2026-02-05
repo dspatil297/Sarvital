@@ -1,8 +1,44 @@
 <section class="lifestyle-usage">
   <div class="lifestyle-usage__container">
     <div class="lifestyle-usage__content">
-      <div class="lifestyle-usage__image">
-        {% if section.settings.image %}
+      <div class="lifestyle-usage__image lifestyle-usage__carousel-wrapper">
+        {% assign carousel_images = section.blocks | where: 'type', 'carousel_image' %}
+        {% if carousel_images.size > 0 %}
+          <div class="lifestyle-usage__carousel" data-lifestyle-carousel>
+            <div class="lifestyle-usage__carousel-track">
+              {% for block in carousel_images %}
+                <div class="lifestyle-usage__carousel-slide" {{ block.shopify_attributes }}>
+                  {% if block.settings.image != blank %}
+                    <img 
+                      src="{{ block.settings.image | image_url: width: 800 }}" 
+                      alt="{{ block.settings.image.alt | default: section.settings.title }}"
+                      loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
+                      width="800"
+                      height="600"
+                    >
+                  {% endif %}
+                </div>
+              {% endfor %}
+            </div>
+            {% if carousel_images.size > 1 %}
+              <button type="button" class="lifestyle-usage__carousel-btn lifestyle-usage__carousel-btn--prev" aria-label="Previous image">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M15 18l-6-6 6-6"/>
+                </svg>
+              </button>
+              <button type="button" class="lifestyle-usage__carousel-btn lifestyle-usage__carousel-btn--next" aria-label="Next image">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M9 18l6-6-6-6"/>
+                </svg>
+              </button>
+              <div class="lifestyle-usage__carousel-dots">
+                {% for block in carousel_images %}
+                  <button type="button" class="lifestyle-usage__carousel-dot {% if forloop.first %}is-active{% endif %}" aria-label="Go to image {{ forloop.index }}" data-index="{{ forloop.index0 }}"></button>
+                {% endfor %}
+              </div>
+            {% endif %}
+          </div>
+        {% elsif section.settings.image %}
           <img 
             src="{{ section.settings.image | image_url: width: 800 }}" 
             alt="{{ section.settings.image.alt | default: section.settings.title }}"
@@ -33,6 +69,7 @@
         
         <div class="lifestyle-usage__features">
           {% for block in section.blocks %}
+            {% if block.type == 'feature' %}
             <div class="lifestyle-feature" {{ block.shopify_attributes }}>
               {% if block.settings.icon_name != blank %}
                 <span class="lifestyle-feature__icon">
@@ -48,6 +85,7 @@
                 {% endif %}
               </div>
             </div>
+            {% endif %}
           {% endfor %}
         </div>
         
@@ -119,6 +157,113 @@
 
   .lifestyle-usage__image:hover img {
     transform: scale(1.05);
+  }
+
+  /* Carousel styles */
+  .lifestyle-usage__carousel-wrapper {
+    position: relative;
+  }
+
+  .lifestyle-usage__carousel {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .lifestyle-usage__carousel-track {
+    display: flex;
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .lifestyle-usage__carousel-slide {
+    flex: 0 0 100%;
+    min-width: 100%;
+  }
+
+  .lifestyle-usage__carousel-slide img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .lifestyle-usage__carousel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 44px;
+    height: 44px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.9);
+    color: var(--forest-green);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    transition: background 0.2s, opacity 0.2s;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .lifestyle-usage__carousel-btn:hover {
+    background: #fff;
+    opacity: 1;
+  }
+
+  .lifestyle-usage__carousel-btn--prev {
+    left: 12px;
+  }
+
+  .lifestyle-usage__carousel-btn--next {
+    right: 12px;
+  }
+
+  .lifestyle-usage__carousel-dots {
+    position: absolute;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    z-index: 2;
+  }
+
+  .lifestyle-usage__carousel-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.6);
+    cursor: pointer;
+    padding: 0;
+    transition: background 0.2s, transform 0.2s;
+  }
+
+  .lifestyle-usage__carousel-dot:hover {
+    background: rgba(255, 255, 255, 0.9);
+  }
+
+  .lifestyle-usage__carousel-dot.is-active {
+    background: #fff;
+    transform: scale(1.2);
+  }
+
+  @media (max-width: 768px) {
+    .lifestyle-usage__carousel-btn {
+      width: 36px;
+      height: 36px;
+    }
+
+    .lifestyle-usage__carousel-btn--prev {
+      left: 8px;
+    }
+
+    .lifestyle-usage__carousel-btn--next {
+      right: 8px;
+    }
+
+    .lifestyle-usage__carousel-dots {
+      bottom: 12px;
+    }
   }
 
   .lifestyle-usage__image-overlay {
@@ -317,6 +462,11 @@
     }
   }
 
+  /* Disable image scale on carousel hover */
+  .lifestyle-usage__carousel:hover .lifestyle-usage__carousel-slide img {
+    transform: none;
+  }
+
   /* Disable hover effects on touch devices to avoid sticky states */
   @media (max-width: 968px) and (hover: none) {
     .lifestyle-usage__image:hover {
@@ -329,6 +479,33 @@
     }
   }
 {% endstylesheet %}
+
+<script>
+  (function() {
+    const carousel = document.querySelector('[data-lifestyle-carousel]');
+    if (!carousel) return;
+
+    const track = carousel.querySelector('.lifestyle-usage__carousel-track');
+    const slides = carousel.querySelectorAll('.lifestyle-usage__carousel-slide');
+    const prevBtn = carousel.querySelector('.lifestyle-usage__carousel-btn--prev');
+    const nextBtn = carousel.querySelector('.lifestyle-usage__carousel-btn--next');
+    const dots = carousel.querySelectorAll('.lifestyle-usage__carousel-dot');
+
+    if (slides.length <= 1) return;
+
+    let currentIndex = 0;
+
+    function goToSlide(index) {
+      currentIndex = ((index % slides.length) + slides.length) % slides.length;
+      track.style.transform = `translateX(-${currentIndex * 100}%)`;
+      dots.forEach((dot, i) => dot.classList.toggle('is-active', i === currentIndex));
+    }
+
+    if (prevBtn) prevBtn.addEventListener('click', () => goToSlide(currentIndex - 1));
+    if (nextBtn) nextBtn.addEventListener('click', () => goToSlide(currentIndex + 1));
+    dots.forEach((dot, i) => dot.addEventListener('click', () => goToSlide(i)));
+  })();
+</script>
 
 {% schema %}
 {
@@ -365,6 +542,18 @@
     }
   ],
   "blocks": [
+    {
+      "type": "carousel_image",
+      "name": "Carousel Image",
+      "limit": 10,
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        }
+      ]
+    },
     {
       "type": "feature",
       "name": "Feature",
