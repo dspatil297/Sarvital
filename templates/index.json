@@ -107,6 +107,24 @@
     "lifestyle_usage": {
       "type": "lifestyle-usage",
       "blocks": {
+        "carousel_image_E7VccL": {
+          "type": "carousel_image",
+          "settings": {
+            "image": "shopify://shop_images/WhatsApp_Image_2026-02-04_at_18.21.26.jpg"
+          }
+        },
+        "carousel_image_RF4HHd": {
+          "type": "carousel_image",
+          "settings": {
+            "image": "shopify://shop_images/WhatsApp_Image_2026-02-04_at_18.21.27.jpg"
+          }
+        },
+        "carousel_image_WggCXR": {
+          "type": "carousel_image",
+          "settings": {
+            "image": "shopify://shop_images/WhatsApp_Image_2026-02-04_at_18.21.27_1.jpg"
+          }
+        },
         "feature_1": {
           "type": "feature",
           "settings": {
@@ -141,6 +159,9 @@
         }
       },
       "block_order": [
+        "carousel_image_E7VccL",
+        "carousel_image_RF4HHd",
+        "carousel_image_WggCXR",
         "feature_1",
         "feature_2",
         "feature_3",
