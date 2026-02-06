@@ -497,7 +497,7 @@
 
     function goToSlide(index) {
       currentIndex = ((index % slides.length) + slides.length) % slides.length;
-      track.style.transform = `translateX(-${currentIndex * 100}%)`;
+      track.style.transform = `translateX(-${(currentIndex / slides.length) * 100}%)`;
       dots.forEach((dot, i) => dot.classList.toggle('is-active', i === currentIndex));
     }
 
