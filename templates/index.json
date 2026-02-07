@@ -12,6 +12,13 @@
     "hero_banner": {
       "type": "hero-banner",
       "blocks": {
+        "slide_Nq893k": {
+          "type": "slide",
+          "settings": {
+            "image": "shopify://shop_images/WhatsApp_Image_2026-01-30_at_11.50.09.jpg",
+            "mobile_image": "shopify://shop_images/WhatsApp_Image_2026-01-30_at_11.50.09_1f4d78e9-90f0-40ab-8e56-190e431adecf.jpg"
+          }
+        },
         "slide_4NXNRf": {
           "type": "slide",
           "settings": {
@@ -32,20 +39,13 @@
             "image": "shopify://shop_images/WhatsApp_Image_2026-01-30_at_11.50.09.jpg",
             "mobile_image": "shopify://shop_images/WhatsApp_Image_2026-01-30_at_11.50.09_1f4d78e9-90f0-40ab-8e56-190e431adecf.jpg"
           }
-        },
-        "slide_Nq893k": {
-          "type": "slide",
-          "settings": {
-            "image": "shopify://shop_images/WhatsApp_Image_2026-01-31_at_13.44.34.jpg",
-            "mobile_image": "shopify://shop_images/WhatsApp_Image_2026-01-31_at_13.44.34_81636a0b-d116-4848-b962-35e323b6fec7.jpg"
-          }
         }
       },
       "block_order": [
+        "slide_Nq893k",
         "slide_4NXNRf",
         "slide_hMhcUm",
-        "slide_knjxEJ",
-        "slide_Nq893k"
+        "slide_knjxEJ"
       ],
       "settings": {
         "hero_image": "shopify://shop_images/WhatsApp_Image_2026-01-30_at_11.50.09.jpg",
