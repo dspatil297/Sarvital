@@ -12,7 +12,7 @@
                     <img 
                       src="{{ block.settings.image | image_url: width: 800 }}" 
                       alt="{{ block.settings.image.alt | default: section.settings.title }}"
-                      loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
+                      loading="eager"
                       width="800"
                       height="600"
                     >

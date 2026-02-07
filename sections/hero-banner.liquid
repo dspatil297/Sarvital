@@ -56,7 +56,7 @@
                 alt="{{ block.settings.image.alt | default: '' }}"
                 width="{{ block.settings.image.width }}"
                 height="{{ block.settings.image.height }}"
-                loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
+                loading="eager"
                 fetchpriority="{% if forloop.first %}high{% else %}low{% endif %}"
               >
             </picture>
