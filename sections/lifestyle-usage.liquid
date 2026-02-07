@@ -4,7 +4,7 @@
       <div class="lifestyle-usage__image lifestyle-usage__carousel-wrapper">
         {% assign carousel_images = section.blocks | where: 'type', 'carousel_image' %}
         {% if carousel_images.size > 0 %}
-          <div class="lifestyle-usage__carousel" data-lifestyle-carousel>
+          <div class="lifestyle-usage__carousel" data-lifestyle-carousel style="--lifestyle-carousel-count: {{ carousel_images.size }};">
             <div class="lifestyle-usage__carousel-track">
               {% for block in carousel_images %}
                 <div class="lifestyle-usage__carousel-slide" {{ block.shopify_attributes }}>
@@ -103,11 +103,15 @@
   .lifestyle-usage {
     width: 100%;
     max-width: 100%;
-    padding: var(--spacing-4xl) var(--spacing-lg);
+    padding: var(--spacing-xl) var(--spacing-lg);
     background: linear-gradient(135deg, rgba(74, 124, 44, 0.03) 0%, rgba(255, 255, 255, 0.02) 50%, rgba(74, 124, 44, 0.03) 100%);
     position: relative;
     overflow: hidden;
     box-sizing: border-box;
+    min-height: 100vh;
+    height: 100vh;
+    display: flex;
+    align-items: center;
   }
 
   .lifestyle-usage::before {
@@ -126,13 +130,14 @@
   .lifestyle-usage__container {
     max-width: 1200px;
     margin: 0 auto;
+    width: 100%;
   }
 
   .lifestyle-usage__content {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: var(--spacing-3xl);
-    align-items: center;
+    gap: var(--spacing-2xl);
+    align-items: flex-start;
   }
 
   .lifestyle-usage__image {
@@ -141,6 +146,16 @@
     overflow: hidden;
     box-shadow: 0 20px 60px rgba(45, 80, 22, 0.15);
     transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    height: auto;
+    max-height: 60vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.7);
+    justify-self: center;
+    width: 100%;
+    max-width: 520px;
+    align-self: center;
   }
 
   .lifestyle-usage__image:hover {
@@ -151,8 +166,12 @@
   .lifestyle-usage__image img {
     width: 100%;
     height: auto;
+    max-height: 60vh;
+    max-width: 100%;
     display: block;
     transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    object-fit: contain;
+    object-position: center;
   }
 
   .lifestyle-usage__image:hover img {
@@ -167,22 +186,33 @@
   .lifestyle-usage__carousel {
     position: relative;
     overflow: hidden;
+    height: auto;
+    display: flex;
+    align-items: center;
   }
 
   .lifestyle-usage__carousel-track {
     display: flex;
     transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    width: 100%;
   }
 
   .lifestyle-usage__carousel-slide {
     flex: 0 0 100%;
-    min-width: 100%;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .lifestyle-usage__carousel-slide img {
     width: 100%;
     height: auto;
+    max-height: 60vh;
+    max-width: 100%;
     display: block;
+    object-fit: contain;
+    object-position: center;
   }
 
   .lifestyle-usage__carousel-btn {
@@ -284,13 +314,13 @@
 
   .lifestyle-usage__title {
     font-family: var(--font-heading);
-    font-size: clamp(36px, 4.5vw, 52px);
+    font-size: clamp(30px, 3.8vw, 44px);
     font-weight: 700;
     background: linear-gradient(135deg, var(--forest-green) 0%, var(--sage-green) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    margin-bottom: var(--spacing-md);
+    margin-bottom: var(--spacing-sm);
     margin-top: 0;
     letter-spacing: -0.02em;
     line-height: 1.2;
@@ -298,17 +328,17 @@
   }
 
   .lifestyle-usage__description {
-    font-size: var(--body-large);
+    font-size: var(--body-normal);
     color: var(--text);
-    line-height: 1.7;
-    margin-bottom: var(--spacing-xl);
+    line-height: 1.6;
+    margin-bottom: var(--spacing-lg);
   }
 
   .lifestyle-usage__features {
     display: flex;
     flex-direction: column;
     gap: var(--spacing-md);
-    margin-bottom: var(--spacing-xl);
+    margin-bottom: var(--spacing-md);
   }
 
   .lifestyle-feature {
@@ -377,6 +407,15 @@
       gap: var(--spacing-xl);
     }
 
+    .lifestyle-usage__image {
+      max-height: 52vh;
+    }
+
+    .lifestyle-usage__image img,
+    .lifestyle-usage__carousel-slide img {
+      max-height: 52vh;
+    }
+
     .lifestyle-usage__title {
       font-size: clamp(28px, 7vw, 36px);
       line-height: 1.25;
@@ -435,14 +474,19 @@
 
     .lifestyle-usage__image {
       border-radius: var(--radius-lg);
-      aspect-ratio: 16 / 10;
       overflow: hidden;
+      max-height: 42vh;
+    }
+
+    .lifestyle-usage__image img,
+    .lifestyle-usage__carousel-slide img {
+      max-height: 42vh;
     }
 
     .lifestyle-usage__image img {
       width: 100%;
       height: 100%;
-      object-fit: cover;
+      object-fit: contain;
       object-position: center;
     }
 
@@ -497,7 +541,7 @@
 
     function goToSlide(index) {
       currentIndex = ((index % slides.length) + slides.length) % slides.length;
-      track.style.transform = `translateX(-${(currentIndex / slides.length) * 100}%)`;
+      track.style.transform = `translateX(-${currentIndex * 100}%)`;
       dots.forEach((dot, i) => dot.classList.toggle('is-active', i === currentIndex));
     }
 
