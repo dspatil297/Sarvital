@@ -12,6 +12,13 @@
     "hero_banner": {
       "type": "hero-banner",
       "blocks": {
+        "slide_hMhcUm": {
+          "type": "slide",
+          "settings": {
+            "image": "shopify://shop_images/WhatsApp_Image_2026-01-31_at_13.44.35_1.jpg",
+            "mobile_image": "shopify://shop_images/WhatsApp_Image_2026-01-31_at_13.44.35_1_4cb17f7c-1ee6-44e8-ae16-afe36b9bb64e.jpg"
+          }
+        },
         "slide_knjxEJ": {
           "type": "slide",
           "settings": {
@@ -28,6 +35,7 @@
         }
       },
       "block_order": [
+        "slide_hMhcUm",
         "slide_knjxEJ",
         "slide_Nq893k"
       ],
