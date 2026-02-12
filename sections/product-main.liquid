@@ -35,6 +35,7 @@
           <div class="product-image-thumbnails">
             {% for image in product.images limit: 5 %}
               <button 
+                type="button"
                 class="product-thumbnail {% if forloop.first %}active{% endif %}"
                 data-image-src="{{ image | image_url: width: 1200 }}"
                 aria-label="View image {{ forloop.index }}"
@@ -1283,20 +1284,33 @@
 
 {% javascript %}
   ;(function() {
-    // Image thumbnail switching
-    const thumbnails = document.querySelectorAll('.product-thumbnail');
-    const mainImage = document.getElementById('main-product-image');
-    
-    thumbnails.forEach(thumb => {
-      thumb.addEventListener('click', function() {
-        const imageSrc = this.getAttribute('data-image-src');
-        if (imageSrc && mainImage) {
-          mainImage.src = imageSrc;
-          thumbnails.forEach(t => t.classList.remove('active'));
-          this.classList.add('active');
-        }
+    function initProductGallery() {
+      const section = document.getElementById('product-hero');
+      if (!section) return;
+
+      const thumbnails = section.querySelectorAll('.product-thumbnail');
+      const mainImage = section.querySelector('.product-image-main__img');
+      if (!mainImage || thumbnails.length === 0) return;
+
+      thumbnails.forEach(thumb => {
+        thumb.addEventListener('click', function(e) {
+          e.preventDefault();
+          const imageSrc = this.getAttribute('data-image-src');
+          if (imageSrc) {
+            mainImage.src = imageSrc;
+            mainImage.alt = this.querySelector('img')?.getAttribute('alt') || mainImage.alt;
+            thumbnails.forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+          }
+        });
       });
-    });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initProductGallery);
+    } else {
+      initProductGallery();
+    }
 
     // Variant selection
     const variantButtons = document.querySelectorAll('.variant-option-btn');
