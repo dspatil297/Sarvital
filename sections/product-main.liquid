@@ -41,11 +41,12 @@
                 aria-label="View image {{ forloop.index }}"
               >
                 <img 
-                  src="{{ image | image_url: width: 150 }}" 
+                  src="{{ image | image_url: width: 160 }}" 
                   alt="{{ image.alt | default: product.title }}"
-                  loading="lazy"
-                  width="150"
-                  height="150"
+                  loading="eager"
+                  width="80"
+                  height="80"
+                  decoding="async"
                 >
               </button>
             {% endfor %}
