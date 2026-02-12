@@ -33,7 +33,7 @@
         
         {% if product.images.size > 1 %}
           <div class="product-image-thumbnails">
-            {% for image in product.images limit: 5 %}
+            {% for image in product.images %}
               <button 
                 type="button"
                 class="product-thumbnail {% if forloop.first %}active{% endif %}"
