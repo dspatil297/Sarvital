@@ -23,7 +23,7 @@
               <span class="badge-sale__text">Save {{ product.compare_at_price | minus: product.price | times: 100 | divided_by: product.compare_at_price }}%</span>
             </div>
           {% endif %}
-          <button class="product-image-zoom" aria-label="Zoom product image">
+          <button type="button" class="product-image-zoom" aria-label="Zoom product image">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <circle cx="11" cy="11" r="8"></circle>
               <path d="m21 21-4.35-4.35"></path>
@@ -433,6 +433,50 @@
   .product-image-zoom:hover {
     background: var(--white);
     transform: scale(1.1);
+  }
+
+  /* Product image lightbox (zoom) */
+  #product-image-lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+  #product-image-lightbox .product-lightbox-inner {
+    max-width: 90vw;
+    max-height: 90vh;
+    position: relative;
+  }
+  #product-image-lightbox .product-lightbox-img {
+    max-width: 100%;
+    max-height: 90vh;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+  }
+  #product-image-lightbox .product-lightbox-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 48px;
+    height: 48px;
+    border: none;
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+    border-radius: 50%;
+    z-index: 10;
+    transition: background 0.2s;
+  }
+  #product-image-lightbox .product-lightbox-close:hover {
+    background: rgba(255, 255, 255, 0.35);
   }
 
   .product-image-thumbnails {
@@ -1284,32 +1328,61 @@
 
 {% javascript %}
   ;(function() {
-    function initProductGallery() {
-      const section = document.getElementById('product-hero');
+    // Thumbnail switching – event delegation so it works even if section loads late
+    document.addEventListener('click', function(e) {
+      const thumb = e.target && e.target.closest ? e.target.closest('.product-thumbnail') : null;
+      if (!thumb) return;
+      e.preventDefault();
+      const section = thumb.closest('#product-hero');
       if (!section) return;
-
-      const thumbnails = section.querySelectorAll('.product-thumbnail');
       const mainImage = section.querySelector('.product-image-main__img');
-      if (!mainImage || thumbnails.length === 0) return;
+      if (!mainImage) return;
+      const imageSrc = thumb.getAttribute('data-image-src');
+      if (!imageSrc) return;
+      mainImage.src = imageSrc;
+      const thumbImg = thumb.querySelector('img');
+      if (thumbImg) mainImage.alt = thumbImg.getAttribute('alt') || mainImage.alt;
+      section.querySelectorAll('.product-thumbnail').forEach(function(t) { t.classList.remove('active'); });
+      thumb.classList.add('active');
+    });
 
-      thumbnails.forEach(thumb => {
-        thumb.addEventListener('click', function(e) {
-          e.preventDefault();
-          const imageSrc = this.getAttribute('data-image-src');
-          if (imageSrc) {
-            mainImage.src = imageSrc;
-            mainImage.alt = this.querySelector('img')?.getAttribute('alt') || mainImage.alt;
-            thumbnails.forEach(t => t.classList.remove('active'));
-            this.classList.add('active');
-          }
-        });
+    // Zoom / magnifier – open lightbox with current main image
+    document.addEventListener('click', function(e) {
+      const zoomBtn = e.target && e.target.closest ? e.target.closest('.product-image-zoom') : null;
+      if (!zoomBtn) return;
+      e.preventDefault();
+      const section = zoomBtn.closest('#product-hero');
+      if (!section) return;
+      const mainImage = section.querySelector('.product-image-main__img');
+      if (!mainImage || !mainImage.src) return;
+      openImageLightbox(mainImage.src, mainImage.alt || '');
+    });
+
+    function openImageLightbox(src, alt) {
+      if (document.getElementById('product-image-lightbox')) return;
+      const overlay = document.createElement('div');
+      overlay.id = 'product-image-lightbox';
+      overlay.setAttribute('role', 'dialog');
+      overlay.setAttribute('aria-modal', 'true');
+      overlay.setAttribute('aria-label', 'Zoomed product image');
+      overlay.innerHTML = '<button type="button" class="product-lightbox-close" aria-label="Close">\u2715</button><div class="product-lightbox-inner"><img src="" alt="" class="product-lightbox-img"></div>';
+      const img = overlay.querySelector('.product-lightbox-img');
+      img.src = src;
+      img.alt = alt;
+      document.body.appendChild(overlay);
+      document.body.style.overflow = 'hidden';
+      function close() {
+        if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+        document.body.style.overflow = '';
+        document.removeEventListener('keydown', onKey);
+      }
+      overlay.addEventListener('click', function(e) {
+        if (e.target === overlay || e.target.classList.contains('product-lightbox-close')) close();
       });
-    }
-
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initProductGallery);
-    } else {
-      initProductGallery();
+      function onKey(e) {
+        if (e.key === 'Escape') close();
+      }
+      document.addEventListener('keydown', onKey);
     }
 
     // Variant selection
