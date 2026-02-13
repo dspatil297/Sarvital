@@ -28,17 +28,29 @@
     },
     "product_image_banner": {
       "type": "product-image-banner",
-      "settings": {}
+      "settings": {
+        "banner_image": "shopify://shop_images/WhatsApp_Image_2026-02-03_at_20.43.06.jpg",
+        "banner_alt": "Product banner",
+        "banner_link": ""
+      }
     },
     "related_products": {
       "type": "product-grid",
       "settings": {
         "title": "Related Products",
         "description": "You may also like these products from our collection.",
+        "layout": "carousel",
+        "carousel_auto_scroll": true,
+        "carousel_auto_scroll_interval": 6,
+        "collection": "",
         "products_to_show": 4,
         "show_view_all": false,
         "view_all_text": "View All Products"
       }
+    },
+    "product_faq": {
+      "type": "product-faq",
+      "settings": {}
     },
     "1769418164e60d6e16": {
       "type": "apps",
@@ -81,10 +93,6 @@
       "block_order": [
         "judge_me_reviews_cards_carousel_mmicRK"
       ],
-      "settings": {}
-    },
-    "product_faq": {
-      "type": "product-faq",
       "settings": {}
     }
   },
