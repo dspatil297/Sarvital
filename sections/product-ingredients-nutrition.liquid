@@ -41,55 +41,42 @@
           </thead>
           <tbody>
             {% if has_nutrition %}
-              {% comment %} Parse nutrition data - handle multiple formats {% endcomment %}
-              {% assign nutrition_raw = nutrition_value.value | default: nutrition_value %}
+              {% comment %} Parse nutrition data - list metafield where each item is a row {% endcomment %}
+              {% assign nutrition_list = nutrition_value.value | default: nutrition_value %}
               {% assign rows_parsed = false %}
               
-              {% comment %} Method 1: Try structured data (JSON/objects) {% endcomment %}
-              {% if nutrition_raw.first %}
-                {% for item in nutrition_raw %}
-                  {% if item.nutrient or item.name %}
-                    {% assign rows_parsed = true %}
-                    <tr>
-                      <td>{{ item.nutrient | default: item.name }}</td>
-                      <td>{{ item.per_100g | default: item.per100g | default: item.per_100_g }}</td>
-                      <td>{{ item.rda_per_serve | default: item.rda | default: item.rda_per_serve }}</td>
-                    </tr>
-                  {% elsif item.first %}
-                    {% assign rows_parsed = true %}
-                    <tr>
-                      <td>{{ item[0] | strip }}</td>
-                      <td>{{ item[1] | strip }}</td>
-                      <td>{{ item[2] | strip }}</td>
-                    </tr>
-                  {% endif %}
-                {% endfor %}
-              {% endif %}
-              
-              {% comment %} Method 2: Parse as multiline string {% endcomment %}
-              {% unless rows_parsed %}
-                {% assign nutrition_text = nutrition_raw | default: nutrition_value %}
-                {% assign nutrition_lines = nutrition_text | newline_to_br | split: '<br />' %}
-                
-                {% for line in nutrition_lines %}
-                  {% assign clean_line = line | strip %}
-                  {% if clean_line != blank %}
+              {% comment %} Handle list metafield - each item is a row {% endcomment %}
+              {% if nutrition_list.first %}
+                {% for row_item in nutrition_list %}
+                  {% assign row_str = row_item | strip %}
+                  {% if row_str != blank %}
                     {% comment %} Skip header rows {% endcomment %}
-                    {% unless clean_line == 'Nutrient' or clean_line == 'Per 100 g' or clean_line == '% RDA per Serve' or clean_line == 'NUTRIENT' or clean_line == 'PER 100 G' or clean_line == '% RDA PER SERVE' %}
+                    {% unless row_str == 'Nutrient' or row_str == 'Per 100 g' or row_str == '% RDA per Serve' or row_str == 'NUTRIENT' or row_str == 'PER 100 G' or row_str == '% RDA PER SERVE' or row_str contains 'Nutrient' and row_str contains 'Per 100' %}
                       {% assign parts = null %}
                       {% assign found_separator = false %}
                       
-                      {% comment %} Try tab separator (using actual tab character) {% endcomment %}
-                      {% assign tab_test = clean_line | split: '	' %}
-                      {% if tab_test.size >= 3 %}
-                        {% assign parts = tab_test %}
-                        {% assign found_separator = true %}
+                      {% comment %} Try comma separator first {% endcomment %}
+                      {% if row_str contains ',' %}
+                        {% assign comma_test = row_str | split: ',' %}
+                        {% if comma_test.size >= 3 %}
+                          {% assign parts = comma_test %}
+                          {% assign found_separator = true %}
+                        {% endif %}
                       {% endif %}
+                      
+                      {% comment %} Try tab separator (actual tab character) {% endcomment %}
+                      {% unless found_separator %}
+                        {% assign tab_test = row_str | split: '	' %}
+                        {% if tab_test.size >= 3 %}
+                          {% assign parts = tab_test %}
+                          {% assign found_separator = true %}
+                        {% endif %}
+                      {% endunless %}
                       
                       {% comment %} Try pipe separator {% endcomment %}
                       {% unless found_separator %}
-                        {% if clean_line contains '|' %}
-                          {% assign pipe_test = clean_line | split: '|' %}
+                        {% if row_str contains '|' %}
+                          {% assign pipe_test = row_str | split: '|' %}
                           {% if pipe_test.size >= 3 %}
                             {% assign parts = pipe_test %}
                             {% assign found_separator = true %}
@@ -97,17 +84,25 @@
                         {% endif %}
                       {% endunless %}
                       
-                      {% comment %} Try multiple spaces as separator {% endcomment %}
+                      {% comment %} Try multiple spaces (2 or more) as separator {% endcomment %}
                       {% unless found_separator %}
-                        {% if clean_line contains '  ' %}
-                          {% assign space_test = clean_line | split: '  ' %}
-                          {% if space_test.size >= 3 %}
-                            {% assign parts = space_test %}
+                        {% if row_str contains '  ' %}
+                          {% comment %} Split by 2+ spaces, but keep single spaces within values {% endcomment %}
+                          {% assign space_parts = row_str | split: '  ' %}
+                          {% if space_parts.size >= 3 %}
+                            {% assign parts = space_parts %}
                             {% assign found_separator = true %}
                           {% endif %}
                         {% endif %}
                       {% endunless %}
                       
+                      {% comment %} If no standard separator found, pass to JavaScript for smart parsing {% endcomment %}
+                      {% unless found_separator %}
+                        {% comment %} Mark this row for JavaScript parsing by adding a data attribute {% endcomment %}
+                        {% assign needs_js_parse = true %}
+                      {% endunless %}
+                      
+                      {% comment %} If we found parts, render the row {% endcomment %}
                       {% if found_separator and parts.size >= 3 %}
                         <tr>
                           <td>{{ parts[0] | strip }}</td>
@@ -115,11 +110,20 @@
                           <td>{{ parts[2] | strip }}</td>
                         </tr>
                         {% assign rows_parsed = true %}
+                      {% elsif row_str != blank %}
+                        {% comment %} If no separator found but item exists, try to parse as single value or show as-is in first column {% endcomment %}
+                        {% comment %} This handles cases where the list item might be just the nutrient name {% endcomment %}
+                        <tr>
+                          <td>{{ row_str }}</td>
+                          <td>—</td>
+                          <td>—</td>
+                        </tr>
+                        {% assign rows_parsed = true %}
                       {% endif %}
                     {% endunless %}
                   {% endif %}
                 {% endfor %}
-              {% endunless %}
+              {% endif %}
               
               {% comment %} If still no rows parsed, show placeholder {% endcomment %}
               {% unless rows_parsed %}
@@ -177,12 +181,51 @@
       nutritionTable.children[0].textContent.includes('Energy') &&
       nutritionTable.children.length <= 3;
     
-    if (nutritionTable && tableElement && (nutritionTable.children.length === 0 || hasOnlyPlaceholders)) {
-      // Try JSON data attribute first
-      let nutritionRaw = tableElement.getAttribute('data-nutrition-json');
+    // Check if rows are incorrectly parsed (all data in first column, others have "—")
+    let needsReparse = false;
+    if (nutritionTable && nutritionTable.children.length > 0) {
+      const firstRow = nutritionTable.children[0];
+      const cells = firstRow.querySelectorAll('td');
+      if (cells.length >= 3) {
+        const firstCell = cells[0].textContent.trim();
+        const secondCell = cells[1].textContent.trim();
+        const thirdCell = cells[2].textContent.trim();
+        
+        // If first cell has multiple words/numbers and other cells are "—" or empty, needs reparse
+        if (firstCell && (secondCell === '—' || secondCell === '' || secondCell === '–') && 
+            (thirdCell === '—' || thirdCell === '' || thirdCell === '–')) {
+          // Check if first cell contains what looks like all three values (has numbers and %)
+          if (firstCell.match(/\d/) && (firstCell.includes('%') || firstCell.match(/\d+\s*(g|mg|kcal)/i))) {
+            needsReparse = true;
+          }
+        }
+      }
+    }
+    
+      if (nutritionTable && tableElement && (nutritionTable.children.length === 0 || hasOnlyPlaceholders || needsReparse)) {
       let nutritionData = null;
       
-      if (nutritionRaw && nutritionRaw !== 'null' && nutritionRaw !== '') {
+      // Clear incorrectly parsed rows if needed
+      if (needsReparse) {
+        // Extract data from existing rows before clearing
+        const existingRows = Array.from(nutritionTable.querySelectorAll('tr'));
+        const rowData = existingRows.map(row => {
+          const firstCell = row.querySelector('td:first-child');
+          return firstCell ? firstCell.textContent.trim() : '';
+        }).filter(text => text && text !== 'Nutrient' && text !== 'NUTRIENT');
+        
+        // Use extracted data if available
+        if (rowData.length > 0) {
+          nutritionData = rowData;
+        }
+        nutritionTable.innerHTML = '';
+      }
+      
+      // Try JSON data attribute first if we don't have data yet
+      if (!nutritionData) {
+        let nutritionRaw = tableElement.getAttribute('data-nutrition-json');
+        
+        if (nutritionRaw && nutritionRaw !== 'null' && nutritionRaw !== '') {
         try {
           nutritionData = JSON.parse(nutritionRaw);
         } catch (e) {
@@ -215,35 +258,240 @@
           
           // Handle different data formats
           if (Array.isArray(nutritionData)) {
-            rows = nutritionData;
+            // List metafield - each item is a row
+            rows = nutritionData.map(item => {
+              // If item is already an object with properties
+              if (typeof item === 'object' && item !== null && !Array.isArray(item)) {
+                return item;
+              }
+              // If item is a string, parse it
+              if (typeof item === 'string') {
+                const cleanItem = item.trim();
+                // Skip header rows
+                if (cleanItem.match(/^(nutrient|per\s*100|rda)/i)) {
+                  return null;
+                }
+                
+                // Try comma separator first
+                let parts = cleanItem.split(',');
+                if (parts.length >= 3) {
+                  return {
+                    nutrient: parts[0].trim(),
+                    per_100g: parts[1].trim(),
+                    rda: parts[2].trim()
+                  };
+                }
+                
+                // Try tab separator
+                if (parts.length < 3) {
+                  parts = cleanItem.split('\t');
+                  if (parts.length >= 3) {
+                    return {
+                      nutrient: parts[0].trim(),
+                      per_100g: parts[1].trim(),
+                      rda: parts[2].trim()
+                    };
+                  }
+                }
+                
+                // Try pipe separator
+                if (parts.length < 3) {
+                  parts = cleanItem.split('|');
+                  if (parts.length >= 3) {
+                    return {
+                      nutrient: parts[0].trim(),
+                      per_100g: parts[1].trim(),
+                      rda: parts[2].trim()
+                    };
+                  }
+                }
+                
+                // Try multiple spaces (2 or more)
+                if (parts.length < 3) {
+                  parts = cleanItem.split(/\s{2,}/);
+                  if (parts.length >= 3) {
+                    return {
+                      nutrient: parts[0].trim(),
+                      per_100g: parts[1].trim(),
+                      rda: parts[2].trim()
+                    };
+                  }
+                }
+                
+                // Smart parsing for space-separated: "Nutrient Value Unit Percentage"
+                // Pattern: "Energy 325 kcal 0.81%" or "Total Sugars 7.62 g 0.42%"
+                if (parts.length < 3) {
+                  const allParts = cleanItem.split(/\s+/);
+                  
+                  // Find the percentage (contains %)
+                  let percentIndex = -1;
+                  for (let i = allParts.length - 1; i >= 0; i--) {
+                    if (allParts[i].includes('%')) {
+                      percentIndex = i;
+                      break;
+                    }
+                  }
+                  
+                  if (percentIndex > 0) {
+                    // Get percentage
+                    const percentage = allParts[percentIndex];
+                    
+                    // Get value + unit (one or two parts before percentage)
+                    let valueUnit = '';
+                    let nutrientEnd = percentIndex - 1;
+                    
+                    // Check if unit is separate (like "g", "mg", "kcal")
+                    if (percentIndex > 0) {
+                      const beforePercent = allParts[percentIndex - 1];
+                      const unitMatch = beforePercent.match(/^(g|mg|kcal)$/i);
+                      
+                      if (unitMatch && percentIndex > 1) {
+                        // Unit is separate, get number + unit
+                        valueUnit = allParts[percentIndex - 2] + ' ' + allParts[percentIndex - 1];
+                        nutrientEnd = percentIndex - 3;
+                      } else {
+                        // Unit is combined with number (like "325kcal")
+                        valueUnit = allParts[percentIndex - 1];
+                        nutrientEnd = percentIndex - 2;
+                      }
+                    }
+                    
+                    // Get nutrient name (everything before value+unit)
+                    const nutrientName = allParts.slice(0, nutrientEnd + 1).join(' ');
+                    
+                    if (nutrientName && valueUnit && percentage) {
+                      return {
+                        nutrient: nutrientName.trim(),
+                        per_100g: valueUnit.trim(),
+                        rda: percentage.trim()
+                      };
+                    }
+                  }
+                }
+                
+                // If can't parse, return as single nutrient
+                return {
+                  nutrient: cleanItem,
+                  per_100g: '',
+                  rda: ''
+                };
+              }
+              // If item is an array
+              if (Array.isArray(item) && item.length >= 3) {
+                return {
+                  nutrient: item[0],
+                  per_100g: item[1],
+                  rda: item[2]
+                };
+              }
+              return null;
+            }).filter(row => row !== null);
           } else if (nutritionData && typeof nutritionData === 'object' && nutritionData.value) {
             if (Array.isArray(nutritionData.value)) {
-              rows = nutritionData.value;
+              rows = nutritionData.value.map(item => {
+                if (typeof item === 'string') {
+                  const cleanItem = item.trim();
+                  if (cleanItem.match(/^(nutrient|per\s*100|rda)/i)) {
+                    return null;
+                  }
+                  // Try comma separator first
+                  let parts = cleanItem.split(',');
+                  if (parts.length >= 3) {
+                    return {
+                      nutrient: parts[0].trim(),
+                      per_100g: parts[1].trim(),
+                      rda: parts[2].trim()
+                    };
+                  }
+                  
+                  // Try tab separator
+                  if (parts.length < 3) parts = cleanItem.split('\t');
+                  if (parts.length >= 3) {
+                    return {
+                      nutrient: parts[0].trim(),
+                      per_100g: parts[1].trim(),
+                      rda: parts[2].trim()
+                    };
+                  }
+                  
+                  // Try pipe separator
+                  if (parts.length < 3) parts = cleanItem.split('|');
+                  if (parts.length >= 3) {
+                    return {
+                      nutrient: parts[0].trim(),
+                      per_100g: parts[1].trim(),
+                      rda: parts[2].trim()
+                    };
+                  }
+                  
+                  // Try multiple spaces
+                  if (parts.length < 3) parts = cleanItem.split(/\s{2,}/);
+                  if (parts.length >= 3) {
+                    return {
+                      nutrient: parts[0].trim(),
+                      per_100g: parts[1].trim(),
+                      rda: parts[2].trim()
+                    };
+                  }
+                  
+                  // Smart parsing for space-separated
+                  const allParts = cleanItem.split(/\s+/);
+                  let percentIndex = -1;
+                  for (let i = allParts.length - 1; i >= 0; i--) {
+                    if (allParts[i].includes('%')) {
+                      percentIndex = i;
+                      break;
+                    }
+                  }
+                  
+                  if (percentIndex > 0) {
+                    const percentage = allParts[percentIndex];
+                    let valueUnit = '';
+                    let nutrientEnd = percentIndex - 1;
+                    
+                    if (percentIndex > 0) {
+                      const beforePercent = allParts[percentIndex - 1];
+                      const unitMatch = beforePercent.match(/^(g|mg|kcal)$/i);
+                      
+                      if (unitMatch && percentIndex > 1) {
+                        valueUnit = allParts[percentIndex - 2] + ' ' + allParts[percentIndex - 1];
+                        nutrientEnd = percentIndex - 3;
+                      } else {
+                        valueUnit = allParts[percentIndex - 1];
+                        nutrientEnd = percentIndex - 2;
+                      }
+                    }
+                    
+                    const nutrientName = allParts.slice(0, nutrientEnd + 1).join(' ');
+                    
+                    if (nutrientName && valueUnit && percentage) {
+                      return {
+                        nutrient: nutrientName.trim(),
+                        per_100g: valueUnit.trim(),
+                        rda: percentage.trim()
+                      };
+                    }
+                  }
+                  
+                  return { nutrient: cleanItem, per_100g: '', rda: '' };
+                }
+                return item;
+              }).filter(row => row !== null);
             } else {
               nutritionData = nutritionData.value;
             }
           }
           
-          // If still not an array, parse as string
+          // If still not an array, parse as multiline string
           if (!Array.isArray(rows) && typeof nutritionData === 'string') {
             const lines = nutritionData.split(/\r?\n/).filter(line => line.trim());
             rows = lines.map(line => {
               const cleanLine = line.trim();
-              // Skip header rows
               if (cleanLine.match(/^(nutrient|per\s*100|rda)/i)) {
                 return null;
               }
-              
-              // Try tab separator first
-              let parts = cleanLine.split('\t');
-              if (parts.length < 3) {
-                // Try pipe separator
-                parts = cleanLine.split('|');
-              }
-              if (parts.length < 3) {
-                // Try multiple spaces (2 or more)
-                parts = cleanLine.split(/\s{2,}/);
-              }
+              // Try comma separator first
+              let parts = cleanLine.split(',');
               if (parts.length >= 3) {
                 return {
                   nutrient: parts[0].trim(),
@@ -251,6 +499,76 @@
                   rda: parts[2].trim()
                 };
               }
+              
+              // Try tab separator
+              if (parts.length < 3) parts = cleanLine.split('\t');
+              if (parts.length >= 3) {
+                return {
+                  nutrient: parts[0].trim(),
+                  per_100g: parts[1].trim(),
+                  rda: parts[2].trim()
+                };
+              }
+              
+              // Try pipe separator
+              if (parts.length < 3) parts = cleanLine.split('|');
+              if (parts.length >= 3) {
+                return {
+                  nutrient: parts[0].trim(),
+                  per_100g: parts[1].trim(),
+                  rda: parts[2].trim()
+                };
+              }
+              
+              // Try multiple spaces
+              if (parts.length < 3) parts = cleanLine.split(/\s{2,}/);
+              if (parts.length >= 3) {
+                return {
+                  nutrient: parts[0].trim(),
+                  per_100g: parts[1].trim(),
+                  rda: parts[2].trim()
+                };
+              }
+              
+              // Smart parsing for space-separated
+              const allParts = cleanLine.split(/\s+/);
+              let percentIndex = -1;
+              for (let i = allParts.length - 1; i >= 0; i--) {
+                if (allParts[i].includes('%')) {
+                  percentIndex = i;
+                  break;
+                }
+              }
+              
+              if (percentIndex > 0) {
+                const percentage = allParts[percentIndex];
+                let valueUnit = '';
+                let nutrientEnd = percentIndex - 1;
+                
+                if (percentIndex > 0) {
+                  const beforePercent = allParts[percentIndex - 1];
+                  const unitMatch = beforePercent.match(/^(g|mg|kcal)$/i);
+                  
+                  if (unitMatch && percentIndex > 1) {
+                    valueUnit = allParts[percentIndex - 2] + ' ' + allParts[percentIndex - 1];
+                    nutrientEnd = percentIndex - 3;
+                  } else {
+                    valueUnit = allParts[percentIndex - 1];
+                    nutrientEnd = percentIndex - 2;
+                  }
+                }
+                
+                const nutrientName = allParts.slice(0, nutrientEnd + 1).join(' ');
+                
+                if (nutrientName && valueUnit && percentage) {
+                  return {
+                    nutrient: nutrientName.trim(),
+                    per_100g: valueUnit.trim(),
+                    rda: percentage.trim()
+                  };
+                }
+              }
+              
               return null;
             }).filter(row => row !== null);
           }
@@ -271,8 +589,8 @@
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                   <td>${nutrient}</td>
-                  <td>${per100g || ''}</td>
-                  <td>${rda || ''}</td>
+                  <td>${per100g || '—'}</td>
+                  <td>${rda || '—'}</td>
                 `;
                 nutritionTable.appendChild(tr);
               }
