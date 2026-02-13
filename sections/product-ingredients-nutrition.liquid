@@ -1,118 +1,13 @@
 
 {% comment %}
-  Product Ingredients & Nutrition Facts Section
-  Conversion-Optimized Design - Displays custom.ingredients and custom.nutrition_facts metafields
-  Each item displayed on its own row with clean formatting (no quotes, brackets, commas)
+  Product Nutrition Facts Section
+  Displays nutrition facts in a table format with columns: Nutrient, Per 100 g, % RDA per Serve
+  Uses custom.nutrition_facts metafield
 {% endcomment %}
 
 <section class="product-ingredients-nutrition" id="product-ingredients-nutrition">
   <div class="product-ingredients-nutrition__container">
     
-    <!-- Ingredients Section -->
-    {% assign has_ingredients = false %}
-    {% assign ingredients_value = product.metafields.custom.ingredients %}
-    {% if ingredients_value != blank %}
-      {% if ingredients_value.value and ingredients_value.value.size > 0 %}
-        {% assign has_ingredients = true %}
-      {% elsif ingredients_value.first %}
-        {% assign has_ingredients = true %}
-      {% elsif ingredients_value != blank %}
-        {% assign has_ingredients = true %}
-      {% endif %}
-    {% endif %}
-    
-    <!-- Always show ingredients section -->
-    <div class="ingredients-section">
-      <div class="section-header">
-        <div class="section-icon">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-            <path d="M2 17l10 5 10-5M2 12l10 5 10-5"/>
-          </svg>
-        </div>
-        <h2 class="section-title">Ingredients</h2>
-      </div>
-      
-      <div class="ingredients-list">
-        {% if has_ingredients %}
-          {% comment %} Handle list metafield (list.single_line_text_field) - try .value first {% endcomment %}
-          {% if ingredients_value.value %}
-            {% for item in ingredients_value.value %}
-              {% assign clean_item = item | strip | remove: '"' | remove: '[' | remove: ']' | remove: ',' %}
-              {% if clean_item != blank %}
-                <div class="list-item">
-                  <span class="list-bullet"></span>
-                  <span class="list-text">{{ clean_item }}</span>
-                </div>
-              {% endif %}
-            {% endfor %}
-          {% comment %} Handle direct array iteration for list metafields {% endcomment %}
-          {% elsif ingredients_value.first %}
-            {% for item in ingredients_value %}
-              {% assign clean_item = item | strip | remove: '"' | remove: '[' | remove: ']' | remove: ',' %}
-              {% if clean_item != blank %}
-                <div class="list-item">
-                  <span class="list-bullet"></span>
-                  <span class="list-text">{{ clean_item }}</span>
-                </div>
-              {% endif %}
-            {% endfor %}
-          {% elsif ingredients_value contains ',' %}
-            {% comment %} Handle comma-separated string {% endcomment %}
-            {% assign ingredients_array = ingredients_value | split: ',' %}
-            {% for item in ingredients_array %}
-              {% assign clean_item = item | strip | remove: '"' | remove: '[' | remove: ']' %}
-              {% if clean_item != blank %}
-                <div class="list-item">
-                  <span class="list-bullet"></span>
-                  <span class="list-text">{{ clean_item }}</span>
-                </div>
-              {% endif %}
-            {% endfor %}
-          {% elsif ingredients_value contains '\n' or ingredients_value contains '<br' %}
-            {% comment %} Handle newline-separated values {% endcomment %}
-            {% assign ingredients_array = ingredients_value | newline_to_br | split: '<br />' %}
-            {% for item in ingredients_array %}
-              {% assign clean_item = item | strip | remove: '"' | remove: '[' | remove: ']' | remove: ',' %}
-              {% if clean_item != blank %}
-                <div class="list-item">
-                  <span class="list-bullet"></span>
-                  <span class="list-text">{{ clean_item }}</span>
-                </div>
-              {% endif %}
-            {% endfor %}
-          {% else %}
-            {% comment %} Handle single value {% endcomment %}
-            {% assign clean_item = ingredients_value | strip | remove: '"' | remove: '[' | remove: ']' | remove: ',' %}
-            {% if clean_item != blank %}
-              <div class="list-item">
-                <span class="list-bullet"></span>
-                <span class="list-text">{{ clean_item }}</span>
-              </div>
-            {% endif %}
-          {% endif %}
-        {% else %}
-          {% comment %} Show placeholder when no ingredients metafield is set {% endcomment %}
-          <div class="list-item">
-            <span class="list-bullet"></span>
-            <span class="list-text">100% Natural Ingredients</span>
-          </div>
-          <div class="list-item">
-            <span class="list-bullet"></span>
-            <span class="list-text">Naturally Sourced</span>
-          </div>
-          <div class="list-item">
-            <span class="list-bullet"></span>
-            <span class="list-text">No Artificial Additives</span>
-          </div>
-          <div class="list-item">
-            <span class="list-bullet"></span>
-            <span class="list-text">Premium Quality Sourced</span>
-          </div>
-        {% endif %}
-      </div>
-    </div>
-
     <!-- Nutrition Facts Section -->
     {% assign has_nutrition = false %}
     {% assign nutrition_value = product.metafields.custom.nutrition_facts %}
@@ -139,83 +34,131 @@
         <h2 class="section-title">Nutrition Facts</h2>
       </div>
       
-      <div class="nutrition-list">
-        {% if has_nutrition %}
-          {% comment %} Handle list metafield (list.single_line_text_field) - try .value first {% endcomment %}
-          {% if nutrition_value.value %}
-            {% for item in nutrition_value.value %}
-              {% assign clean_item = item | strip | remove: '"' | remove: '[' | remove: ']' | remove: ',' %}
-              {% if clean_item != blank %}
-                <div class="list-item">
-                  <span class="list-bullet"></span>
-                  <span class="list-text">{{ clean_item }}</span>
-                </div>
+      <div class="nutrition-table-wrapper">
+        <table class="nutrition-table">
+          <thead>
+            <tr>
+              <th>Nutrient</th>
+              <th>Per 100 g</th>
+              <th>% RDA per Serve</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if has_nutrition %}
+              {% comment %} Handle structured nutrition data - expecting JSON or structured format {% endcomment %}
+              {% if nutrition_value.value %}
+                {% comment %} If it's a JSON object or structured data {% endcomment %}
+                {% assign nutrition_data = nutrition_value.value %}
+                {% if nutrition_data.first %}
+                  {% comment %} Array of objects {% endcomment %}
+                  {% for row in nutrition_data %}
+                    <tr>
+                      <td>{{ row.nutrient | default: row.name | default: row[0] }}</td>
+                      <td>{{ row.per_100g | default: row.per100g | default: row[1] }}</td>
+                      <td>{{ row.rda_per_serve | default: row.rda | default: row[2] }}</td>
+                    </tr>
+                  {% endfor %}
+                {% else %}
+                  {% comment %} Single object or string {% endcomment %}
+                  {% assign nutrition_str = nutrition_data | json %}
+                  {% if nutrition_str contains 'nutrient' or nutrition_str contains 'per_100g' %}
+                    <tr>
+                      <td>{{ nutrition_data.nutrient | default: nutrition_data.name }}</td>
+                      <td>{{ nutrition_data.per_100g | default: nutrition_data.per100g }}</td>
+                      <td>{{ nutrition_data.rda_per_serve | default: nutrition_data.rda }}</td>
+                    </tr>
+                  {% endif %}
+                {% endif %}
+              {% elsif nutrition_value.first %}
+                {% comment %} Array format {% endcomment %}
+                {% for row in nutrition_value %}
+                  {% if row.nutrient %}
+                    <tr>
+                      <td>{{ row.nutrient }}</td>
+                      <td>{{ row.per_100g | default: row.per100g }}</td>
+                      <td>{{ row.rda_per_serve | default: row.rda }}</td>
+                    </tr>
+                  {% elsif row contains '|' %}
+                    {% comment %} Pipe-separated format: Nutrient|Per 100g|% RDA {% endcomment %}
+                    {% assign parts = row | split: '|' %}
+                    {% if parts.size >= 3 %}
+                      <tr>
+                        <td>{{ parts[0] | strip }}</td>
+                        <td>{{ parts[1] | strip }}</td>
+                        <td>{{ parts[2] | strip }}</td>
+                      </tr>
+                    {% endif %}
+                  {% elsif row contains '\t' %}
+                    {% comment %} Tab-separated format {% endcomment %}
+                    {% assign parts = row | split: '\t' %}
+                    {% if parts.size >= 3 %}
+                      <tr>
+                        <td>{{ parts[0] | strip }}</td>
+                        <td>{{ parts[1] | strip }}</td>
+                        <td>{{ parts[2] | strip }}</td>
+                      </tr>
+                    {% endif %}
+                  {% endif %}
+                {% endfor %}
+              {% elsif nutrition_value contains '|' %}
+                {% comment %} Pipe-separated string format {% endcomment %}
+                {% assign rows = nutrition_value | split: '\n' %}
+                {% for row in rows %}
+                  {% assign parts = row | split: '|' %}
+                  {% if parts.size >= 3 %}
+                    <tr>
+                      <td>{{ parts[0] | strip }}</td>
+                      <td>{{ parts[1] | strip }}</td>
+                      <td>{{ parts[2] | strip }}</td>
+                    </tr>
+                  {% endif %}
+                {% endfor %}
+              {% elsif nutrition_value contains '\n' %}
+                {% comment %} Newline-separated format - try to parse as table rows {% endcomment %}
+                {% assign rows = nutrition_value | newline_to_br | split: '<br />' %}
+                {% for row in rows %}
+                  {% assign clean_row = row | strip %}
+                  {% if clean_row != blank and clean_row != 'Nutrient' and clean_row != 'Per 100 g' and clean_row != '% RDA per Serve' %}
+                    {% assign parts = clean_row | split: '\t' %}
+                    {% if parts.size >= 3 %}
+                      <tr>
+                        <td>{{ parts[0] | strip }}</td>
+                        <td>{{ parts[1] | strip }}</td>
+                        <td>{{ parts[2] | strip }}</td>
+                      </tr>
+                    {% elsif clean_row contains '|' %}
+                      {% assign parts = clean_row | split: '|' %}
+                      {% if parts.size >= 3 %}
+                        <tr>
+                          <td>{{ parts[0] | strip }}</td>
+                          <td>{{ parts[1] | strip }}</td>
+                          <td>{{ parts[2] | strip }}</td>
+                        </tr>
+                      {% endif %}
+                    {% endif %}
+                  {% endif %}
+                {% endfor %}
               {% endif %}
-            {% endfor %}
-          {% comment %} Handle direct array iteration for list metafields {% endcomment %}
-          {% elsif nutrition_value.first %}
-            {% for item in nutrition_value %}
-              {% assign clean_item = item | strip | remove: '"' | remove: '[' | remove: ']' | remove: ',' %}
-              {% if clean_item != blank %}
-                <div class="list-item">
-                  <span class="list-bullet"></span>
-                  <span class="list-text">{{ clean_item }}</span>
-                </div>
-              {% endif %}
-            {% endfor %}
-          {% elsif nutrition_value contains ',' %}
-            {% comment %} Handle comma-separated string {% endcomment %}
-            {% assign nutrition_array = nutrition_value | split: ',' %}
-            {% for item in nutrition_array %}
-              {% assign clean_item = item | strip | remove: '"' | remove: '[' | remove: ']' %}
-              {% if clean_item != blank %}
-                <div class="list-item">
-                  <span class="list-bullet"></span>
-                  <span class="list-text">{{ clean_item }}</span>
-                </div>
-              {% endif %}
-            {% endfor %}
-          {% elsif nutrition_value contains '\n' or nutrition_value contains '<br' %}
-            {% comment %} Handle newline-separated values {% endcomment %}
-            {% assign nutrition_array = nutrition_value | newline_to_br | split: '<br />' %}
-            {% for item in nutrition_array %}
-              {% assign clean_item = item | strip | remove: '"' | remove: '[' | remove: ']' | remove: ',' %}
-              {% if clean_item != blank %}
-                <div class="list-item">
-                  <span class="list-bullet"></span>
-                  <span class="list-text">{{ clean_item }}</span>
-                </div>
-              {% endif %}
-            {% endfor %}
-          {% else %}
-            {% comment %} Handle single value {% endcomment %}
-            {% assign clean_item = nutrition_value | strip | remove: '"' | remove: '[' | remove: ']' | remove: ',' %}
-            {% if clean_item != blank %}
-              <div class="list-item">
-                <span class="list-bullet"></span>
-                <span class="list-text">{{ clean_item }}</span>
-              </div>
+            {% else %}
+              {% comment %} Show placeholder table when no nutrition metafield is set {% endcomment %}
+              <tr>
+                <td>Energy</td>
+                <td>325 kcal</td>
+                <td>0.81%</td>
+              </tr>
+              <tr>
+                <td>Protein</td>
+                <td>17.4 g</td>
+                <td>1.74%</td>
+              </tr>
+              <tr>
+                <td>Carbohydrate</td>
+                <td>60.9 g</td>
+                <td>1.17%</td>
+              </tr>
             {% endif %}
-          {% endif %}
-        {% else %}
-          {% comment %} Show placeholder when no nutrition metafield is set {% endcomment %}
-          <div class="list-item">
-            <span class="list-bullet"></span>
-            <span class="list-text">Rich in Essential Vitamins</span>
-          </div>
-          <div class="list-item">
-            <span class="list-bullet"></span>
-            <span class="list-text">High in Antioxidants</span>
-          </div>
-          <div class="list-item">
-            <span class="list-bullet"></span>
-            <span class="list-text">Natural Minerals</span>
-          </div>
-          <div class="list-item">
-            <span class="list-bullet"></span>
-            <span class="list-text">No Added Sugar</span>
-          </div>
-        {% endif %}
+          </tbody>
+        </table>
       </div>
     </div>
 
@@ -247,13 +190,8 @@
   .product-ingredients-nutrition__container {
     max-width: 1200px;
     margin: 0 auto;
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 40px;
-    align-items: start;
   }
 
-  .ingredients-section,
   .nutrition-section {
     background: linear-gradient(145deg, var(--white) 0%, rgba(255, 255, 255, 0.95) 100%);
     border-radius: 24px;
@@ -268,7 +206,6 @@
     overflow: hidden;
   }
 
-  .ingredients-section::before,
   .nutrition-section::before {
     content: '';
     position: absolute;
@@ -282,12 +219,10 @@
     transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  .ingredients-section:hover::before,
   .nutrition-section:hover::before {
     transform: scaleX(1);
   }
 
-  .ingredients-section:hover,
   .nutrition-section:hover {
     box-shadow: 
       0 20px 60px rgba(45, 80, 22, 0.15),
@@ -349,7 +284,6 @@
     transition: all 0.6s;
   }
 
-  .ingredients-section:hover .section-icon::before,
   .nutrition-section:hover .section-icon::before {
     animation: shine 1.5s ease-in-out;
   }
@@ -367,7 +301,6 @@
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
   }
 
-  .ingredients-section:hover .section-icon,
   .nutrition-section:hover .section-icon {
     transform: rotate(5deg) scale(1.1);
     box-shadow: 
@@ -389,111 +322,86 @@
     text-shadow: 0 2px 4px rgba(45, 80, 22, 0.1);
   }
 
-  .ingredients-list,
-  .nutrition-list {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
-
-  .list-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 16px;
-    padding: 16px 20px;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(250, 250, 250, 0.6) 100%);
+  .nutrition-table-wrapper {
+    overflow-x: auto;
     border-radius: 12px;
-    border: 1px solid rgba(74, 124, 44, 0.1);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
+  }
+
+  .nutrition-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(250, 250, 250, 0.9) 100%);
+    border-radius: 12px;
     overflow: hidden;
-  }
-
-  .list-item::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 4px;
-    background: linear-gradient(180deg, var(--forest-green), var(--sage-green));
-    transform: scaleY(0);
-    transform-origin: bottom;
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .list-item:hover::before {
-    transform: scaleY(1);
-  }
-
-  .list-item:hover {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 1) 0%, rgba(250, 250, 250, 0.9) 100%);
-    border-color: rgba(74, 124, 44, 0.25);
     box-shadow: 
-      0 4px 16px rgba(45, 80, 22, 0.1),
-      0 2px 8px rgba(0, 0, 0, 0.05);
-    transform: translateX(8px);
+      0 4px 16px rgba(45, 80, 22, 0.08),
+      0 2px 8px rgba(0, 0, 0, 0.04);
   }
 
-  .list-bullet {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
+  .nutrition-table thead {
     background: linear-gradient(135deg, var(--forest-green) 0%, var(--sage-green) 100%);
-    margin-top: 6px;
-    flex-shrink: 0;
-    position: relative;
-    box-shadow: 
-      0 2px 8px rgba(45, 80, 22, 0.3),
-      inset 0 1px 2px rgba(255, 255, 255, 0.3);
   }
 
-  .list-bullet::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, rgba(45, 80, 22, 0.2), rgba(74, 124, 44, 0.15));
-    animation: pulse-ring 2s ease-in-out infinite;
+  .nutrition-table th {
+    padding: 18px 24px;
+    text-align: left;
+    font-family: var(--font-heading);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--white);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.2);
   }
 
-  @keyframes pulse-ring {
-    0%, 100% {
-      opacity: 0.6;
-      transform: translate(-50%, -50%) scale(1);
-    }
-    50% {
-      opacity: 0.3;
-      transform: translate(-50%, -50%) scale(1.4);
-    }
+  .nutrition-table th:first-child {
+    border-top-left-radius: 12px;
   }
 
-  .list-item:hover .list-bullet {
-    background: linear-gradient(135deg, var(--sage-green) 0%, var(--forest-green) 100%);
-    box-shadow: 
-      0 4px 12px rgba(74, 124, 44, 0.4),
-      inset 0 1px 2px rgba(255, 255, 255, 0.4);
-    transform: scale(1.2);
+  .nutrition-table th:last-child {
+    border-top-right-radius: 12px;
+    text-align: right;
   }
 
-  .list-text {
-    font-size: 17px;
-    line-height: 1.8;
+  .nutrition-table th:nth-child(2) {
+    text-align: center;
+  }
+
+  .nutrition-table tbody tr {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-bottom: 1px solid rgba(74, 124, 44, 0.1);
+  }
+
+  .nutrition-table tbody tr:last-child {
+    border-bottom: none;
+  }
+
+  .nutrition-table tbody tr:hover {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 1) 0%, rgba(250, 250, 250, 0.95) 100%);
+    box-shadow: inset 0 0 0 2px rgba(74, 124, 44, 0.15);
+  }
+
+  .nutrition-table td {
+    padding: 16px 24px;
+    font-size: 16px;
+    line-height: 1.6;
     color: rgba(26, 26, 26, 0.9);
     font-weight: 500;
-    flex: 1;
-    word-wrap: break-word;
-    transition: all 0.3s ease;
   }
 
-  .list-item:hover .list-text {
-    color: var(--forest-green);
+  .nutrition-table td:first-child {
     font-weight: 600;
-    transform: translateX(4px);
+    color: var(--forest-green);
+  }
+
+  .nutrition-table td:last-child {
+    text-align: right;
+    font-weight: 600;
+  }
+
+  .nutrition-table td:nth-child(2) {
+    text-align: center;
   }
 
   /* Responsive Design */
@@ -502,12 +410,6 @@
       padding: 40px 20px;
     }
 
-    .product-ingredients-nutrition__container {
-      grid-template-columns: 1fr;
-      gap: 32px;
-    }
-
-    .ingredients-section,
     .nutrition-section {
       padding: 28px 24px;
     }
@@ -525,6 +427,12 @@
       width: 24px;
       height: 24px;
     }
+
+    .nutrition-table th,
+    .nutrition-table td {
+      padding: 14px 20px;
+      font-size: 15px;
+    }
   }
 
   @media (max-width: 768px) {
@@ -532,7 +440,6 @@
       padding: 30px 16px;
     }
 
-    .ingredients-section,
     .nutrition-section {
       padding: 24px 20px;
       border-radius: 20px;
@@ -559,13 +466,14 @@
       font-size: 26px;
     }
 
-    .list-item {
-      gap: 14px;
-      padding: 14px 18px;
+    .nutrition-table th,
+    .nutrition-table td {
+      padding: 12px 16px;
+      font-size: 14px;
     }
 
-    .list-text {
-      font-size: 16px;
+    .nutrition-table th {
+      font-size: 14px;
     }
   }
 
@@ -574,7 +482,6 @@
       padding: 24px 16px;
     }
 
-    .ingredients-section,
     .nutrition-section {
       padding: 20px 16px;
       border-radius: 16px;
@@ -601,35 +508,35 @@
       font-size: 22px;
     }
 
-    .ingredients-list,
-    .nutrition-list {
-      gap: 16px;
+    .nutrition-table-wrapper {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
     }
 
-    .list-item {
-      padding: 12px 16px;
-      border-radius: 10px;
+    .nutrition-table {
+      min-width: 500px;
     }
 
-    .list-bullet {
-      width: 10px;
-      height: 10px;
+    .nutrition-table th,
+    .nutrition-table td {
+      padding: 10px 12px;
+      font-size: 13px;
     }
 
-    .list-text {
-      font-size: 15px;
-      line-height: 1.7;
+    .nutrition-table th {
+      font-size: 12px;
+      padding: 12px 14px;
     }
   }
 {% endstylesheet %}
 
 {% schema %}
 {
-  "name": "Ingredients & Nutrition",
+  "name": "Nutrition Facts",
   "settings": [],
   "presets": [
     {
-      "name": "Ingredients & Nutrition"
+      "name": "Nutrition Facts"
     }
   ]
 }
