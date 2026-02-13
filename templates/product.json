@@ -26,8 +26,8 @@
       "type": "product-trust-badges-compact",
       "settings": {}
     },
-    "product_how_to_use_compact": {
-      "type": "product-how-to-use-compact",
+    "product_image_banner": {
+      "type": "product-image-banner",
       "settings": {}
     },
     "related_products": {
@@ -93,7 +93,7 @@
     "product_benefits_compact",
     "product_ingredients_nutrition_y7n8pk",
     "product_trust_badges_compact",
-    "product_how_to_use_compact",
+    "product_image_banner",
     "related_products",
     "product_faq",
     "1769418164e60d6e16"

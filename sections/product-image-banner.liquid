@@ -1,0 +1,172 @@
+{% comment %}
+  Product Image Banner Section
+  Simple banner image display for product pages
+{% endcomment %}
+
+<section class="product-image-banner" id="product-image-banner-{{ section.id }}">
+  <div class="product-image-banner__container">
+    {% if section.settings.banner_image != blank %}
+      <div class="product-image-banner__image-wrapper">
+        {% if section.settings.banner_link != blank %}
+          <a href="{{ section.settings.banner_link }}" class="product-image-banner__link">
+        {% endif %}
+        
+        {% if section.settings.mobile_image != blank %}
+          <picture class="product-image-banner__picture">
+            <source
+              media="(max-width: 768px)"
+              srcset="
+                {{ section.settings.mobile_image | image_url: width: 480 }} 480w,
+                {{ section.settings.mobile_image | image_url: width: 768 }} 768w,
+                {{ section.settings.mobile_image | image_url: width: 1024 }} 1024w
+              "
+              sizes="100vw"
+            >
+            <img
+              class="product-image-banner__image"
+              src="{{ section.settings.banner_image | image_url: width: 1920 }}"
+              srcset="
+                {{ section.settings.banner_image | image_url: width: 960 }} 960w,
+                {{ section.settings.banner_image | image_url: width: 1280 }} 1280w,
+                {{ section.settings.banner_image | image_url: width: 1920 }} 1920w,
+                {{ section.settings.banner_image | image_url: width: 2560 }} 2560w
+              "
+              sizes="100vw"
+              alt="{{ section.settings.banner_image.alt | default: section.settings.banner_alt | default: 'Product banner' }}"
+              width="{{ section.settings.banner_image.width }}"
+              height="{{ section.settings.banner_image.height }}"
+              loading="lazy"
+            >
+          </picture>
+        {% else %}
+          <img
+            class="product-image-banner__image"
+            src="{{ section.settings.banner_image | image_url: width: 1920 }}"
+            srcset="
+              {{ section.settings.banner_image | image_url: width: 960 }} 960w,
+              {{ section.settings.banner_image | image_url: width: 1280 }} 1280w,
+              {{ section.settings.banner_image | image_url: width: 1920 }} 1920w,
+              {{ section.settings.banner_image | image_url: width: 2560 }} 2560w
+            "
+            sizes="100vw"
+            alt="{{ section.settings.banner_image.alt | default: section.settings.banner_alt | default: 'Product banner' }}"
+            width="{{ section.settings.banner_image.width }}"
+            height="{{ section.settings.banner_image.height }}"
+            loading="lazy"
+          >
+        {% endif %}
+        
+        {% if section.settings.banner_link != blank %}
+          </a>
+        {% endif %}
+      </div>
+    {% else %}
+      <div class="product-image-banner__placeholder">
+        <p>Add a banner image in Theme Customizer</p>
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+{% stylesheet %}
+  .product-image-banner {
+    width: 100%;
+    max-width: 100%;
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+  }
+
+  .product-image-banner__container {
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+  }
+
+  .product-image-banner__image-wrapper {
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .product-image-banner__link {
+    display: block;
+    width: 100%;
+    text-decoration: none;
+    transition: opacity 0.3s ease;
+  }
+
+  .product-image-banner__link:hover {
+    opacity: 0.95;
+  }
+
+  .product-image-banner__picture {
+    display: block;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  .product-image-banner__image {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+    object-position: center;
+  }
+
+  .product-image-banner__placeholder {
+    width: 100%;
+    padding: 60px 20px;
+    text-align: center;
+    background: rgba(45, 80, 22, 0.05);
+    border: 2px dashed rgba(74, 124, 44, 0.3);
+    border-radius: 12px;
+    color: var(--forest-green);
+    font-size: 16px;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .product-image-banner {
+      padding: 0;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Product Image Banner",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "banner_image",
+      "label": "Banner Image",
+      "info": "Recommended size: 1920x600px or larger"
+    },
+    {
+      "type": "image_picker",
+      "id": "mobile_image",
+      "label": "Mobile Banner Image (Optional)",
+      "info": "Optional: Different image for mobile devices. Recommended size: 768x400px"
+    },
+    {
+      "type": "text",
+      "id": "banner_alt",
+      "label": "Image Alt Text",
+      "default": "Product banner"
+    },
+    {
+      "type": "url",
+      "id": "banner_link",
+      "label": "Banner Link (Optional)",
+      "info": "Optional: Make the banner clickable"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product Image Banner"
+    }
+  ]
+}
+{% endschema %}
