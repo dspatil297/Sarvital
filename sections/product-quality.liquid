@@ -36,23 +36,23 @@
   .product-quality {
     width: 100%;
     max-width: 100%;
-    padding: 100px 40px;
+    padding: var(--spacing-5xl) var(--spacing-xl);
     background: var(--bg);
     box-sizing: border-box;
   }
 
   .product-quality__container {
-    max-width: 1200px;
+    max-width: var(--container-max-width);
     margin: 0 auto;
   }
 
   .product-quality__title {
     text-align: center;
     font-family: var(--font-heading);
-    font-size: 42px;
+    font-size: clamp(var(--h2-size), 3vw, 42px);
     font-weight: 600;
     color: var(--text);
-    margin-bottom: 60px;
+    margin-bottom: var(--spacing-3xl);
     letter-spacing: -0.02em;
     line-height: 1.2;
   }
@@ -60,14 +60,14 @@
   .product-quality__badges {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 32px;
+    gap: var(--spacing-xl);
   }
 
   .quality-badge-card {
     text-align: center;
-    padding: 48px 32px;
+    padding: var(--spacing-3xl) var(--spacing-xl);
     background: var(--white);
-    border-radius: 12px;
+    border-radius: var(--radius-lg);
     border: 1px solid var(--border-color);
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
@@ -99,13 +99,14 @@
   .quality-badge-card__icon {
     width: 72px;
     height: 72px;
-    margin: 0 auto 28px;
+    margin: 0 auto var(--spacing-xl);
     display: flex;
     align-items: center;
     justify-content: center;
     background: linear-gradient(135deg, rgba(74, 124, 44, 0.1), rgba(74, 124, 44, 0.05));
-    border-radius: 16px;
+    border-radius: var(--radius-xl);
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    flex-shrink: 0;
   }
 
   .quality-badge-card__icon svg {
@@ -127,10 +128,10 @@
 
   .quality-badge-card__title {
     font-family: var(--font-heading);
-    font-size: 22px;
+    font-size: clamp(var(--h5-size), 1.5vw, var(--h4-size));
     font-weight: 600;
     color: var(--text);
-    margin-bottom: 14px;
+    margin-bottom: var(--spacing-sm);
     line-height: 1.3;
     transition: color 0.3s ease;
   }
@@ -140,44 +141,101 @@
   }
 
   .quality-badge-card__description {
-    font-size: 15px;
+    font-size: clamp(var(--body-small), 1vw, 15px);
     color: rgba(26, 26, 26, 0.7);
     line-height: 1.7;
     margin: 0;
     font-weight: 300;
   }
 
+  /* Tablet breakpoint (768px - 968px) */
   @media (max-width: 968px) {
-    .product-quality__badges {
-      grid-template-columns: repeat(2, 1fr);
-      gap: 30px;
-    }
-  }
-
-  @media (max-width: 968px) {
-    .product-quality__badges {
-      grid-template-columns: repeat(2, 1fr);
-      gap: 24px;
-    }
-  }
-
-  @media (max-width: 768px) {
     .product-quality {
-      padding: 60px 20px;
+      padding: var(--spacing-4xl) var(--spacing-lg);
     }
 
     .product-quality__title {
-      font-size: 36px;
-      margin-bottom: 40px;
+      margin-bottom: var(--spacing-2xl);
+    }
+
+    .product-quality__badges {
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--spacing-lg);
+    }
+
+    .quality-badge-card {
+      padding: var(--spacing-2xl) var(--spacing-lg);
+    }
+
+    .quality-badge-card__icon {
+      width: 64px;
+      height: 64px;
+      margin-bottom: var(--spacing-lg);
+    }
+  }
+
+  /* Mobile breakpoint (max-width: 768px) */
+  @media (max-width: 768px) {
+    .product-quality {
+      padding: var(--spacing-3xl) var(--spacing-md);
+    }
+
+    .product-quality__title {
+      margin-bottom: var(--spacing-xl);
     }
 
     .product-quality__badges {
       grid-template-columns: 1fr;
-      gap: 24px;
+      gap: var(--spacing-lg);
     }
 
     .quality-badge-card {
-      padding: 40px 28px;
+      padding: var(--spacing-xl) var(--spacing-md);
+    }
+
+    .quality-badge-card__icon {
+      width: 56px;
+      height: 56px;
+      margin-bottom: var(--spacing-md);
+    }
+
+    .quality-badge-card__icon svg {
+      width: 28px;
+      height: 28px;
+    }
+  }
+
+  /* Small mobile breakpoint (max-width: 480px) */
+  @media (max-width: 480px) {
+    .product-quality {
+      padding: var(--spacing-2xl) var(--spacing-sm);
+    }
+
+    .quality-badge-card {
+      padding: var(--spacing-lg) var(--spacing-sm);
+    }
+
+    .quality-badge-card__icon {
+      width: 48px;
+      height: 48px;
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .quality-badge-card__icon svg {
+      width: 24px;
+      height: 24px;
+    }
+  }
+
+  /* Touch device optimizations */
+  @media (hover: none) and (pointer: coarse) {
+    .quality-badge-card:hover {
+      transform: none;
+    }
+
+    .quality-badge-card:active {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 20px rgba(74, 124, 44, 0.15);
     }
   }
 {% endstylesheet %}
