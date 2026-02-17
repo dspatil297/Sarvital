@@ -9,6 +9,14 @@
         <h1 class="cart-page__title">Shopping Cart</h1>
         <p class="cart-page__item-count">{{ cart.item_count }} {{ cart.item_count | pluralize: 'item', 'items' }}</p>
       </div>
+
+      {% assign cart_has_gst5 = false %}
+      {% for item in cart.items %}
+        {% if item.product.tags contains 'gst-5' %}
+          {% assign cart_has_gst5 = true %}
+          {% break %}
+        {% endif %}
+      {% endfor %}
       
       <form action="{{ routes.cart_url }}" method="post" id="cart-form" class="cart-page__form">
         <div class="cart-page__content">
@@ -125,19 +133,19 @@
                 
                 <div class="cart-summary__row cart-summary__row--shipping">
                   <span>Shipping</span>
-                  <span class="cart-summary__shipping-value">
-                    {% if cart.total_price >= 50000 %}
-                      <span class="cart-summary__free-shipping">Free Shipping</span>
-                    {% else %}
-                      Calculated at checkout
-                    {% endif %}
-                  </span>
+                  <span>Calculated at checkout</span>
                 </div>
                 
                 <div class="cart-summary__row cart-summary__row--total">
                   <span>Total</span>
                   <span>{{ cart.total_price | money }}</span>
                 </div>
+
+                {% if cart_has_gst5 %}
+                  <div class="cart-summary__gst-note">
+                    Gst 5% for fruit and vegetables Dehydrated products.
+                  </div>
+                {% endif %}
               </div>
               
               {% if section.settings.show_discount_code %}
@@ -157,8 +165,6 @@
                 </div>
               {% endif %}
               
-              <p class="cart-summary__free-shipping-note">Free Shipping above ₹500</p>
-              
               <div class="cart-summary__actions">
                 <button type="submit" name="checkout" class="btn btn-primary btn-large cart-summary__checkout">
                   Proceed to Checkout
@@ -175,6 +181,13 @@
                       <path d="M5 13L9 17L19 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                     <span>Secure Checkout</span>
+                  </div>
+                  <div class="trust-badge-item">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M1 3h15v13H1V3zm16 8h4l3 3v4h-7v-7z"/>
+                      <path d="M5 21a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm12 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/>
+                    </svg>
+                    <span>Free Shipping above ₹500</span>
                   </div>
                 </div>
               {% endif %}
@@ -501,6 +514,17 @@
     border-bottom: 2px solid rgba(74, 124, 44, 0.1);
   }
 
+  .cart-summary__gst-note {
+    margin-top: var(--spacing-sm);
+    padding: var(--spacing-md) var(--spacing-lg);
+    border: 2px solid rgba(74, 124, 44, 0.25);
+    background: rgba(74, 124, 44, 0.06);
+    border-radius: var(--radius-md);
+    font-size: var(--body-small);
+    font-weight: 700;
+    color: var(--forest-green);
+  }
+
   .cart-summary__row {
     display: flex;
     justify-content: space-between;
@@ -531,29 +555,12 @@
     color: #666;
   }
 
-  .cart-summary__free-shipping {
-    color: var(--sage-green);
-    font-weight: 700;
-  }
-
   .cart-summary__row--total {
     font-size: var(--h4-size);
     font-weight: 900;
     color: var(--forest-green);
     padding-top: var(--spacing-md);
     border-top: 2px solid rgba(74, 124, 44, 0.1);
-  }
-
-  .cart-summary__free-shipping-note {
-    font-size: var(--body-small);
-    color: var(--sage-green);
-    font-weight: 600;
-    margin: 0 0 var(--spacing-md) 0;
-    padding: var(--spacing-md) var(--spacing-lg);
-    text-align: center;
-    border: 2px solid rgba(74, 124, 44, 0.35);
-    border-radius: var(--radius-md);
-    background: rgba(74, 124, 44, 0.08);
   }
 
   .cart-summary__discount {

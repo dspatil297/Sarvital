@@ -23,7 +23,7 @@
               <span class="badge-sale__text">Save {{ product.compare_at_price | minus: product.price | times: 100 | divided_by: product.compare_at_price }}%</span>
             </div>
           {% endif %}
-          <button type="button" class="product-image-zoom" aria-label="Zoom product image">
+          <button class="product-image-zoom" aria-label="Zoom product image">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <circle cx="11" cy="11" r="8"></circle>
               <path d="m21 21-4.35-4.35"></path>
@@ -33,20 +33,18 @@
         
         {% if product.images.size > 1 %}
           <div class="product-image-thumbnails">
-            {% for image in product.images %}
+            {% for image in product.images limit: 5 %}
               <button 
-                type="button"
                 class="product-thumbnail {% if forloop.first %}active{% endif %}"
                 data-image-src="{{ image | image_url: width: 1200 }}"
                 aria-label="View image {{ forloop.index }}"
               >
                 <img 
-                  src="{{ image | image_url: width: 160 }}" 
+                  src="{{ image | image_url: width: 150 }}" 
                   alt="{{ image.alt | default: product.title }}"
-                  loading="eager"
-                  width="80"
-                  height="80"
-                  decoding="async"
+                  loading="lazy"
+                  width="150"
+                  height="150"
                 >
               </button>
             {% endfor %}
@@ -131,7 +129,10 @@
             <span class="price-value">{{ product.price | money }}</span>
           </div>
         {% endif %}
-        <span class="price-gst">Inc. GST</span>
+        <span class="price-gst">Incl. GST</span>
+        {% if product.tags contains 'gst-5' %}
+          <span class="price-gst-note">Gst 5% for fruit and vegetables Dehydrated products.</span>
+        {% endif %}
       </div>
       
       <!-- Stock Availability -->
@@ -322,7 +323,6 @@
             <span class="price-old">{{ product.compare_at_price | money }}</span>
           {% endif %}
           <span class="price-current">{{ product.price | money }}</span>
-          <span class="price-gst">Inc. GST</span>
         </div>
       </div>
     </div>
@@ -357,7 +357,6 @@
     padding: 30px 40px;
     background: var(--white);
     box-sizing: border-box;
-    overflow-x: hidden;
   }
 
   .product-hero__container {
@@ -367,23 +366,17 @@
     grid-template-columns: 1fr 1fr;
     gap: 60px;
     align-items: start;
-    width: 100%;
-    box-sizing: border-box;
   }
 
   /* Product Images */
   .product-images {
     position: sticky;
     top: 100px;
-    width: 100%;
-    max-width: 100%;
-    box-sizing: border-box;
   }
 
   .product-image-main {
     position: relative;
     width: 100%;
-    max-width: 100%;
     aspect-ratio: 1;
     border-radius: 16px;
     overflow: hidden;
@@ -391,7 +384,6 @@
     margin-bottom: 20px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    box-sizing: border-box;
   }
 
   .product-image-main:hover {
@@ -402,12 +394,8 @@
   .product-image-main__img {
     width: 100%;
     height: 100%;
-    max-width: 100%;
-    max-height: 100%;
     object-fit: contain;
-    object-position: center;
-    transition: transform 0.3s ease, opacity 0.2s ease;
-    display: block;
+    transition: transform 0.3s ease;
   }
 
   .product-image-main:hover .product-image-main__img {
@@ -448,50 +436,6 @@
   .product-image-zoom:hover {
     background: var(--white);
     transform: scale(1.1);
-  }
-
-  /* Product image lightbox (zoom) */
-  #product-image-lightbox {
-    position: fixed;
-    inset: 0;
-    z-index: 9999;
-    background: rgba(0, 0, 0, 0.9);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    box-sizing: border-box;
-  }
-  #product-image-lightbox .product-lightbox-inner {
-    max-width: 90vw;
-    max-height: 90vh;
-    position: relative;
-  }
-  #product-image-lightbox .product-lightbox-img {
-    max-width: 100%;
-    max-height: 90vh;
-    width: auto;
-    height: auto;
-    object-fit: contain;
-  }
-  #product-image-lightbox .product-lightbox-close {
-    position: absolute;
-    top: 16px;
-    right: 16px;
-    width: 48px;
-    height: 48px;
-    border: none;
-    background: rgba(255, 255, 255, 0.2);
-    color: #fff;
-    font-size: 24px;
-    line-height: 1;
-    cursor: pointer;
-    border-radius: 50%;
-    z-index: 10;
-    transition: background 0.2s;
-  }
-  #product-image-lightbox .product-lightbox-close:hover {
-    background: rgba(255, 255, 255, 0.35);
   }
 
   .product-image-thumbnails {
@@ -660,6 +604,13 @@
     color: rgba(26, 26, 26, 0.6);
     font-weight: 700;
     margin-top: 4px;
+  }
+
+  .price-gst-note {
+    font-size: 12px;
+    color: rgba(26, 26, 26, 0.75);
+    font-weight: 600;
+    margin-top: 2px;
   }
 
   /* Stock Alert */
@@ -1098,12 +1049,6 @@
     color: var(--forest-green);
   }
 
-  .sticky-cart-bar__price .price-gst {
-    font-size: 11px;
-    color: rgba(26, 26, 26, 0.5);
-    font-weight: 700;
-  }
-
   .sticky-cart-bar__button {
     padding: 12px 24px;
     background: var(--forest-green);
@@ -1126,32 +1071,15 @@
     .product-hero {
       padding: 24px 20px;
       padding-bottom: 100px;
-      overflow-x: hidden;
-      width: 100%;
-      max-width: 100vw;
     }
 
     .product-hero__container {
       grid-template-columns: 1fr;
       gap: 28px; /* Tighter gap so price + CTA appear above fold */
-      width: 100%;
-      max-width: 100%;
-      padding: 0;
-      margin: 0 auto;
     }
 
     .product-images {
       position: static;
-      width: 100%;
-      max-width: 100%;
-      overflow: hidden;
-    }
-
-    .product-image-main {
-      width: 100%;
-      max-width: 100%;
-      margin-left: 0;
-      margin-right: 0;
     }
 
     .product-info {
@@ -1257,42 +1185,12 @@
     .product-hero {
       padding: 20px 16px;
       padding-bottom: 88px; /* Space for sticky bar + safe area */
-      overflow-x: hidden;
-      width: 100%;
-      max-width: 100vw;
     }
 
     .product-hero__container {
-      padding-left: 0;
-      padding-right: 0;
+      padding-left: var(--container-padding);
+      padding-right: var(--container-padding);
       gap: 22px;
-      width: 100%;
-      max-width: 100%;
-      margin: 0;
-    }
-
-    .product-images {
-      width: 100%;
-      max-width: 100%;
-      overflow: hidden;
-      padding: 0;
-      margin: 0;
-    }
-
-    .product-image-main {
-      width: 100%;
-      max-width: 100%;
-      margin-left: 0;
-      margin-right: 0;
-      border-radius: 12px;
-    }
-
-    .product-image-main__img {
-      width: 100%;
-      max-width: 100%;
-      height: auto;
-      object-fit: contain;
-      object-position: center;
     }
 
     .product-info {
@@ -1403,11 +1301,25 @@
 
 {% javascript %}
   ;(function() {
-    // Product gallery thumbnails and zoom are handled in layout/theme.liquid (inline script) so they run reliably after DOM.
+    // Image thumbnail switching
+    const thumbnails = document.querySelectorAll('.product-thumbnail');
+    const mainImage = document.getElementById('main-product-image');
+    
+    thumbnails.forEach(thumb => {
+      thumb.addEventListener('click', function() {
+        const imageSrc = this.getAttribute('data-image-src');
+        if (imageSrc && mainImage) {
+          mainImage.src = imageSrc;
+          thumbnails.forEach(t => t.classList.remove('active'));
+          this.classList.add('active');
+        }
+      });
+    });
 
     // Variant selection
     const variantButtons = document.querySelectorAll('.variant-option-btn');
     const variantSelect = document.getElementById('product-variant-select');
+    const isGst5 = {{ product.tags contains 'gst-5' | json }};
     
     variantButtons.forEach(btn => {
       btn.addEventListener('click', function() {
@@ -1532,6 +1444,10 @@
       const priceSection = document.querySelector('.product-price-section');
       if (!priceSection) return;
       
+      const gstNote = isGst5
+        ? '<span class="price-gst-note">Gst 5% for fruit and vegetables Dehydrated products.</span>'
+        : '';
+
       const priceNum = parseInt(price) / 100;
       const comparePriceNum = comparePrice ? parseInt(comparePrice) / 100 : null;
       
@@ -1547,14 +1463,16 @@
             <span class="price-value price-value--sale">${formatMoney(price)}</span>
             <span class="price-savings">Save ${formatMoney(savings * 100)}</span>
           </div>
-          <span class="price-gst">Inc. GST</span>
+          <span class="price-gst">Incl. GST</span>
+          ${gstNote}
         `;
       } else {
         priceSection.innerHTML = `
           <div class="price-current">
             <span class="price-value">${formatMoney(price)}</span>
           </div>
-          <span class="price-gst">Inc. GST</span>
+          <span class="price-gst">Incl. GST</span>
+          ${gstNote}
         `;
       }
       
