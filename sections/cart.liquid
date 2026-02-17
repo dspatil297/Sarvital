@@ -125,7 +125,13 @@
                 
                 <div class="cart-summary__row cart-summary__row--shipping">
                   <span>Shipping</span>
-                  <span>Calculated at checkout</span>
+                  <span class="cart-summary__shipping-value">
+                    {% if cart.total_price >= 50000 %}
+                      <span class="cart-summary__free-shipping">Free Shipping</span>
+                    {% else %}
+                      Calculated at checkout
+                    {% endif %}
+                  </span>
                 </div>
                 
                 <div class="cart-summary__row cart-summary__row--total">
@@ -151,6 +157,8 @@
                 </div>
               {% endif %}
               
+              <p class="cart-summary__free-shipping-note">Free Shipping above ₹500</p>
+              
               <div class="cart-summary__actions">
                 <button type="submit" name="checkout" class="btn btn-primary btn-large cart-summary__checkout">
                   Proceed to Checkout
@@ -167,13 +175,6 @@
                       <path d="M5 13L9 17L19 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                     <span>Secure Checkout</span>
-                  </div>
-                  <div class="trust-badge-item">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M1 3h15v13H1V3zm16 8h4l3 3v4h-7v-7z"/>
-                      <path d="M5 21a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm12 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/>
-                    </svg>
-                    <span>Free Shipping above ₹500</span>
                   </div>
                 </div>
               {% endif %}
@@ -530,12 +531,29 @@
     color: #666;
   }
 
+  .cart-summary__free-shipping {
+    color: var(--sage-green);
+    font-weight: 700;
+  }
+
   .cart-summary__row--total {
     font-size: var(--h4-size);
     font-weight: 900;
     color: var(--forest-green);
     padding-top: var(--spacing-md);
     border-top: 2px solid rgba(74, 124, 44, 0.1);
+  }
+
+  .cart-summary__free-shipping-note {
+    font-size: var(--body-small);
+    color: var(--sage-green);
+    font-weight: 600;
+    margin: 0 0 var(--spacing-md) 0;
+    padding: var(--spacing-md) var(--spacing-lg);
+    text-align: center;
+    border: 2px solid rgba(74, 124, 44, 0.35);
+    border-radius: var(--radius-md);
+    background: rgba(74, 124, 44, 0.08);
   }
 
   .cart-summary__discount {
