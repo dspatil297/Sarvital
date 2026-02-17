@@ -30,14 +30,14 @@
         {% for link in section.settings.menu.links %}
           <li class="nav-item {% if link.links != blank %}has-dropdown{% endif %}">
             <a href="{{ link.url }}" class="nav-link {% if link.active %}active{% endif %}">
-              {{ link.title }}
+              {{ link.title | replace: 'Catalog', 'Products' }}
             </a>
             {% if link.links != blank %}
               <ul class="nav-dropdown">
                 {% for childlink in link.links %}
                   <li>
                     <a href="{{ childlink.url }}" class="nav-dropdown-link {% if childlink.active %}active{% endif %}">
-                      {{ childlink.title }}
+                      {{ childlink.title | replace: 'Catalog', 'Products' }}
                     </a>
                   </li>
                 {% endfor %}
@@ -116,10 +116,10 @@
           {% for link in section.settings.menu.links %}
             <li class="mobile-nav-item {% if link.links != blank %}has-children{% endif %}">
               <a href="{{ link.url }}" class="mobile-nav-link {% if link.active %}active{% endif %}">
-                {{ link.title }}
+                {{ link.title | replace: 'Catalog', 'Products' }}
               </a>
               {% if link.links != blank %}
-                <button type="button" class="mobile-nav-toggle" aria-label="Toggle {{ link.title }} submenu" aria-expanded="false">
+                <button type="button" class="mobile-nav-toggle" aria-label="Toggle {{ link.title | replace: 'Catalog', 'Products' }} submenu" aria-expanded="false">
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M6 12L10 8L6 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                   </svg>
@@ -128,7 +128,7 @@
                   {% for childlink in link.links %}
                     <li>
                       <a href="{{ childlink.url }}" class="mobile-nav-sublink {% if childlink.active %}active{% endif %}">
-                        {{ childlink.title }}
+                        {{ childlink.title | replace: 'Catalog', 'Products' }}
                       </a>
                     </li>
                   {% endfor %}
