@@ -149,7 +149,7 @@
 
                 {% if cart_has_gst5 %}
                   <div class="cart-summary__gst-note">
-                    Gst 5% for fruit and vegetables Dehydrated products.
+                    GST 5% for fruit and vegetables Dehydrated products.
                   </div>
                 {% endif %}
               </div>
@@ -516,14 +516,17 @@
   }
 
   .cart-summary__gst-note {
-    margin-top: var(--spacing-sm);
+    display: block;
+    margin-top: var(--spacing-md);
     padding: var(--spacing-md) var(--spacing-lg);
-    border: 2px solid rgba(74, 124, 44, 0.25);
-    background: rgba(74, 124, 44, 0.06);
+    border: 2px solid rgba(74, 124, 44, 0.35);
+    background: rgba(74, 124, 44, 0.08);
     border-radius: var(--radius-md);
+    border-left: 4px solid var(--sage-green);
     font-size: var(--body-small);
     font-weight: 700;
     color: var(--forest-green);
+    text-align: center;
   }
 
   .cart-summary__row {

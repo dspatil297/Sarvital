@@ -48,13 +48,17 @@
       {% endif %}
       
       <div class="product-card__price">
-        {% if product.compare_at_price > product.price %}
-          <span class="product-card__price--compare">{{ product.compare_at_price | money }}</span>
-        {% endif %}
-        <span class="product-card__price--current">{{ product.price | money }}</span>
-        <span class="product-card__price--gst">Incl. GST</span>
+        <div class="product-card__price-row">
+          {% if product.compare_at_price > product.price %}
+            <span class="product-card__price--compare">{{ product.compare_at_price | money }}</span>
+          {% endif %}
+          <span class="product-card__price--current">{{ product.price | money }}</span>
+        </div>
+        <div class="product-card__price-meta">
+          <span class="product-card__price--gst">Incl. GST</span>
+        </div>
         {% if product.tags contains 'gst-5' %}
-          <span class="product-card__price--gst-note">Gst 5% for fruit and vegetables Dehydrated products.</span>
+          <span class="product-card__price--gst-note">GST 5% for fruit and vegetables Dehydrated products.</span>
         {% endif %}
       </div>
       
@@ -246,10 +250,17 @@
 
   .product-card__price {
     display: flex;
-    align-items: baseline;
-    gap: 10px;
+    flex-direction: column;
+    gap: 6px;
     margin-bottom: 20px;
     margin-top: auto;
+  }
+
+  .product-card__price-row {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    flex-wrap: wrap;
   }
 
   .product-card__price--current {
@@ -258,6 +269,7 @@
     font-weight: 800;
     color: var(--forest-green);
     letter-spacing: -0.02em;
+    line-height: 1.2;
   }
 
   .product-card__price--compare {
@@ -265,22 +277,32 @@
     color: rgba(26, 26, 26, 0.35);
     text-decoration: line-through;
     font-weight: 500;
+    line-height: 1.2;
+  }
+
+  .product-card__price-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
 
   .product-card__price--gst {
-    font-size: 11px;
-    color: rgba(26, 26, 26, 0.55);
+    font-size: 12px;
+    color: rgba(26, 26, 26, 0.6);
     font-weight: 700;
-    width: 100%;
-    margin-top: -4px;
   }
 
   .product-card__price--gst-note {
+    display: block;
     font-size: 11px;
-    color: rgba(26, 26, 26, 0.75);
-    font-weight: 600;
+    color: var(--forest-green);
+    font-weight: 700;
     width: 100%;
-    margin-top: -6px;
+    margin-top: 4px;
+    padding: 4px 8px;
+    background: rgba(74, 124, 44, 0.08);
+    border-radius: 4px;
+    border-left: 3px solid var(--sage-green);
   }
 
   .product-card__form {
