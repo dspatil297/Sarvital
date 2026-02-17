@@ -131,6 +131,7 @@
             <span class="price-value">{{ product.price | money }}</span>
           </div>
         {% endif %}
+        <span class="price-gst">Inc. GST</span>
       </div>
       
       <!-- Stock Availability -->
@@ -321,6 +322,7 @@
             <span class="price-old">{{ product.compare_at_price | money }}</span>
           {% endif %}
           <span class="price-current">{{ product.price | money }}</span>
+          <span class="price-gst">Inc. GST</span>
         </div>
       </div>
     </div>
@@ -651,6 +653,13 @@
     border-radius: 4px;
     font-size: 14px;
     font-weight: 600;
+  }
+
+  .price-gst {
+    font-size: 13px;
+    color: rgba(26, 26, 26, 0.6);
+    font-weight: 700;
+    margin-top: 4px;
   }
 
   /* Stock Alert */
@@ -1087,6 +1096,12 @@
     font-size: 16px;
     font-weight: 700;
     color: var(--forest-green);
+  }
+
+  .sticky-cart-bar__price .price-gst {
+    font-size: 11px;
+    color: rgba(26, 26, 26, 0.5);
+    font-weight: 700;
   }
 
   .sticky-cart-bar__button {
@@ -1532,12 +1547,14 @@
             <span class="price-value price-value--sale">${formatMoney(price)}</span>
             <span class="price-savings">Save ${formatMoney(savings * 100)}</span>
           </div>
+          <span class="price-gst">Inc. GST</span>
         `;
       } else {
         priceSection.innerHTML = `
           <div class="price-current">
             <span class="price-value">${formatMoney(price)}</span>
           </div>
+          <span class="price-gst">Inc. GST</span>
         `;
       }
       

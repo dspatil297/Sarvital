@@ -55,6 +55,7 @@
           <span class="product-card__price--compare">{{ product.compare_at_price | money }}</span>
         {% endif %}
         <span class="product-card__price--current">{{ product.price | money }}</span>
+        <span class="product-card__price--gst">Inc. GST</span>
       </div>
       
       <form action="/cart/add" method="post" enctype="multipart/form-data" class="product-card__form">
@@ -277,6 +278,16 @@
     font-weight: 500;
     white-space: nowrap;
     flex-shrink: 0;
+  }
+
+  .product-card__price--gst {
+    font-size: 11px;
+    color: rgba(26, 26, 26, 0.5);
+    font-weight: 700;
+    white-space: nowrap;
+    flex-shrink: 0;
+    width: 100%;
+    margin-top: -4px;
   }
 
   .product-card__form {
