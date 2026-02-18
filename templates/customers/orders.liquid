@@ -1,0 +1,194 @@
+<script>
+  (function() {
+    console.log('Redirect script loaded on orders page');
+    
+    const urlParams = new URLSearchParams(window.location.search);
+    const hasLocale = urlParams.has('locale');
+    const hasRedirected = sessionStorage.getItem('oauth_redirected');
+    
+    console.log('Has locale param:', hasLocale);
+    console.log('Already redirected:', hasRedirected);
+    
+    // If locale parameter exists (sign of fresh login) and haven't redirected yet
+    if (hasLocale && !hasRedirected) {
+      console.log('Redirecting to homepage...');
+      sessionStorage.setItem('oauth_redirected', 'true');
+      window.location.replace('https://sarvital.com/');
+    }
+  })();
+</script>
+
+{% comment %}
+  Customer Orders Template
+  This template displays the customer's order history.
+  The redirect script above handles post-login redirects to homepage.
+{% endcomment %}
+
+{% if customer %}
+  <section class="orders-section">
+    <div class="orders-container">
+      <h1 class="orders-title">{{ 'customer.orders.title' | t | default: 'Order History' }}</h1>
+      
+      {% if customer.orders.size > 0 %}
+        <div class="orders-list">
+          {% for order in customer.orders %}
+            <div class="order-item">
+              <div class="order-header">
+                <h3 class="order-number">
+                  {{ 'customer.orders.order_number' | t | default: 'Order' }} {{ order.name }}
+                </h3>
+                <span class="order-date">{{ order.created_at | date: '%B %d, %Y' }}</span>
+              </div>
+              <div class="order-details">
+                <p class="order-total">
+                  <strong>{{ 'customer.orders.total' | t | default: 'Total' }}:</strong> {{ order.total_price | money }}
+                </p>
+                <p class="order-status">
+                  <strong>{{ 'customer.orders.fulfillment_status' | t | default: 'Status' }}:</strong> 
+                  {{ order.fulfillment_status_label | default: order.financial_status_label }}
+                </p>
+                <a href="{{ order.customer_url }}" class="order-link">
+                  {{ 'customer.orders.view_order' | t | default: 'View Order' }}
+                </a>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="orders-empty">
+          <p>{{ 'customer.orders.none' | t | default: 'You haven\'t placed any orders yet.' }}</p>
+          <a href="{{ routes.collections_url }}" class="btn btn-primary">
+            {{ 'customer.orders.continue_shopping' | t | default: 'Continue Shopping' }}
+          </a>
+        </div>
+      {% endif %}
+    </div>
+  </section>
+{% else %}
+  <script>
+    window.location.href = '{{ routes.account_login_url }}';
+  </script>
+{% endif %}
+
+{% stylesheet %}
+  .orders-section {
+    width: 100%;
+    max-width: 100%;
+    padding: var(--spacing-2xl) var(--container-padding);
+    background: var(--white);
+    box-sizing: border-box;
+  }
+
+  .orders-container {
+    max-width: var(--container-max-width);
+    margin: 0 auto;
+  }
+
+  .orders-title {
+    font-family: var(--font-heading);
+    font-size: clamp(var(--h2-size), 3vw, 36px);
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: var(--spacing-xl);
+  }
+
+  .orders-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+  }
+
+  .order-item {
+    background: var(--white);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-xl);
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow 0.3s ease;
+  }
+
+  .order-item:hover {
+    box-shadow: var(--shadow-md);
+  }
+
+  .order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-md);
+    padding-bottom: var(--spacing-md);
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .order-number {
+    font-family: var(--font-heading);
+    font-size: var(--h4-size);
+    font-weight: 600;
+    color: var(--text);
+    margin: 0;
+  }
+
+  .order-date {
+    font-size: var(--body-small);
+    color: rgba(26, 26, 26, 0.7);
+  }
+
+  .order-details {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+
+  .order-total,
+  .order-status {
+    font-size: var(--body-normal);
+    color: var(--text);
+    margin: 0;
+  }
+
+  .order-link {
+    display: inline-block;
+    margin-top: var(--spacing-sm);
+    padding: var(--spacing-sm) var(--spacing-lg);
+    background: var(--forest-green);
+    color: var(--white);
+    text-decoration: none;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    transition: background 0.3s ease;
+    width: fit-content;
+  }
+
+  .order-link:hover {
+    background: var(--sage-green);
+  }
+
+  .orders-empty {
+    text-align: center;
+    padding: var(--spacing-3xl) var(--spacing-xl);
+    background: var(--bg);
+    border-radius: var(--radius-lg);
+  }
+
+  .orders-empty p {
+    font-size: var(--body-large);
+    color: var(--text);
+    margin-bottom: var(--spacing-lg);
+  }
+
+  @media (max-width: 768px) {
+    .orders-section {
+      padding: var(--spacing-xl) var(--spacing-md);
+    }
+
+    .order-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--spacing-xs);
+    }
+
+    .order-item {
+      padding: var(--spacing-lg);
+    }
+  }
+{% endstylesheet %}
