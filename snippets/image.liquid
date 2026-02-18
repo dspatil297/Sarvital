@@ -1,11 +1,7 @@
 {% doc %}
-  Renders a responsive image that might be wrapped in a link.
-
-  When `width`, `height` and `crop` are provided, the image will be rendered
-  with a fixed aspect ratio.
-
-  Serves as an example of how to use the `image_url` filter and `image_tag` filter
-  as well as how you can use LiquidDoc to document your code.
+  Renders an optimized responsive image with proper lazy loading, error handling, and responsive srcset.
+  
+  Uses Shopify's image_tag filter for automatic optimization, WebP support, and proper dimensions.
 
   @param {image} image - The image to be rendered
   @param {string} [url] - An optional destination URL for the image
@@ -13,10 +9,13 @@
   @param {number} [width] - The highest resolution width of the image to be rendered
   @param {number} [height] - The highest resolution height of the image to be rendered
   @param {string} [crop] - The crop position of the image
+  @param {string} [loading] - Loading strategy: 'eager' for above-fold, 'lazy' for below-fold (default: 'lazy')
+  @param {string} [sizes] - Sizes attribute for responsive images (default: '100vw')
+  @param {string} [alt] - Alt text override
 
   @example
   {% render 'image', image: product.featured_image %}
-  {% render 'image', image: product.featured_image, url: product.url %}
+  {% render 'image', image: product.featured_image, url: product.url, loading: 'eager' %}
   {% render 'image',
     class: 'product__image',
     image: product.featured_image,
@@ -24,10 +23,16 @@
     width: 1200,
     height: 800,
     crop: 'center',
+    loading: 'eager',
+    sizes: '(max-width: 768px) 100vw, 50vw'
   %}
 {% enddoc %}
 
 {% liquid
+  assign loading_strategy = loading | default: 'lazy'
+  assign sizes_attr = sizes | default: '100vw'
+  assign image_alt = alt | default: image.alt | default: ''
+  
   unless height
     assign width = width | default: image.width
   endunless
@@ -37,15 +42,48 @@
   else
     assign wrapper = 'div'
   endif
+  
+  # Generate responsive srcset widths
+  assign srcset_widths = '180,360,540,720,900,1080,1296,1512,1728,1944,2160,2376,2592,2808,3024' | split: ','
+  assign srcset_string = ''
+  assign max_width = width | default: image.width | default: 1920
+  
+  for srcset_width in srcset_widths
+    assign width_num = srcset_width | plus: 0
+    if width_num <= max_width
+      if srcset_string != ''
+        assign srcset_string = srcset_string | append: ', '
+      endif
+      assign srcset_string = srcset_string | append: image | image_url: width: width_num | append: ' ' | append: width_num | append: 'w'
+    endif
+  endfor
 %}
 
 <{{ wrapper }}
-  class="image {{ class }}"
+  class="image image--optimized {{ class }}"
   {% if url %}
     href="{{ url }}"
   {% endif %}
 >
-  {{ image | image_url: width: width, height: height, crop: crop | image_tag }}
+  {% if image %}
+    {{ image | image_url: width: width, height: height, crop: crop | image_tag:
+      loading: loading_strategy,
+      width: width,
+      height: height,
+      alt: image_alt,
+      sizes: sizes_attr,
+      class: 'image__img',
+      onerror: 'this.classList.add(\'image__img--error\'); this.alt=\'Image failed to load\';'
+    }}
+  {% else %}
+    <div class="image__placeholder">
+      <svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="100" height="100" fill="#f5f5f5"/>
+        <path d="M30 40L50 25L70 40V70H30V40Z" stroke="#ccc" stroke-width="2" fill="none"/>
+        <circle cx="45" cy="50" r="5" fill="#ccc"/>
+      </svg>
+    </div>
+  {% endif %}
 </{{ wrapper }}>
 
 {% stylesheet %}
@@ -57,8 +95,106 @@
     height: auto;
   }
 
-  .image > img {
+  .image--optimized {
+    background-color: rgba(245, 245, 245, 0.5);
+  }
+
+  .image__img {
     width: 100%;
     height: auto;
+    display: block;
+    transition: opacity 0.3s ease;
+  }
+
+  .image__img[loading="lazy"] {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .image__img[loading="lazy"].loaded {
+    opacity: 1;
+  }
+
+  .image__img--error {
+    opacity: 0.5;
+  }
+
+  .image__placeholder {
+    width: 100%;
+    padding: 40px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(245, 245, 245, 0.8);
+    min-height: 200px;
+  }
+
+  .image__placeholder svg {
+    opacity: 0.5;
   }
 {% endstylesheet %}
+
+<script>
+  (function() {
+    // Enhanced image loading with error handling
+    function initImageOptimization() {
+      const images = document.querySelectorAll('.image--optimized img[loading="lazy"]');
+      
+      if ('IntersectionObserver' in window) {
+        const imageObserver = new IntersectionObserver((entries, observer) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              const img = entry.target;
+              
+              // Load the image
+              if (img.dataset.src) {
+                img.src = img.dataset.src;
+                img.removeAttribute('data-src');
+              }
+              
+              // Add loaded class when image loads
+              if (img.complete) {
+                img.classList.add('loaded');
+              } else {
+                img.addEventListener('load', function() {
+                  this.classList.add('loaded');
+                }, { once: true });
+                
+                img.addEventListener('error', function() {
+                  this.classList.add('image__img--error');
+                  this.alt = 'Image failed to load';
+                }, { once: true });
+              }
+              
+              observer.unobserve(img);
+            }
+          });
+        }, {
+          rootMargin: '50px'
+        });
+
+        images.forEach(img => {
+          imageObserver.observe(img);
+        });
+      } else {
+        // Fallback for browsers without IntersectionObserver
+        images.forEach(img => {
+          if (img.dataset.src) {
+            img.src = img.dataset.src;
+            img.removeAttribute('data-src');
+          }
+          img.addEventListener('load', function() {
+            this.classList.add('loaded');
+          }, { once: true });
+        });
+      }
+    }
+
+    // Initialize on DOM ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initImageOptimization);
+    } else {
+      initImageOptimization();
+    }
+  })();
+</script>

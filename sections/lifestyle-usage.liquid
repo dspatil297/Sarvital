@@ -11,10 +11,18 @@
                   {% if block.settings.image != blank %}
                     <img 
                       src="{{ block.settings.image | image_url: width: 800 }}" 
+                      srcset="
+                        {{ block.settings.image | image_url: width: 400 }} 400w,
+                        {{ block.settings.image | image_url: width: 600 }} 600w,
+                        {{ block.settings.image | image_url: width: 800 }} 800w,
+                        {{ block.settings.image | image_url: width: 1000 }} 1000w
+                      "
+                      sizes="(max-width: 768px) 100vw, 50vw"
                       alt="{{ block.settings.image.alt | default: section.settings.title }}"
-                      loading="eager"
-                      width="800"
-                      height="600"
+                      loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
+                      width="{{ block.settings.image.width }}"
+                      height="{{ block.settings.image.height }}"
+                      onerror="this.classList.add('image-error'); this.alt='Image failed to load';"
                     >
                   {% endif %}
                 </div>
@@ -41,18 +49,18 @@
         {% elsif section.settings.image %}
           <img 
             src="{{ section.settings.image | image_url: width: 800 }}" 
+            srcset="
+              {{ section.settings.image | image_url: width: 400 }} 400w,
+              {{ section.settings.image | image_url: width: 600 }} 600w,
+              {{ section.settings.image | image_url: width: 800 }} 800w,
+              {{ section.settings.image | image_url: width: 1000 }} 1000w
+            "
+            sizes="(max-width: 768px) 100vw, 50vw"
             alt="{{ section.settings.image.alt | default: section.settings.title }}"
             loading="lazy"
-            width="800"
-            height="600"
-          >
-        {% else %}
-          <img 
-            src="https://images.unsplash.com/photo-1495521821757-a1efb6729352?w=800&q=80" 
-            alt="Fresh natural fruits and vegetables arranged beautifully"
-            loading="lazy"
-            width="800"
-            height="600"
+            width="{{ section.settings.image.width }}"
+            height="{{ section.settings.image.height }}"
+            onerror="this.classList.add('image-error'); this.alt='Image failed to load';"
           >
         {% endif %}
         <div class="lifestyle-usage__image-overlay"></div>
@@ -169,9 +177,14 @@
     max-height: 60vh;
     max-width: 100%;
     display: block;
-    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
     object-fit: contain;
     object-position: center;
+  }
+
+  .lifestyle-usage__image img.image-error {
+    opacity: 0.5;
+    background: rgba(245, 245, 245, 0.8);
   }
 
   .lifestyle-usage__image:hover img {
@@ -221,8 +234,14 @@
     max-height: 60vh;
     max-width: 100%;
     display: block;
+    transition: opacity 0.3s ease;
     object-fit: contain;
     object-position: center;
+  }
+
+  .lifestyle-usage__carousel-slide img.image-error {
+    opacity: 0.5;
+    background: rgba(245, 245, 245, 0.8);
   }
 
   .lifestyle-usage__carousel-btn {

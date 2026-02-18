@@ -26,6 +26,8 @@
               class="product-image-banner__image"
               src="{{ section.settings.banner_image | image_url: width: 1920 }}"
               srcset="
+                {{ section.settings.banner_image | image_url: width: 480 }} 480w,
+                {{ section.settings.banner_image | image_url: width: 768 }} 768w,
                 {{ section.settings.banner_image | image_url: width: 960 }} 960w,
                 {{ section.settings.banner_image | image_url: width: 1280 }} 1280w,
                 {{ section.settings.banner_image | image_url: width: 1920 }} 1920w,
@@ -36,6 +38,7 @@
               width="{{ section.settings.banner_image.width }}"
               height="{{ section.settings.banner_image.height }}"
               loading="lazy"
+              onerror="this.classList.add('image-error'); this.alt='Banner image failed to load';"
             >
           </picture>
         {% else %}
@@ -113,6 +116,12 @@
     display: block;
     object-fit: cover;
     object-position: center;
+    transition: opacity 0.3s ease;
+  }
+
+  .product-image-banner__image.image-error {
+    opacity: 0.5;
+    background: rgba(245, 245, 245, 0.8);
   }
 
   .product-image-banner__placeholder {

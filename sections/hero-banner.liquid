@@ -39,7 +39,8 @@
                 srcset="
                   {{ mobile_img | image_url: width: 480 }} 480w,
                   {{ mobile_img | image_url: width: 768 }} 768w,
-                  {{ mobile_img | image_url: width: 1024 }} 1024w
+                  {{ mobile_img | image_url: width: 1024 }} 1024w,
+                  {{ mobile_img | image_url: width: 1280 }} 1280w
                 "
                 sizes="100vw"
               >
@@ -58,6 +59,7 @@
                 height="{{ block.settings.image.height }}"
                 loading="eager"
                 fetchpriority="{% if forloop.first %}high{% else %}low{% endif %}"
+                onerror="this.classList.add('image-error'); this.alt='Image failed to load';"
               >
             </picture>
           {%- else -%}
@@ -69,20 +71,28 @@
       {% if section.settings.hero_image %}
         <div class="hero-banner__slide hero-banner__slide--active">
           <img
+            class="hero-banner__slide-img"
             src="{{ section.settings.hero_image | image_url: width: 1920 }}"
+            srcset="
+              {{ section.settings.hero_image | image_url: width: 960 }} 960w,
+              {{ section.settings.hero_image | image_url: width: 1280 }} 1280w,
+              {{ section.settings.hero_image | image_url: width: 1920 }} 1920w,
+              {{ section.settings.hero_image | image_url: width: 2560 }} 2560w
+            "
+            sizes="100vw"
             alt="{{ section.settings.hero_image.alt | default: section.settings.heading }}"
             width="{{ section.settings.hero_image.width }}"
             height="{{ section.settings.hero_image.height }}"
             loading="eager"
+            fetchpriority="high"
+            onerror="this.classList.add('image-error'); this.alt='Image failed to load';"
           >
         </div>
       {% else %}
         <div class="hero-banner__slide hero-banner__slide--active">
-          <img
-            src="https://images.unsplash.com/photo-1542838132-92c53300491e?w=1920&q=80"
-            alt="Fresh natural fruits and vegetables"
-            loading="eager"
-          >
+          <div class="hero-banner__slide-placeholder">
+            <p>Add a hero image in Theme Customizer</p>
+          </div>
         </div>
       {% endif %}
     {% endif %}
@@ -256,6 +266,36 @@
     object-fit: cover;
     object-position: center;
     display: block;
+    transition: opacity 0.3s ease;
+  }
+
+  .hero-banner__slide-img {
+    opacity: 0;
+    animation: fadeInImage 0.5s ease forwards;
+  }
+
+  .hero-banner__slide-img.image-error {
+    opacity: 0.5;
+    background: rgba(245, 245, 245, 0.8);
+  }
+
+  @keyframes fadeInImage {
+    to {
+      opacity: 1;
+    }
+  }
+
+  .hero-banner__slide-placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(74, 124, 44, 0.05);
+    color: var(--forest-green);
+    font-size: 16px;
+    padding: 20px;
+    text-align: center;
   }
 
   .hero-banner__overlay {

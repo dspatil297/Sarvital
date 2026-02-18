@@ -223,9 +223,43 @@
   }
 
   /**
-   * Enhanced image optimization and lazy loading
+   * Enhanced image optimization and lazy loading with error handling
    */
   function initImageOptimization() {
+    // Enhanced error handling for all images
+    function handleImageError(img) {
+      img.classList.add('image-error');
+      if (!img.alt || img.alt === '') {
+        img.alt = 'Image failed to load';
+      }
+      // Try to load a placeholder if available
+      if (!img.dataset.placeholderAttempted) {
+        img.dataset.placeholderAttempted = 'true';
+        // Could add placeholder image logic here if needed
+      }
+    }
+
+    // Add error handlers to all images
+    document.querySelectorAll('img').forEach(img => {
+      // Skip if already has error handler
+      if (img.dataset.errorHandlerAdded) return;
+      img.dataset.errorHandlerAdded = 'true';
+      
+      // Add error event listener
+      img.addEventListener('error', function() {
+        handleImageError(this);
+      }, { once: true });
+
+      // Add load event listener for fade-in effect
+      if (img.loading === 'lazy') {
+        img.addEventListener('load', function() {
+          this.classList.add('loaded');
+          this.style.opacity = '1';
+        }, { once: true });
+      }
+    });
+
+    // IntersectionObserver for lazy loading
     if ('IntersectionObserver' in window) {
       const imageObserver = new IntersectionObserver((entries, observer) => {
         entries.forEach(entry => {
@@ -234,7 +268,8 @@
             
             // Handle data-src for lazy loading
             if (img.dataset.src) {
-              img.src = img.dataset.src;
+              const newSrc = img.dataset.src;
+              img.src = newSrc;
               img.removeAttribute('data-src');
             }
             
@@ -244,8 +279,11 @@
               img.removeAttribute('data-srcset');
             }
             
-            // Add loaded class for fade-in effect
-            img.classList.add('loaded');
+            // Add loaded class when image loads
+            if (img.complete && img.naturalHeight !== 0) {
+              img.classList.add('loaded');
+              img.style.opacity = '1';
+            }
             
             // Stop observing once loaded
             observer.unobserve(img);
@@ -256,17 +294,35 @@
       });
 
       // Observe all images with lazy loading attributes
-      document.querySelectorAll('img[data-src], img[data-srcset]').forEach(img => {
+      document.querySelectorAll('img[data-src], img[data-srcset], img[loading="lazy"]').forEach(img => {
         imageObserver.observe(img);
+      });
+    } else {
+      // Fallback for browsers without IntersectionObserver
+      document.querySelectorAll('img[data-src]').forEach(img => {
+        img.src = img.dataset.src;
+        img.removeAttribute('data-src');
+      });
+      document.querySelectorAll('img[data-srcset]').forEach(img => {
+        img.srcset = img.dataset.srcset;
+        img.removeAttribute('data-srcset');
       });
     }
 
-    // Add loading state to images
-    document.querySelectorAll('img[loading="lazy"]').forEach(img => {
-      img.addEventListener('load', function() {
-        this.classList.add('loaded');
-      });
+    // Preload critical images (above the fold)
+    const criticalImages = document.querySelectorAll('img[loading="eager"], img[fetchpriority="high"]');
+    criticalImages.forEach(img => {
+      if (img.complete && img.naturalHeight !== 0) {
+        img.classList.add('loaded');
+      }
     });
+  }
+
+  // Initialize image optimization on page load
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initImageOptimization);
+  } else {
+    initImageOptimization();
   }
 
   // Export utilities to window for global access
