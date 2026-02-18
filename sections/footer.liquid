@@ -16,7 +16,7 @@
 
 <footer class="site-footer" role="contentinfo">
   <div class="footer-container">
-    {%- comment -%} Four columns: About, Policies, Contact Us, Legal {%- endcomment -%}
+    {%- comment -%} Four columns: About, Quick links, Contact Us, Legal {%- endcomment -%}
     <div class="footer__grid">
       <div class="footer__col footer__about">
         <h4 class="footer__col-title">About {{ shop.name | upcase }}</h4>
@@ -24,7 +24,7 @@
       </div>
 
       <div class="footer__col footer__policies">
-        <h4 class="footer__col-title">Policies</h4>
+        <h4 class="footer__col-title">Quick links</h4>
         <ul class="footer__list">
           <li><a href="/pages/recipes">Recipes</a></li>
           {% if section.settings.policies_menu != blank %}
@@ -510,12 +510,12 @@
     },
     {
       "type": "header",
-      "content": "Policies"
+      "content": "Quick links"
     },
     {
       "type": "link_list",
       "id": "policies_menu",
-      "label": "Policies menu (blank = default links)"
+      "label": "Quick links menu (blank = default links)"
     },
     {
       "type": "header",
