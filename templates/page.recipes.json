@@ -1,0 +1,24 @@
+{
+  "sections": {
+    "recipe_gallery": {
+      "type": "recipe-gallery",
+      "settings": {
+        "heading": "Recipes",
+        "subheading": "Try these recipes with our products. Each image explains the recipe—view, follow along, and enjoy.",
+        "columns": 2
+      },
+      "blocks": {
+        "recipe_1": {
+          "type": "recipe",
+          "settings": {
+            "title": "Add your first recipe",
+            "caption": "Upload an image and add a title in the theme editor."
+          }
+        }
+      },
+      "block_order": ["recipe_1"],
+      "type": "recipe-gallery"
+    }
+  },
+  "order": ["recipe_gallery"]
+}
