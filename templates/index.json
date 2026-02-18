@@ -115,7 +115,7 @@
         "carousel_auto_scroll": true,
         "carousel_auto_scroll_interval": 6,
         "collection": "frontpage",
-        "products_to_show": 12,
+        "products_to_show": 7,
         "show_view_all": true,
         "view_all_text": "View All Products"
       }
