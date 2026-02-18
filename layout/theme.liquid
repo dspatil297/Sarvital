@@ -40,48 +40,107 @@
     {%- comment -%} OAuth / Post-login redirect: run in head so it runs before any content {%- endcomment -%}
     <script>
       (function() {
-        var homeUrl = 'https://{{ request.host }}/';
+        // Always redirect to main site (sarvital.com), not account subdomain
+        var homeUrl = 'https://sarvital.com/';
+        var host = window.location.hostname || '';
         var path = window.location.pathname || '';
         var search = window.location.search || '';
         var urlParams = new URLSearchParams(search);
+        var referrer = document.referrer || '';
+
+        // Helper: Set cookie that works across subdomains (.sarvital.com)
+        function setCookie(name, value, minutes) {
+          var expires = '';
+          if (minutes) {
+            var date = new Date();
+            date.setTime(date.getTime() + (minutes * 60 * 1000));
+            expires = '; expires=' + date.toUTCString();
+          }
+          document.cookie = name + '=' + value + expires + '; path=/; domain=.sarvital.com; SameSite=Lax';
+        }
+
+        // Helper: Get cookie
+        function getCookie(name) {
+          var nameEQ = name + '=';
+          var ca = document.cookie.split(';');
+          for (var i = 0; i < ca.length; i++) {
+            var c = ca[i];
+            while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+            if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+          }
+          return null;
+        }
+
+        // Helper: Delete cookie
+        function deleteCookie(name) {
+          document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.sarvital.com';
+        }
 
         // 1) OAuth callback: URL has code or state (Google OAuth callback)
         if (urlParams.has('code') || urlParams.has('state')) {
+          setCookie('sarvital_oauth_redirect', '1', 2); // Set flag for 2 minutes
           setTimeout(function() { window.location.replace(homeUrl); }, 300);
           return;
         }
 
         // 2) Shopify challenge/authorize path (OAuth intermediate page)
         if (path.indexOf('/challenge') !== -1 || path.indexOf('/account/authorize') !== -1 || path.indexOf('authorize') !== -1) {
+          setCookie('sarvital_oauth_redirect', '1', 2);
           setTimeout(function() { window.location.replace(homeUrl); }, 800);
           return;
         }
 
-        // 3) Just landed on account index after login: we set a flag on the login page; if it's recent, redirect to home
-        try {
-          var isAccountIndex = path === '/account' || path === '/account/' ||
-            path.match(/^\/[a-z]{2}\/account\/?$/); // e.g. /en/account
-          if (isAccountIndex) {
-            var ts = sessionStorage.getItem('sarvital_login_ts');
-            if (ts) {
-              var t = parseInt(ts, 10);
-              if (!isNaN(t) && (Date.now() - t) < 120000) {
-                sessionStorage.removeItem('sarvital_login_ts');
+        // 3) On account subdomain: check if we should redirect to main site
+        if (host.indexOf('account.') === 0 || host === 'account.sarvital.com') {
+          // Check for OAuth redirect cookie (set during OAuth flow)
+          var oauthFlag = getCookie('sarvital_oauth_redirect');
+          if (oauthFlag === '1') {
+            deleteCookie('sarvital_oauth_redirect');
+            window.location.replace(homeUrl);
+            return;
+          }
+
+          // Check for login timestamp cookie (set on login page)
+          var loginTs = getCookie('sarvital_login_ts');
+          if (loginTs) {
+            var t = parseInt(loginTs, 10);
+            if (!isNaN(t) && (Date.now() - t) < 120000) { // Within 2 minutes
+              deleteCookie('sarvital_login_ts');
+              // Only redirect if on account index page
+              if (path === '/account' || path === '/account/' || path.match(/^\/[a-z]{2}\/account\/?$/)) {
                 window.location.replace(homeUrl);
                 return;
               }
             }
           }
-        } catch (e) {}
+
+          // Check referrer: if coming from Google OAuth or accounts.google.com
+          if (referrer.indexOf('accounts.google.com') !== -1 || referrer.indexOf('google.com/oauth') !== -1) {
+            setTimeout(function() { window.location.replace(homeUrl); }, 500);
+            return;
+          }
+        }
       })();
     </script>
   </head>
 
   <body class="template-{{ request.page_type | handle }}">
-    {%- comment -%} On login page: set timestamp so account page can redirect to home after Google login {%- endcomment -%}
+    {%- comment -%} On login page: set cookie timestamp (works across subdomains) so account page can redirect to home after Google login {%- endcomment -%}
     {% if request.page_type == 'customers/login' %}
     <script>
-      try { sessionStorage.setItem('sarvital_login_ts', String(Date.now())); } catch (e) {}
+      (function() {
+        // Set cookie that works across subdomains (.sarvital.com)
+        function setCookie(name, value, minutes) {
+          var expires = '';
+          if (minutes) {
+            var date = new Date();
+            date.setTime(date.getTime() + (minutes * 60 * 1000));
+            expires = '; expires=' + date.toUTCString();
+          }
+          document.cookie = name + '=' + value + expires + '; path=/; domain=.sarvital.com; SameSite=Lax';
+        }
+        setCookie('sarvital_login_ts', String(Date.now()), 2); // Expires in 2 minutes
+      })();
     </script>
     {% endif %}
 
