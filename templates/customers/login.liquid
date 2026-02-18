@@ -8,7 +8,7 @@
     <h1 class="login-section__title">{{ 'customers.login.title' | t | default: 'Login' }}</h1>
 
     <div class="login-card">
-      {% form 'customer_login', return_to: routes.account_url, class: 'login-form', id: 'customer-login' %}
+      {% form 'customer_login', return_to: routes.root_url, class: 'login-form', id: 'customer-login' %}
         {{ form.errors | default_errors }}
 
         <div class="login-form__field">
