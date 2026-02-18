@@ -1,24 +1,37 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "recipe_gallery": {
       "type": "recipe-gallery",
-      "settings": {
-        "heading": "Recipes",
-        "subheading": "Try these recipes with our products. Each image explains the recipe—view, follow along, and enjoy.",
-        "columns": 2
-      },
       "blocks": {
         "recipe_1": {
           "type": "recipe",
           "settings": {
-            "title": "Add your first recipe",
-            "caption": "Upload an image and add a title in the theme editor."
+            "image": "shopify://shop_images/Moringa-Banana-Smoothie.jpg",
+            "title": "Moringa Banana Smothie",
+            "caption": "Vibrant moringa meets creamy banana for a nutrient-packed green smoothie that energizes naturally."
           }
         }
       },
-      "block_order": ["recipe_1"],
-      "type": "recipe-gallery"
+      "block_order": [
+        "recipe_1"
+      ],
+      "settings": {
+        "heading": "Recipes",
+        "subheading": "Try these recipes with our products. Each image explains the recipe—view, follow along, and enjoy.",
+        "columns": 2
+      }
     }
   },
-  "order": ["recipe_gallery"]
+  "order": [
+    "recipe_gallery"
+  ]
 }
