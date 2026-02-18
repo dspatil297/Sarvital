@@ -36,23 +36,55 @@
     {% render 'meta-tags' %}
 
     {{ content_for_header }}
+
+    {%- comment -%} OAuth / Post-login redirect: run in head so it runs before any content {%- endcomment -%}
+    <script>
+      (function() {
+        var homeUrl = 'https://{{ request.host }}/';
+        var path = window.location.pathname || '';
+        var search = window.location.search || '';
+        var urlParams = new URLSearchParams(search);
+
+        // 1) OAuth callback: URL has code or state (Google OAuth callback)
+        if (urlParams.has('code') || urlParams.has('state')) {
+          setTimeout(function() { window.location.replace(homeUrl); }, 300);
+          return;
+        }
+
+        // 2) Shopify challenge/authorize path (OAuth intermediate page)
+        if (path.indexOf('/challenge') !== -1 || path.indexOf('/account/authorize') !== -1 || path.indexOf('authorize') !== -1) {
+          setTimeout(function() { window.location.replace(homeUrl); }, 800);
+          return;
+        }
+
+        // 3) Just landed on account index after login: we set a flag on the login page; if it's recent, redirect to home
+        try {
+          var isAccountIndex = path === '/account' || path === '/account/' ||
+            path.match(/^\/[a-z]{2}\/account\/?$/); // e.g. /en/account
+          if (isAccountIndex) {
+            var ts = sessionStorage.getItem('sarvital_login_ts');
+            if (ts) {
+              var t = parseInt(ts, 10);
+              if (!isNaN(t) && (Date.now() - t) < 120000) {
+                sessionStorage.removeItem('sarvital_login_ts');
+                window.location.replace(homeUrl);
+                return;
+              }
+            }
+          }
+        } catch (e) {}
+      })();
+    </script>
   </head>
 
   <body class="template-{{ request.page_type | handle }}">
-    {%- comment -%} OAuth Callback Handler - Redirect to homepage after successful OAuth login {%- endcomment -%}
+    {%- comment -%} On login page: set timestamp so account page can redirect to home after Google login {%- endcomment -%}
+    {% if request.page_type == 'customers/login' %}
     <script>
-      (function() {
-        // Check for OAuth callback parameters
-        var urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.has('code') || urlParams.has('state')) {
-          // OAuth callback detected - redirect to homepage after short delay
-          setTimeout(function() {
-            window.location.href = 'https://sarvital.com/';
-          }, 500);
-        }
-      })();
+      try { sessionStorage.setItem('sarvital_login_ts', String(Date.now())); } catch (e) {}
     </script>
-    
+    {% endif %}
+
     {%- comment -%} Skip to main content link for accessibility {%- endcomment -%}
     <a href="#main-content" class="skip-to-main">{{ 'general.accessibility.skip_to_content' | t | default: 'Skip to main content' }}</a>
     
