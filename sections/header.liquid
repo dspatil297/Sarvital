@@ -45,6 +45,9 @@
             {% endif %}
           </li>
         {% endfor %}
+        <li class="nav-item">
+          <a href="/pages/recipes" class="nav-link {% if request.path == '/pages/recipes' %}active{% endif %}">Recipes</a>
+        </li>
       </ul>
     </nav>
 
@@ -136,6 +139,9 @@
               {% endif %}
             </li>
           {% endfor %}
+          <li class="mobile-nav-item">
+            <a href="/pages/recipes" class="mobile-nav-link {% if request.path == '/pages/recipes' %}active{% endif %}">Recipes</a>
+          </li>
         </ul>
       </nav>
       {% if shop.customer_accounts_enabled %}
