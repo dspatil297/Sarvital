@@ -12,6 +12,14 @@
     "recipe_gallery": {
       "type": "recipe-gallery",
       "blocks": {
+        "recipe_YEKdPi": {
+          "type": "recipe",
+          "settings": {
+            "image": "shopify://shop_images/sattu-sharbat.jpg",
+            "title": "Classic Sattu Sharbat",
+            "caption": "Traditional sattu sharbat - a cooling, protein-rich drink rooted in Indian wellness heritage."
+          }
+        },
         "recipe_1": {
           "type": "recipe",
           "settings": {
@@ -22,6 +30,7 @@
         }
       },
       "block_order": [
+        "recipe_YEKdPi",
         "recipe_1"
       ],
       "settings": {
