@@ -39,6 +39,20 @@
   </head>
 
   <body class="template-{{ request.page_type | handle }}">
+    {%- comment -%} OAuth Callback Handler - Redirect to homepage after successful OAuth login {%- endcomment -%}
+    <script>
+      (function() {
+        // Check for OAuth callback parameters
+        var urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('code') || urlParams.has('state')) {
+          // OAuth callback detected - redirect to homepage after short delay
+          setTimeout(function() {
+            window.location.href = 'https://sarvital.com/';
+          }, 500);
+        }
+      })();
+    </script>
+    
     {%- comment -%} Skip to main content link for accessibility {%- endcomment -%}
     <a href="#main-content" class="skip-to-main">{{ 'general.accessibility.skip_to_content' | t | default: 'Skip to main content' }}</a>
     
