@@ -363,6 +363,10 @@
   </div>
 </section>
 
+{% if product %}
+<script src="{{ 'delivery-estimator.js' | asset_url }}" defer></script>
+{% endif %}
+
 <!-- Product Description Section -->
 {% if product and product.description != blank %}
   <section class="product-description-section" id="product-description">
