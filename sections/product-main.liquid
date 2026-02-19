@@ -403,7 +403,7 @@
         </div>
       </div>
     </div>
-    <button type="button" class="sticky-cart-bar__button" id="sticky-add-to-cart">
+    <button type="submit" form="product-form" name="add" class="sticky-cart-bar__button" id="sticky-add-to-cart" {% unless product.selected_or_first_available_variant.available %}disabled{% endunless %}>
       Add to Cart
     </button>
   </div>
@@ -1561,43 +1561,8 @@
       }
     });
 
-    // Sticky Add to Cart (mobile): delegation + touch so it works when script runs early and on touch devices
-    function submitProductForm() {
-      var mainForm = document.getElementById('product-form');
-      if (!mainForm) return;
-      var submitBtn = mainForm.querySelector('button[type="submit"][name="add"]');
-      if (submitBtn && submitBtn.disabled) return;
-      if (submitBtn && typeof mainForm.requestSubmit === 'function') {
-        try {
-          mainForm.requestSubmit(submitBtn);
-          return;
-        } catch (err) {}
-      }
-      if (submitBtn) {
-        submitBtn.click();
-        return;
-      }
-      mainForm.submit();
-    }
-
-    document.addEventListener('click', function(e) {
-      var btn = e.target && e.target.closest ? e.target.closest('#sticky-add-to-cart, .sticky-cart-bar__button') : null;
-      if (!btn) return;
-      e.preventDefault();
-      e.stopPropagation();
-      submitProductForm();
-    }, true);
-
-    document.addEventListener('touchend', function(e) {
-      if (!e.changedTouches || e.changedTouches.length === 0) return;
-      var touch = e.changedTouches[0];
-      var el = document.elementFromPoint(touch.clientX, touch.clientY);
-      var btn = el && el.closest ? el.closest('#sticky-add-to-cart, .sticky-cart-bar__button') : null;
-      if (!btn) return;
-      e.preventDefault();
-      e.stopPropagation();
-      submitProductForm();
-    }, { passive: false, capture: true });
+    // Sticky Add to Cart uses type="submit" form="product-form" so it natively submits (no JS needed).
+    // Variant change handler below updates sticky button disabled state.
 
     // Buy Now button
     const buyNowBtn = document.getElementById('buy-now-btn');
