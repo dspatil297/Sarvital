@@ -329,5 +329,34 @@
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(74, 124, 44, 0.3);
   }
+
+  /* Mobile: Remove quick view and hover effects */
+  @media (max-width: 768px) {
+    /* Hide quick view overlay completely on mobile */
+    .product-card__overlay {
+      display: none !important;
+    }
+
+    /* Disable all hover effects on mobile */
+    .product-card:hover {
+      transform: none;
+      box-shadow: 0 2px 12px rgba(45, 80, 22, 0.06);
+      border-color: rgba(74, 124, 44, 0.1);
+    }
+
+    .product-card:hover .product-card__image {
+      transform: none;
+    }
+
+    .product-card:hover .product-card__title {
+      color: var(--forest-green);
+    }
+
+    .product-card__add-to-cart:hover {
+      background: linear-gradient(135deg, var(--forest-green) 0%, var(--sage-green) 100%);
+      transform: none;
+      box-shadow: none;
+    }
+  }
 {% endstylesheet %}
 
