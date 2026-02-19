@@ -24,17 +24,25 @@
       </a>
     </div>
 
-    <!-- Desktop Navigation (hidden on mobile via CSS) -->
+    <!-- Desktop Navigation (hidden on mobile via CSS) - Order: Home, Products, Recipes, Contact -->
     <nav class="header__nav header__nav--desktop" aria-label="Main navigation">
       <ul class="nav-menu">
+        <li class="nav-item">
+          <a href="{{ routes.root_url }}" class="nav-link {% if request.path == '/' %}active{% endif %}">Home</a>
+        </li>
         {% for link in section.settings.menu.links %}
-          <li class="nav-item {% if link.links != blank %}has-dropdown{% endif %}">
-            <a href="{{ link.url }}" class="nav-link {% if link.active %}active{% endif %}">
-              {{ link.title | replace: 'Catalog', 'Products' }}
-            </a>
-            {% if link.links != blank %}
+          {% assign link_title_plain = link.title | strip %}
+          {% if link_title_plain == 'Products' or link_title_plain == 'Catalog' or link.url contains '/collections' %}
+            {% assign products_link = link %}
+            {% break %}
+          {% endif %}
+        {% endfor %}
+        {% if products_link %}
+          <li class="nav-item {% if products_link.links != blank %}has-dropdown{% endif %}">
+            <a href="{{ products_link.url }}" class="nav-link {% if products_link.active %}active{% endif %}">Products</a>
+            {% if products_link.links != blank %}
               <ul class="nav-dropdown">
-                {% for childlink in link.links %}
+                {% for childlink in products_link.links %}
                   <li>
                     <a href="{{ childlink.url }}" class="nav-dropdown-link {% if childlink.active %}active{% endif %}">
                       {{ childlink.title | replace: 'Catalog', 'Products' }}
@@ -44,10 +52,29 @@
               </ul>
             {% endif %}
           </li>
-        {% endfor %}
+        {% else %}
+          <li class="nav-item">
+            <a href="{{ routes.collections_url }}" class="nav-link {% if request.path contains '/collections' %}active{% endif %}">Products</a>
+          </li>
+        {% endif %}
         <li class="nav-item">
           <a href="/pages/recipes" class="nav-link {% if request.path == '/pages/recipes' %}active{% endif %}">Recipes</a>
         </li>
+        {% for link in section.settings.menu.links %}
+          {% if link.title == 'Contact' or link.url contains 'contact' %}
+            {% assign contact_link = link %}
+            {% break %}
+          {% endif %}
+        {% endfor %}
+        {% if contact_link %}
+          <li class="nav-item">
+            <a href="{{ contact_link.url }}" class="nav-link {% if contact_link.active %}active{% endif %}">Contact</a>
+          </li>
+        {% else %}
+          <li class="nav-item">
+            <a href="/pages/contact" class="nav-link {% if request.path == '/pages/contact' %}active{% endif %}">Contact</a>
+          </li>
+        {% endif %}
       </ul>
     </nav>
 
@@ -116,19 +143,27 @@
       </div>
       <nav class="mobile-nav" aria-label="Mobile navigation">
         <ul class="mobile-nav-menu">
+          <li class="mobile-nav-item">
+            <a href="{{ routes.root_url }}" class="mobile-nav-link {% if request.path == '/' %}active{% endif %}">Home</a>
+          </li>
           {% for link in section.settings.menu.links %}
-            <li class="mobile-nav-item {% if link.links != blank %}has-children{% endif %}">
-              <a href="{{ link.url }}" class="mobile-nav-link {% if link.active %}active{% endif %}">
-                {{ link.title | replace: 'Catalog', 'Products' }}
-              </a>
-              {% if link.links != blank %}
-                <button type="button" class="mobile-nav-toggle" aria-label="Toggle {{ link.title | replace: 'Catalog', 'Products' }} submenu" aria-expanded="false">
+            {% assign link_title_plain = link.title | strip %}
+            {% if link_title_plain == 'Products' or link_title_plain == 'Catalog' or link.url contains '/collections' %}
+              {% assign products_link_mob = link %}
+              {% break %}
+            {% endif %}
+          {% endfor %}
+          {% if products_link_mob %}
+            <li class="mobile-nav-item {% if products_link_mob.links != blank %}has-children{% endif %}">
+              <a href="{{ products_link_mob.url }}" class="mobile-nav-link {% if products_link_mob.active %}active{% endif %}">Products</a>
+              {% if products_link_mob.links != blank %}
+                <button type="button" class="mobile-nav-toggle" aria-label="Toggle Products submenu" aria-expanded="false">
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M6 12L10 8L6 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                   </svg>
                 </button>
                 <ul class="mobile-nav-submenu">
-                  {% for childlink in link.links %}
+                  {% for childlink in products_link_mob.links %}
                     <li>
                       <a href="{{ childlink.url }}" class="mobile-nav-sublink {% if childlink.active %}active{% endif %}">
                         {{ childlink.title | replace: 'Catalog', 'Products' }}
@@ -138,10 +173,29 @@
                 </ul>
               {% endif %}
             </li>
-          {% endfor %}
+          {% else %}
+            <li class="mobile-nav-item">
+              <a href="{{ routes.collections_url }}" class="mobile-nav-link {% if request.path contains '/collections' %}active{% endif %}">Products</a>
+            </li>
+          {% endif %}
           <li class="mobile-nav-item">
             <a href="/pages/recipes" class="mobile-nav-link {% if request.path == '/pages/recipes' %}active{% endif %}">Recipes</a>
           </li>
+          {% for link in section.settings.menu.links %}
+            {% if link.title == 'Contact' or link.url contains 'contact' %}
+              {% assign contact_link_mob = link %}
+              {% break %}
+            {% endif %}
+          {% endfor %}
+          {% if contact_link_mob %}
+            <li class="mobile-nav-item">
+              <a href="{{ contact_link_mob.url }}" class="mobile-nav-link {% if contact_link_mob.active %}active{% endif %}">Contact</a>
+            </li>
+          {% else %}
+            <li class="mobile-nav-item">
+              <a href="/pages/contact" class="mobile-nav-link {% if request.path == '/pages/contact' %}active{% endif %}">Contact</a>
+            </li>
+          {% endif %}
         </ul>
       </nav>
       {% if shop.customer_accounts_enabled %}
