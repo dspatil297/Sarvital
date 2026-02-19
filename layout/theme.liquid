@@ -348,7 +348,9 @@
           }
         }
         function onDocTouchEnd(e) {
-          var target = e.target;
+          if (!e.changedTouches || e.changedTouches.length === 0) return;
+          var touch = e.changedTouches[0];
+          var target = document.elementFromPoint(touch.clientX, touch.clientY);
           var thumb = target && target.closest ? target.closest('.product-thumbnail') : null;
           if (thumb) {
             e.preventDefault();
