@@ -5,66 +5,115 @@
 
 <section class="product-hero" id="product-hero">
   <div class="product-hero__container">
-    <!-- Left Column - Product Images -->
+    <!-- Left Column - Product Images (carousel: slide to view) -->
     <div class="product-images fade-in-up" style="animation-delay: 0.1s;">
-      {% if product.featured_image %}
-        <div class="product-image-main">
-          <img 
-            src="{{ product.featured_image | image_url: width: 1200 }}" 
-            srcset="
-              {{ product.featured_image | image_url: width: 300 }} 300w,
-              {{ product.featured_image | image_url: width: 600 }} 600w,
-              {{ product.featured_image | image_url: width: 900 }} 900w,
-              {{ product.featured_image | image_url: width: 1200 }} 1200w,
-              {{ product.featured_image | image_url: width: 1500 }} 1500w
-            "
-            sizes="(max-width: 768px) 100vw, 50vw"
-            alt="{{ product.featured_image.alt | default: product.title }}"
-            class="product-image-main__img"
-            id="main-product-image"
-            loading="eager"
-            fetchpriority="high"
-            width="{{ product.featured_image.width }}"
-            height="{{ product.featured_image.height }}"
-            onerror="this.classList.add('image-error'); this.alt='Product image failed to load';"
-          >
+      {% if product.featured_image or product.images.size > 0 %}
+        <div class="product-image-main product-image-carousel-wrapper">
+          <div class="product-image-carousel" id="product-image-carousel">
+            <div class="product-carousel-track" id="product-carousel-track">
+              {% for image in product.images %}
+                <div class="product-carousel-slide" data-index="{{ forloop.index0 }}">
+                  <img
+                    src="{{ image | image_url: width: 1200 }}"
+                    srcset="
+                      {{ image | image_url: width: 300 }} 300w,
+                      {{ image | image_url: width: 600 }} 600w,
+                      {{ image | image_url: width: 900 }} 900w,
+                      {{ image | image_url: width: 1200 }} 1200w,
+                      {{ image | image_url: width: 1500 }} 1500w
+                    "
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    alt="{{ image.alt | default: product.title }}"
+                    class="product-image-main__img"
+                    {% if forloop.first %}loading="eager" fetchpriority="high"{% else %}loading="lazy"{% endif %}
+                    width="{{ image.width }}"
+                    height="{{ image.height }}"
+                    onerror="this.classList.add('image-error'); this.alt='Product image failed to load';"
+                  >
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+          {% if product.images.size > 1 %}
+            <button type="button" class="product-carousel-btn product-carousel-prev" aria-label="Previous image">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+            </button>
+            <button type="button" class="product-carousel-btn product-carousel-next" aria-label="Next image">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+            </button>
+            <div class="product-carousel-dots" id="product-carousel-dots" aria-hidden="true"></div>
+          {% endif %}
           {% if product.compare_at_price > product.price %}
             <div class="product-badge-sale">
               <span class="badge-sale__text">Save {{ product.compare_at_price | minus: product.price | times: 100 | divided_by: product.compare_at_price }}%</span>
             </div>
           {% endif %}
-          <button class="product-image-zoom" aria-label="Zoom product image">
+          <button type="button" class="product-image-zoom" id="product-image-zoom-btn" aria-label="Zoom product image">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <circle cx="11" cy="11" r="8"></circle>
               <path d="m21 21-4.35-4.35"></path>
             </svg>
           </button>
         </div>
-        
         {% if product.images.size > 1 %}
-          <div class="product-image-thumbnails">
-            {% for image in product.images limit: 5 %}
-              <button 
-                class="product-thumbnail {% if forloop.first %}active{% endif %}"
-                data-image-src="{{ image | image_url: width: 1200 }}"
-                aria-label="View image {{ forloop.index }}"
-              >
-                <img 
-                  src="{{ image | image_url: width: 150 }}" 
-                  srcset="
-                    {{ image | image_url: width: 150 }} 150w,
-                    {{ image | image_url: width: 300 }} 300w
-                  "
-                  sizes="80px"
-                  alt="{{ image.alt | default: product.title }}"
-                  loading="lazy"
-                  width="150"
-                  height="150"
-                  onerror="this.classList.add('image-error'); this.alt='Thumbnail failed to load';"
-                >
-              </button>
-            {% endfor %}
-          </div>
+          <script>
+            (function() {
+              var carousel = document.getElementById('product-image-carousel');
+              var track = document.getElementById('product-carousel-track');
+              var dotsEl = document.getElementById('product-carousel-dots');
+              if (!carousel || !track) return;
+              var slides = track.querySelectorAll('.product-carousel-slide');
+              var total = slides.length;
+              if (total === 0) return;
+              var current = 0;
+              function goTo(index) {
+                current = Math.max(0, Math.min(index, total - 1));
+                track.style.transform = 'translate3d(-' + (current * 100) + '%, 0, 0)';
+                if (dotsEl) {
+                  var dots = dotsEl.querySelectorAll('.product-carousel-dot');
+                  for (var i = 0; i < dots.length; i++) dots[i].classList.toggle('active', i === current);
+                }
+              }
+              var wrapper = carousel.closest('.product-image-carousel-wrapper');
+              if (wrapper) {
+                var prevBtn = wrapper.querySelector('.product-carousel-prev');
+                var nextBtn = wrapper.querySelector('.product-carousel-next');
+                if (prevBtn) prevBtn.addEventListener('click', function() { goTo(current - 1); });
+                if (nextBtn) nextBtn.addEventListener('click', function() { goTo(current + 1); });
+              }
+              if (dotsEl && total > 1) {
+                for (var i = 0; i < total; i++) {
+                  var dot = document.createElement('button');
+                  dot.type = 'button';
+                  dot.className = 'product-carousel-dot' + (i === 0 ? ' active' : '');
+                  dot.setAttribute('aria-label', 'Go to image ' + (i + 1));
+                  dot.addEventListener('click', function(ix) { return function() { goTo(ix); }; }(i));
+                  dotsEl.appendChild(dot);
+                }
+              }
+              var touchStartX = 0;
+              carousel.addEventListener('touchstart', function(e) {
+                if (e.touches.length) touchStartX = e.touches[0].clientX;
+              }, { passive: true });
+              carousel.addEventListener('touchend', function(e) {
+                if (!e.changedTouches || !e.changedTouches.length) return;
+                var touchEndX = e.changedTouches[0].clientX;
+                var diff = touchStartX - touchEndX;
+                if (diff > 50) goTo(current + 1);
+                else if (diff < -50) goTo(current - 1);
+              }, { passive: true });
+              var zoomBtn = document.getElementById('product-image-zoom-btn');
+              if (zoomBtn) {
+                zoomBtn.addEventListener('click', function() {
+                  var slide = slides[current];
+                  var img = slide ? slide.querySelector('img') : null;
+                  if (!img || !img.src) return;
+                  var ev = new CustomEvent('product-zoom-image', { detail: { src: img.src, alt: img.alt || '' } });
+                  document.dispatchEvent(ev);
+                });
+              }
+            })();
+          </script>
         {% endif %}
       {% else %}
         <div class="product-image-placeholder">
@@ -419,11 +468,100 @@
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
   }
 
-  .product-image-main__img {
+  /* Carousel */
+  .product-image-carousel-wrapper {
+    position: relative;
+    width: 100%;
+  }
+
+  .product-image-carousel {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    border-radius: 16px;
+    touch-action: pan-y pinch-zoom;
+  }
+
+  .product-carousel-track {
+    display: flex;
+    width: 100%;
+    transition: transform 0.35s ease-out;
+    will-change: transform;
+  }
+
+  .product-carousel-slide {
+    flex: 0 0 100%;
+    width: 100%;
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: var(--bg);
+  }
+
+  .product-carousel-slide .product-image-main__img {
     width: 100%;
     height: 100%;
     object-fit: contain;
-    transition: transform 0.3s ease, opacity 0.3s ease;
+    pointer-events: none;
+  }
+
+  .product-carousel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 44px;
+    height: 44px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3;
+    transition: background 0.2s, transform 0.2s;
+  }
+
+  .product-carousel-btn:hover {
+    background: var(--white);
+    transform: translateY(-50%) scale(1.05);
+  }
+
+  .product-carousel-prev { left: 12px; }
+  .product-carousel-next { right: 12px; }
+
+  .product-carousel-dots {
+    position: absolute;
+    bottom: 16px;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    z-index: 3;
+  }
+
+  .product-carousel-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    padding: 0;
+    transition: background 0.2s, transform 0.2s;
+  }
+
+  .product-carousel-dot:hover {
+    background: rgba(255, 255, 255, 0.8);
+  }
+
+  .product-carousel-dot.active {
+    background: var(--white);
+    transform: scale(1.2);
   }
 
   .product-image-main__img.image-error {
@@ -431,18 +569,9 @@
     background: rgba(245, 245, 245, 0.8);
   }
 
-  .product-thumbnail img.image-error {
-    opacity: 0.5;
-    background: rgba(245, 245, 245, 0.8);
-  }
-
   .sticky-cart-bar__image img.image-error {
     opacity: 0.5;
     background: rgba(245, 245, 245, 0.8);
-  }
-
-  .product-image-main:hover .product-image-main__img {
-    transform: scale(1.05);
   }
 
   .product-badge-sale {
@@ -479,37 +608,6 @@
   .product-image-zoom:hover {
     background: var(--white);
     transform: scale(1.1);
-  }
-
-  .product-image-thumbnails {
-    display: flex;
-    gap: 12px;
-    overflow-x: auto;
-    padding-bottom: 10px;
-  }
-
-  .product-thumbnail {
-    flex-shrink: 0;
-    width: 80px;
-    height: 80px;
-    border: 2px solid transparent;
-    border-radius: 8px;
-    overflow: hidden;
-    background: var(--bg);
-    cursor: pointer;
-    transition: all 0.3s ease;
-    padding: 0;
-  }
-
-  .product-thumbnail.active {
-    border-color: var(--forest-green);
-  }
-
-  .product-thumbnail img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    pointer-events: none; /* touch/click hit the button, not the img */
   }
 
   /* Product Info */
@@ -1140,23 +1238,11 @@
       box-sizing: border-box;
     }
 
-    .product-image-main__img {
+    .product-carousel-slide .product-image-main__img {
       max-width: 100%;
       width: 100%;
       height: auto;
       object-fit: contain;
-    }
-
-    /* Thumbnails: reliable tap on mobile (no scroll steal, no 300ms delay) */
-    .product-image-thumbnails {
-      -webkit-overflow-scrolling: touch;
-      touch-action: pan-x;
-    }
-
-    .product-thumbnail {
-      touch-action: manipulation;
-      -webkit-tap-highlight-color: transparent;
-      cursor: pointer;
     }
 
     .product-info {
@@ -1383,40 +1469,7 @@
 
 {% javascript %}
   ;(function() {
-    // Image thumbnail switching (click + touchend so thumbnails work on mobile)
-    const thumbnails = document.querySelectorAll('.product-thumbnail');
-    const mainImage = document.getElementById('main-product-image');
-    
-    function switchToThumbnail(thumb) {
-      var imageSrc = thumb.getAttribute('data-image-src');
-      if (!imageSrc || !mainImage) return;
-      mainImage.style.opacity = '0.6';
-      mainImage.classList.remove('image-error');
-      var newImg = new Image();
-      newImg.onload = function() {
-        mainImage.src = imageSrc;
-        mainImage.style.opacity = '1';
-      };
-      newImg.onerror = function() {
-        mainImage.classList.add('image-error');
-        mainImage.style.opacity = '1';
-        mainImage.alt = 'Image failed to load';
-      };
-      newImg.src = imageSrc;
-      thumbnails.forEach(function(t) { t.classList.remove('active'); });
-      thumb.classList.add('active');
-    }
-
-    thumbnails.forEach(function(thumb) {
-      thumb.addEventListener('click', function(e) {
-        e.preventDefault();
-        switchToThumbnail(thumb);
-      });
-      thumb.addEventListener('touchend', function(e) {
-        e.preventDefault();
-        switchToThumbnail(thumb);
-      }, { passive: false });
-    });
+    // Thumbnail switching is handled by inline script on #product-thumbnails-container (click + touchend)
 
     // Variant selection
     const variantButtons = document.querySelectorAll('.variant-option-btn');

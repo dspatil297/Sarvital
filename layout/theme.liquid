@@ -291,82 +291,6 @@
     </style>
     <script>
       (function() {
-        // Preload all gallery images so switching is instant (they load in background on page load)
-        function preloadGalleryImages() {
-          var section = document.getElementById('product-hero');
-          if (!section) return;
-          var thumbs = section.querySelectorAll('.product-thumbnail[data-image-src]');
-          for (var i = 0; i < thumbs.length; i++) {
-            var src = thumbs[i].getAttribute('data-image-src');
-            if (src) {
-              var img = new Image();
-              img.src = src;
-            }
-          }
-        }
-        preloadGalleryImages();
-
-        function handleThumbnail(thumb) {
-          var section = thumb.closest('#product-hero');
-          if (!section) return;
-          var mainImg = section.querySelector('.product-image-main__img');
-          if (!mainImg) return;
-          var src = thumb.getAttribute('data-image-src');
-          if (!src) return;
-          mainImg.style.opacity = '0.6';
-          mainImg.onload = function() {
-            mainImg.style.opacity = '';
-            mainImg.onload = null;
-          };
-          mainImg.src = src;
-          var thumbImg = thumb.querySelector('img');
-          if (thumbImg) mainImg.alt = thumbImg.getAttribute('alt') || mainImg.alt;
-          var all = section.querySelectorAll('.product-thumbnail');
-          for (var i = 0; i < all.length; i++) all[i].classList.remove('active');
-          thumb.classList.add('active');
-          if (mainImg.complete) {
-            mainImg.style.opacity = '';
-            mainImg.onload = null;
-          }
-        }
-        function onDocClick(e) {
-          var target = e.target;
-          var thumb = target && target.closest ? target.closest('.product-thumbnail') : null;
-          if (thumb) {
-            e.preventDefault();
-            handleThumbnail(thumb);
-            return;
-          }
-          var zoomBtn = target && target.closest ? target.closest('.product-image-zoom') : null;
-          if (zoomBtn) {
-            e.preventDefault();
-            var sec = zoomBtn.closest('#product-hero');
-            if (!sec) return;
-            var img = sec.querySelector('.product-image-main__img');
-            if (!img || !img.src) return;
-            openLightbox(img.src, img.alt || '');
-          }
-        }
-        function onDocTouchStart(e) {
-          if (!e.touches || e.touches.length === 0) return;
-          var touch = e.touches[0];
-          var target = document.elementFromPoint(touch.clientX, touch.clientY);
-          var thumb = target && target.closest ? target.closest('.product-thumbnail') : null;
-          if (thumb) {
-            e.preventDefault();
-            handleThumbnail(thumb);
-          }
-        }
-        function onDocTouchEnd(e) {
-          if (!e.changedTouches || e.changedTouches.length === 0) return;
-          var touch = e.changedTouches[0];
-          var target = document.elementFromPoint(touch.clientX, touch.clientY);
-          var thumb = target && target.closest ? target.closest('.product-thumbnail') : null;
-          if (thumb) {
-            e.preventDefault();
-            handleThumbnail(thumb);
-          }
-        }
         function openLightbox(src, alt) {
           if (document.getElementById('product-image-lightbox')) return;
           var overlay = document.createElement('div');
@@ -393,9 +317,9 @@
           });
           document.addEventListener('keydown', onKey);
         }
-        document.addEventListener('click', onDocClick);
-        document.addEventListener('touchstart', onDocTouchStart, { passive: false });
-        document.addEventListener('touchend', onDocTouchEnd, { passive: false });
+        document.addEventListener('product-zoom-image', function(e) {
+          if (e.detail && e.detail.src) openLightbox(e.detail.src, e.detail.alt || '');
+        });
       })();
     </script>
     {% endif %}
