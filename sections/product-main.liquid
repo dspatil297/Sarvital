@@ -356,9 +356,26 @@
       </div>
 
       <!-- Delivery Estimator (pincode-based, pan-India) -->
-      {% if product %}
-        {% render 'delivery-estimator' %}
-      {% endif %}
+      <div class="delivery-estimator"{% if product %} data-product-id="{{ product.id }}"{% endif %}>
+        <label for="delivery-estimator-pincode" class="delivery-estimator__label">Check delivery time</label>
+        <div class="delivery-estimator__wrapper">
+          <input
+            type="text"
+            id="delivery-estimator-pincode"
+            class="delivery-estimator__input"
+            placeholder="Enter 6-digit pincode"
+            maxlength="6"
+            pattern="[0-9]{6}"
+            inputmode="numeric"
+            autocomplete="postal-code"
+            aria-describedby="delivery-estimator-result"
+          >
+          <button type="button" id="delivery-estimator-check" class="delivery-estimator__btn" aria-label="Check delivery">
+            Check
+          </button>
+        </div>
+        <div id="delivery-estimator-result" class="delivery-estimator__result" aria-live="polite"></div>
+      </div>
     </div>
   </div>
 </section>
@@ -1542,6 +1559,70 @@
       padding: 12px 14px;
       font-size: 12px;
     }
+
+    /* Delivery Estimator Styles */
+    .delivery-estimator {
+      margin: 1rem 0 !important;
+      padding: 16px !important;
+      background: rgba(74, 124, 44, 0.06) !important;
+      border: 1px solid rgba(74, 124, 44, 0.2) !important;
+      border-radius: 12px !important;
+      display: block !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+    }
+    .delivery-estimator__label {
+      display: block !important;
+      font-size: 14px;
+      font-weight: 600;
+      color: #2d5016;
+      margin-bottom: 10px;
+    }
+    .delivery-estimator__wrapper {
+      display: flex !important;
+      gap: 10px;
+    }
+    .delivery-estimator__input {
+      flex: 1;
+      padding: 12px 14px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 15px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .delivery-estimator__input:focus {
+      outline: none;
+      border-color: #2d5016;
+    }
+    .delivery-estimator__btn {
+      padding: 12px 20px;
+      background: #2d5016;
+      color: #fff !important;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .delivery-estimator__btn:hover {
+      background: #4a7c2c;
+    }
+    .delivery-estimator__result {
+      margin-top: 10px;
+      font-size: 14px;
+      min-height: 1.4em;
+      display: block;
+    }
+    .delivery-estimator__result.delivery-success {
+      color: #2d5016;
+      font-weight: 500;
+    }
+    .delivery-estimator__result.delivery-error {
+      color: #c62828;
+    }
   }
 {% endstylesheet %}
 
@@ -1767,6 +1848,65 @@
         variantSelect.dispatchEvent(new Event('change'));
       }
     }
+
+    // Delivery Estimator - Inline initialization
+    (function initDeliveryEstimator() {
+      var input = document.getElementById('delivery-estimator-pincode');
+      var button = document.getElementById('delivery-estimator-check');
+      var result = document.getElementById('delivery-estimator-result');
+      
+      if (!input || !button || !result) {
+        setTimeout(initDeliveryEstimator, 100);
+        return;
+      }
+      
+      function checkDelivery() {
+        var pincode = input.value.trim().replace(/[^0-9]/g, '');
+        input.value = pincode;
+        
+        if (pincode.length !== 6) {
+          result.className = 'delivery-estimator__result delivery-error';
+          result.textContent = 'Please enter a valid 6-digit pincode';
+          return;
+        }
+        
+        var prefix = pincode.substring(0, 3);
+        var warehouseRegion = 'west';
+        var customerRegion = 'other';
+        
+        if (['110','111','112','121','122','160','201','226','301','302'].indexOf(prefix) !== -1) customerRegion = 'north';
+        else if (['500','560','600','700'].indexOf(prefix) !== -1) customerRegion = 'south';
+        else if (['400','410','411','380','422'].indexOf(prefix) !== -1) customerRegion = 'west';
+        else if (['700','800'].indexOf(prefix) !== -1) customerRegion = 'east';
+        
+        var days;
+        if (customerRegion === warehouseRegion) {
+          days = '2-4 business days';
+        } else if (
+          (warehouseRegion === 'south' && customerRegion === 'central') ||
+          (warehouseRegion === 'central' && ['south','west','north'].indexOf(customerRegion) !== -1) ||
+          (warehouseRegion === 'west' && ['central','north'].indexOf(customerRegion) !== -1)
+        ) {
+          days = '4-6 business days';
+        } else {
+          days = '6-8 business days';
+        }
+        
+        result.className = 'delivery-estimator__result delivery-success';
+        result.textContent = 'Estimated delivery: ' + days;
+      }
+      
+      button.addEventListener('click', checkDelivery);
+      input.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          checkDelivery();
+        }
+      });
+      input.addEventListener('input', function(e) {
+        e.target.value = e.target.value.replace(/[^0-9]/g, '');
+      });
+    })();
   })();
 {% endjavascript %}
 

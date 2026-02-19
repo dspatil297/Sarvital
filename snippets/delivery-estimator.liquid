@@ -3,7 +3,7 @@
   Renders on product page. Requires assets/delivery-estimator.js.
 {% endcomment %}
 
-<div class="delivery-estimator" data-product-id="{{ product.id }}">
+<div class="delivery-estimator"{% if product %} data-product-id="{{ product.id }}"{% endif %}>
   <label for="delivery-estimator-pincode" class="delivery-estimator__label">Check delivery time</label>
   <div class="delivery-estimator__wrapper">
     <input
