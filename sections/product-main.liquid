@@ -1126,8 +1126,36 @@
       gap: 28px; /* Tighter gap so price + CTA appear above fold */
     }
 
+    /* Prevent main product image flowing out of screen on mobile */
     .product-images {
       position: static;
+      max-width: 100%;
+      overflow: hidden;
+      box-sizing: border-box;
+    }
+
+    .product-image-main {
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+
+    .product-image-main__img {
+      max-width: 100%;
+      width: 100%;
+      height: auto;
+      object-fit: contain;
+    }
+
+    /* Thumbnails: reliable tap on mobile (no scroll steal, no 300ms delay) */
+    .product-image-thumbnails {
+      -webkit-overflow-scrolling: touch;
+      touch-action: pan-x;
+    }
+
+    .product-thumbnail {
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      cursor: pointer;
     }
 
     .product-info {
@@ -1199,6 +1227,11 @@
       flex-shrink: 0;
       font-size: 15px;
       font-weight: 600;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      cursor: pointer;
+      position: relative;
+      z-index: 2;
     }
 
     .product-description-section {
@@ -1470,17 +1503,26 @@
       }
     });
 
-    // Sticky cart bar functionality
+    // Sticky cart bar functionality (mobile) – use requestSubmit for reliable form submit on touch devices
     const stickyCartBar = document.getElementById('sticky-cart-bar');
     const stickyAddToCartBtn = document.getElementById('sticky-add-to-cart');
     
+    function submitProductForm() {
+      const mainForm = document.getElementById('product-form');
+      if (!mainForm) return;
+      const submitBtn = mainForm.querySelector('button[type="submit"]');
+      if (!submitBtn || submitBtn.disabled) return;
+      if (typeof mainForm.requestSubmit === 'function') {
+        mainForm.requestSubmit(submitBtn);
+      } else {
+        submitBtn.click();
+      }
+    }
+
     if (stickyAddToCartBtn) {
-      stickyAddToCartBtn.addEventListener('click', function() {
-        const mainForm = document.getElementById('product-form');
-        if (mainForm) {
-          const submitBtn = mainForm.querySelector('button[type="submit"]');
-          if (submitBtn) submitBtn.click();
-        }
+      stickyAddToCartBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        submitProductForm();
       });
     }
 
