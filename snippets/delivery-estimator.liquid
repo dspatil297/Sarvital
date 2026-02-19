@@ -1,0 +1,83 @@
+{% comment %}
+  Delivery Estimator - Pincode-based estimated delivery (pan-India, no real-time API).
+  Renders on product page. Requires assets/delivery-estimator.js.
+{% endcomment %}
+
+<div class="delivery-estimator" data-product-id="{{ product.id }}">
+  <label for="delivery-estimator-pincode" class="delivery-estimator__label">Check delivery time</label>
+  <div class="delivery-estimator__wrapper">
+    <input
+      type="text"
+      id="delivery-estimator-pincode"
+      class="delivery-estimator__input"
+      placeholder="Enter 6-digit pincode"
+      maxlength="6"
+      pattern="[0-9]{6}"
+      inputmode="numeric"
+      autocomplete="postal-code"
+      aria-describedby="delivery-estimator-result"
+    >
+    <button type="button" id="delivery-estimator-check" class="delivery-estimator__btn" aria-label="Check delivery">
+      Check
+    </button>
+  </div>
+  <div id="delivery-estimator-result" class="delivery-estimator__result" aria-live="polite"></div>
+</div>
+
+<style>
+  .delivery-estimator {
+    margin: 1rem 0;
+    padding: 16px;
+    background: rgba(74, 124, 44, 0.06);
+    border: 1px solid rgba(74, 124, 44, 0.2);
+    border-radius: 12px;
+  }
+  .delivery-estimator__label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--forest-green, #2d5016);
+    margin-bottom: 10px;
+  }
+  .delivery-estimator__wrapper {
+    display: flex;
+    gap: 10px;
+  }
+  .delivery-estimator__input {
+    flex: 1;
+    padding: 12px 14px;
+    border: 2px solid var(--border-color, #e0e0e0);
+    border-radius: 8px;
+    font-size: 15px;
+  }
+  .delivery-estimator__input:focus {
+    outline: none;
+    border-color: var(--forest-green, #2d5016);
+  }
+  .delivery-estimator__btn {
+    padding: 12px 20px;
+    background: var(--forest-green, #2d5016);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .delivery-estimator__btn:hover {
+    background: var(--sage-green, #4a7c2c);
+  }
+  .delivery-estimator__result {
+    margin-top: 10px;
+    font-size: 14px;
+    min-height: 1.4em;
+  }
+  .delivery-estimator__result.delivery-success {
+    color: var(--forest-green, #2d5016);
+    font-weight: 500;
+  }
+  .delivery-estimator__result.delivery-error {
+    color: #c62828;
+  }
+</style>

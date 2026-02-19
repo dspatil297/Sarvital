@@ -1,0 +1,23 @@
+{% comment %}
+  Order Delivery Info Section - Shows estimated delivery date on order status pages
+  Usage: Add this section to templates/page.order-status.json or order confirmation pages
+  Note: Requires 'order' object to be available in template context
+{% endcomment %}
+
+{% if order and order.shipping_address.zip %}
+  {% render 'order-delivery-date', order: order %}
+{% elsif checkout and checkout.shipping_address.zip %}
+  {% render 'order-delivery-date', pincode: checkout.shipping_address.zip %}
+{% endif %}
+
+{% schema %}
+{
+  "name": "Order Delivery Info",
+  "settings": [],
+  "presets": [
+    {
+      "name": "Order Delivery Info"
+    }
+  ]
+}
+{% endschema %}

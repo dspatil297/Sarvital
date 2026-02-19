@@ -1,0 +1,64 @@
+{% comment %}
+  Delivery Date Calculator - Calculates estimated delivery date from pincode.
+  Usage: {% render 'delivery-date-calculator', pincode: '422010' %}
+  Output: Sets 'estimated_delivery_date' variable
+{% endcomment %}
+
+{% assign warehouse_pincode = '422010' %}
+{% assign pincode_prefix = pincode | slice: 0, 3 %}
+
+{% comment %} Region mapping based on pincode prefix {% endcomment %}
+{% assign warehouse_prefix = warehouse_pincode | slice: 0, 3 %}
+{% assign warehouse_region = 'west' %}
+{% if warehouse_prefix == '110' or warehouse_prefix == '111' or warehouse_prefix == '112' or warehouse_prefix == '121' or warehouse_prefix == '122' or warehouse_prefix == '160' or warehouse_prefix == '201' or warehouse_prefix == '226' or warehouse_prefix == '301' or warehouse_prefix == '302' %}
+  {% assign warehouse_region = 'north' %}
+{% elsif warehouse_prefix == '500' or warehouse_prefix == '560' or warehouse_prefix == '600' or warehouse_prefix == '700' %}
+  {% assign warehouse_region = 'south' %}
+{% elsif warehouse_prefix == '400' or warehouse_prefix == '410' or warehouse_prefix == '411' or warehouse_prefix == '380' or warehouse_prefix == '422' %}
+  {% assign warehouse_region = 'west' %}
+{% elsif warehouse_prefix == '700' or warehouse_prefix == '800' %}
+  {% assign warehouse_region = 'east' %}
+{% endif %}
+
+{% assign customer_region = 'other' %}
+{% if pincode_prefix == '110' or pincode_prefix == '111' or pincode_prefix == '112' or pincode_prefix == '121' or pincode_prefix == '122' or pincode_prefix == '160' or pincode_prefix == '201' or pincode_prefix == '226' or pincode_prefix == '301' or pincode_prefix == '302' %}
+  {% assign customer_region = 'north' %}
+{% elsif pincode_prefix == '500' or pincode_prefix == '560' or pincode_prefix == '600' or pincode_prefix == '700' %}
+  {% assign customer_region = 'south' %}
+{% elsif pincode_prefix == '400' or pincode_prefix == '410' or pincode_prefix == '411' or pincode_prefix == '380' or pincode_prefix == '422' %}
+  {% assign customer_region = 'west' %}
+{% elsif pincode_prefix == '700' or pincode_prefix == '800' %}
+  {% assign customer_region = 'east' %}
+{% endif %}
+
+{% comment %} Calculate business days {% endcomment %}
+{% if customer_region == warehouse_region %}
+  {% assign min_days = 2 %}
+  {% assign max_days = 4 %}
+{% elsif warehouse_region == 'south' and customer_region == 'central' %}
+  {% assign min_days = 4 %}
+  {% assign max_days = 6 %}
+{% elsif warehouse_region == 'central' %}
+  {% if customer_region == 'south' or customer_region == 'west' or customer_region == 'north' %}
+    {% assign min_days = 4 %}
+    {% assign max_days = 6 %}
+  {% else %}
+    {% assign min_days = 6 %}
+    {% assign max_days = 8 %}
+  {% endif %}
+{% elsif warehouse_region == 'west' %}
+  {% if customer_region == 'central' or customer_region == 'north' %}
+    {% assign min_days = 4 %}
+    {% assign max_days = 6 %}
+  {% else %}
+    {% assign min_days = 6 %}
+    {% assign max_days = 8 %}
+  {% endif %}
+{% else %}
+  {% assign min_days = 6 %}
+  {% assign max_days = 8 %}
+{% endif %}
+
+{% comment %} Note: Liquid can't calculate actual dates, so we'll use JavaScript for date calculation {% endcomment %}
+{% assign estimated_delivery_days_min = min_days %}
+{% assign estimated_delivery_days_max = max_days %}

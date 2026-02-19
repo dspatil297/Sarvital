@@ -354,9 +354,13 @@
           <span>SSL encrypted & secure payment</span>
         </div>
       </div>
+
+      <!-- Delivery Estimator (pincode-based, pan-India) -->
+      {% render 'delivery-estimator' %}
     </div>
   </div>
 </section>
+<script src="{{ 'delivery-estimator.js' | asset_url }}" defer></script>
 
 <!-- Product Description Section -->
 {% if product and product.description != blank %}

@@ -1,0 +1,89 @@
+{% comment %}
+  Order Delivery Date - Shows estimated delivery date for orders.
+  Usage: {% render 'order-delivery-date', order: order %} or {% render 'order-delivery-date', pincode: '422010' %}
+{% endcomment %}
+
+{% if order %}
+  {% assign shipping_pincode = order.shipping_address.zip %}
+{% elsif pincode %}
+  {% assign shipping_pincode = pincode %}
+{% else %}
+  {% assign shipping_pincode = '' %}
+{% endif %}
+
+{% if shipping_pincode != blank %}
+  <div class="order-delivery-date" data-pincode="{{ shipping_pincode }}">
+    <div class="order-delivery-date__icon">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M1 3h15v13H1V3zm16 8h4l3 3v4h-7v-7z"/>
+        <path d="M5 21a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm12 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/>
+      </svg>
+    </div>
+    <div class="order-delivery-date__content">
+      <strong class="order-delivery-date__label">Estimated Delivery:</strong>
+      <span class="order-delivery-date__date" id="delivery-date-{{ shipping_pincode }}">Calculating...</span>
+    </div>
+  </div>
+  <script src="{{ 'delivery-estimator.js' | asset_url }}" defer></script>
+  <script>
+    (function() {
+      function calculateDate() {
+        var pincode = '{{ shipping_pincode }}';
+        if (!pincode) return;
+        if (window.calculateDeliveryDate) {
+          var delivery = window.calculateDeliveryDate(pincode);
+          if (delivery) {
+            var el = document.getElementById('delivery-date-' + pincode);
+            if (el) {
+              if (delivery.minDate === delivery.maxDate) {
+                el.textContent = delivery.minDate;
+              } else {
+                el.textContent = delivery.minDate + ' - ' + delivery.maxDate;
+              }
+            }
+          }
+        } else {
+          setTimeout(calculateDate, 100);
+        }
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', calculateDate);
+      } else {
+        calculateDate();
+      }
+    })();
+  </script>
+{% endif %}
+
+<style>
+  .order-delivery-date {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    background: rgba(74, 124, 44, 0.08);
+    border: 1px solid rgba(74, 124, 44, 0.2);
+    border-radius: 12px;
+    margin: 16px 0;
+  }
+  .order-delivery-date__icon {
+    flex-shrink: 0;
+    color: var(--forest-green, #2d5016);
+  }
+  .order-delivery-date__content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .order-delivery-date__label {
+    font-size: 13px;
+    color: rgba(26, 26, 26, 0.7);
+    font-weight: 600;
+  }
+  .order-delivery-date__date {
+    font-size: 15px;
+    color: var(--forest-green, #2d5016);
+    font-weight: 700;
+  }
+</style>
