@@ -347,6 +347,16 @@
             openLightbox(img.src, img.alt || '');
           }
         }
+        function onDocTouchStart(e) {
+          if (!e.touches || e.touches.length === 0) return;
+          var touch = e.touches[0];
+          var target = document.elementFromPoint(touch.clientX, touch.clientY);
+          var thumb = target && target.closest ? target.closest('.product-thumbnail') : null;
+          if (thumb) {
+            e.preventDefault();
+            handleThumbnail(thumb);
+          }
+        }
         function onDocTouchEnd(e) {
           if (!e.changedTouches || e.changedTouches.length === 0) return;
           var touch = e.changedTouches[0];
@@ -384,6 +394,7 @@
           document.addEventListener('keydown', onKey);
         }
         document.addEventListener('click', onDocClick);
+        document.addEventListener('touchstart', onDocTouchStart, { passive: false });
         document.addEventListener('touchend', onDocTouchEnd, { passive: false });
       })();
     </script>
