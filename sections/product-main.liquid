@@ -1561,28 +1561,43 @@
       }
     });
 
-    // Sticky cart bar functionality (mobile) – use requestSubmit for reliable form submit on touch devices
-    const stickyCartBar = document.getElementById('sticky-cart-bar');
-    const stickyAddToCartBtn = document.getElementById('sticky-add-to-cart');
-    
+    // Sticky Add to Cart (mobile): delegation + touch so it works when script runs early and on touch devices
     function submitProductForm() {
-      const mainForm = document.getElementById('product-form');
+      var mainForm = document.getElementById('product-form');
       if (!mainForm) return;
-      const submitBtn = mainForm.querySelector('button[type="submit"]');
-      if (!submitBtn || submitBtn.disabled) return;
-      if (typeof mainForm.requestSubmit === 'function') {
-        mainForm.requestSubmit(submitBtn);
-      } else {
-        submitBtn.click();
+      var submitBtn = mainForm.querySelector('button[type="submit"][name="add"]');
+      if (submitBtn && submitBtn.disabled) return;
+      if (submitBtn && typeof mainForm.requestSubmit === 'function') {
+        try {
+          mainForm.requestSubmit(submitBtn);
+          return;
+        } catch (err) {}
       }
+      if (submitBtn) {
+        submitBtn.click();
+        return;
+      }
+      mainForm.submit();
     }
 
-    if (stickyAddToCartBtn) {
-      stickyAddToCartBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        submitProductForm();
-      });
-    }
+    document.addEventListener('click', function(e) {
+      var btn = e.target && e.target.closest ? e.target.closest('#sticky-add-to-cart, .sticky-cart-bar__button') : null;
+      if (!btn) return;
+      e.preventDefault();
+      e.stopPropagation();
+      submitProductForm();
+    }, true);
+
+    document.addEventListener('touchend', function(e) {
+      if (!e.changedTouches || e.changedTouches.length === 0) return;
+      var touch = e.changedTouches[0];
+      var el = document.elementFromPoint(touch.clientX, touch.clientY);
+      var btn = el && el.closest ? el.closest('#sticky-add-to-cart, .sticky-cart-bar__button') : null;
+      if (!btn) return;
+      e.preventDefault();
+      e.stopPropagation();
+      submitProductForm();
+    }, { passive: false, capture: true });
 
     // Buy Now button
     const buyNowBtn = document.getElementById('buy-now-btn');
