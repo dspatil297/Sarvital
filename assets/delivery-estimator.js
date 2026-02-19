@@ -98,10 +98,19 @@
     var input = document.getElementById('delivery-estimator-pincode');
     var button = document.getElementById('delivery-estimator-check');
     var result = document.getElementById('delivery-estimator-result');
-    if (!input || !button || !result) return;
+    
+    if (!input || !button || !result) {
+      setTimeout(init, 100);
+      return;
+    }
 
     function runCheck() {
       var pincode = input.value.trim();
+      if (!pincode) {
+        result.className = 'delivery-estimator__result delivery-error';
+        result.textContent = 'Please enter a pincode';
+        return;
+      }
       var estimate = estimateDelivery(pincode);
       result.className = 'delivery-estimator__result ' + (estimate.success ? 'delivery-success' : 'delivery-error');
       result.textContent = estimate.message;
@@ -114,11 +123,25 @@
         runCheck();
       }
     });
+    
+    input.addEventListener('input', function(e) {
+      e.target.value = e.target.value.replace(/[^0-9]/g, '');
+    });
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
+  function startInit() {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  }
+
+  startInit();
+  
+  if (typeof window.addEventListener !== 'undefined') {
+    window.addEventListener('load', function() {
+      setTimeout(init, 50);
+    });
   }
 })();

@@ -356,11 +356,12 @@
       </div>
 
       <!-- Delivery Estimator (pincode-based, pan-India) -->
-      {% render 'delivery-estimator' %}
+      {% if product %}
+        {% render 'delivery-estimator' %}
+      {% endif %}
     </div>
   </div>
 </section>
-<script src="{{ 'delivery-estimator.js' | asset_url }}" defer></script>
 
 <!-- Product Description Section -->
 {% if product and product.description != blank %}

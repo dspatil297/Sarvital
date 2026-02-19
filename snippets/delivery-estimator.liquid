@@ -24,57 +24,129 @@
   <div id="delivery-estimator-result" class="delivery-estimator__result" aria-live="polite"></div>
 </div>
 
+<script>
+  (function() {
+    function initDeliveryEstimator() {
+      var input = document.getElementById('delivery-estimator-pincode');
+      var button = document.getElementById('delivery-estimator-check');
+      var result = document.getElementById('delivery-estimator-result');
+      
+      if (!input || !button || !result) {
+        setTimeout(initDeliveryEstimator, 100);
+        return;
+      }
+
+      if (window.estimateDelivery) {
+        attachHandlers();
+      } else {
+        var script = document.createElement('script');
+        script.src = '{{ "delivery-estimator.js" | asset_url }}';
+        script.onload = attachHandlers;
+        script.onerror = function() {
+          console.error('Failed to load delivery-estimator.js');
+        };
+        if (!document.querySelector('script[src*="delivery-estimator.js"]')) {
+          document.head.appendChild(script);
+        } else {
+          setTimeout(attachHandlers, 200);
+        }
+      }
+
+      function attachHandlers() {
+        if (!window.estimateDelivery) {
+          setTimeout(attachHandlers, 100);
+          return;
+        }
+        function runCheck() {
+          var pincode = input.value.trim();
+          if (!pincode) {
+            result.className = 'delivery-estimator__result delivery-error';
+            result.textContent = 'Please enter a pincode';
+            return;
+          }
+          var estimate = window.estimateDelivery(pincode);
+          result.className = 'delivery-estimator__result ' + (estimate.success ? 'delivery-success' : 'delivery-error');
+          result.textContent = estimate.message;
+        }
+        button.addEventListener('click', runCheck);
+        input.addEventListener('keypress', function(e) {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            runCheck();
+          }
+        });
+        input.addEventListener('input', function(e) {
+          e.target.value = e.target.value.replace(/[^0-9]/g, '');
+        });
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initDeliveryEstimator);
+    } else {
+      initDeliveryEstimator();
+    }
+  })();
+</script>
+
 <style>
   .delivery-estimator {
-    margin: 1rem 0;
-    padding: 16px;
-    background: rgba(74, 124, 44, 0.06);
-    border: 1px solid rgba(74, 124, 44, 0.2);
-    border-radius: 12px;
+    margin: 1rem 0 !important;
+    padding: 16px !important;
+    background: rgba(74, 124, 44, 0.06) !important;
+    border: 1px solid rgba(74, 124, 44, 0.2) !important;
+    border-radius: 12px !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
   }
   .delivery-estimator__label {
-    display: block;
+    display: block !important;
     font-size: 14px;
     font-weight: 600;
-    color: var(--forest-green, #2d5016);
+    color: #2d5016;
     margin-bottom: 10px;
   }
   .delivery-estimator__wrapper {
-    display: flex;
+    display: flex !important;
     gap: 10px;
   }
   .delivery-estimator__input {
     flex: 1;
     padding: 12px 14px;
-    border: 2px solid var(--border-color, #e0e0e0);
+    border: 2px solid #e0e0e0;
     border-radius: 8px;
     font-size: 15px;
+    width: 100%;
+    box-sizing: border-box;
   }
   .delivery-estimator__input:focus {
     outline: none;
-    border-color: var(--forest-green, #2d5016);
+    border-color: #2d5016;
   }
   .delivery-estimator__btn {
     padding: 12px 20px;
-    background: var(--forest-green, #2d5016);
-    color: #fff;
+    background: #2d5016;
+    color: #fff !important;
     border: none;
     border-radius: 8px;
     font-weight: 600;
     font-size: 14px;
     cursor: pointer;
     white-space: nowrap;
+    flex-shrink: 0;
   }
   .delivery-estimator__btn:hover {
-    background: var(--sage-green, #4a7c2c);
+    background: #4a7c2c;
   }
   .delivery-estimator__result {
     margin-top: 10px;
     font-size: 14px;
     min-height: 1.4em;
+    display: block;
   }
   .delivery-estimator__result.delivery-success {
-    color: var(--forest-green, #2d5016);
+    color: #2d5016;
     font-weight: 500;
   }
   .delivery-estimator__result.delivery-error {
