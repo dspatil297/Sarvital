@@ -1,5 +1,5 @@
 {% comment %}
-  Main Account Section - Customer account dashboard with orders and address.
+  Account Page Section - Customer account dashboard with orders and address.
   Uses theme layout (theme.liquid) so global header and footer are visible.
 {% endcomment %}
 
@@ -101,7 +101,7 @@
             {% endif %}
           {% else %}
             <div class="account-orders__empty">
-              <p>{{ 'customers.orders.none' | t | default: 'You haven\'t placed any orders yet.' }}</p>
+              <p>{{ 'customers.orders.none' | t }}</p>
               <a href="{{ routes.all_products_collection_url }}" class="btn btn-primary">
                 {{ 'customers.orders.start_shopping' | t | default: 'Start shopping' }}
               </a>
