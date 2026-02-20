@@ -1030,6 +1030,81 @@
     font-size: 14px;
   }
 
+  /* Delivery Estimator - desktop (input + button in one row, styled button) */
+  .delivery-estimator {
+    margin: 1rem 0;
+    padding: 20px;
+    background: rgba(74, 124, 44, 0.06);
+    border: 1px solid rgba(74, 124, 44, 0.2);
+    border-radius: 12px;
+  }
+
+  .delivery-estimator__label {
+    display: block;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--forest-green);
+    margin-bottom: 12px;
+  }
+
+  .delivery-estimator__wrapper {
+    display: flex;
+    align-items: stretch;
+    gap: 12px;
+    max-width: 400px;
+  }
+
+  .delivery-estimator__input {
+    flex: 1;
+    min-width: 0;
+    padding: 14px 18px;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 15px;
+    transition: border-color 0.2s ease;
+  }
+
+  .delivery-estimator__input:focus {
+    outline: none;
+    border-color: var(--forest-green);
+  }
+
+  .delivery-estimator__btn {
+    padding: 14px 28px;
+    background: var(--forest-green);
+    color: var(--white);
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: background 0.2s ease, transform 0.2s ease;
+    box-shadow: 0 2px 8px rgba(74, 124, 44, 0.25);
+  }
+
+  .delivery-estimator__btn:hover {
+    background: var(--sage-green);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(74, 124, 44, 0.3);
+  }
+
+  .delivery-estimator__result {
+    margin-top: 12px;
+    font-size: 14px;
+    min-height: 1.4em;
+  }
+
+  .delivery-estimator__result.delivery-success {
+    color: var(--forest-green);
+    font-weight: 500;
+  }
+
+  .delivery-estimator__result.delivery-error {
+    color: #c62828;
+  }
+
   /* Product Description Section */
   .product-description-section {
     width: 100%;
