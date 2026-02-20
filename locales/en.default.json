@@ -20,6 +20,24 @@
     "remove": "Remove"
   },
   "customers": {
+    "account": {
+      "title": "My Account",
+      "log_out": "Log out",
+      "details": "Account details",
+      "default_address": "Default address",
+      "view_addresses": "View addresses"
+    },
+    "orders": {
+      "title": "Order history",
+      "order_number": "Order",
+      "date": "Date",
+      "payment_status": "Payment",
+      "fulfillment_status": "Fulfillment",
+      "total": "Total",
+      "view_order": "View",
+      "none": "You haven't placed any orders yet.",
+      "start_shopping": "Start shopping"
+    },
     "login": {
       "email": "Email",
       "password": "Password",
