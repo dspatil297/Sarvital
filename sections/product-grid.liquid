@@ -436,36 +436,75 @@
     transform: none;
   }
 
-  /* Mobile carousel: compact card – smaller padding, typography and image ratio */
+  /* Mobile carousel: professional full-width card – balanced ratio, clear hierarchy */
   @media (max-width: 768px) {
+    .product-grid-section__carousel-wrap--mobile .product-grid-section__carousel-slide .product-card {
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(45, 80, 22, 0.08), 0 1px 3px rgba(0, 0, 0, 0.06);
+      border-color: rgba(74, 124, 44, 0.15);
+    }
     .product-grid-section__carousel-wrap--mobile .product-grid-section__carousel-slide .product-card__image-wrapper {
-      padding-top: 85%;
+      padding-top: 78%;
+      background: linear-gradient(180deg, #f5f7f5 0%, #eef0ee 100%);
+    }
+    .product-grid-section__carousel-wrap--mobile .product-grid-section__carousel-slide .product-card__image {
+      object-fit: cover;
+      object-position: center;
+    }
+    .product-grid-section__carousel-wrap--mobile .product-grid-section__carousel-slide .product-card__badge {
+      top: 12px;
+      left: 12px;
+      padding: 6px 12px;
+      font-size: 11px;
+      border-radius: 8px;
     }
     .product-grid-section__carousel-wrap--mobile .product-grid-section__carousel-slide .product-card__info {
-      padding: 14px 16px;
+      padding: 18px 20px 22px;
     }
     .product-grid-section__carousel-wrap--mobile .product-grid-section__carousel-slide .product-card__title {
-      font-size: 15px;
-      margin-bottom: 6px;
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 1.4;
+      margin-bottom: 8px;
+      -webkit-line-clamp: 2;
     }
-    .product-grid-section__carousel-wrap--mobile .product-grid-section__carousel-slide .product-card__price-row {
+    .product-grid-section__carousel-wrap--mobile .product-grid-section__carousel-slide .product-card__tags {
+      margin-bottom: 10px;
       gap: 6px;
     }
+    .product-grid-section__carousel-wrap--mobile .product-grid-section__carousel-slide .product-card__tag {
+      padding: 4px 8px;
+      font-size: 10px;
+      border-radius: 6px;
+    }
+    .product-grid-section__carousel-wrap--mobile .product-grid-section__carousel-slide .product-card__price-row {
+      gap: 8px;
+      align-items: baseline;
+    }
     .product-grid-section__carousel-wrap--mobile .product-grid-section__carousel-slide .product-card__price--current {
-      font-size: 18px;
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
     }
     .product-grid-section__carousel-wrap--mobile .product-grid-section__carousel-slide .product-card__price--compare {
-      font-size: 12px;
+      font-size: 13px;
+      color: rgba(26, 26, 26, 0.45);
     }
     .product-grid-section__carousel-wrap--mobile .product-grid-section__carousel-slide .product-card__price {
-      margin-bottom: 12px;
+      margin-bottom: 16px;
+    }
+    .product-grid-section__carousel-wrap--mobile .product-grid-section__carousel-slide .product-card__price--gst {
+      font-size: 11px;
+      color: rgba(26, 26, 26, 0.55);
     }
     .product-grid-section__carousel-wrap--mobile .product-grid-section__carousel-slide .product-card__add-to-cart {
-      padding: 12px 16px;
-      font-size: 13px;
-    }
-    .product-grid-section__carousel-wrap--mobile .product-grid-section__carousel-slide .product-card {
-      border-radius: 14px;
+      min-height: 48px;
+      padding: 14px 20px;
+      font-size: 14px;
+      font-weight: 700;
+      border-radius: 10px;
+      letter-spacing: 0.04em;
+      box-shadow: 0 2px 10px rgba(45, 80, 22, 0.25);
     }
   }
 
@@ -503,31 +542,69 @@
         var totalSlides = slides.length;
         if (totalSlides < 2) return;
 
-        var slideWidthPx = 280;
-        var gapPx = 28;
-        var slideStep = slideWidthPx + gapPx;
         var half = Math.floor(totalSlides / 2);
-        var setWidth = half * slideStep;
         var autoInterval = null;
-        var cardIntervalMs = 1500;
+        var wrapInProgress = false;
 
-        function snapToStep(pos) {
-          return Math.round(pos / slideStep) * slideStep;
+        function getSlideStep() {
+          var first = slides[0];
+          if (!first) return 308;
+          var slideWidth = first.offsetWidth || 280;
+          var gap = 0;
+          var trackStyle = window.getComputedStyle(track);
+          var gapStr = trackStyle.gap || trackStyle.columnGap;
+          if (gapStr) gap = parseFloat(gapStr) || 0;
+          return slideWidth + gap;
         }
 
-        function slideToNext() {
-          var current = scrollEl.scrollLeft;
-          var target = snapToStep(current) + slideStep;
-          if (target >= setWidth) {
+        function getSetWidth() {
+          return half * getSlideStep();
+        }
+
+        function snapToStep(pos, step) {
+          step = step || getSlideStep();
+          return Math.round(pos / step) * step;
+        }
+
+        function infiniteWrap() {
+          if (wrapInProgress) return;
+          var setWidth = getSetWidth();
+          var cur = scrollEl.scrollLeft;
+          if (cur >= setWidth - 2) {
+            wrapInProgress = true;
             scrollEl.style.scrollBehavior = 'auto';
-            scrollEl.scrollLeft = 0;
-            scrollEl.style.scrollBehavior = 'smooth';
+            scrollEl.scrollLeft = cur - setWidth;
+            scrollEl.style.scrollBehavior = '';
+            requestAnimationFrame(function() { wrapInProgress = false; });
+          }
+        }
+
+        var scrollEndTimer = null;
+        function onScroll() {
+          if (wrapInProgress) return;
+          if (scrollEndTimer) clearTimeout(scrollEndTimer);
+          scrollEndTimer = setTimeout(function() {
+            scrollEndTimer = null;
+            infiniteWrap();
+          }, 80);
+        }
+
+        scrollEl.addEventListener('scroll', onScroll, { passive: true });
+
+        function slideToNext() {
+          var step = getSlideStep();
+          var setWidth = getSetWidth();
+          var current = scrollEl.scrollLeft;
+          var target = snapToStep(current, step) + step;
+          scrollEl.style.scrollBehavior = 'smooth';
+          if (target >= setWidth) {
             scrollEl.scrollLeft = target - setWidth;
           } else {
             scrollEl.scrollLeft = target;
           }
         }
 
+        var cardIntervalMs = half > 0 ? (intervalSec * 1000) / half : 3000;
         function startAutoScroll() {
           if (!autoScroll || autoInterval) return;
           autoInterval = setInterval(slideToNext, cardIntervalMs);
@@ -545,12 +622,13 @@
         if (prevBtn) {
           prevBtn.addEventListener('click', function() {
             stopAutoScroll();
+            var step = getSlideStep();
+            var setWidth = getSetWidth();
             var cur = scrollEl.scrollLeft;
-            var targetPrev = snapToStep(cur) - slideStep;
+            var targetPrev = snapToStep(cur, step) - step;
+            scrollEl.style.scrollBehavior = 'smooth';
             if (targetPrev < 0) {
-              scrollEl.style.scrollBehavior = 'auto';
-              scrollEl.scrollLeft = setWidth - slideStep;
-              scrollEl.style.scrollBehavior = 'smooth';
+              scrollEl.scrollLeft = setWidth + targetPrev;
             } else {
               scrollEl.scrollLeft = targetPrev;
             }
@@ -560,12 +638,12 @@
         if (nextBtn) {
           nextBtn.addEventListener('click', function() {
             stopAutoScroll();
+            var step = getSlideStep();
+            var setWidth = getSetWidth();
             var cur = scrollEl.scrollLeft;
-            var next = snapToStep(cur) + slideStep;
+            var next = snapToStep(cur, step) + step;
+            scrollEl.style.scrollBehavior = 'smooth';
             if (next >= setWidth) {
-              scrollEl.style.scrollBehavior = 'auto';
-              scrollEl.scrollLeft = 0;
-              scrollEl.style.scrollBehavior = 'smooth';
               scrollEl.scrollLeft = next - setWidth;
             } else {
               scrollEl.scrollLeft = next;
