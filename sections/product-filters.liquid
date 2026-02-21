@@ -308,6 +308,9 @@
     width: 85%;
     max-width: 360px;
     height: 100vh;
+    height: 100dvh;
+    height: -webkit-fill-available;
+    min-height: -webkit-fill-available;
     background-color: var(--white);
     box-shadow: var(--shadow-xl);
     transform: translateX(-100%);
@@ -316,6 +319,8 @@
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     touch-action: pan-y;
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
   }
 
   .product-filters__sidebar.active {
@@ -530,13 +535,15 @@
     function openFilters() {
       filterSidebar.classList.add('active');
       filterOverlay.classList.add('active');
-      document.body.style.overflow = 'hidden';
+      if (window.lockBodyScroll) window.lockBodyScroll();
+      else document.body.style.overflow = 'hidden';
     }
 
     function closeFilters() {
       filterSidebar.classList.remove('active');
       filterOverlay.classList.remove('active');
-      document.body.style.overflow = '';
+      if (window.unlockBodyScroll) window.unlockBodyScroll();
+      else document.body.style.overflow = '';
     }
 
     if (filterToggle) {

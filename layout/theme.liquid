@@ -58,6 +58,26 @@
       (function() {
         var cartListenerAdded = false;
         var menuAttached = false;
+        // iOS Safari: overflow:hidden doesn't lock scroll; position:fixed + save/restore scrollY does
+        window.lockBodyScroll = function() {
+          var scrollY = window.pageYOffset || document.documentElement.scrollTop;
+          document.body.style.position = 'fixed';
+          document.body.style.top = '-' + scrollY + 'px';
+          document.body.style.left = '0';
+          document.body.style.right = '0';
+          document.body.style.overflow = 'hidden';
+          document.body.setAttribute('data-scroll-position', String(scrollY));
+        };
+        window.unlockBodyScroll = function() {
+          var scrollY = document.body.getAttribute('data-scroll-position') || '0';
+          document.body.style.position = '';
+          document.body.style.top = '';
+          document.body.style.left = '';
+          document.body.style.right = '';
+          document.body.style.overflow = '';
+          document.body.removeAttribute('data-scroll-position');
+          window.scrollTo(0, parseInt(scrollY, 10));
+        };
         function initHeaderAndCart() {
           var doc = document;
 
@@ -69,7 +89,8 @@
                 var d = doc.getElementById('cart-drawer');
                 if (d) {
                   d.classList.add('active');
-                  doc.body.style.overflow = 'hidden';
+                  if (window.lockBodyScroll) window.lockBodyScroll();
+                  else doc.body.style.overflow = 'hidden';
                 }
               };
             }
@@ -81,7 +102,8 @@
               var drawer = doc.getElementById('cart-drawer');
               if (drawer) {
                 drawer.classList.add('active');
-                doc.body.style.overflow = 'hidden';
+                if (window.lockBodyScroll) window.lockBodyScroll();
+                else doc.body.style.overflow = 'hidden';
                 if (typeof window.openCartDrawer === 'function') {
                   try { window.openCartDrawer(); } catch (err) { /* ignore */ }
                 } else {
@@ -105,7 +127,8 @@
                 }
                 drawer.classList.add('active');
                 drawer.setAttribute('aria-hidden', 'false');
-                doc.body.style.overflow = 'hidden';
+                if (window.lockBodyScroll) window.lockBodyScroll();
+                else doc.body.style.overflow = 'hidden';
               }
               function closeMenu(toggle, drawer) {
                 if (toggle) {
@@ -115,7 +138,8 @@
                 }
                 drawer.classList.remove('active');
                 drawer.setAttribute('aria-hidden', 'true');
-                doc.body.style.overflow = '';
+                if (window.unlockBodyScroll) window.unlockBodyScroll();
+                else doc.body.style.overflow = '';
               }
               doc.addEventListener('click', function(e) {
                 var toggle = e.target && e.target.closest ? e.target.closest('[data-mobile-menu-toggle]') : null;
@@ -249,6 +273,7 @@
       #product-image-lightbox {
         position: fixed;
         inset: 0;
+        inset: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
         z-index: 9999;
         background: rgba(0, 0, 0, 0.9);
         display: flex;
@@ -260,19 +285,21 @@
       #product-image-lightbox .product-lightbox-inner {
         max-width: 90vw;
         max-height: 90vh;
+        max-height: 90dvh;
         position: relative;
       }
       #product-image-lightbox .product-lightbox-img {
         max-width: 100%;
         max-height: 90vh;
+        max-height: 90dvh;
         width: auto;
         height: auto;
         object-fit: contain;
       }
       #product-image-lightbox .product-lightbox-close {
         position: absolute;
-        top: 16px;
-        right: 16px;
+        top: max(16px, env(safe-area-inset-top));
+        right: max(16px, env(safe-area-inset-right));
         width: 48px;
         height: 48px;
         border: none;
@@ -303,10 +330,12 @@
           im.src = src;
           im.alt = alt;
           document.body.appendChild(overlay);
-          document.body.style.overflow = 'hidden';
+          if (window.lockBodyScroll) window.lockBodyScroll();
+          else document.body.style.overflow = 'hidden';
           function closeLightbox() {
             if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
-            document.body.style.overflow = '';
+            if (window.unlockBodyScroll) window.unlockBodyScroll();
+            else document.body.style.overflow = '';
             document.removeEventListener('keydown', onKey);
           }
           function onKey(ev) {
