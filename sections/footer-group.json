@@ -14,7 +14,25 @@
     "footer": {
       "type": "footer",
       "settings": {
-        "show_payment_icons": true
+        "show_cta_bar": true,
+        "cta_headline": "Start Your Wellness Journey Today",
+        "cta_subtitle": "Join thousands who have transformed their health with SARVITAL",
+        "cta_button_text": "Order Now",
+        "cta_button_url": "",
+        "company_description": "SARVITAL brings you premium, nature-backed wellness products crafted with care. We are committed to quality, purity, and your wellbeing helping you live healthier, naturally.",
+        "policies_menu": "",
+        "email": "",
+        "address": "",
+        "working_hours": "Mon-Sat: 9AM - 6PM",
+        "legal_manufacturer": "Sarvital Sarvadnya Foodtech Pvt Ltd",
+        "legal_mfg": "",
+        "legal_origin": "India",
+        "legal_expiry": "",
+        "disclaimer_text": "Disclaimer: This product is a health supplement and is not for medicinal use. Not intended to diagnose, treat, cure, or prevent any disease. Consult your healthcare provider if pregnant, nursing, or on medication.",
+        "company_legal_name": "Sarvital Sarvadnya Foodtech Pvt Ltd",
+        "show_scroll_top": true,
+        "show_chat": true,
+        "chat_url": ""
       }
     }
   },
