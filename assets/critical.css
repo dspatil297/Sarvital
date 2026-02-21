@@ -1119,6 +1119,11 @@ html {
   -webkit-text-size-adjust: 100%;
 }
 
+/* Mobile menu drawer when moved to body: always on top of hero/carousel and all sections */
+body > .mobile-menu-drawer {
+  z-index: 99999;
+}
+
 /* Safe area for notched devices (e.g. iPhone X+) */
 @supports (padding: env(safe-area-inset-left)) {
   body {

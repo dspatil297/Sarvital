@@ -53,6 +53,14 @@
     {%- comment -%} Cart Drawer (markup + script runs after layout) {%- endcomment -%}
     {% render 'cart-drawer' %}
 
+    {%- comment -%} Move mobile menu drawer to end of body so it always stacks above hero/carousel {%- endcomment -%}
+    <script>
+      (function() {
+        var drawer = document.getElementById('mobile-menu-drawer');
+        if (drawer && drawer.parentNode && document.body) document.body.appendChild(drawer);
+      })();
+    </script>
+
     {%- comment -%} Header + Cart: single inline script so hamburger and cart work (runs after header/cart in DOM) {%- endcomment -%}
     <script>
       (function() {
