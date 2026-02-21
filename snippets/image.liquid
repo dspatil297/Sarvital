@@ -66,6 +66,7 @@
   {% endif %}
 >
   {% if image %}
+    {% assign onerror_attr = "this.classList.add('image__img--error'); this.alt='Image failed to load';" %}
     {{ image | image_url: width: width, height: height, crop: crop | image_tag:
       loading: loading_strategy,
       width: width,
@@ -73,7 +74,7 @@
       alt: image_alt,
       sizes: sizes_attr,
       class: 'image__img',
-      onerror: 'this.classList.add(\'image__img--error\'); this.alt=\'Image failed to load\';'
+      onerror: onerror_attr
     }}
   {% else %}
     <div class="image__placeholder">

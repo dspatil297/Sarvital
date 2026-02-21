@@ -1,10 +1,15 @@
 {% comment %}
   This section is used in the list-collections template to render a list of
-  collections.
-
+  collections. We redirect /collections to the all-products page so customers
+  cannot reach this index.
   https://shopify.dev/docs/storefronts/themes/architecture/templates/collection
 {% endcomment %}
 
+{% if request.path == '/collections' %}
+  <script>window.location.replace('{{ routes.all_products_collection_url }}');</script>
+  <noscript><meta http-equiv="refresh" content="0;url={{ routes.all_products_collection_url }}"></noscript>
+  <p style="padding:2rem;text-align:center;">Redirecting to products…</p>
+{% else %}
 <h1>{{ 'collections.title' | t }}</h1>
 
 <div
@@ -33,6 +38,7 @@
     </a>
   {% endfor %}
 </div>
+{% endif %}
 
 {% stylesheet %}
   .collections {
