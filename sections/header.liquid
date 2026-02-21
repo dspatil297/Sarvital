@@ -395,6 +395,8 @@
   /* Hamburger: hidden on desktop, shown only on mobile */
   .mobile-menu-toggle {
     display: none;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
   }
 
   .mobile-menu-toggle:hover {
@@ -474,6 +476,9 @@
     right: 0;
     bottom: 0;
     background-color: rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
   }
 
   .mobile-menu-content {
@@ -493,6 +498,7 @@
     display: flex;
     flex-direction: column;
     touch-action: pan-y;
+    -webkit-overflow-scrolling: touch;
     padding-top: env(safe-area-inset-top);
     padding-right: env(safe-area-inset-right);
     padding-bottom: env(safe-area-inset-bottom);
@@ -580,10 +586,15 @@
     align-items: center;
   }
 
+  .mobile-nav-item.has-children .mobile-nav-link {
+    padding-right: 48px;
+  }
+
   .mobile-nav-toggle {
     position: absolute;
     right: 0;
-    top: var(--spacing-md);
+    top: 50%;
+    transform: translateY(-50%);
     background: none;
     border: none;
     color: var(--text);
@@ -596,10 +607,12 @@
     justify-content: center;
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    z-index: 2;
   }
 
   .mobile-nav-item.active .mobile-nav-toggle {
-    transform: rotate(90deg);
+    transform: translateY(-50%) rotate(90deg);
   }
 
   .mobile-nav-submenu {
@@ -735,7 +748,8 @@
       mobileMenu.setAttribute('aria-hidden', 'false');
       mobileMenuToggle.setAttribute('aria-expanded', 'true');
       mobileMenuToggle.setAttribute('aria-label', 'Close menu');
-      document.body.style.overflow = 'hidden';
+      if (window.lockBodyScroll) window.lockBodyScroll();
+      else document.body.style.overflow = 'hidden';
     }
 
     function closeMobileMenu() {
@@ -745,7 +759,8 @@
       mobileMenu.setAttribute('aria-hidden', 'true');
       mobileMenuToggle.setAttribute('aria-expanded', 'false');
       mobileMenuToggle.setAttribute('aria-label', 'Open menu');
-      document.body.style.overflow = '';
+      if (window.unlockBodyScroll) window.unlockBodyScroll();
+      else document.body.style.overflow = '';
     }
 
     if (mobileMenuToggle && mobileMenu) {
