@@ -128,7 +128,7 @@
   }
 
   .product-grid-section__container {
-    max-width: 1400px;
+    max-width: var(--container-max-width);
     margin: 0 auto;
   }
 
@@ -167,6 +167,7 @@
     grid-template-columns: repeat(4, 1fr);
     gap: var(--spacing-xl);
     margin-bottom: var(--spacing-xl);
+    align-items: start;
   }
 
   @media (min-width: 1400px) {
@@ -232,15 +233,17 @@
       gap: var(--spacing-sm);
     }
 
-    .product-grid-section__carousel-slide {
-      flex: 0 0 calc(100vw - 60px);
-      width: calc(100vw - 60px);
-      min-width: calc(100vw - 60px);
-      max-width: calc(100vw - 60px);
+    /* Carousel: one card = 100vw (same as 768px) */
+    .product-grid-section__carousel-wrap--mobile .product-grid-section__carousel-slide {
+      flex: 0 0 100vw;
+      width: 100vw;
+      min-width: 100vw;
+      max-width: 100vw;
     }
-
-    .product-grid-section__carousel-track {
-      gap: var(--spacing-sm);
+    .product-grid-section__carousel-wrap--mobile .product-grid-section__carousel-track {
+      gap: 0;
+      padding-left: 0;
+      padding-right: 0;
     }
   }
 
@@ -283,6 +286,25 @@
     padding: 0 var(--spacing-lg);
     box-sizing: border-box;
     min-height: 420px;
+  }
+
+  /* Mobile: carousel full viewport width so we can center cards with 50vw */
+  @media (max-width: 768px) {
+    .product-grid-section__carousel-wrap--mobile {
+      width: 100vw;
+      max-width: 100vw;
+      margin-left: calc(50% - 50vw);
+      margin-right: calc(50% - 50vw);
+      padding-left: 0;
+      padding-right: 0;
+      box-sizing: border-box;
+    }
+    .product-grid-section__carousel-wrap--mobile .product-grid-section__carousel-scroll {
+      margin-left: 0;
+      margin-right: 0;
+      padding-left: 0;
+      padding-right: 0;
+    }
   }
 
   @media (min-width: 769px) {
@@ -354,6 +376,15 @@
     box-sizing: border-box;
   }
 
+  /* Mobile: one card at a time – slide = 100vw, no gap or padding so only one card visible */
+  @media (max-width: 768px) {
+    .product-grid-section__carousel-wrap--mobile .product-grid-section__carousel-track {
+      gap: 0;
+      padding-left: 0;
+      padding-right: 0;
+    }
+  }
+
   .product-grid-section__carousel-slide {
     flex: 0 0 280px;
     width: 280px;
@@ -365,6 +396,16 @@
     box-sizing: border-box;
     scroll-snap-align: start;
     scroll-snap-stop: always;
+  }
+
+  /* Mobile: one card only – each slide = 100vw */
+  @media (max-width: 768px) {
+    .product-grid-section__carousel-wrap--mobile .product-grid-section__carousel-slide {
+      flex: 0 0 100vw;
+      width: 100vw;
+      min-width: 100vw;
+      max-width: 100vw;
+    }
   }
 
   .product-grid-section__carousel-slide .product-card {
@@ -393,6 +434,39 @@
 
   .product-grid-section__carousel-slide .product-card:hover {
     transform: none;
+  }
+
+  /* Mobile carousel: compact card – smaller padding, typography and image ratio */
+  @media (max-width: 768px) {
+    .product-grid-section__carousel-wrap--mobile .product-grid-section__carousel-slide .product-card__image-wrapper {
+      padding-top: 85%;
+    }
+    .product-grid-section__carousel-wrap--mobile .product-grid-section__carousel-slide .product-card__info {
+      padding: 14px 16px;
+    }
+    .product-grid-section__carousel-wrap--mobile .product-grid-section__carousel-slide .product-card__title {
+      font-size: 15px;
+      margin-bottom: 6px;
+    }
+    .product-grid-section__carousel-wrap--mobile .product-grid-section__carousel-slide .product-card__price-row {
+      gap: 6px;
+    }
+    .product-grid-section__carousel-wrap--mobile .product-grid-section__carousel-slide .product-card__price--current {
+      font-size: 18px;
+    }
+    .product-grid-section__carousel-wrap--mobile .product-grid-section__carousel-slide .product-card__price--compare {
+      font-size: 12px;
+    }
+    .product-grid-section__carousel-wrap--mobile .product-grid-section__carousel-slide .product-card__price {
+      margin-bottom: 12px;
+    }
+    .product-grid-section__carousel-wrap--mobile .product-grid-section__carousel-slide .product-card__add-to-cart {
+      padding: 12px 16px;
+      font-size: 13px;
+    }
+    .product-grid-section__carousel-wrap--mobile .product-grid-section__carousel-slide .product-card {
+      border-radius: 14px;
+    }
   }
 
   @media (min-width: 769px) {
