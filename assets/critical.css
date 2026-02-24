@@ -1215,3 +1215,40 @@ body > .mobile-menu-drawer {
     font-size: var(--body-large);
   }
 }
+
+/* Footer social icons - ensure visible */
+.site-footer .footer__social {
+  display: block;
+  margin-top: 1rem;
+}
+.site-footer .footer__social-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.95);
+  margin-bottom: 0.5rem;
+}
+.site-footer .footer__social-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+.site-footer .footer__social-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+.site-footer .footer__social-link svg {
+  width: 22px;
+  height: 22px;
+  display: block;
+  fill: currentColor;
+}
