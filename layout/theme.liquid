@@ -212,8 +212,8 @@
       })();
     </script>
 
-    {%- comment -%} Base JavaScript - Load with defer for better performance {%- endcomment -%}
-    <script src="{{ 'application.js' | asset_url }}" defer></script>
+    {%- comment -%} Base JavaScript - Load scripts.js to avoid "Unexpected )" at scripts.js:760:4 (was application.js) {%- endcomment -%}
+    <script src="{{ 'scripts.js' | asset_url }}" defer></script>
     {%- comment -%} Cart page +/- and remove: event delegation in capture phase so it runs before other handlers {%- endcomment -%}
     <script>
       (function() {

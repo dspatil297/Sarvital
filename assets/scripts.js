@@ -1,8 +1,6 @@
 /**
- * Sarvital Theme - scripts.js
- * This file mirrors application.js (~318 lines). Theme layout loads application.js.
- * If GoKwik reported an error at "scripts.js line 760", that line is not in this file;
- * see docs/GOKWIK-SCRIPTS-JS-NOTE.md and check Liquid sections (cart-drawer, header, product-main).
+ * Sarvital Theme - Base JavaScript (scripts.js)
+ * Same as application.js. Theme loads this to avoid scripts.js:760 error from combined/bundled asset.
  */
 (function() {
   'use strict';
@@ -86,17 +84,13 @@
       isValid = false;
       errorMessage = 'This field is required';
     }
-    if (type === 'email' && value) {
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-        isValid = false;
-        errorMessage = 'Please enter a valid email address';
-      }
+    if (type === 'email' && value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+      isValid = false;
+      errorMessage = 'Please enter a valid email address';
     }
-    if (type === 'tel' && value) {
-      if (!/^[\d\s\-\+\(\)]+$/.test(value) || value.length < 10) {
-        isValid = false;
-        errorMessage = 'Please enter a valid phone number';
-      }
+    if (type === 'tel' && value && (!/^[\d\s\-\+\(\)]+$/.test(value) || value.length < 10)) {
+      isValid = false;
+      errorMessage = 'Please enter a valid phone number';
     }
     if (!isValid) {
       field.classList.add('error');
