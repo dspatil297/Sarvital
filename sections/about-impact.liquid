@@ -209,18 +209,18 @@
 
 {% javascript %}
   ;(function() {
-  // Animated counter for impact metrics
+  // Animated counter for impact metrics (ES5 for Shopify compiled_assets/scripts.js minification)
   document.addEventListener('DOMContentLoaded', function() {
-    const counters = document.querySelectorAll('[data-count]');
+    var counters = document.querySelectorAll('[data-count]');
     
-    const animateCounter = (counter) => {
-      const target = parseInt(counter.dataset.count.replace(/[^0-9]/g, ''));
-      const suffix = counter.dataset.count.replace(/[0-9]/g, '');
-      const duration = 2000;
-      const increment = target / (duration / 16);
-      let current = 0;
+    function animateCounter(counter) {
+      var target = parseInt(counter.dataset.count.replace(/[^0-9]/g, ''), 10) || 0;
+      var suffix = counter.dataset.count.replace(/[0-9]/g, '');
+      var duration = 2000;
+      var increment = target / (duration / 16);
+      var current = 0;
       
-      const updateCounter = () => {
+      function updateCounter() {
         current += increment;
         if (current < target) {
           counter.textContent = Math.floor(current) + suffix;
@@ -228,11 +228,10 @@
         } else {
           counter.textContent = target + suffix;
         }
-      };
+      }
       
-      // Start animation when element is in viewport
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
+      var observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
           if (entry.isIntersecting) {
             updateCounter();
             observer.unobserve(entry.target);
@@ -241,7 +240,7 @@
       }, { threshold: 0.5 });
       
       observer.observe(counter);
-    };
+    }
     
     counters.forEach(animateCounter);
   });
