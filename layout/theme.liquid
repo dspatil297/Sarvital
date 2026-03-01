@@ -45,7 +45,7 @@
     {% sections 'header-group' %}
 
     <main id="main-content" role="main" tabindex="-1">
-      {{ content_for_layout }}
+      {{ content_for_layout }}  
     </main>
 
     {% sections 'footer-group' %}
@@ -65,6 +65,30 @@
       var cartSubtotal = document.querySelector('[data-cart-subtotal]');
       var cartTotal = document.querySelector('[data-cart-total]');
       var cartCheckout = document.querySelector('[data-cart-checkout]');
+
+      if (!window.lockBodyScroll) {
+        window.lockBodyScroll = function() {
+          var scrollY = window.pageYOffset || document.documentElement.scrollTop;
+          document.body.style.position = 'fixed';
+          document.body.style.top = '-' + scrollY + 'px';
+          document.body.style.left = '0';
+          document.body.style.right = '0';
+          document.body.style.overflow = 'hidden';
+          document.body.setAttribute('data-scroll-position', String(scrollY));
+        };
+      }
+      if (!window.unlockBodyScroll) {
+        window.unlockBodyScroll = function() {
+          var scrollY = document.body.getAttribute('data-scroll-position') || '0';
+          document.body.style.position = '';
+          document.body.style.top = '';
+          document.body.style.left = '';
+          document.body.style.right = '';
+          document.body.style.overflow = '';
+          document.body.removeAttribute('data-scroll-position');
+          window.scrollTo(0, parseInt(scrollY, 10));
+        };
+      }
 
       function openCartDrawer() {
         cartDrawer.classList.add('active');
@@ -93,6 +117,9 @@
         }).catch(function(err) {
           console.error('Cart load error:', err);
           cartLoading.classList.remove('active');
+          if (cartItems) cartItems.classList.remove('active');
+          if (cartEmpty) { cartEmpty.classList.add('active'); cartItems.innerHTML = ''; }
+          if (cartFooter) cartFooter.style.display = 'none';
         });
       }
       function formatMoney(cents) {
@@ -154,8 +181,20 @@
       document.addEventListener('cart:updated', function() { if (cartDrawer.classList.contains('active')) loadCart(); });
       for (var i = 0; i < cartDrawerClose.length; i++) cartDrawerClose[i].addEventListener('click', closeCartDrawer);
       cartDrawer.addEventListener('click', function(e) { if (e.target && e.target.classList && e.target.classList.contains('cart-drawer-overlay')) closeCartDrawer(); });
-      if (cartCheckout) cartCheckout.addEventListener('click', function() { window.location.href = '/checkout'; });
+      if (cartCheckout) cartCheckout.addEventListener('click', function(e) { e.preventDefault(); window.location.href = '/checkout'; });
       window.openCartDrawer = openCartDrawer;
+
+      document.addEventListener('click', function(e) {
+        var t = e.target;
+        if (!t || typeof t.closest !== 'function') return;
+        var toggle = t.closest('[data-cart-toggle]');
+        if (toggle) {
+          e.preventDefault();
+          e.stopPropagation();
+          openCartDrawer();
+        }
+      }, true);
+
       if (cartDrawer.classList.contains('active')) loadCart();
     })();
     </script>
@@ -196,7 +235,7 @@
         function initHeaderAndCart() {
           var doc = document;
 
-          // --- Cart: run once; open drawer and trigger load (capture phase so it runs first) ---
+          // --- Cart: fallback only; cart drawer script owns toggle (capture) and openCartDrawer ---
           if (!cartListenerAdded) {
             cartListenerAdded = true;
             if (typeof window.openCartDrawer !== 'function') {
@@ -206,25 +245,10 @@
                   d.classList.add('active');
                   if (window.lockBodyScroll) window.lockBodyScroll();
                   else doc.body.style.overflow = 'hidden';
+                  doc.dispatchEvent(new CustomEvent('open-cart-drawer'));
                 }
               };
             }
-            doc.addEventListener('click', function(e) {
-              var toggle = e.target && e.target.closest ? e.target.closest('[data-cart-toggle]') : null;
-              if (!toggle) return;
-              e.preventDefault();
-              e.stopPropagation();
-              var drawer = doc.getElementById('cart-drawer');
-              if (!drawer) return;
-              drawer.classList.add('active');
-              if (window.lockBodyScroll) window.lockBodyScroll();
-              else doc.body.style.overflow = 'hidden';
-              if (typeof window.openCartDrawer === 'function') {
-                try { window.openCartDrawer(); } catch (err) { /* ignore */ }
-              } else {
-                doc.dispatchEvent(new CustomEvent('open-cart-drawer'));
-              }
-            }, true);
           }
 
           // --- Hamburger / Mobile menu: use event delegation so it works even if header loads late ---
