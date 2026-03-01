@@ -1783,8 +1783,56 @@
       }
     });
 
-    // Sticky Add to Cart uses type="submit" form="product-form" so it natively submits (no JS needed).
-    // Variant change handler below updates sticky button disabled state.
+    // AJAX Add to Cart: prevent full page submit, add via /cart/add.js, update header count and open cart drawer
+    var productForm = document.getElementById('product-form');
+    if (productForm) {
+      productForm.addEventListener('submit', function(e) {
+        var submitBtn = e.target.querySelector('button[type="submit"][name="add"]');
+        var isSticky = e.submitter && e.submitter.id === 'sticky-add-to-cart';
+        if (!submitBtn && !isSticky) return;
+        var idInput = productForm.querySelector('input[name="id"], select[name="id"]');
+        var qtyInput = productForm.querySelector('input[name="quantity"]');
+        var variantId = idInput ? (idInput.value || (idInput.options && idInput.options[idInput.selectedIndex] && idInput.options[idInput.selectedIndex].value)) : null;
+        var quantity = (qtyInput && parseInt(qtyInput.value, 10)) || 1;
+        if (!variantId) return;
+        e.preventDefault();
+        var btn = isSticky ? e.submitter : submitBtn;
+        var originalText = btn && btn.querySelector && btn.querySelector('.cta-button__text') ? btn.querySelector('.cta-button__text').textContent : btn.textContent;
+        if (btn) {
+          btn.disabled = true;
+          if (btn.querySelector && btn.querySelector('.cta-button__text')) btn.querySelector('.cta-button__text').textContent = 'Adding...';
+          else btn.textContent = 'Adding...';
+        }
+        fetch('/cart/add.js', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: variantId, quantity: quantity })
+        }).then(function(res) { return res.json().then(function(data) { return { ok: res.ok, data: data }; }); }).then(function(result) {
+          if (result.ok) {
+            document.dispatchEvent(new CustomEvent('cart:updated'));
+            if (typeof window.openCartDrawer === 'function') {
+              window.openCartDrawer();
+            } else {
+              document.dispatchEvent(new CustomEvent('open-cart-drawer'));
+            }
+          } else {
+            if (result.data && result.data.message) {
+              alert(result.data.message);
+            } else {
+              alert('Could not add to cart. Please try again.');
+            }
+          }
+        }).catch(function() {
+          alert('Could not add to cart. Please try again.');
+        }).then(function() {
+          if (btn) {
+            btn.disabled = false;
+            if (btn.querySelector && btn.querySelector('.cta-button__text')) btn.querySelector('.cta-button__text').textContent = originalText;
+            else btn.textContent = originalText;
+          }
+        });
+      });
+    }
 
     var buyNowBtn = document.getElementById('buy-now-btn');
     if (buyNowBtn) {
