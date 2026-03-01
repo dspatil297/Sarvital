@@ -109,20 +109,13 @@
               e.stopPropagation();
               var drawer = doc.getElementById('cart-drawer');
               if (!drawer) return;
-              var open = function() {
-                drawer.classList.add('active');
-                if (window.lockBodyScroll) window.lockBodyScroll();
-                else doc.body.style.overflow = 'hidden';
-                if (typeof window.openCartDrawer === 'function') {
-                  try { window.openCartDrawer(); } catch (err) { /* ignore */ }
-                } else {
-                  doc.dispatchEvent(new CustomEvent('open-cart-drawer'));
-                }
-              };
-              if (typeof requestAnimationFrame !== 'undefined') {
-                requestAnimationFrame(open);
+              drawer.classList.add('active');
+              if (window.lockBodyScroll) window.lockBodyScroll();
+              else doc.body.style.overflow = 'hidden';
+              if (typeof window.openCartDrawer === 'function') {
+                try { window.openCartDrawer(); } catch (err) { /* ignore */ }
               } else {
-                setTimeout(open, 0);
+                doc.dispatchEvent(new CustomEvent('open-cart-drawer'));
               }
             }, true);
           }
