@@ -59,12 +59,15 @@
 
     {% sections 'footer-group' %}
 
-    {%- comment -%} Only hide the theme's cart drawer (id=cart-drawer). Do not hide .cart-drawer or [data-cart-drawer] globally — GoKwik may use those. {%- endcomment -%}
+    {%- comment -%} Theme cart drawer hidden. GoKwik drawer: ensure it stacks above theme (common app selectors). {%- endcomment -%}
     <style>
       #cart-drawer {
         display: none !important;
         visibility: hidden !important;
         pointer-events: none !important;
+      }
+      [id*="kwik"], [id*="Kwik"], [class*="kwik-cart"], [class*="KwikCart"], [class*="gokwik"], [class*="slide-cart"] {
+        z-index: 999999 !important;
       }
     </style>
     <script>
@@ -119,19 +122,26 @@
       };
     })();
     </script>
-    {%- comment -%} On load: if URL has open_cart/openCart, try to open GoKwik drawer; after 4s if body still locked, unlock so page never freezes. {%- endcomment -%}
+    {%- comment -%} On load with open_cart/openCart: try every way to open GoKwik drawer; unfreeze after 4s if stuck. {%- endcomment -%}
     <script>
     (function() {
       var q = window.location.search || '';
       if (q.indexOf('open_cart=') === -1 && q.indexOf('openCart=') === -1) return;
       var attempts = 0;
-      var maxAttempts = 20;
+      var maxAttempts = 25;
       function tryOpen() {
         attempts++;
-        if (typeof window.KwikCart !== 'undefined' && typeof window.KwikCart.open === 'function') {
-          window.KwikCart.open();
+        if (typeof window.KwikCart !== 'undefined') {
+          if (typeof window.KwikCart.open === 'function') window.KwikCart.open();
+          if (typeof window.KwikCart.show === 'function') window.KwikCart.show();
+          if (typeof window.KwikCart.openCart === 'function') window.KwikCart.openCart();
         }
-        if (attempts < maxAttempts) setTimeout(tryOpen, 200);
+        if (attempts === 3) {
+          document.dispatchEvent(new CustomEvent('open-cart-drawer'));
+          document.dispatchEvent(new CustomEvent('openCart'));
+          document.dispatchEvent(new CustomEvent('cart:open'));
+        }
+        if (attempts < maxAttempts) setTimeout(tryOpen, 250);
       }
       function unfreezeIfNeeded() {
         if (document.body && document.body.style && document.body.style.position === 'fixed') {
@@ -144,14 +154,14 @@
           }
         }
       }
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', function() {
-          tryOpen();
-          setTimeout(unfreezeIfNeeded, 4000);
-        });
-      } else {
+      function run() {
         tryOpen();
         setTimeout(unfreezeIfNeeded, 4000);
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', run);
+      } else {
+        run();
       }
     })();
     </script>
@@ -192,18 +202,18 @@
         function initHeaderAndCart() {
           var doc = document;
 
-          // --- Cart: button triggers full navigation to ?open_cart=1 so no script can intercept; GoKwik opens on load. ---
+          // --- Cart: intercept to try KwikCart.open() without reload; if not available, let link navigate to ?open_cart=1. ---
           if (!cartListenerAdded) {
             cartListenerAdded = true;
             doc.addEventListener('click', function(e) {
-              var btn = e.target && e.target.closest ? e.target.closest('#header-cart-btn, .header__cart[data-cart-url]') : null;
-              if (btn) {
-                var url = btn.getAttribute && btn.getAttribute('data-cart-url');
-                if (url) {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  window.location.href = url;
-                }
+              var cart = e.target && e.target.closest ? e.target.closest('#header-cart-link, .header__cart[href*="open_cart"]') : null;
+              if (!cart || !cart.href) return;
+              e.preventDefault();
+              e.stopPropagation();
+              if (typeof window.KwikCart !== 'undefined' && typeof window.KwikCart.open === 'function') {
+                window.KwikCart.open();
+              } else {
+                window.location.href = cart.getAttribute('href') || cart.href;
               }
             }, true);
           }
