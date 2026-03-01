@@ -127,16 +127,28 @@
         function initHeaderAndCart() {
           var doc = document;
 
-          // --- Cart: open GoKwik side cart on same page (prevent navigation, dispatch event) ---
+          // --- Cart: open GoKwik side cart on same page (no navigation). Try URL param + popstate, events, and common app APIs. ---
           if (!cartListenerAdded) {
             cartListenerAdded = true;
+            function triggerCartOpen() {
+              var url = new URL(window.location.href);
+              url.searchParams.set('openCart', 'true');
+              var newUrl = url.pathname + (url.search ? url.search : '');
+              history.replaceState(null, '', newUrl);
+              doc.dispatchEvent(new PopStateEvent('popstate', { state: null }));
+              doc.dispatchEvent(new CustomEvent('open-cart-drawer'));
+              doc.dispatchEvent(new CustomEvent('openCart'));
+              doc.dispatchEvent(new CustomEvent('cart:open'));
+              if (typeof window.KwikCart !== 'undefined' && typeof window.KwikCart.open === 'function') window.KwikCart.open();
+              if (typeof window.openKwikCart === 'function') window.openKwikCart();
+              if (typeof window.gokwikOpenCart === 'function') window.gokwikOpenCart();
+            }
             doc.addEventListener('click', function(e) {
               var cartToggle = e.target && e.target.closest ? e.target.closest('[data-cart-toggle]') : null;
-              if (cartToggle) {
-                e.preventDefault();
-                e.stopPropagation();
-                doc.dispatchEvent(new CustomEvent('open-cart-drawer'));
-              }
+              if (!cartToggle) return;
+              e.preventDefault();
+              triggerCartOpen();
+              setTimeout(triggerCartOpen, 100);
             }, true);
           }
 
