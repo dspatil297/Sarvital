@@ -109,19 +109,50 @@
           window.scrollTo(0, parseInt(scrollY, 10));
         };
       }
-      /** Open GoKwik drawer (after add-to-cart). No event dispatch to avoid body scroll lock. If KwikCart.open missing, navigate so drawer opens on load. */
+      /** Open GoKwik drawer (after add-to-cart). Navigate to ?open_cart=1 so drawer opens on load. */
       window.openCartDrawer = function() {
         var url = new URL(window.location.href);
-        url.searchParams.set('openCart', 'true');
+        if (!url.searchParams.has('open_cart')) url.searchParams.set('open_cart', '1');
+        if (!url.searchParams.has('openCart')) url.searchParams.set('openCart', '1');
         var newUrl = url.pathname + (url.search ? url.search : '');
-        if (typeof window.KwikCart !== 'undefined' && typeof window.KwikCart.open === 'function') {
-          if (window.history && window.history.replaceState) window.history.replaceState({ openCart: true }, '', newUrl);
-          window.KwikCart.open();
-          setTimeout(function() { window.KwikCart.open(); }, 150);
-        } else {
-          window.location.href = newUrl;
-        }
+        window.location.href = newUrl;
       };
+    })();
+    </script>
+    {%- comment -%} On load: if URL has open_cart/openCart, try to open GoKwik drawer; after 4s if body still locked, unlock so page never freezes. {%- endcomment -%}
+    <script>
+    (function() {
+      var q = window.location.search || '';
+      if (q.indexOf('open_cart=') === -1 && q.indexOf('openCart=') === -1) return;
+      var attempts = 0;
+      var maxAttempts = 20;
+      function tryOpen() {
+        attempts++;
+        if (typeof window.KwikCart !== 'undefined' && typeof window.KwikCart.open === 'function') {
+          window.KwikCart.open();
+        }
+        if (attempts < maxAttempts) setTimeout(tryOpen, 200);
+      }
+      function unfreezeIfNeeded() {
+        if (document.body && document.body.style && document.body.style.position === 'fixed') {
+          if (typeof window.unlockBodyScroll === 'function') window.unlockBodyScroll();
+          else {
+            document.body.style.position = '';
+            document.body.style.top = '';
+            document.body.style.overflow = '';
+            document.body.removeAttribute('data-scroll-position');
+          }
+        }
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+          tryOpen();
+          setTimeout(unfreezeIfNeeded, 4000);
+        });
+      } else {
+        tryOpen();
+        setTimeout(unfreezeIfNeeded, 4000);
+      }
     })();
     </script>
 
@@ -161,8 +192,21 @@
         function initHeaderAndCart() {
           var doc = document;
 
-          // --- Cart: no intercept; header cart link goes to ?openCart=true so page loads and GoKwik opens drawer on load (avoids freeze). ---
-          if (!cartListenerAdded) cartListenerAdded = true;
+          // --- Cart: button triggers full navigation to ?open_cart=1 so no script can intercept; GoKwik opens on load. ---
+          if (!cartListenerAdded) {
+            cartListenerAdded = true;
+            doc.addEventListener('click', function(e) {
+              var btn = e.target && e.target.closest ? e.target.closest('#header-cart-btn, .header__cart[data-cart-url]') : null;
+              if (btn) {
+                var url = btn.getAttribute && btn.getAttribute('data-cart-url');
+                if (url) {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  window.location.href = url;
+                }
+              }
+            }, true);
+          }
 
           // --- Hamburger / Mobile menu: use event delegation so it works even if header loads late ---
           if (!menuAttached) {

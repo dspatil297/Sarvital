@@ -101,15 +101,15 @@
         {% endif %}
       {% endif %}
 
-      <!-- Cart: link to ?openCart=true so on load GoKwik opens side cart (no JS intercept to avoid freeze). -->
-      <a href="{{ request.path }}{% if request.query_string != blank %}&{% else %}?{% endif %}openCart=true" class="header__cart" data-cart-toggle aria-label="Shopping cart">
+      <!-- Cart: button triggers full page nav to open GoKwik drawer (no link = nothing to intercept; theme uses only GoKwik). -->
+      <button type="button" class="header__cart" id="header-cart-btn" data-cart-url="{{ request.path }}{% if request.query_string != blank %}&{% else %}?{% endif %}open_cart=1&amp;openCart=1" aria-label="Open cart">
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M2 2H4L4.4 4M6 14H16L20 4H4.4M6 14L4.4 4M6 14L3.29289 16.7071C3.10536 16.8946 3 17.149 3 17.4142V18C3 18.5523 3.44772 19 4 19H17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           <circle cx="8" cy="19" r="1" fill="currentColor"/>
           <circle cx="17" cy="19" r="1" fill="currentColor"/>
         </svg>
         <span class="cart-count" data-cart-count aria-hidden="true"{% if cart.item_count == 0 %} style="display: none;"{% endif %}>{{ cart.item_count }}</span>
-      </a>
+      </button>
 
       <!-- Hamburger: visible only on mobile (via CSS) -->
       <button
