@@ -329,17 +329,15 @@
 {% javascript %}
   ;(function() {
     'use strict';
-
-    // Open quick view (disabled on mobile)
     document.addEventListener('click', function(e) {
-      const quickViewBtn = e.target.closest('[data-quick-view]');
+      var quickViewBtn = e.target.closest('[data-quick-view]');
       if (quickViewBtn) {
         if (window.innerWidth <= 767) return;
         e.preventDefault();
         e.stopPropagation();
         e.stopImmediatePropagation();
-        const productId = quickViewBtn.getAttribute('data-quick-view');
-        const modal = document.getElementById('quick-view-' + productId);
+        var productId = quickViewBtn.getAttribute('data-quick-view');
+        var modal = document.getElementById('quick-view-' + productId);
         if (modal) {
           modal.classList.add('active');
           if (window.lockBodyScroll) window.lockBodyScroll();
@@ -350,10 +348,9 @@
       }
     }, true);
 
-    // Close quick view
     document.addEventListener('click', function(e) {
       if (e.target.closest('[data-quick-view-close]')) {
-        const modal = e.target.closest('.quick-view');
+        var modal = e.target.closest('.quick-view');
         if (modal) {
           modal.classList.remove('active');
           if (window.unlockBodyScroll) window.unlockBodyScroll();
@@ -362,10 +359,9 @@
       }
     });
 
-    // Close on Escape key
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape') {
-        const activeModal = document.querySelector('.quick-view.active');
+        var activeModal = document.querySelector('.quick-view.active');
         if (activeModal) {
           activeModal.classList.remove('active');
           if (window.unlockBodyScroll) window.unlockBodyScroll();

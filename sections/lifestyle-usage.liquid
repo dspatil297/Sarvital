@@ -592,28 +592,31 @@
 
 <script>
   (function() {
-    const carousel = document.querySelector('[data-lifestyle-carousel]');
+    var carousel = document.querySelector('[data-lifestyle-carousel]');
     if (!carousel) return;
-
-    const track = carousel.querySelector('.lifestyle-usage__carousel-track');
-    const slides = carousel.querySelectorAll('.lifestyle-usage__carousel-slide');
-    const prevBtn = carousel.querySelector('.lifestyle-usage__carousel-btn--prev');
-    const nextBtn = carousel.querySelector('.lifestyle-usage__carousel-btn--next');
-    const dots = carousel.querySelectorAll('.lifestyle-usage__carousel-dot');
-
+    var track = carousel.querySelector('.lifestyle-usage__carousel-track');
+    var slides = carousel.querySelectorAll('.lifestyle-usage__carousel-slide');
+    var prevBtn = carousel.querySelector('.lifestyle-usage__carousel-btn--prev');
+    var nextBtn = carousel.querySelector('.lifestyle-usage__carousel-btn--next');
+    var dots = carousel.querySelectorAll('.lifestyle-usage__carousel-dot');
     if (slides.length <= 1) return;
-
-    let currentIndex = 0;
+    var currentIndex = 0;
 
     function goToSlide(index) {
       currentIndex = ((index % slides.length) + slides.length) % slides.length;
-      track.style.transform = `translateX(-${currentIndex * 100}%)`;
-      dots.forEach((dot, i) => dot.classList.toggle('is-active', i === currentIndex));
+      track.style.transform = 'translateX(-' + (currentIndex * 100) + '%)';
+      for (var i = 0; i < dots.length; i++) {
+        dots[i].classList.toggle('is-active', i === currentIndex);
+      }
     }
 
-    if (prevBtn) prevBtn.addEventListener('click', () => goToSlide(currentIndex - 1));
-    if (nextBtn) nextBtn.addEventListener('click', () => goToSlide(currentIndex + 1));
-    dots.forEach((dot, i) => dot.addEventListener('click', () => goToSlide(i)));
+    if (prevBtn) prevBtn.addEventListener('click', function() { goToSlide(currentIndex - 1); });
+    if (nextBtn) nextBtn.addEventListener('click', function() { goToSlide(currentIndex + 1); });
+    for (var j = 0; j < dots.length; j++) {
+      (function(idx) {
+        dots[idx].addEventListener('click', function() { goToSlide(idx); });
+      })(j);
+    }
   })();
 </script>
 

@@ -137,57 +137,47 @@
 
 <script>
   (function() {
-    // Enhanced image loading with error handling
     function initImageOptimization() {
-      const images = document.querySelectorAll('.image--optimized img[loading="lazy"]');
-      
+      var images = document.querySelectorAll('.image--optimized img[loading="lazy"]');
       if ('IntersectionObserver' in window) {
-        const imageObserver = new IntersectionObserver((entries, observer) => {
-          entries.forEach(entry => {
+        var imageObserver = new IntersectionObserver(function(entries, observer) {
+          for (var i = 0; i < entries.length; i++) {
+            var entry = entries[i];
             if (entry.isIntersecting) {
-              const img = entry.target;
-              
-              // Load the image
-              if (img.dataset.src) {
-                img.src = img.dataset.src;
+              var img = entry.target;
+              if (img.getAttribute('data-src')) {
+                img.src = img.getAttribute('data-src');
                 img.removeAttribute('data-src');
               }
-              
-              // Add loaded class when image loads
               if (img.complete) {
                 img.classList.add('loaded');
               } else {
                 img.addEventListener('load', function() {
                   this.classList.add('loaded');
-                }, { once: true });
-                
+                }, false);
                 img.addEventListener('error', function() {
                   this.classList.add('image__img--error');
                   this.alt = 'Image failed to load';
-                }, { once: true });
+                }, false);
               }
-              
               observer.unobserve(img);
             }
-          });
-        }, {
-          rootMargin: '50px'
-        });
-
-        images.forEach(img => {
-          imageObserver.observe(img);
-        });
+          }
+        }, { rootMargin: '50px' });
+        for (var j = 0; j < images.length; j++) {
+          imageObserver.observe(images[j]);
+        }
       } else {
-        // Fallback for browsers without IntersectionObserver
-        images.forEach(img => {
-          if (img.dataset.src) {
-            img.src = img.dataset.src;
+        for (var k = 0; k < images.length; k++) {
+          var img = images[k];
+          if (img.getAttribute('data-src')) {
+            img.src = img.getAttribute('data-src');
             img.removeAttribute('data-src');
           }
           img.addEventListener('load', function() {
             this.classList.add('loaded');
-          }, { once: true });
-        });
+          }, false);
+        }
       }
     }
 
