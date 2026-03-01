@@ -1703,60 +1703,50 @@
 
 {% javascript %}
   ;(function() {
-    // Thumbnail switching is handled by inline script on #product-thumbnails-container (click + touchend)
-
-    // Variant selection
-    const variantButtons = document.querySelectorAll('.variant-option-btn');
-    const variantSelect = document.getElementById('product-variant-select');
-    const isGst5 = {{ product.tags contains 'gst-5' | json }};
+    'use strict';
+    // Thumbnail switching is handled by inline script on #product-thumbnails-container (ES5 for Shopify compiled_assets/scripts.js)
+    var variantButtons = document.querySelectorAll('.variant-option-btn');
+    var variantSelect = document.getElementById('product-variant-select');
+    var isGst5 = {{ product.tags contains 'gst-5' | json }};
     
-    variantButtons.forEach(btn => {
-      btn.addEventListener('click', function() {
-        if (this.disabled) return;
-        
-        const option = this.getAttribute('data-option');
-        const value = this.getAttribute('data-value');
-        
-        // Update active state
-        const sameOptionButtons = document.querySelectorAll(`[data-option="${option}"]`);
-        sameOptionButtons.forEach(b => b.classList.remove('active'));
-        this.classList.add('active');
-        
-        // Update hidden select
-        if (variantSelect) {
-          // Find matching variant
-          const options = Array.from(variantSelect.options);
-          const matchingVariant = options.find(opt => {
-            const variantTitle = opt.textContent.toLowerCase();
-            return variantTitle.includes(value.toLowerCase());
-          });
-          
-          if (matchingVariant && !matchingVariant.disabled) {
-            variantSelect.value = matchingVariant.value;
-            variantSelect.dispatchEvent(new Event('change'));
+    for (var bi = 0; bi < variantButtons.length; bi++) {
+      (function(btn) {
+        btn.addEventListener('click', function() {
+          if (this.disabled) return;
+          var option = this.getAttribute('data-option');
+          var value = this.getAttribute('data-value');
+          var sameOptionButtons = document.querySelectorAll('[data-option="' + option + '"]');
+          for (var si = 0; si < sameOptionButtons.length; si++) sameOptionButtons[si].classList.remove('active');
+          this.classList.add('active');
+          if (variantSelect) {
+            var options = Array.prototype.slice.call(variantSelect.options);
+            var matchingVariant = null;
+            for (var oi = 0; oi < options.length; oi++) {
+              var variantTitle = options[oi].textContent.toLowerCase();
+              if (variantTitle.indexOf(value.toLowerCase()) !== -1) {
+                matchingVariant = options[oi];
+                break;
+              }
+            }
+            if (matchingVariant && !matchingVariant.disabled) {
+              variantSelect.value = matchingVariant.value;
+              variantSelect.dispatchEvent(new Event('change'));
+            }
           }
-        }
-      });
-    });
+        });
+      })(variantButtons[bi]);
+    }
 
-    // Variant change handler
     if (variantSelect) {
       variantSelect.addEventListener('change', function() {
-        const selectedOption = this.options[this.selectedIndex];
-        const price = selectedOption.getAttribute('data-price');
-        const comparePrice = selectedOption.getAttribute('data-compare-price');
-        const inventory = selectedOption.getAttribute('data-inventory');
-        
-        // Update price display
+        var selectedOption = this.options[this.selectedIndex];
+        var price = selectedOption.getAttribute('data-price');
+        var comparePrice = selectedOption.getAttribute('data-compare-price');
+        var inventory = selectedOption.getAttribute('data-inventory');
         updatePriceDisplay(price, comparePrice);
-        
-        // Update stock alert
         updateStockAlert(inventory);
-        
-        // Update add to cart button
-        const addToCartBtn = document.getElementById('add-to-cart-btn');
-        const stickyBtn = document.getElementById('sticky-add-to-cart');
-        
+        var addToCartBtn = document.getElementById('add-to-cart-btn');
+        var stickyBtn = document.getElementById('sticky-add-to-cart');
         if (selectedOption.disabled) {
           if (addToCartBtn) {
             addToCartBtn.disabled = true;
@@ -1766,28 +1756,26 @@
         } else {
           if (addToCartBtn) {
             addToCartBtn.disabled = false;
-            const priceFormatted = formatMoney(price);
-            addToCartBtn.querySelector('.cta-button__text').textContent = `Add to Cart - ${priceFormatted}`;
+            addToCartBtn.querySelector('.cta-button__text').textContent = 'Add to Cart - ' + formatMoney(price);
           }
           if (stickyBtn) stickyBtn.disabled = false;
         }
       });
     }
 
-    // Quantity selector – event delegation so it works regardless of script load order
     document.addEventListener('click', function(e) {
-      const btn = e.target && e.target.closest ? e.target.closest('button.quantity-btn[data-action]') : null;
+      var btn = e.target && e.target.closest ? e.target.closest('button.quantity-btn[data-action]') : null;
       if (!btn) return;
-      const form = btn.closest('#product-form');
+      var form = btn.closest('#product-form');
       if (!form) return;
-      const selector = btn.closest('.quantity-selector');
-      const quantityInput = selector ? selector.querySelector('input.quantity-input, input[name="quantity"]') : null;
+      var selector = btn.closest('.quantity-selector');
+      var quantityInput = selector ? selector.querySelector('input.quantity-input, input[name="quantity"]') : null;
       if (!quantityInput) return;
       e.preventDefault();
-      const action = btn.getAttribute('data-action');
-      const currentValue = parseInt(quantityInput.value, 10) || 1;
-      const min = parseInt(quantityInput.getAttribute('min'), 10) || 1;
-      const max = parseInt(quantityInput.getAttribute('max'), 10) || 10;
+      var action = btn.getAttribute('data-action');
+      var currentValue = parseInt(quantityInput.value, 10) || 1;
+      var min = parseInt(quantityInput.getAttribute('min'), 10) || 1;
+      var max = parseInt(quantityInput.getAttribute('max'), 10) || 10;
       if (action === 'increase' && currentValue < max) {
         quantityInput.value = currentValue + 1;
       } else if (action === 'decrease' && currentValue > min) {
@@ -1798,105 +1786,62 @@
     // Sticky Add to Cart uses type="submit" form="product-form" so it natively submits (no JS needed).
     // Variant change handler below updates sticky button disabled state.
 
-    // Buy Now button
-    const buyNowBtn = document.getElementById('buy-now-btn');
+    var buyNowBtn = document.getElementById('buy-now-btn');
     if (buyNowBtn) {
       buyNowBtn.addEventListener('click', function() {
-        const form = document.getElementById('product-form');
+        var form = document.getElementById('product-form');
         if (form) {
-          // Add a hidden input to indicate buy now
-          const buyNowInput = document.createElement('input');
+          var buyNowInput = document.createElement('input');
           buyNowInput.type = 'hidden';
           buyNowInput.name = 'return_to';
           buyNowInput.value = '/checkout';
           form.appendChild(buyNowInput);
-          
-          const submitBtn = form.querySelector('button[type="submit"]');
+          var submitBtn = form.querySelector('button[type="submit"]');
           if (submitBtn) submitBtn.click();
         }
       });
     }
 
-    // Helper functions
     function updatePriceDisplay(price, comparePrice) {
-      const priceSection = document.querySelector('.product-price-section');
+      var priceSection = document.querySelector('.product-price-section');
       if (!priceSection) return;
-      
-      const gstNote = isGst5
+      var gstNote = isGst5
         ? '<span class="price-gst-note">GST 5% for fruit and vegetables Dehydrated products.</span>'
         : '';
-
-      const priceNum = parseInt(price) / 100;
-      const comparePriceNum = comparePrice ? parseInt(comparePrice) / 100 : null;
-      
+      var priceNum = parseInt(price, 10) / 100;
+      var comparePriceNum = comparePrice ? parseInt(comparePrice, 10) / 100 : null;
       if (comparePriceNum && comparePriceNum > priceNum) {
-        const savings = comparePriceNum - priceNum;
-        priceSection.innerHTML = `
-          <div class="price-original">
-            <span class="price-label">Was:</span>
-            <span class="price-value price-value--old">${formatMoney(comparePrice)}</span>
-          </div>
-          <div class="price-current">
-            <span class="price-label">Now:</span>
-            <span class="price-value price-value--sale">${formatMoney(price)}</span>
-            <span class="price-savings">Save ${formatMoney(savings * 100)}</span>
-          </div>
-          <span class="price-gst">Incl. GST</span>
-          ${gstNote}
-        `;
+        var savings = comparePriceNum - priceNum;
+        priceSection.innerHTML = '<div class="price-original"><span class="price-label">Was:</span><span class="price-value price-value--old">' + formatMoney(comparePrice) + '</span></div><div class="price-current"><span class="price-label">Now:</span><span class="price-value price-value--sale">' + formatMoney(price) + '</span><span class="price-savings">Save ' + formatMoney(savings * 100) + '</span></div><span class="price-gst">Incl. GST</span>' + gstNote;
       } else {
-        priceSection.innerHTML = `
-          <div class="price-current">
-            <span class="price-value">${formatMoney(price)}</span>
-          </div>
-          <span class="price-gst">Incl. GST</span>
-          ${gstNote}
-        `;
+        priceSection.innerHTML = '<div class="price-current"><span class="price-value">' + formatMoney(price) + '</span></div><span class="price-gst">Incl. GST</span>' + gstNote;
       }
-      
-      // Update sticky bar price
-      const stickyPrice = document.querySelector('.sticky-cart-bar__price .price-current');
+      var stickyPrice = document.querySelector('.sticky-cart-bar__price .price-current');
       if (stickyPrice) {
         stickyPrice.textContent = formatMoney(price);
       }
     }
 
     function updateStockAlert(inventory) {
-      const stockAlert = document.querySelector('.product-stock-alert');
-      const stockAvailable = document.querySelector('.product-stock-available');
-      
-      // Remove existing alerts
+      var stockAlert = document.querySelector('.product-stock-alert');
+      var stockAvailable = document.querySelector('.product-stock-available');
       if (stockAlert) stockAlert.remove();
       if (stockAvailable) stockAvailable.remove();
-      
-      const inventoryNum = parseInt(inventory) || 0;
-      const productInfo = document.querySelector('.product-info');
-      
+      var inventoryNum = parseInt(inventory, 10) || 0;
+      var productInfo = document.querySelector('.product-info');
       if (inventoryNum > 0 && inventoryNum <= 10) {
-        const alert = document.createElement('div');
+        var alert = document.createElement('div');
         alert.className = 'product-stock-alert';
-        alert.innerHTML = `
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="10"/>
-            <line x1="12" y1="8" x2="12" y2="12"/>
-            <line x1="12" y1="16" x2="12.01" y2="16"/>
-          </svg>
-          <span>Only ${inventoryNum} left in stock!</span>
-        `;
-        const priceSection = document.querySelector('.product-price-section');
+        alert.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span>Only ' + inventoryNum + ' left in stock!</span>';
+        var priceSection = document.querySelector('.product-price-section');
         if (priceSection && priceSection.nextSibling) {
           productInfo.insertBefore(alert, priceSection.nextSibling);
         }
       } else if (inventoryNum > 10) {
-        const available = document.createElement('div');
+        var available = document.createElement('div');
         available.className = 'product-stock-available';
-        available.innerHTML = `
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="20 6 9 17 4 12"/>
-          </svg>
-          <span>In Stock - Ready to Ship</span>
-        `;
-        const priceSection = document.querySelector('.product-price-section');
+        available.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span>In Stock - Ready to Ship</span>';
+        var priceSection = document.querySelector('.product-price-section');
         if (priceSection && priceSection.nextSibling) {
           productInfo.insertBefore(available, priceSection.nextSibling);
         }
@@ -1904,9 +1849,8 @@
     }
 
     function formatMoney(cents) {
-      // Get currency symbol from Shopify
-      const currencySymbol = '{{ cart.currency.symbol }}' || '₹';
-      const amount = (parseInt(cents) / 100).toFixed(2);
+      var currencySymbol = '{{ cart.currency.symbol }}' || '₹';
+      var amount = (parseInt(cents, 10) / 100).toFixed(2);
       return currencySymbol + amount;
     }
 

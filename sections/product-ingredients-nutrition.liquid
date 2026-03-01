@@ -171,31 +171,30 @@
 </section>
 
 {% javascript %}
-  (function() {
-    // Fallback: Parse nutrition data client-side if needed
-    const nutritionTable = document.querySelector('.nutrition-table tbody');
-    const tableElement = document.querySelector('.nutrition-table');
+  ;(function() {
+    'use strict';
+    // Fallback: Parse nutrition data client-side if needed (ES5 for Shopify compiled_assets/scripts.js)
+    var nutritionTable = document.querySelector('.nutrition-table tbody');
+    var tableElement = document.querySelector('.nutrition-table');
     
-    // Check if table only has placeholder data (Energy, Protein, Carbohydrate)
-    const hasOnlyPlaceholders = nutritionTable && nutritionTable.children.length > 0 && 
-      nutritionTable.children[0].textContent.includes('Energy') &&
+    var hasOnlyPlaceholders = nutritionTable && nutritionTable.children.length > 0 &&
+      nutritionTable.children[0].textContent.indexOf('Energy') !== -1 &&
       nutritionTable.children.length <= 3;
     
-    // Check if rows are incorrectly parsed (all data in first column, others have "—")
-    let needsReparse = false;
+    var needsReparse = false;
     if (nutritionTable && nutritionTable.children.length > 0) {
-      const firstRow = nutritionTable.children[0];
-      const cells = firstRow.querySelectorAll('td');
+      var firstRow = nutritionTable.children[0];
+      var cells = firstRow.querySelectorAll('td');
       if (cells.length >= 3) {
-        const firstCell = cells[0].textContent.trim();
-        const secondCell = cells[1].textContent.trim();
-        const thirdCell = cells[2].textContent.trim();
+        var firstCell = cells[0].textContent.trim();
+        var secondCell = cells[1].textContent.trim();
+        var thirdCell = cells[2].textContent.trim();
         
         // If first cell has multiple words/numbers and other cells are "—" or empty, needs reparse
         if (firstCell && (secondCell === '—' || secondCell === '' || secondCell === '–') && 
             (thirdCell === '—' || thirdCell === '' || thirdCell === '–')) {
           // Check if first cell contains what looks like all three values (has numbers and %)
-          if (firstCell.match(/\d/) && (firstCell.includes('%') || firstCell.match(/\d+\s*(g|mg|kcal)/i))) {
+          if (firstCell.match(/\d/) && (firstCell.indexOf('%') !== -1 || firstCell.match(/\d+\s*(g|mg|kcal)/i))) {
             needsReparse = true;
           }
         }
@@ -203,16 +202,14 @@
     }
     
       if (nutritionTable && tableElement && (nutritionTable.children.length === 0 || hasOnlyPlaceholders || needsReparse)) {
-      let nutritionData = null;
+      var nutritionData = null;
       
-      // Clear incorrectly parsed rows if needed
       if (needsReparse) {
-        // Extract data from existing rows before clearing
-        const existingRows = Array.from(nutritionTable.querySelectorAll('tr'));
-        const rowData = existingRows.map(row => {
-          const firstCell = row.querySelector('td:first-child');
+        var existingRows = Array.prototype.slice.call(nutritionTable.querySelectorAll('tr'));
+        var rowData = existingRows.map(function(row) {
+          var firstCell = row.querySelector('td:first-child');
           return firstCell ? firstCell.textContent.trim() : '';
-        }).filter(text => text && text !== 'Nutrient' && text !== 'NUTRIENT');
+        }).filter(function(text) { return text && text !== 'Nutrient' && text !== 'NUTRIENT'; });
         
         // Use extracted data if available
         if (rowData.length > 0) {
@@ -221,9 +218,8 @@
         nutritionTable.innerHTML = '';
       }
       
-      // Try JSON data attribute first if we don't have data yet
       if (!nutritionData) {
-        let nutritionRaw = tableElement.getAttribute('data-nutrition-json');
+        var nutritionRaw = tableElement.getAttribute('data-nutrition-json');
         
         if (nutritionRaw && nutritionRaw !== 'null' && nutritionRaw !== '') {
         try {
@@ -253,27 +249,19 @@
       
       if (nutritionData) {
         try {
+          var rows = [];
           
-          let rows = [];
-          
-          // Handle different data formats
           if (Array.isArray(nutritionData)) {
-            // List metafield - each item is a row
-            rows = nutritionData.map(item => {
-              // If item is already an object with properties
+            rows = nutritionData.map(function(item) {
               if (typeof item === 'object' && item !== null && !Array.isArray(item)) {
                 return item;
               }
-              // If item is a string, parse it
               if (typeof item === 'string') {
-                const cleanItem = item.trim();
-                // Skip header rows
+                var cleanItem = item.trim();
                 if (cleanItem.match(/^(nutrient|per\s*100|rda)/i)) {
                   return null;
                 }
-                
-                // Try comma separator first
-                let parts = cleanItem.split(',');
+                var parts = cleanItem.split(',');
                 if (parts.length >= 3) {
                   return {
                     nutrient: parts[0].trim(),
@@ -318,47 +306,31 @@
                   }
                 }
                 
-                // Smart parsing for space-separated: "Nutrient Value Unit Percentage"
-                // Pattern: "Energy 325 kcal 0.81%" or "Total Sugars 7.62 g 0.42%"
                 if (parts.length < 3) {
-                  const allParts = cleanItem.split(/\s+/);
-                  
-                  // Find the percentage (contains %)
-                  let percentIndex = -1;
-                  for (let i = allParts.length - 1; i >= 0; i--) {
-                    if (allParts[i].includes('%')) {
+                  var allParts = cleanItem.split(/\s+/);
+                  var percentIndex = -1;
+                  for (var i = allParts.length - 1; i >= 0; i--) {
+                    if (allParts[i].indexOf('%') !== -1) {
                       percentIndex = i;
                       break;
                     }
                   }
-                  
                   if (percentIndex > 0) {
-                    // Get percentage
-                    const percentage = allParts[percentIndex];
-                    
-                    // Get value + unit (one or two parts before percentage)
-                    let valueUnit = '';
-                    let nutrientEnd = percentIndex - 1;
-                    
-                    // Check if unit is separate (like "g", "mg", "kcal")
+                    var percentage = allParts[percentIndex];
+                    var valueUnit = '';
+                    var nutrientEnd = percentIndex - 1;
                     if (percentIndex > 0) {
-                      const beforePercent = allParts[percentIndex - 1];
-                      const unitMatch = beforePercent.match(/^(g|mg|kcal)$/i);
-                      
+                      var beforePercent = allParts[percentIndex - 1];
+                      var unitMatch = beforePercent.match(/^(g|mg|kcal)$/i);
                       if (unitMatch && percentIndex > 1) {
-                        // Unit is separate, get number + unit
                         valueUnit = allParts[percentIndex - 2] + ' ' + allParts[percentIndex - 1];
                         nutrientEnd = percentIndex - 3;
                       } else {
-                        // Unit is combined with number (like "325kcal")
                         valueUnit = allParts[percentIndex - 1];
                         nutrientEnd = percentIndex - 2;
                       }
                     }
-                    
-                    // Get nutrient name (everything before value+unit)
-                    const nutrientName = allParts.slice(0, nutrientEnd + 1).join(' ');
-                    
+                    var nutrientName = allParts.slice(0, nutrientEnd + 1).join(' ');
                     if (nutrientName && valueUnit && percentage) {
                       return {
                         nutrient: nutrientName.trim(),
@@ -368,15 +340,12 @@
                     }
                   }
                 }
-                
-                // If can't parse, return as single nutrient
                 return {
                   nutrient: cleanItem,
                   per_100g: '',
                   rda: ''
                 };
               }
-              // If item is an array
               if (Array.isArray(item) && item.length >= 3) {
                 return {
                   nutrient: item[0],
@@ -385,17 +354,16 @@
                 };
               }
               return null;
-            }).filter(row => row !== null);
+            }).filter(function(row) { return row !== null; });
           } else if (nutritionData && typeof nutritionData === 'object' && nutritionData.value) {
             if (Array.isArray(nutritionData.value)) {
-              rows = nutritionData.value.map(item => {
+              rows = nutritionData.value.map(function(item) {
                 if (typeof item === 'string') {
-                  const cleanItem = item.trim();
+                  var cleanItem = item.trim();
                   if (cleanItem.match(/^(nutrient|per\s*100|rda)/i)) {
                     return null;
                   }
-                  // Try comma separator first
-                  let parts = cleanItem.split(',');
+                  var parts = cleanItem.split(',');
                   if (parts.length >= 3) {
                     return {
                       nutrient: parts[0].trim(),
@@ -403,8 +371,6 @@
                       rda: parts[2].trim()
                     };
                   }
-                  
-                  // Try tab separator
                   if (parts.length < 3) parts = cleanItem.split('\t');
                   if (parts.length >= 3) {
                     return {
@@ -413,8 +379,6 @@
                       rda: parts[2].trim()
                     };
                   }
-                  
-                  // Try pipe separator
                   if (parts.length < 3) parts = cleanItem.split('|');
                   if (parts.length >= 3) {
                     return {
@@ -423,8 +387,6 @@
                       rda: parts[2].trim()
                     };
                   }
-                  
-                  // Try multiple spaces
                   if (parts.length < 3) parts = cleanItem.split(/\s{2,}/);
                   if (parts.length >= 3) {
                     return {
@@ -433,26 +395,21 @@
                       rda: parts[2].trim()
                     };
                   }
-                  
-                  // Smart parsing for space-separated
-                  const allParts = cleanItem.split(/\s+/);
-                  let percentIndex = -1;
-                  for (let i = allParts.length - 1; i >= 0; i--) {
-                    if (allParts[i].includes('%')) {
+                  var allParts = cleanItem.split(/\s+/);
+                  var percentIndex = -1;
+                  for (var i = allParts.length - 1; i >= 0; i--) {
+                    if (allParts[i].indexOf('%') !== -1) {
                       percentIndex = i;
                       break;
                     }
                   }
-                  
                   if (percentIndex > 0) {
-                    const percentage = allParts[percentIndex];
-                    let valueUnit = '';
-                    let nutrientEnd = percentIndex - 1;
-                    
+                    var percentage = allParts[percentIndex];
+                    var valueUnit = '';
+                    var nutrientEnd = percentIndex - 1;
                     if (percentIndex > 0) {
-                      const beforePercent = allParts[percentIndex - 1];
-                      const unitMatch = beforePercent.match(/^(g|mg|kcal)$/i);
-                      
+                      var beforePercent = allParts[percentIndex - 1];
+                      var unitMatch = beforePercent.match(/^(g|mg|kcal)$/i);
                       if (unitMatch && percentIndex > 1) {
                         valueUnit = allParts[percentIndex - 2] + ' ' + allParts[percentIndex - 1];
                         nutrientEnd = percentIndex - 3;
@@ -461,9 +418,7 @@
                         nutrientEnd = percentIndex - 2;
                       }
                     }
-                    
-                    const nutrientName = allParts.slice(0, nutrientEnd + 1).join(' ');
-                    
+                    var nutrientName = allParts.slice(0, nutrientEnd + 1).join(' ');
                     if (nutrientName && valueUnit && percentage) {
                       return {
                         nutrient: nutrientName.trim(),
@@ -472,26 +427,23 @@
                       };
                     }
                   }
-                  
                   return { nutrient: cleanItem, per_100g: '', rda: '' };
                 }
                 return item;
-              }).filter(row => row !== null);
+              }).filter(function(row) { return row !== null; });
             } else {
               nutritionData = nutritionData.value;
             }
           }
           
-          // If still not an array, parse as multiline string
           if (!Array.isArray(rows) && typeof nutritionData === 'string') {
-            const lines = nutritionData.split(/\r?\n/).filter(line => line.trim());
-            rows = lines.map(line => {
-              const cleanLine = line.trim();
+            var lines = nutritionData.split(/\r?\n/).filter(function(line) { return line.trim(); });
+            rows = lines.map(function(line) {
+              var cleanLine = line.trim();
               if (cleanLine.match(/^(nutrient|per\s*100|rda)/i)) {
                 return null;
               }
-              // Try comma separator first
-              let parts = cleanLine.split(',');
+              var parts = cleanLine.split(',');
               if (parts.length >= 3) {
                 return {
                   nutrient: parts[0].trim(),
@@ -530,25 +482,21 @@
                 };
               }
               
-              // Smart parsing for space-separated
-              const allParts = cleanLine.split(/\s+/);
-              let percentIndex = -1;
-              for (let i = allParts.length - 1; i >= 0; i--) {
-                if (allParts[i].includes('%')) {
+              var allParts = cleanLine.split(/\s+/);
+              var percentIndex = -1;
+              for (var i = allParts.length - 1; i >= 0; i--) {
+                if (allParts[i].indexOf('%') !== -1) {
                   percentIndex = i;
                   break;
                 }
               }
-              
               if (percentIndex > 0) {
-                const percentage = allParts[percentIndex];
-                let valueUnit = '';
-                let nutrientEnd = percentIndex - 1;
-                
+                var percentage = allParts[percentIndex];
+                var valueUnit = '';
+                var nutrientEnd = percentIndex - 1;
                 if (percentIndex > 0) {
-                  const beforePercent = allParts[percentIndex - 1];
-                  const unitMatch = beforePercent.match(/^(g|mg|kcal)$/i);
-                  
+                  var beforePercent = allParts[percentIndex - 1];
+                  var unitMatch = beforePercent.match(/^(g|mg|kcal)$/i);
                   if (unitMatch && percentIndex > 1) {
                     valueUnit = allParts[percentIndex - 2] + ' ' + allParts[percentIndex - 1];
                     nutrientEnd = percentIndex - 3;
@@ -557,9 +505,7 @@
                     nutrientEnd = percentIndex - 2;
                   }
                 }
-                
-                const nutrientName = allParts.slice(0, nutrientEnd + 1).join(' ');
-                
+                var nutrientName = allParts.slice(0, nutrientEnd + 1).join(' ');
                 if (nutrientName && valueUnit && percentage) {
                   return {
                     nutrient: nutrientName.trim(),
@@ -568,30 +514,20 @@
                   };
                 }
               }
-              
               return null;
-            }).filter(row => row !== null);
+            }).filter(function(row) { return row !== null; });
           }
-          
-          // Render rows
           if (Array.isArray(rows) && rows.length > 0) {
-            // Clear placeholder rows if we have real data
             if (hasOnlyPlaceholders) {
               nutritionTable.innerHTML = '';
             }
-            
-            rows.forEach(row => {
-              const nutrient = row.nutrient || row.name || (Array.isArray(row) ? row[0] : '');
-              const per100g = row.per_100g || row.per100g || row.per_100_g || (Array.isArray(row) ? row[1] : '');
-              const rda = row.rda_per_serve || row.rda || (Array.isArray(row) ? row[2] : '');
-              
+            rows.forEach(function(row) {
+              var nutrient = row.nutrient || row.name || (Array.isArray(row) ? row[0] : '');
+              var per100g = row.per_100g || row.per100g || row.per_100_g || (Array.isArray(row) ? row[1] : '');
+              var rda = row.rda_per_serve || row.rda || (Array.isArray(row) ? row[2] : '');
               if (nutrient && typeof nutrient === 'string' && !nutrient.match(/^(nutrient|per\s*100|rda)/i)) {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                  <td>${nutrient}</td>
-                  <td>${per100g || '—'}</td>
-                  <td>${rda || '—'}</td>
-                `;
+                var tr = document.createElement('tr');
+                tr.innerHTML = '<td>' + nutrient + '</td><td>' + (per100g || '—') + '</td><td>' + (rda || '—') + '</td>';
                 nutritionTable.appendChild(tr);
               }
             });
