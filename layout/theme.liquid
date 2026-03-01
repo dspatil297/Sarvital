@@ -81,16 +81,9 @@
       if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', keepThemeCartClosed);
       }
-      document.addEventListener('DOMContentLoaded', function() {
-        var observer = new MutationObserver(function() { keepThemeCartClosed(); });
-        var root = document.body;
-        if (root) observer.observe(root, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
-      });
     })();
     </script>
-    {%- comment -%} GoKwik side cart: open without page reload via replaceState + KwikCart.open(). {%- endcomment -%}
-
-    {%- comment -%} lockBodyScroll/unlockBodyScroll for mobile menu. openCartDrawer opens GoKwik drawer in-place (no navigation). {%- endcomment -%}
+    {%- comment -%} openCartDrawer for add-to-cart only. Cart icon uses normal link so GoKwik opens on load (no freeze). {%- endcomment -%}
     <script>
     (function() {
       if (!window.lockBodyScroll) {
@@ -116,29 +109,18 @@
           window.scrollTo(0, parseInt(scrollY, 10));
         };
       }
-      /** Open GoKwik drawer: update URL, call KwikCart.open(), dispatch events GoKwik may listen for. Theme drawer is #cart-drawer only and is hidden above. */
+      /** Open GoKwik drawer (after add-to-cart). No event dispatch to avoid body scroll lock. If KwikCart.open missing, navigate so drawer opens on load. */
       window.openCartDrawer = function() {
         var url = new URL(window.location.href);
         url.searchParams.set('openCart', 'true');
         var newUrl = url.pathname + (url.search ? url.search : '');
-        if (window.history && window.history.replaceState) {
-          window.history.replaceState({ openCart: true }, '', newUrl);
-        }
         if (typeof window.KwikCart !== 'undefined' && typeof window.KwikCart.open === 'function') {
+          if (window.history && window.history.replaceState) window.history.replaceState({ openCart: true }, '', newUrl);
           window.KwikCart.open();
+          setTimeout(function() { window.KwikCart.open(); }, 150);
+        } else {
+          window.location.href = newUrl;
         }
-        document.dispatchEvent(new CustomEvent('open-cart-drawer'));
-        document.dispatchEvent(new CustomEvent('openCart'));
-        document.dispatchEvent(new CustomEvent('cart:open'));
-        if (typeof window.dispatchEvent !== 'undefined') {
-          try { window.dispatchEvent(new PopStateEvent('popstate', { state: { openCart: true } })); } catch (err) {}
-        }
-        setTimeout(function() {
-          if (typeof window.KwikCart !== 'undefined' && typeof window.KwikCart.open === 'function') {
-            window.KwikCart.open();
-          }
-          document.dispatchEvent(new CustomEvent('open-cart-drawer'));
-        }, 150);
       };
     })();
     </script>
@@ -179,18 +161,8 @@
         function initHeaderAndCart() {
           var doc = document;
 
-          // --- Cart: intercept header cart link so GoKwik drawer opens without page reload ---
-          if (!cartListenerAdded) {
-            cartListenerAdded = true;
-            doc.addEventListener('click', function(e) {
-              var cartLink = e.target && e.target.closest ? e.target.closest('.header__cart') : null;
-              if (cartLink && cartLink.getAttribute('href') && cartLink.getAttribute('href').indexOf('openCart=true') !== -1) {
-                e.preventDefault();
-                e.stopPropagation();
-                if (typeof window.openCartDrawer === 'function') window.openCartDrawer();
-              }
-            }, true);
-          }
+          // --- Cart: no intercept; header cart link goes to ?openCart=true so page loads and GoKwik opens drawer on load (avoids freeze). ---
+          if (!cartListenerAdded) cartListenerAdded = true;
 
           // --- Hamburger / Mobile menu: use event delegation so it works even if header loads late ---
           if (!menuAttached) {
