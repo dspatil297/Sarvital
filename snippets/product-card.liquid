@@ -61,23 +61,22 @@
           <span class="product-card__price--gst-note">GST 5% for fruit and vegetables Dehydrated products.</span>
         {% endif %}
       </div>
-      
-      <form action="/cart/add" method="post" enctype="multipart/form-data" class="product-card__form" data-product-card-form>
-        <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
-        <div class="product-card__quantity-row product-card__quantity-row--hidden" data-product-card-qty-row>
-          <label for="qty-{{ product.id }}" class="product-card__qty-label">Qty</label>
-          <div class="product-card__quantity-selector">
-            <button type="button" class="product-card__qty-btn" data-action="decrease" aria-label="Decrease quantity">−</button>
-            <input type="number" id="qty-{{ product.id }}" name="quantity" value="1" min="0" max="10" class="product-card__qty-input" aria-label="Quantity">
-            <button type="button" class="product-card__qty-btn" data-action="increase" aria-label="Increase quantity">+</button>
-          </div>
-        </div>
-        <button type="submit" class="btn btn-primary product-card__add-to-cart" name="add">
-          Add to Cart
-        </button>
-      </form>
     </div>
   </a>
+  <form action="/cart/add" method="post" enctype="multipart/form-data" class="product-card__form" data-product-card-form>
+    <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+    <div class="product-card__quantity-row product-card__quantity-row--hidden" data-product-card-qty-row>
+      <label for="qty-{{ product.id }}" class="product-card__qty-label">Qty</label>
+      <div class="product-card__quantity-selector">
+        <button type="button" class="product-card__qty-btn" data-action="decrease" aria-label="Decrease quantity">−</button>
+        <input type="number" id="qty-{{ product.id }}" name="quantity" value="1" min="0" max="10" class="product-card__qty-input" aria-label="Quantity">
+        <button type="button" class="product-card__qty-btn" data-action="increase" aria-label="Increase quantity">+</button>
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary product-card__add-to-cart" name="add">
+      Add to Cart
+    </button>
+  </form>
 </div>
 
 {% stylesheet %}
@@ -105,7 +104,8 @@
     color: inherit;
     display: flex;
     flex-direction: column;
-    height: 100%;
+    flex: 1;
+    min-height: 0;
   }
 
   .product-card__image-wrapper {
@@ -319,6 +319,7 @@
 
   .product-card__form {
     margin-top: auto;
+    padding: 0 22px 24px;
     display: flex;
     flex-direction: column;
     gap: 10px;

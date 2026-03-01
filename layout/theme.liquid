@@ -375,6 +375,17 @@
     {%- comment -%} Product cards: show quantity only after add-to-cart; +/- updates cart via change.js {%- endcomment -%}
     <script>
       (function() {
+        function showProductCardQtyRow(form, lineKey, quantity) {
+          if (lineKey) form.setAttribute('data-line-key', lineKey);
+          var qtyRow = form.querySelector('.product-card__quantity-row');
+          if (qtyRow) {
+            qtyRow.classList.remove('product-card__quantity-row--hidden');
+            qtyRow.style.display = 'flex';
+            qtyRow.style.visibility = 'visible';
+          }
+          var qtyInput = form.querySelector('.product-card__qty-input');
+          if (qtyInput) qtyInput.value = quantity || 1;
+        }
         function doProductCardAddToCart(form) {
           var idInput = form.querySelector('input[name="id"]');
           var qtyInput = form.querySelector('input[name="quantity"]');
@@ -392,17 +403,26 @@
             body: JSON.stringify({ id: variantId, quantity: 1 })
           }).then(function(r) { return r.json().then(function(data) { return { ok: r.ok, data: data }; }); }).then(function(result) {
             if (result.ok) {
-              var key = (result.data && result.data.key) || (result && result.key);
-              if (key) {
-                form.setAttribute('data-line-key', key);
-                var qtyRow = form.querySelector('[data-product-card-qty-row]');
-                if (qtyRow) qtyRow.classList.remove('product-card__quantity-row--hidden');
-                if (qtyInput) qtyInput.value = (result.data && result.data.quantity) || 1;
+              var data = result.data || result;
+              var key = (data && data.key) || null;
+              var qty = (data && (data.quantity != null)) ? data.quantity : 1;
+              function done() {
+                document.dispatchEvent(new CustomEvent('cart:updated'));
+                if (typeof window.openCartDrawer === 'function') window.openCartDrawer();
               }
-              document.dispatchEvent(new CustomEvent('cart:updated'));
-              if (typeof window.openCartDrawer === 'function') window.openCartDrawer();
+              if (!key) {
+                fetch('/cart.js').then(function(r) { return r.json(); }).then(function(cart) {
+                  var item = (cart.items || []).find(function(i) { return String(i.variant_id) === String(variantId) || String(i.id) === String(variantId); });
+                  key = item ? item.key : null;
+                  showProductCardQtyRow(form, key, item ? item.quantity : qty);
+                  done();
+                }).catch(function() { showProductCardQtyRow(form, null, qty); done(); });
+              } else {
+                showProductCardQtyRow(form, key, qty);
+                done();
+              }
             } else {
-              alert(result.data && result.data.description ? result.data.description : 'Could not add to cart.');
+              alert((result.data && result.data.description) || (result.description) || 'Could not add to cart.');
             }
           }).catch(function() { alert('Could not add to cart.'); }).then(function() {
             if (submitBtn) {
@@ -453,8 +473,12 @@
                 document.dispatchEvent(new CustomEvent('cart:updated'));
                 if (newQty === 0) {
                   form.removeAttribute('data-line-key');
-                  var qtyRow = form.querySelector('[data-product-card-qty-row]');
-                  if (qtyRow) qtyRow.classList.add('product-card__quantity-row--hidden');
+                  var qtyRow = form.querySelector('.product-card__quantity-row');
+                  if (qtyRow) {
+                    qtyRow.classList.add('product-card__quantity-row--hidden');
+                    qtyRow.style.display = '';
+                    qtyRow.style.visibility = '';
+                  }
                 }
               } else {
                 alert(result.data && result.data.description ? result.data.description : 'Could not update cart.');
