@@ -59,9 +59,9 @@
 
     {% sections 'footer-group' %}
 
-    {%- comment -%} GoKwik side cart: cart link goes to current page + ?openCart=true so GoKwik opens on load. No theme drawer. {%- endcomment -%}
+    {%- comment -%} GoKwik side cart: open without page reload via replaceState + events + KwikCart.open(). {%- endcomment -%}
 
-    {%- comment -%} lockBodyScroll/unlockBodyScroll for mobile menu. openCartDrawer redirects to ?openCart=true for GoKwik. {%- endcomment -%}
+    {%- comment -%} lockBodyScroll/unlockBodyScroll for mobile menu. openCartDrawer opens GoKwik drawer in-place (no navigation). {%- endcomment -%}
     <script>
     (function() {
       if (!window.lockBodyScroll) {
@@ -87,10 +87,28 @@
           window.scrollTo(0, parseInt(scrollY, 10));
         };
       }
+      /** Opens GoKwik drawer without reload: update URL, dispatch events, call KwikCart.open() if present. */
       window.openCartDrawer = function() {
         var url = new URL(window.location.href);
         url.searchParams.set('openCart', 'true');
-        window.location.href = url.pathname + (url.search ? url.search : '');
+        var newUrl = url.pathname + (url.search ? url.search : '');
+        if (window.history && window.history.replaceState) {
+          window.history.replaceState({ openCart: true }, '', newUrl);
+        }
+        document.dispatchEvent(new CustomEvent('open-cart-drawer'));
+        document.dispatchEvent(new CustomEvent('openCart'));
+        document.dispatchEvent(new CustomEvent('cart:open'));
+        if (typeof window.KwikCart !== 'undefined' && typeof window.KwikCart.open === 'function') {
+          window.KwikCart.open();
+        }
+        if (typeof window.dispatchEvent !== 'undefined') {
+          try { window.dispatchEvent(new PopStateEvent('popstate', { state: { openCart: true } })); } catch (err) {}
+        }
+        setTimeout(function() {
+          if (typeof window.KwikCart !== 'undefined' && typeof window.KwikCart.open === 'function') {
+            window.KwikCart.open();
+          }
+        }, 100);
       };
     })();
     </script>
@@ -131,8 +149,18 @@
         function initHeaderAndCart() {
           var doc = document;
 
-          // --- Cart: GoKwik opens only on page load when URL has ?openCart=true. Header cart link now points to current page + ?openCart=true so click navigates and drawer opens (no JS intercept). ---
-          if (!cartListenerAdded) cartListenerAdded = true;
+          // --- Cart: intercept header cart link so GoKwik drawer opens without page reload ---
+          if (!cartListenerAdded) {
+            cartListenerAdded = true;
+            doc.addEventListener('click', function(e) {
+              var cartLink = e.target && e.target.closest ? e.target.closest('.header__cart') : null;
+              if (cartLink && cartLink.getAttribute('href') && cartLink.getAttribute('href').indexOf('openCart=true') !== -1) {
+                e.preventDefault();
+                e.stopPropagation();
+                if (typeof window.openCartDrawer === 'function') window.openCartDrawer();
+              }
+            }, true);
+          }
 
           // --- Hamburger / Mobile menu: use event delegation so it works even if header loads late ---
           if (!menuAttached) {
