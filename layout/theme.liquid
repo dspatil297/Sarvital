@@ -108,7 +108,8 @@
               e.preventDefault();
               e.stopPropagation();
               var drawer = doc.getElementById('cart-drawer');
-              if (drawer) {
+              if (!drawer) return;
+              var open = function() {
                 drawer.classList.add('active');
                 if (window.lockBodyScroll) window.lockBodyScroll();
                 else doc.body.style.overflow = 'hidden';
@@ -117,6 +118,11 @@
                 } else {
                   doc.dispatchEvent(new CustomEvent('open-cart-drawer'));
                 }
+              };
+              if (typeof requestAnimationFrame !== 'undefined') {
+                requestAnimationFrame(open);
+              } else {
+                setTimeout(open, 0);
               }
             }, true);
           }
