@@ -202,21 +202,8 @@
         function initHeaderAndCart() {
           var doc = document;
 
-          // --- Cart: intercept to try KwikCart.open() without reload; if not available, let link navigate to ?open_cart=1. ---
-          if (!cartListenerAdded) {
-            cartListenerAdded = true;
-            doc.addEventListener('click', function(e) {
-              var cart = e.target && e.target.closest ? e.target.closest('#header-cart-link, .header__cart[href*="open_cart"]') : null;
-              if (!cart || !cart.href) return;
-              e.preventDefault();
-              e.stopPropagation();
-              if (typeof window.KwikCart !== 'undefined' && typeof window.KwikCart.open === 'function') {
-                window.KwikCart.open();
-              } else {
-                window.location.href = cart.getAttribute('href') || cart.href;
-              }
-            }, true);
-          }
+          // --- Cart: no theme intercept; link is href="/cart" so GoKwik can intercept and open drawer. ---
+          if (!cartListenerAdded) cartListenerAdded = true;
 
           // --- Hamburger / Mobile menu: use event delegation so it works even if header loads late ---
           if (!menuAttached) {
