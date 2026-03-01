@@ -59,8 +59,41 @@
 
     {% sections 'footer-group' %}
 
-    {%- comment -%} GoKwik side cart only: hide theme cart drawer so only GoKwik drawer shows. {%- endcomment -%}
-    <style>#cart-drawer[data-cart-drawer]{display:none!important;}</style>
+    {%- comment -%} GoKwik only: theme cart drawer fully disabled so only GoKwik cart works. {%- endcomment -%}
+    <style>
+      .cart-drawer, #cart-drawer, [data-cart-drawer] {
+        display: none !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+        opacity: 0 !important;
+        position: absolute !important;
+        left: -9999px !important;
+        width: 0 !important;
+        height: 0 !important;
+        overflow: hidden !important;
+      }
+    </style>
+    <script>
+    (function() {
+      function keepThemeCartClosed() {
+        var el = document.getElementById('cart-drawer') || document.querySelector('.cart-drawer') || document.querySelector('[data-cart-drawer]');
+        if (el) {
+          el.classList.remove('active');
+          el.setAttribute('aria-hidden', 'true');
+          el.style.setProperty('display', 'none', 'important');
+        }
+      }
+      keepThemeCartClosed();
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', keepThemeCartClosed);
+      }
+      document.addEventListener('DOMContentLoaded', function() {
+        var observer = new MutationObserver(function() { keepThemeCartClosed(); });
+        observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
+        setInterval(keepThemeCartClosed, 500);
+      });
+    })();
+    </script>
     {%- comment -%} GoKwik side cart: open without page reload via replaceState + KwikCart.open(). {%- endcomment -%}
 
     {%- comment -%} lockBodyScroll/unlockBodyScroll for mobile menu. openCartDrawer opens GoKwik drawer in-place (no navigation). {%- endcomment -%}
@@ -366,11 +399,10 @@
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id: variantId, quantity: quantity })
-          }).then(function(r) { return r.json().then(function(data) { return { ok: r.ok, data: data }; }); }).then(function(result) {
+          }).then(function(r) { return r.json().then(function(data) { return { ok: r.ok, data: data }; });           }).then(function(result) {
             if (result.ok) {
               document.dispatchEvent(new CustomEvent('cart:updated'));
               if (typeof window.openCartDrawer === 'function') window.openCartDrawer();
-              else document.dispatchEvent(new CustomEvent('open-cart-drawer'));
             } else {
               alert(result.data && result.data.description ? result.data.description : 'Could not add to cart.');
             }

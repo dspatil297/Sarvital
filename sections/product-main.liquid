@@ -1812,11 +1812,7 @@
         }).then(function(res) { return res.json().then(function(data) { return { ok: res.ok, data: data }; }); }).then(function(result) {
           if (result.ok) {
             document.dispatchEvent(new CustomEvent('cart:updated'));
-            if (typeof window.openCartDrawer === 'function') {
-              window.openCartDrawer();
-            } else {
-              document.dispatchEvent(new CustomEvent('open-cart-drawer'));
-            }
+            if (typeof window.openCartDrawer === 'function') window.openCartDrawer();
           } else {
             if (result.data && result.data.message) {
               alert(result.data.message);
