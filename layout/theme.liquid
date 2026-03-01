@@ -59,7 +59,9 @@
 
     {% sections 'footer-group' %}
 
-    {%- comment -%} GoKwik side cart: open without page reload via replaceState + events + KwikCart.open(). {%- endcomment -%}
+    {%- comment -%} GoKwik side cart only: hide theme cart drawer so only GoKwik drawer shows. {%- endcomment -%}
+    <style>#cart-drawer[data-cart-drawer]{display:none!important;}</style>
+    {%- comment -%} GoKwik side cart: open without page reload via replaceState + KwikCart.open(). {%- endcomment -%}
 
     {%- comment -%} lockBodyScroll/unlockBodyScroll for mobile menu. openCartDrawer opens GoKwik drawer in-place (no navigation). {%- endcomment -%}
     <script>
@@ -87,7 +89,7 @@
           window.scrollTo(0, parseInt(scrollY, 10));
         };
       }
-      /** Opens GoKwik drawer without reload: update URL, dispatch events, call KwikCart.open() if present. */
+      /** Opens GoKwik drawer only (no theme drawer): update URL, call KwikCart.open(). Do not dispatch open-cart-drawer so theme drawer stays closed. */
       window.openCartDrawer = function() {
         var url = new URL(window.location.href);
         url.searchParams.set('openCart', 'true');
@@ -95,9 +97,6 @@
         if (window.history && window.history.replaceState) {
           window.history.replaceState({ openCart: true }, '', newUrl);
         }
-        document.dispatchEvent(new CustomEvent('open-cart-drawer'));
-        document.dispatchEvent(new CustomEvent('openCart'));
-        document.dispatchEvent(new CustomEvent('cart:open'));
         if (typeof window.KwikCart !== 'undefined' && typeof window.KwikCart.open === 'function') {
           window.KwikCart.open();
         }
