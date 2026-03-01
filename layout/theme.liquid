@@ -35,7 +35,16 @@
     {%- comment -%} SEO Meta Tags {%- endcomment -%}
     {% render 'meta-tags' %}
 
-    {{ content_for_header }}
+    {%- comment -%} Strip broken compiled_assets/scripts.js to prevent Uncaught SyntaxError: Unexpected token ')' {%- endcomment -%}
+    {% assign header_parts = content_for_header | split: '<script' %}
+    {{ header_parts[0] }}
+    {% for part in header_parts %}
+      {% if forloop.index0 > 0 %}
+        {% unless part contains 'compiled_assets/scripts.js' %}
+<script{{ part }}
+        {% endunless %}
+      {% endif %}
+    {% endfor %}
   </head>
 
   <body class="template-{{ request.page_type | handle }}">

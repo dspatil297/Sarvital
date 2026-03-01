@@ -207,9 +207,8 @@
   }
 {% endstylesheet %}
 
-{% javascript %}
+<script>
   ;(function() {
-  // Animated counter for impact metrics (ES5 for Shopify compiled_assets/scripts.js minification)
   document.addEventListener('DOMContentLoaded', function() {
     var counters = document.querySelectorAll('[data-count]');
     
@@ -246,7 +245,7 @@
     counters.forEach(animateCounter);
   });
   })();
-{% endjavascript %}
+</script>
 
 {% schema %}
 {

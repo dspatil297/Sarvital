@@ -170,10 +170,9 @@
   </div>
 </section>
 
-{% javascript %}
+<script>
   ;(function() {
     'use strict';
-    // Fallback: Parse nutrition data client-side if needed (ES5 for Shopify compiled_assets/scripts.js)
     var nutritionTable = document.querySelector('.nutrition-table tbody');
     var tableElement = document.querySelector('.nutrition-table');
     
@@ -538,7 +537,7 @@
       }
     }
   })();
-{% endjavascript %}
+</script>
 
 {% stylesheet %}
   .product-ingredients-nutrition {
