@@ -577,12 +577,12 @@
 
 {% javascript %}
   ;(function() {
+  'use strict';
   document.addEventListener('DOMContentLoaded', function() {
-    const sortSelect = document.querySelector('[data-search-sort]');
-    
+    var sortSelect = document.querySelector('[data-search-sort]');
     if (sortSelect) {
       sortSelect.addEventListener('change', function() {
-        const url = new URL(window.location);
+        var url = new URL(window.location.href);
         url.searchParams.set('sort_by', this.value);
         window.location.href = url.toString();
       });

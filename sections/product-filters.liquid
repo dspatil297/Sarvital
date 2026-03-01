@@ -526,11 +526,10 @@
 {% javascript %}
   ;(function() {
     'use strict';
-
-    const filterToggle = document.querySelector('[data-filter-toggle]');
-    const filterSidebar = document.querySelector('[data-filter-sidebar]');
-    const filterOverlay = document.querySelector('[data-filter-overlay]');
-    const filterClose = document.querySelector('[data-filter-close]');
+    var filterToggle = document.querySelector('[data-filter-toggle]');
+    var filterSidebar = document.querySelector('[data-filter-sidebar]');
+    var filterOverlay = document.querySelector('[data-filter-overlay]');
+    var filterClose = document.querySelector('[data-filter-close]');
 
     function openFilters() {
       filterSidebar.classList.add('active');
@@ -558,17 +557,16 @@
       filterOverlay.addEventListener('click', closeFilters);
     }
 
-    // Auto-submit on checkbox change (desktop)
     if (window.innerWidth >= 769) {
-      const checkboxes = document.querySelectorAll('.filter-checkbox input[type="checkbox"]');
-      checkboxes.forEach(checkbox => {
-        checkbox.addEventListener('change', function() {
-          // Small delay to allow multiple selections
-          setTimeout(() => {
-            this.closest('form').submit();
+      var checkboxes = document.querySelectorAll('.filter-checkbox input[type="checkbox"]');
+      for (var i = 0; i < checkboxes.length; i++) {
+        checkboxes[i].addEventListener('change', function() {
+          var self = this;
+          setTimeout(function() {
+            self.closest('form').submit();
           }, 300);
         });
-      });
+      }
     }
   })();
 {% endjavascript %}

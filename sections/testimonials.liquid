@@ -311,45 +311,40 @@
 {% javascript %}
   ;(function() {
     'use strict';
-
-    const carousel = document.querySelector('[data-testimonials-carousel]');
+    var carousel = document.querySelector('[data-testimonials-carousel]');
     if (!carousel) return;
-
-    const track = carousel.querySelector('[data-testimonials-track]');
-    const prevBtn = carousel.querySelector('[data-testimonials-prev]');
-    const nextBtn = carousel.querySelector('[data-testimonials-next]');
-    const dotsContainer = carousel.querySelector('[data-testimonials-dots]');
-    const cards = carousel.querySelectorAll('.testimonial-card');
-    
+    var track = carousel.querySelector('[data-testimonials-track]');
+    var prevBtn = carousel.querySelector('[data-testimonials-prev]');
+    var nextBtn = carousel.querySelector('[data-testimonials-next]');
+    var dotsContainer = carousel.querySelector('[data-testimonials-dots]');
+    var cards = carousel.querySelectorAll('.testimonial-card');
     if (cards.length <= 1) return;
+    var currentIndex = 0;
+    var totalCards = cards.length;
+    var isMobile = window.innerWidth < 768;
+    var cardsPerView = isMobile ? 1 : 2;
 
-    let currentIndex = 0;
-    const totalCards = cards.length;
-    const isMobile = window.innerWidth < 768;
-    const cardsPerView = isMobile ? 1 : 2;
-
-    // Create dots
     if (dotsContainer) {
-      for (let i = 0; i < Math.ceil(totalCards / cardsPerView); i++) {
-        const dot = document.createElement('button');
-        dot.className = 'testimonials__dot' + (i === 0 ? ' active' : '');
-        dot.setAttribute('aria-label', `Go to slide ${i + 1}`);
-        dot.addEventListener('click', () => goToSlide(i));
-        dotsContainer.appendChild(dot);
+      for (var i = 0; i < Math.ceil(totalCards / cardsPerView); i++) {
+        (function(idx) {
+          var dot = document.createElement('button');
+          dot.className = 'testimonials__dot' + (idx === 0 ? ' active' : '');
+          dot.setAttribute('aria-label', 'Go to slide ' + (idx + 1));
+          dot.addEventListener('click', function() { goToSlide(idx); });
+          dotsContainer.appendChild(dot);
+        })(i);
       }
     }
 
     function updateCarousel() {
-      const translateX = -(currentIndex * (100 / cardsPerView));
-      track.style.transform = `translateX(${translateX}%)`;
-      
-      // Update dots
-      const dots = dotsContainer?.querySelectorAll('.testimonials__dot');
-      dots?.forEach((dot, index) => {
-        dot.classList.toggle('active', index === Math.floor(currentIndex / cardsPerView));
-      });
-
-      // Update buttons
+      var translateX = -(currentIndex * (100 / cardsPerView));
+      track.style.transform = 'translateX(' + translateX + '%)';
+      var dots = dotsContainer && dotsContainer.querySelectorAll('.testimonials__dot');
+      if (dots) {
+        for (var d = 0; d < dots.length; d++) {
+          dots[d].classList.toggle('active', d === Math.floor(currentIndex / cardsPerView));
+        }
+      }
       if (prevBtn) prevBtn.disabled = currentIndex === 0;
       if (nextBtn) nextBtn.disabled = currentIndex >= totalCards - cardsPerView;
     }
@@ -379,11 +374,10 @@
     if (prevBtn) prevBtn.addEventListener('click', prevSlide);
     if (nextBtn) nextBtn.addEventListener('click', nextSlide);
 
-    // Auto-rotate
-    let autoRotateInterval;
-    const autoRotate = {{ section.settings.auto_rotate | json }};
+    var autoRotateInterval;
+    var autoRotate = {{ section.settings.auto_rotate | json }};
     if (autoRotate) {
-      autoRotateInterval = setInterval(() => {
+      autoRotateInterval = setInterval(function() {
         if (currentIndex >= totalCards - cardsPerView) {
           currentIndex = 0;
         } else {
@@ -393,14 +387,13 @@
       }, 5000);
     }
 
-    // Pause on hover
-    carousel.addEventListener('mouseenter', () => {
+    carousel.addEventListener('mouseenter', function() {
       if (autoRotateInterval) clearInterval(autoRotateInterval);
     });
 
-    carousel.addEventListener('mouseleave', () => {
+    carousel.addEventListener('mouseleave', function() {
       if (autoRotate) {
-        autoRotateInterval = setInterval(() => {
+        autoRotateInterval = setInterval(function() {
           if (currentIndex >= totalCards - cardsPerView) {
             currentIndex = 0;
           } else {
@@ -411,26 +404,24 @@
       }
     });
 
-    // Touch/swipe support
-    let startX = 0;
-    let isDragging = false;
+    var startX = 0;
+    var isDragging = false;
 
-    track.addEventListener('touchstart', (e) => {
+    track.addEventListener('touchstart', function(e) {
       startX = e.touches[0].clientX;
       isDragging = true;
     });
 
-    track.addEventListener('touchmove', (e) => {
+    track.addEventListener('touchmove', function(e) {
       if (!isDragging) return;
       e.preventDefault();
     });
 
-    track.addEventListener('touchend', (e) => {
+    track.addEventListener('touchend', function(e) {
       if (!isDragging) return;
       isDragging = false;
-      const endX = e.changedTouches[0].clientX;
-      const diff = startX - endX;
-
+      var endX = e.changedTouches[0].clientX;
+      var diff = startX - endX;
       if (Math.abs(diff) > 50) {
         if (diff > 0) {
           nextSlide();
@@ -440,13 +431,11 @@
       }
     });
 
-    // Initialize
     updateCarousel();
 
-    // Handle resize
-    window.addEventListener('resize', () => {
-      const wasMobile = isMobile;
-      const nowMobile = window.innerWidth < 768;
+    window.addEventListener('resize', function() {
+      var wasMobile = isMobile;
+      var nowMobile = window.innerWidth < 768;
       if (wasMobile !== nowMobile) {
         currentIndex = 0;
         updateCarousel();

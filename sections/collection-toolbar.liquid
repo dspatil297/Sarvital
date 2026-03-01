@@ -183,21 +183,18 @@
 {% javascript %}
   ;(function() {
     'use strict';
-
-    const sortSelect = document.getElementById('sort-by');
-    const perPageSelect = document.getElementById('products-per-page');
-
+    var sortSelect = document.getElementById('sort-by');
+    var perPageSelect = document.getElementById('products-per-page');
     if (sortSelect) {
       sortSelect.addEventListener('change', function() {
-        const url = new URL(window.location.href);
+        var url = new URL(window.location.href);
         url.searchParams.set('sort_by', this.value);
         window.location.href = url.toString();
       });
     }
-
     if (perPageSelect) {
       perPageSelect.addEventListener('change', function() {
-        const url = new URL(window.location.href);
+        var url = new URL(window.location.href);
         url.searchParams.set('limit', this.value);
         url.searchParams.delete('page');
         window.location.href = url.toString();

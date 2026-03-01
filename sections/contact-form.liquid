@@ -296,33 +296,30 @@
 
 {% javascript %}
   ;(function() {
-  // Form validation
+  'use strict';
   document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('contact-form');
-    const inputs = form.querySelectorAll('input[required], textarea[required], select[required]');
-    
-    inputs.forEach(input => {
-      input.addEventListener('blur', function() {
+    var form = document.getElementById('contact-form');
+    if (!form) return;
+    var inputs = form.querySelectorAll('input[required], textarea[required], select[required]');
+    for (var i = 0; i < inputs.length; i++) {
+      inputs[i].addEventListener('blur', function() {
         if (!this.value.trim()) {
           this.classList.add('error');
         } else {
           this.classList.remove('error');
         }
       });
-    });
-    
+    }
     form.addEventListener('submit', function(e) {
-      let isValid = true;
-      
-      inputs.forEach(input => {
-        if (!input.value.trim()) {
-          input.classList.add('error');
+      var isValid = true;
+      for (var j = 0; j < inputs.length; j++) {
+        if (!inputs[j].value.trim()) {
+          inputs[j].classList.add('error');
           isValid = false;
         } else {
-          input.classList.remove('error');
+          inputs[j].classList.remove('error');
         }
-      });
-      
+      }
       if (!isValid) {
         e.preventDefault();
       }
