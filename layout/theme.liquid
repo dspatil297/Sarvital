@@ -59,24 +59,18 @@
 
     {% sections 'footer-group' %}
 
-    {%- comment -%} GoKwik only: theme cart drawer fully disabled so only GoKwik cart works. {%- endcomment -%}
+    {%- comment -%} Only hide the theme's cart drawer (id=cart-drawer). Do not hide .cart-drawer or [data-cart-drawer] globally — GoKwik may use those. {%- endcomment -%}
     <style>
-      .cart-drawer, #cart-drawer, [data-cart-drawer] {
+      #cart-drawer {
         display: none !important;
         visibility: hidden !important;
         pointer-events: none !important;
-        opacity: 0 !important;
-        position: absolute !important;
-        left: -9999px !important;
-        width: 0 !important;
-        height: 0 !important;
-        overflow: hidden !important;
       }
     </style>
     <script>
     (function() {
       function keepThemeCartClosed() {
-        var el = document.getElementById('cart-drawer') || document.querySelector('.cart-drawer') || document.querySelector('[data-cart-drawer]');
+        var el = document.getElementById('cart-drawer');
         if (el) {
           el.classList.remove('active');
           el.setAttribute('aria-hidden', 'true');
@@ -89,8 +83,8 @@
       }
       document.addEventListener('DOMContentLoaded', function() {
         var observer = new MutationObserver(function() { keepThemeCartClosed(); });
-        observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
-        setInterval(keepThemeCartClosed, 500);
+        var root = document.body;
+        if (root) observer.observe(root, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
       });
     })();
     </script>
@@ -122,7 +116,7 @@
           window.scrollTo(0, parseInt(scrollY, 10));
         };
       }
-      /** Opens GoKwik drawer only (no theme drawer): update URL, call KwikCart.open(). Do not dispatch open-cart-drawer so theme drawer stays closed. */
+      /** Open GoKwik drawer: update URL, call KwikCart.open(), dispatch events GoKwik may listen for. Theme drawer is #cart-drawer only and is hidden above. */
       window.openCartDrawer = function() {
         var url = new URL(window.location.href);
         url.searchParams.set('openCart', 'true');
@@ -133,6 +127,9 @@
         if (typeof window.KwikCart !== 'undefined' && typeof window.KwikCart.open === 'function') {
           window.KwikCart.open();
         }
+        document.dispatchEvent(new CustomEvent('open-cart-drawer'));
+        document.dispatchEvent(new CustomEvent('openCart'));
+        document.dispatchEvent(new CustomEvent('cart:open'));
         if (typeof window.dispatchEvent !== 'undefined') {
           try { window.dispatchEvent(new PopStateEvent('popstate', { state: { openCart: true } })); } catch (err) {}
         }
@@ -140,7 +137,8 @@
           if (typeof window.KwikCart !== 'undefined' && typeof window.KwikCart.open === 'function') {
             window.KwikCart.open();
           }
-        }, 100);
+          document.dispatchEvent(new CustomEvent('open-cart-drawer'));
+        }, 150);
       };
     })();
     </script>
