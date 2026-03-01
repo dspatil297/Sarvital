@@ -101,8 +101,8 @@
         {% endif %}
       {% endif %}
 
-      <!-- Cart: opens theme side drawer without reload; href fallback to cart page if no JS. -->
-      <a href="{{ routes.cart_url }}" class="header__cart" aria-label="Shopping cart" data-cart-toggle>
+      <!-- Cart: opens GoKwik side cart (same page + ?openCart=true loads and opens their drawer). -->
+      <a href="{{ request.path }}{% if request.query_string != blank %}&{% else %}?{% endif %}openCart=true" class="header__cart" aria-label="Shopping cart">
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M2 2H4L4.4 4M6 14H16L20 4H4.4M6 14L4.4 4M6 14L3.29289 16.7071C3.10536 16.8946 3 17.149 3 17.4142V18C3 18.5523 3.44772 19 4 19H17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           <circle cx="8" cy="19" r="1" fill="currentColor"/>
