@@ -59,7 +59,7 @@
 
     {% sections 'footer-group' %}
 
-    {%- comment -%} Theme cart drawer disabled – GoKwik side cart is used. Cart icon links to /cart. lockBodyScroll/unlockBodyScroll kept for mobile menu. {%- endcomment -%}
+    {%- comment -%} Theme cart drawer disabled – GoKwik side cart is used. Cart icon / View Cart: JS prevents navigation and dispatches open-cart-drawer so drawer opens on same page. lockBodyScroll/unlockBodyScroll kept for mobile menu. {%- endcomment -%}
     <script>
     (function() {
       if (!window.lockBodyScroll) {
@@ -127,11 +127,11 @@
         function initHeaderAndCart() {
           var doc = document;
 
-          // --- Cart: theme cart disabled; GoKwik side cart used. Intercept cart icon click to open GoKwik drawer instead of navigating to /cart. ---
+          // --- Cart: open GoKwik side cart on same page (prevent navigation, dispatch event) ---
           if (!cartListenerAdded) {
             cartListenerAdded = true;
             doc.addEventListener('click', function(e) {
-              var cartToggle = e.target && e.target.closest ? e.target.closest('[data-cart-toggle], .header__cart') : null;
+              var cartToggle = e.target && e.target.closest ? e.target.closest('[data-cart-toggle]') : null;
               if (cartToggle) {
                 e.preventDefault();
                 e.stopPropagation();
