@@ -85,7 +85,9 @@
           window.scrollTo(0, parseInt(scrollY, 10));
         };
       }
-      window.openCartDrawer = function() {};
+      window.openCartDrawer = function() {
+        try { document.dispatchEvent(new CustomEvent('open-cart-drawer')); } catch (err) {}
+      };
     })();
     </script>
 
@@ -125,8 +127,18 @@
         function initHeaderAndCart() {
           var doc = document;
 
-          // --- Cart: theme cart disabled; GoKwik side cart used. openCartDrawer is no-op set above. ---
-          if (!cartListenerAdded) cartListenerAdded = true;
+          // --- Cart: theme cart disabled; GoKwik side cart used. Intercept cart icon click to open GoKwik drawer instead of navigating to /cart. ---
+          if (!cartListenerAdded) {
+            cartListenerAdded = true;
+            doc.addEventListener('click', function(e) {
+              var cartToggle = e.target && e.target.closest ? e.target.closest('[data-cart-toggle], .header__cart') : null;
+              if (cartToggle) {
+                e.preventDefault();
+                e.stopPropagation();
+                doc.dispatchEvent(new CustomEvent('open-cart-drawer'));
+              }
+            }, true);
+          }
 
           // --- Hamburger / Mobile menu: use event delegation so it works even if header loads late ---
           if (!menuAttached) {
