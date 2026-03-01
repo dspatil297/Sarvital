@@ -4,7 +4,7 @@
       <h2 class="testimonials__title">{{ section.settings.title }}</h2>
     {% endif %}
     
-    <div class="testimonials__carousel" data-testimonials-carousel>
+    <div class="testimonials__carousel" data-testimonials-carousel data-auto-rotate="{{ section.settings.auto_rotate | json }}">
       <div class="testimonials__track" data-testimonials-track>
         {% for block in section.blocks %}
           <div class="testimonial-card" {{ block.shopify_attributes }} data-testimonial-index="{{ forloop.index0 }}">
@@ -375,7 +375,8 @@
     if (nextBtn) nextBtn.addEventListener('click', nextSlide);
 
     var autoRotateInterval;
-    var autoRotate = {{ section.settings.auto_rotate | json }};
+    var autoRotateStr = carousel.getAttribute('data-auto-rotate');
+    var autoRotate = autoRotateStr === 'true' || autoRotateStr === true;
     if (autoRotate) {
       autoRotateInterval = setInterval(function() {
         if (currentIndex >= totalCards - cardsPerView) {

@@ -733,7 +733,7 @@
       var mobileMenuClose = document.querySelectorAll('[data-mobile-menu-close]');
       var mobileNavItems = document.querySelectorAll('.mobile-nav-item.has-children');
 
-    if (header && header.dataset.stickyHeader === 'true') {
+    if (header && header.getAttribute('data-sticky-header') === 'true') {
       window.addEventListener('scroll', function() {
         if (window.pageYOffset > 100) {
           header.classList.add('sticky');

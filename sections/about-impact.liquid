@@ -214,8 +214,9 @@
     var counters = document.querySelectorAll('[data-count]');
     
     function animateCounter(counter) {
-      var target = parseInt(counter.dataset.count.replace(/[^0-9]/g, ''), 10) || 0;
-      var suffix = counter.dataset.count.replace(/[0-9]/g, '');
+      var countAttr = counter.getAttribute('data-count') || '';
+      var target = parseInt(countAttr.replace(/[^0-9]/g, ''), 10) || 0;
+      var suffix = countAttr.replace(/[0-9]/g, '');
       var duration = 2000;
       var increment = target / (duration / 16);
       var current = 0;
