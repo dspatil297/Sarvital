@@ -1,0 +1,482 @@
+{% comment %}
+  Home FAQ Section
+  Displays FAQs from shop.metafields.custom.site_faqs.
+  Supports: rich_text_field (use metafield_text for plain text) or multi-line text.
+  Format: Q: Question text / A: Answer text (block-based parsing).
+{% endcomment %}
+
+{% assign faq_meta = shop.metafields.custom.site_faqs %}
+{% assign faq_items = '' | split: '' %}
+
+{% comment %} Get plain text: rich text metafields must use metafield_text to avoid rendering object/hash {% endcomment %}
+{% assign faq_text = faq_meta | metafield_text %}
+{% if faq_text == blank and faq_meta.value != blank %}
+  {% assign faq_text = faq_meta.value %}
+{% endif %}
+{% if faq_text == blank and faq_meta != blank %}
+  {% assign faq_text = faq_meta %}
+{% endif %}
+{% if faq_text != blank %}
+  {% assign faq_text = faq_text | strip %}
+{% endif %}
+
+{% comment %} Parse Q: / A: blocks into pairs. Split by "Q:" then each block by "A:" for question/answer. {% endcomment %}
+{% if faq_text != blank and faq_text.size > 0 %}
+  {% assign faq_items_string = '' %}
+  {% assign blocks = faq_text | split: 'Q:' %}
+  {% for block in blocks %}
+    {% assign block_stripped = block | strip %}
+    {% if block_stripped != blank %}
+      {% assign question_part = '' %}
+      {% assign answer_part = '' %}
+      {% assign by_a = block_stripped | split: 'A:' %}
+      {% if by_a.size >= 2 %}
+        {% assign question_part = by_a[0] | strip %}
+        {% assign answer_part = by_a[1] | strip %}
+        {% if by_a.size > 2 %}
+          {% for extra in by_a %}
+            {% if forloop.index0 > 1 %}
+              {% assign answer_part = answer_part | append: ' A: ' | append: extra | strip %}
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+      {% else %}
+        {% assign by_a_lower = block_stripped | split: 'a:' %}
+        {% if by_a_lower.size >= 2 %}
+          {% assign question_part = by_a_lower[0] | strip %}
+          {% assign answer_part = by_a_lower[1] | strip %}
+        {% else %}
+          {% assign question_part = block_stripped %}
+        {% endif %}
+      {% endif %}
+      {% if question_part != blank %}
+        {% assign qa_pair = question_part | append: '|||' | append: answer_part %}
+        {% if faq_items_string != blank %}
+          {% assign faq_items_string = faq_items_string | append: '###FAQ###' %}
+        {% endif %}
+        {% assign faq_items_string = faq_items_string | append: qa_pair %}
+      {% endif %}
+    {% endif %}
+  {% endfor %}
+
+  {% comment %} Alternative: line-by-line parse if block parse didn't work (e.g. no "Q:" in text) {% endcomment %}
+  {% if faq_items_string == blank %}
+    {% assign all_lines = faq_text | newline_to_br | split: '<br />' %}
+    {% assign current_question = '' %}
+    {% assign current_answer = '' %}
+    {% assign non_empty_line_count = 0 %}
+    {% for line in all_lines %}
+      {% assign clean_line = line | strip %}
+      {% if clean_line != blank %}
+        {% assign non_empty_line_count = non_empty_line_count | plus: 1 %}
+        {% assign line_lower = clean_line | downcase %}
+        {% if line_lower contains 'q:' %}
+          {% if current_question != blank %}
+            {% assign qa_pair = current_question | append: '|||' | append: current_answer %}
+            {% if faq_items_string != blank %}
+              {% assign faq_items_string = faq_items_string | append: '###FAQ###' %}
+            {% endif %}
+            {% assign faq_items_string = faq_items_string | append: qa_pair %}
+          {% endif %}
+          {% assign after_q = clean_line | split: ':' | size %}
+          {% if after_q >= 2 %}
+            {% assign current_question = clean_line | replace: 'Q:', '' | replace: 'q:', '' | strip %}
+          {% else %}
+            {% assign current_question = clean_line %}
+          {% endif %}
+          {% assign current_answer = '' %}
+        {% elsif line_lower contains 'a:' %}
+          {% assign answer_text = clean_line | replace: 'A:', '' | replace: 'a:', '' | strip %}
+          {% if current_answer != blank %}
+            {% assign current_answer = current_answer | append: ' ' | append: answer_text %}
+          {% else %}
+            {% assign current_answer = answer_text %}
+          {% endif %}
+        {% else %}
+          {% assign is_q = non_empty_line_count | modulo: 2 %}
+          {% if is_q == 1 %}
+            {% if current_question != blank %}
+              {% assign qa_pair = current_question | append: '|||' | append: current_answer %}
+              {% if faq_items_string != blank %}
+                {% assign faq_items_string = faq_items_string | append: '###FAQ###' %}
+              {% endif %}
+              {% assign faq_items_string = faq_items_string | append: qa_pair %}
+            {% endif %}
+            {% assign current_question = clean_line %}
+            {% assign current_answer = '' %}
+          {% else %}
+            {% if current_answer != blank %}
+              {% assign current_answer = current_answer | append: ' ' | append: clean_line %}
+            {% else %}
+              {% assign current_answer = clean_line %}
+            {% endif %}
+          {% endif %}
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+    {% if current_question != blank %}
+      {% assign qa_pair = current_question | append: '|||' | append: current_answer %}
+      {% if faq_items_string != blank %}
+        {% assign faq_items_string = faq_items_string | append: '###FAQ###' %}
+      {% endif %}
+      {% assign faq_items_string = faq_items_string | append: qa_pair %}
+    {% endif %}
+  {% endif %}
+
+  {% if faq_items_string != blank %}
+    {% assign faq_items = faq_items_string | split: '###FAQ###' %}
+  {% endif %}
+{% endif %}
+
+{% if faq_items.size > 0 %}
+<section class="home-faq" id="home-faq" {{ section.shopify_attributes }}>
+  <div class="home-faq__container">
+    <div class="home-faq__header">
+      <div class="home-faq__icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+          <line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+      </div>
+      <h2 class="home-faq__title">{{ section.settings.title | default: 'Frequently Asked Questions' }}</h2>
+    </div>
+
+    <div class="home-faq__accordion">
+      {% for item in faq_items %}
+        {% assign qa_parts = item | split: '|||' %}
+        {% assign question = qa_parts[0] | strip %}
+        {% assign answer = qa_parts[1] | strip %}
+
+        {% if question != blank %}
+          <div class="home-faq-item" data-faq-index="{{ forloop.index0 }}">
+            <button class="home-faq-item__button" type="button" aria-expanded="false" aria-controls="home-faq-answer-{{ section.id }}-{{ forloop.index0 }}">
+              <span class="home-faq-item__question">{{ question | strip | escape }}</span>
+              <span class="home-faq-item__icon" aria-hidden="true">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M5 7.5l5 5 5-5"/>
+                </svg>
+              </span>
+            </button>
+            <div class="home-faq-item__content" id="home-faq-answer-{{ section.id }}-{{ forloop.index0 }}" role="region">
+              <div class="home-faq-item__answer">
+                {% if answer != blank %}
+                  {{ answer | strip | newline_to_br }}
+                {% else %}
+                  <p>No answer provided.</p>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<script>
+(function() {
+  function handleHomeFaqClick(e) {
+    var target = e.target;
+    var button = target.closest ? target.closest('.home-faq-item__button') : null;
+    if (!button) {
+      var p = target.parentElement;
+      while (p && p !== document.body) {
+        if (p.classList && p.classList.contains('home-faq-item__button')) {
+          button = p;
+          break;
+        }
+        p = p.parentElement;
+      }
+    }
+    if (!button) return;
+    var item = button.parentElement;
+    while (item && item !== document.body) {
+      if (item.classList && item.classList.contains('home-faq-item')) break;
+      item = item.parentElement;
+    }
+    if (!item) return;
+    var section = item.closest ? item.closest('#home-faq') : null;
+    if (!section) {
+      var s = item.parentElement;
+      while (s && s !== document.body) {
+        if (s.id === 'home-faq') { section = s; break; }
+        s = s.parentElement;
+      }
+    }
+    if (!section) return;
+    e.preventDefault();
+    e.stopPropagation();
+    var isOpen = item.classList.contains('active');
+    var allItems = section.querySelectorAll('.home-faq-item');
+    for (var j = 0; j < allItems.length; j++) {
+      allItems[j].classList.remove('active');
+      var b = allItems[j].querySelector('.home-faq-item__button');
+      if (b) b.setAttribute('aria-expanded', 'false');
+    }
+    if (!isOpen) {
+      item.classList.add('active');
+      button.setAttribute('aria-expanded', 'true');
+    }
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() {
+      document.addEventListener('click', handleHomeFaqClick, true);
+    });
+  } else {
+    document.addEventListener('click', handleHomeFaqClick, true);
+  }
+})();
+</script>
+{% endif %}
+
+{% stylesheet %}
+  .home-faq {
+    width: 100%;
+    max-width: 100%;
+    padding: var(--spacing-4xl) var(--spacing-lg);
+    background: linear-gradient(135deg, rgba(74, 124, 44, 0.04) 0%, rgba(255, 255, 255, 0.02) 100%);
+    box-sizing: border-box;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .home-faq::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(74, 124, 44, 0.2), transparent);
+  }
+
+  .home-faq__container {
+    max-width: var(--container-max-width, 900px);
+    margin: 0 auto;
+  }
+
+  .home-faq__header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-2xl);
+    padding-bottom: var(--spacing-xl);
+    border-bottom: 3px solid transparent;
+    border-image: linear-gradient(90deg, var(--forest-green), var(--sage-green), transparent) 1;
+    position: relative;
+  }
+
+  .home-faq__header::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 0;
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, var(--sage-green), rgba(74, 124, 44, 0.3));
+    border-radius: 2px;
+  }
+
+  .home-faq__icon {
+    width: 56px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--forest-green) 0%, var(--sage-green) 100%);
+    border-radius: var(--radius-lg);
+    color: var(--white);
+    flex-shrink: 0;
+    box-shadow: 0 8px 20px rgba(45, 80, 22, 0.2);
+  }
+
+  .home-faq__icon svg {
+    width: 26px;
+    height: 26px;
+  }
+
+  .home-faq__title {
+    font-family: var(--font-heading);
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--forest-green) 0%, var(--sage-green) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+
+  .home-faq__accordion {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+
+  .home-faq-item {
+    background: var(--white);
+    border-radius: var(--radius-xl);
+    border: 2px solid rgba(74, 124, 44, 0.12);
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(45, 80, 22, 0.06);
+  }
+
+  .home-faq-item:hover {
+    border-color: rgba(74, 124, 44, 0.25);
+    box-shadow: 0 8px 24px rgba(45, 80, 22, 0.1);
+  }
+
+  .home-faq-item.active {
+    border-color: rgba(74, 124, 44, 0.35);
+    box-shadow: 0 12px 32px rgba(45, 80, 22, 0.12);
+  }
+
+  .home-faq-item__button {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-lg);
+    padding: var(--spacing-lg) var(--spacing-xl);
+    background: transparent;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+    font: inherit;
+    transition: background 0.3s ease;
+  }
+
+  .home-faq-item__button:hover {
+    background: rgba(74, 124, 44, 0.04);
+  }
+
+  .home-faq-item__button:focus {
+    outline: 2px solid var(--forest-green);
+    outline-offset: -2px;
+  }
+
+  .home-faq-item__button[aria-expanded="true"] {
+    background: rgba(74, 124, 44, 0.06);
+  }
+
+  .home-faq-item__question {
+    font-family: var(--font-heading);
+    font-size: 1.0625rem;
+    font-weight: 600;
+    color: var(--forest-green);
+    line-height: 1.45;
+    flex: 1;
+  }
+
+  .home-faq-item.active .home-faq-item__question {
+    color: var(--sage-green);
+  }
+
+  .home-faq-item__icon {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(74, 124, 44, 0.1);
+    border-radius: var(--radius-md);
+    color: var(--forest-green);
+    flex-shrink: 0;
+    transition: transform 0.3s ease, background 0.3s ease, color 0.3s ease;
+  }
+
+  .home-faq-item.active .home-faq-item__icon {
+    background: var(--forest-green);
+    color: var(--white);
+    transform: rotate(180deg);
+  }
+
+  .home-faq-item__content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 0 var(--spacing-xl);
+  }
+
+  #home-faq .home-faq-item.active .home-faq-item__content,
+  .home-faq-item.active .home-faq-item__content {
+    max-height: 800px !important;
+    overflow: visible !important;
+    padding: 0 var(--spacing-xl) var(--spacing-lg) var(--spacing-xl);
+  }
+
+  .home-faq-item__answer {
+    font-size: var(--body-normal);
+    line-height: 1.7;
+    color: var(--text);
+    padding-top: var(--spacing-xs);
+  }
+
+  .home-faq-item__answer p {
+    margin: 0 0 0.75rem 0;
+  }
+
+  .home-faq-item__answer p:last-child {
+    margin-bottom: 0;
+  }
+
+  @media (max-width: 768px) {
+    .home-faq {
+      padding: var(--spacing-2xl) var(--spacing-md);
+    }
+    .home-faq__header {
+      gap: var(--spacing-md);
+      margin-bottom: var(--spacing-xl);
+      padding-bottom: var(--spacing-lg);
+    }
+    .home-faq__icon {
+      width: 48px;
+      height: 48px;
+    }
+    .home-faq__icon svg {
+      width: 22px;
+      height: 22px;
+    }
+    .home-faq__title {
+      font-size: 1.35rem;
+    }
+    .home-faq-item__button {
+      padding: var(--spacing-md) var(--spacing-lg);
+    }
+    .home-faq-item__question {
+      font-size: 1rem;
+    }
+    .home-faq-item__content,
+    .home-faq-item.active .home-faq-item__content {
+      padding-left: var(--spacing-lg);
+      padding-right: var(--spacing-lg);
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Home FAQ",
+  "tag": "section",
+  "class": "section-home-faq",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Frequently Asked Questions"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Home FAQ",
+      "settings": {
+        "title": "Frequently Asked Questions"
+      }
+    }
+  ]
+}
+{% endschema %}

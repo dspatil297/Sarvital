@@ -43,6 +43,19 @@
   </head>
 
   <body class="template-{{ request.page_type | handle }}">
+    {%- if request.page_type == 'index' -%}
+    <style>
+      /* Hide Judge.me floating overlay on home so it doesn't sit on hero */
+      body.template-index > div[class*="jdgm"]:not([id^="shopify-section"]),
+      body.template-index [class*="jdgm-preview-badge"],
+      body.template-index [class*="jdgm-floating"],
+      body.template-index [class*="jdgm-float"],
+      body.template-index [id*="judge-me"][style*="fixed"],
+      body.template-index [class*="jdgm"][style*="position: fixed"],
+      body.template-index .hero-banner [class*="jdgm"],
+      body.template-index .hero-banner [class*="judge-me"] { display: none !important; visibility: hidden !important; }
+    </style>
+    {%- endif -%}
     {%- comment -%} Skip to main content link for accessibility {%- endcomment -%}
     <a href="#main-content" class="skip-to-main">{{ 'general.accessibility.skip_to_content' | t | default: 'Skip to main content' }}</a>
     

@@ -277,6 +277,12 @@
         "judge_me_reviews_cards_carousel_V4bCgm"
       ],
       "settings": {}
+    },
+    "home_faq": {
+      "type": "home-faq",
+      "settings": {
+        "title": "Frequently Asked Questions"
+      }
     }
   },
   "order": [
@@ -285,6 +291,7 @@
     "featured_products",
     "lifestyle_usage",
     "quality_assurance",
-    "176943494681be9f0a"
+    "176943494681be9f0a",
+    "home_faq"
   ]
 }

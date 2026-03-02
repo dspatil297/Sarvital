@@ -12,14 +12,16 @@ body.template-index .shopify-section:has([class*="judge-me"]) [class*="judge-me"
   box-sizing: border-box;
 }
 
-/* Section: FULL WIDTH – no max-width, spans viewport */
+/* Section: FULL WIDTH – in normal flow, below hero (not inside it) */
 body.template-index .shopify-section:has([class*="jdgm"]),
 body.template-index .shopify-section:has([class*="judge-me"]) {
+  position: relative !important;
   width: 100% !important;
   max-width: 100% !important;
   padding: 2.5rem 0 !important;
   background: #fff;
   overflow: hidden;
+  clear: both;
 }
 
 /* Inner wrapper: full width with horizontal padding for title + carousel */
