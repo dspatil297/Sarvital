@@ -257,7 +257,7 @@
             "image_ratio": "1",
             "reviews_shown": 3,
             "show_reviewer_name": true,
-            "show_product_name": false,
+            "show_product_name": true,
             "hide_arrows_mobile": true,
             "arrows_position": "sides",
             "max_width": 1100,
