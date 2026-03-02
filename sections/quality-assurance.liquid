@@ -92,10 +92,12 @@
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: var(--spacing-lg);
     margin-bottom: var(--spacing-2xl);
-    align-items: start;
+    align-items: stretch;
   }
 
   .quality-badge {
+    display: flex;
+    flex-direction: column;
     padding: var(--spacing-2xl);
     background: linear-gradient(135deg, var(--white) 0%, rgba(250, 250, 250, 0.8) 100%);
     border-radius: var(--radius-xl);
@@ -161,6 +163,7 @@
     color: var(--text);
     line-height: 1.7;
     margin: 0;
+    margin-top: auto;
   }
 
   .quality-assurance__promise {
