@@ -31,14 +31,15 @@
 
     {%- comment -%} Critical CSS - load normally to avoid "preloaded but not used" console warning {%- endcomment -%}
     {{ 'critical.css' | asset_url | stylesheet_tag }}
-    {%- if request.page_type == 'index' -%}
-      {{ 'reviews-carousel-home.css' | asset_url | stylesheet_tag }}
-    {%- endif -%}
 
     {%- comment -%} SEO Meta Tags {%- endcomment -%}
     {% render 'meta-tags' %}
 
     {{content_for_header}}
+    {%- comment -%} Judge.me reviews carousel overrides – load after app styles so they apply {%- endcomment -%}
+    {%- if request.page_type == 'index' -%}
+      {{ 'reviews-carousel-home.css' | asset_url | stylesheet_tag }}
+    {%- endif -%}
   </head>
 
   <body class="template-{{ request.page_type | handle }}">

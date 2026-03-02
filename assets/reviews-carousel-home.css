@@ -1,15 +1,20 @@
 /**
  * Home page "What Our Customers Say" – Judge.me cards carousel
- * Full-width section, large spacious cards (~4 visible), Judge.me classes: jdgm-rev, jdgm-carousel-item, jdgm-rev__title, jdgm-carousel-item__review-body
+ * Targets section containing Judge.me (jdgm/judge-me) so it works regardless of section ID.
+ * Loaded after content_for_header in theme.liquid so overrides app styles.
  */
-body.template-index #shopify-section-176943494681be9f0a,
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm"],
-body.template-index #shopify-section-176943494681be9f0a [class*="judge-me"] {
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]),
+body.template-index .shopify-section:has([class*="jdgm"]) [class*="jdgm"],
+body.template-index .shopify-section:has([class*="jdgm"]) [class*="judge-me"],
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm"],
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="judge-me"] {
   box-sizing: border-box;
 }
 
 /* Section: FULL WIDTH – no max-width, spans viewport */
-body.template-index #shopify-section-176943494681be9f0a {
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) {
   width: 100% !important;
   max-width: 100% !important;
   padding: 2.5rem 0 !important;
@@ -18,7 +23,8 @@ body.template-index #shopify-section-176943494681be9f0a {
 }
 
 /* Inner wrapper: full width with horizontal padding for title + carousel */
-body.template-index #shopify-section-176943494681be9f0a > div {
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) > div {
   width: 100% !important;
   max-width: 100% !important;
   margin: 0 !important;
@@ -27,17 +33,23 @@ body.template-index #shopify-section-176943494681be9f0a > div {
 }
 
 /* Judge.me root widget – full width */
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm-carousel"],
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm"] > div {
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm-carousel"],
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm"] > div {
   width: 100% !important;
   max-width: 100% !important;
 }
 
 /* Section title – top left, bold, large, full-width row */
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm"] [class*="header"],
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm"] h2,
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm-carousel"] [class*="header"],
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm-carousel"] h2 {
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm"] [class*="header"],
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm"] h2,
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm-carousel"] [class*="header"],
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm-carousel"] h2 {
   text-align: left !important;
   font-size: clamp(1.5rem, 3vw, 2rem) !important;
   font-weight: 700 !important;
@@ -49,14 +61,22 @@ body.template-index #shopify-section-176943494681be9f0a [class*="jdgm-carousel"]
 }
 
 /* Carousel track / slider – full width, room for side arrows */
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm"] [class*="track"],
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm"] [class*="slides"],
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm"] .slick-list,
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm"] .slick-track,
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm-carousel"] [class*="track"],
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm-carousel"] [class*="slides"],
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm-carousel"] .slick-list,
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm-carousel"] [class*="wrapper"] {
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm"] [class*="track"],
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm"] [class*="slides"],
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm"] .slick-list,
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm"] .slick-track,
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm-carousel"] [class*="track"],
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm-carousel"] [class*="slides"],
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm-carousel"] .slick-list,
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm-carousel"] [class*="wrapper"] {
   display: flex !important;
   align-items: stretch;
   gap: 1.25rem !important;
@@ -67,12 +87,18 @@ body.template-index #shopify-section-176943494681be9f0a [class*="jdgm-carousel"]
 }
 
 /* LARGE BOXES – wider cards, spacious padding (~4 visible on desktop) */
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm"] [class*="carousel-item"],
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm"] .jdgm-rev,
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm-carousel"] [class*="carousel-item"],
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm-carousel"] .jdgm-rev,
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm"] .slick-slide > div,
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm-carousel"] .slick-slide > div {
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm"] [class*="carousel-item"],
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm"] .jdgm-rev,
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm-carousel"] [class*="carousel-item"],
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm-carousel"] .jdgm-rev,
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm"] .slick-slide > div,
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm-carousel"] .slick-slide > div {
   flex: 0 0 auto !important;
   width: 340px !important;
   min-width: 340px !important;
@@ -91,24 +117,32 @@ body.template-index #shopify-section-176943494681be9f0a [class*="jdgm-carousel"]
 }
 
 /* Slick slide wrapper – pass through for card sizing */
-body.template-index #shopify-section-176943494681be9f0a .slick-slide {
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) .slick-slide {
   height: inherit !important;
 }
-body.template-index #shopify-section-176943494681be9f0a .slick-slide > div {
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) .slick-slide > div {
   height: 100% !important;
 }
 
 /* Card content – left align */
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm-carousel-item"] > *,
-body.template-index #shopify-section-176943494681be9f0a .jdgm-rev > * {
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm-carousel-item"] > *,
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) .jdgm-rev > * {
   text-align: left !important;
 }
 
 /* Date – top right */
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm"] [class*="timestamp"],
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm"] [class*="date"],
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm-carousel"] [class*="timestamp"],
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm-carousel"] [class*="date"] {
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm"] [class*="timestamp"],
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm"] [class*="date"],
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm-carousel"] [class*="timestamp"],
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm-carousel"] [class*="date"] {
   position: absolute !important;
   top: 1.5rem !important;
   right: 1.5rem !important;
@@ -119,41 +153,59 @@ body.template-index #shopify-section-176943494681be9f0a [class*="jdgm-carousel"]
 }
 
 /* Reviewer – top left, spacious spacing */
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm"] [class*="author"],
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm"] [class*="reviewer"],
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm-carousel"] [class*="author"],
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm-carousel"] [class*="reviewer"] {
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm"] [class*="author"],
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm"] [class*="reviewer"],
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm-carousel"] [class*="author"],
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm-carousel"] [class*="reviewer"] {
   font-size: 0.875rem !important;
   color: #1a1a1a !important;
   margin: 0 0 0.5rem 0 !important;
   padding-right: 5rem;
 }
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm"] [class*="verified"],
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm-carousel"] [class*="verified"] {
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm"] [class*="verified"],
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm-carousel"] [class*="verified"] {
   color: #888 !important;
   font-weight: 400 !important;
 }
 
 /* Stars – black, more spacing below */
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm"] [class*="rating"],
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm"] [class*="stars"],
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm-carousel"] [class*="rating"],
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm-carousel"] [class*="stars"] {
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm"] [class*="rating"],
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm"] [class*="stars"],
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm-carousel"] [class*="rating"],
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm-carousel"] [class*="stars"] {
   margin-bottom: 0.6rem !important;
 }
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm"] [class*="star"],
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm"] .jdgm-rev__icon,
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm-carousel"] [class*="star"],
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm-carousel"] .jdgm-rev__icon {
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm"] [class*="star"],
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm"] .jdgm-rev__icon,
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm-carousel"] [class*="star"],
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm-carousel"] .jdgm-rev__icon {
   color: #1a1a1a !important;
   fill: #1a1a1a !important;
 }
 
 /* Review title – jdgm-rev__title, bold, spacious */
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm"] [class*="review-title"],
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm"] .jdgm-rev__title,
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm-carousel"] [class*="review-title"],
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm-carousel"] .jdgm-rev__title {
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm"] [class*="review-title"],
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm"] .jdgm-rev__title,
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm-carousel"] [class*="review-title"],
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm-carousel"] .jdgm-rev__title {
   font-weight: 600 !important;
   font-size: 1rem !important;
   color: #1a1a1a !important;
@@ -162,12 +214,18 @@ body.template-index #shopify-section-176943494681be9f0a [class*="jdgm-carousel"]
 }
 
 /* Review body – jdgm-carousel-item__review-body, spacious */
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm"] [class*="review-body"],
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm"] [class*="body"],
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm"] .jdgm-rev__body,
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm-carousel-item__review-body"],
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm-carousel"] [class*="review-body"],
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm-carousel"] .jdgm-rev__body {
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm"] [class*="review-body"],
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm"] [class*="body"],
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm"] .jdgm-rev__body,
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm-carousel-item__review-body"],
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm-carousel"] [class*="review-body"],
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm-carousel"] .jdgm-rev__body {
   font-size: 0.9375rem !important;
   color: #1a1a1a !important;
   line-height: 1.55 !important;
@@ -176,10 +234,14 @@ body.template-index #shopify-section-176943494681be9f0a [class*="jdgm-carousel"]
 }
 
 /* Product row – bottom, generous spacing, jdgm-rev__pic-img for image */
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm"] [class*="product"],
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm"] [class*="product-name"],
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm-carousel"] [class*="product"],
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm-carousel"] [class*="product-name"] {
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm"] [class*="product"],
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm"] [class*="product-name"],
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm-carousel"] [class*="product"],
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm-carousel"] [class*="product-name"] {
   margin-top: 1.25rem !important;
   padding-top: 1rem !important;
   border-top: 1px solid #eee !important;
@@ -189,9 +251,12 @@ body.template-index #shopify-section-176943494681be9f0a [class*="jdgm-carousel"]
   align-items: center !important;
   gap: 0.6rem !important;
 }
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm"] [class*="product"] img,
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm"] .jdgm-rev__pic-img,
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm-carousel"] [class*="product"] img {
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm"] [class*="product"] img,
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm"] .jdgm-rev__pic-img,
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm-carousel"] [class*="product"] img {
   width: 44px !important;
   height: 44px !important;
   min-width: 44px;
@@ -200,16 +265,26 @@ body.template-index #shopify-section-176943494681be9f0a [class*="jdgm-carousel"]
 }
 
 /* Prev/Next arrows – circular, light grey, overlapping sides */
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm"] [class*="prev"],
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm"] [class*="next"],
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm"] button[aria-label*="Previous"],
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm"] button[aria-label*="Next"],
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm-carousel"] [class*="prev"],
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm-carousel"] [class*="next"],
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm-carousel"] button[aria-label*="Previous"],
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm-carousel"] button[aria-label*="Next"],
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm-carousel"] .slick-prev,
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm-carousel"] .slick-next {
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm"] [class*="prev"],
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm"] [class*="next"],
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm"] button[aria-label*="Previous"],
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm"] button[aria-label*="Next"],
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm-carousel"] [class*="prev"],
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm-carousel"] [class*="next"],
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm-carousel"] button[aria-label*="Previous"],
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm-carousel"] button[aria-label*="Next"],
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm-carousel"] .slick-prev,
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm-carousel"] .slick-next {
   position: absolute !important;
   top: 50% !important;
   transform: translateY(-50%) !important;
@@ -226,64 +301,96 @@ body.template-index #shopify-section-176943494681be9f0a [class*="jdgm-carousel"]
   z-index: 3;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm"] [class*="prev"],
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm"] button[aria-label*="Previous"],
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm-carousel"] [class*="prev"],
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm-carousel"] button[aria-label*="Previous"],
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm-carousel"] .slick-prev {
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm"] [class*="prev"],
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm"] button[aria-label*="Previous"],
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm-carousel"] [class*="prev"],
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm-carousel"] button[aria-label*="Previous"],
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm-carousel"] .slick-prev {
   left: 1.5rem !important;
 }
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm"] [class*="next"],
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm"] button[aria-label*="Next"],
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm-carousel"] [class*="next"],
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm-carousel"] button[aria-label*="Next"],
-body.template-index #shopify-section-176943494681be9f0a [class*="jdgm-carousel"] .slick-next {
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm"] [class*="next"],
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm"] button[aria-label*="Next"],
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm-carousel"] [class*="next"],
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm-carousel"] button[aria-label*="Next"],
+body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm-carousel"] .slick-next {
   right: 1.5rem !important;
 }
 
 @media (max-width: 1024px) {
-  body.template-index #shopify-section-176943494681be9f0a [class*="jdgm"] [class*="carousel-item"],
-  body.template-index #shopify-section-176943494681be9f0a [class*="jdgm"] .jdgm-rev,
-  body.template-index #shopify-section-176943494681be9f0a [class*="jdgm-carousel"] [class*="carousel-item"],
-  body.template-index #shopify-section-176943494681be9f0a [class*="jdgm-carousel"] .jdgm-rev,
-  body.template-index #shopify-section-176943494681be9f0a .slick-slide > div {
+  body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm"] [class*="carousel-item"],
+  body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm"] .jdgm-rev,
+  body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm-carousel"] [class*="carousel-item"],
+  body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm-carousel"] .jdgm-rev,
+  body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) .slick-slide > div {
     min-width: 300px;
     width: 300px !important;
   }
 }
 
 @media (max-width: 768px) {
-  body.template-index #shopify-section-176943494681be9f0a {
+  body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) {
     padding: 2rem 0 !important;
   }
-  body.template-index #shopify-section-176943494681be9f0a > div {
+  body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) > div {
     padding: 0 1rem !important;
   }
-  body.template-index #shopify-section-176943494681be9f0a [class*="jdgm"] [class*="carousel-item"],
-  body.template-index #shopify-section-176943494681be9f0a [class*="jdgm"] .jdgm-rev,
-  body.template-index #shopify-section-176943494681be9f0a [class*="jdgm-carousel"] [class*="carousel-item"],
-  body.template-index #shopify-section-176943494681be9f0a [class*="jdgm-carousel"] .jdgm-rev,
-  body.template-index #shopify-section-176943494681be9f0a .slick-slide > div {
+  body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm"] [class*="carousel-item"],
+  body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm"] .jdgm-rev,
+  body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm-carousel"] [class*="carousel-item"],
+  body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm-carousel"] .jdgm-rev,
+  body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) .slick-slide > div {
     min-width: 280px;
     width: 280px !important;
     min-height: 340px;
     padding: 1.5rem 1.25rem !important;
   }
-  body.template-index #shopify-section-176943494681be9f0a [class*="jdgm"] [class*="track"],
-  body.template-index #shopify-section-176943494681be9f0a [class*="jdgm"] .slick-list,
-  body.template-index #shopify-section-176943494681be9f0a [class*="jdgm-carousel"] [class*="track"],
-  body.template-index #shopify-section-176943494681be9f0a [class*="jdgm-carousel"] .slick-list {
+  body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm"] [class*="track"],
+  body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm"] .slick-list,
+  body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm-carousel"] [class*="track"],
+  body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm-carousel"] .slick-list {
     margin: 0 2.75rem !important;
     width: calc(100% - 5.5rem) !important;
   }
-  body.template-index #shopify-section-176943494681be9f0a [class*="jdgm"] [class*="prev"],
-  body.template-index #shopify-section-176943494681be9f0a [class*="jdgm-carousel"] [class*="prev"],
-  body.template-index #shopify-section-176943494681be9f0a [class*="jdgm-carousel"] .slick-prev {
+  body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm"] [class*="prev"],
+  body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm-carousel"] [class*="prev"],
+  body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm-carousel"] .slick-prev {
     left: 0.75rem !important;
   }
-  body.template-index #shopify-section-176943494681be9f0a [class*="jdgm"] [class*="next"],
-  body.template-index #shopify-section-176943494681be9f0a [class*="jdgm-carousel"] [class*="next"],
-  body.template-index #shopify-section-176943494681be9f0a [class*="jdgm-carousel"] .slick-next {
+  body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm"] [class*="next"],
+  body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm-carousel"] [class*="next"],
+  body.template-index .shopify-section:has([class*="jdgm"]),
+body.template-index .shopify-section:has([class*="judge-me"]) [class*="jdgm-carousel"] .slick-next {
     right: 0.75rem !important;
   }
 }
