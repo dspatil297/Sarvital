@@ -412,7 +412,7 @@
               var qty = (data && (data.quantity != null)) ? data.quantity : 1;
               function done() {
                 document.dispatchEvent(new CustomEvent('cart:updated'));
-                if (typeof window.openCartDrawer === 'function') window.openCartDrawer();
+                // Do not open side cart on add — let user continue shopping; they can open cart via header icon
               }
               if (!key) {
                 fetch('/cart.js').then(function(r) { return r.json(); }).then(function(cart) {

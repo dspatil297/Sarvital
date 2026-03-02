@@ -1812,7 +1812,7 @@
         }).then(function(res) { return res.json().then(function(data) { return { ok: res.ok, data: data }; }); }).then(function(result) {
           if (result.ok) {
             document.dispatchEvent(new CustomEvent('cart:updated'));
-            if (typeof window.openCartDrawer === 'function') window.openCartDrawer();
+            // Do not open side cart on add — let user continue shopping; they can open cart via header icon
           } else {
             if (result.data && result.data.message) {
               alert(result.data.message);
