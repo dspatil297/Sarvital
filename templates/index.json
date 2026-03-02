@@ -238,6 +238,46 @@
         "promise_text": "Every product is lab-tested, certified, and guaranteed to meet our premium quality standards."
       }
     },
+    "176943494681be9f0a": {
+      "type": "apps",
+      "blocks": {
+        "judge_me_reviews_cards_carousel_V4bCgm": {
+          "type": "shopify://apps/judge-me-reviews/blocks/cards_carousel/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8",
+          "settings": {
+            "show_sample_reviews": true,
+            "reviews_selection": "all",
+            "products": [],
+            "star_rating": "4_to_5_star",
+            "show_review_media": false,
+            "display_order": "media_first",
+            "no_image_fallback": "review_text_only",
+            "max_reviews": 20,
+            "review_length": "medium",
+            "text_size": "medium",
+            "image_ratio": "1",
+            "reviews_shown": 3,
+            "show_reviewer_name": true,
+            "show_product_name": true,
+            "hide_arrows_mobile": true,
+            "arrows_position": "sides",
+            "max_width": 1100,
+            "corner_styling": "soft",
+            "header_text_color": "#2d5016",
+            "text_color": "#1a1a1a",
+            "card_color": "#ffffff",
+            "stars_color": "#4a7c2c",
+            "arrows_color": "#1a1a1a",
+            "transition_speed": 5,
+            "header_text": "What Our Customers Say",
+            "show_average_rating": false
+          }
+        }
+      },
+      "block_order": [
+        "judge_me_reviews_cards_carousel_V4bCgm"
+      ],
+      "settings": {}
+    },
     "home_faq": {
       "type": "home-faq",
       "settings": {
@@ -251,6 +291,7 @@
     "featured_products",
     "lifestyle_usage",
     "quality_assurance",
+    "176943494681be9f0a",
     "home_faq"
   ]
 }
