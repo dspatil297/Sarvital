@@ -1839,6 +1839,9 @@
       productForm.addEventListener('submit', function(e) {
         var submitBtn = e.target.querySelector('button[type="submit"][name="add"]');
         var isSticky = e.submitter && e.submitter.id === 'sticky-add-to-cart';
+        var hasReturnToCheckout = productForm.querySelector('input[name="return_to"][value="/checkout"]');
+        // If Buy Now has added return_to=/checkout, let the normal form submit so Shopify redirects to checkout
+        if (hasReturnToCheckout) return;
         if (!submitBtn && !isSticky) return;
         var idInput = productForm.querySelector('input[name="id"], select[name="id"]');
         var qtyInput = productForm.querySelector('input[name="quantity"]');
