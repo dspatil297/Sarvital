@@ -500,6 +500,27 @@
           e.stopPropagation();
           doProductCardAddToCart(e.target);
         }, true);
+        // On load: if product is already in cart, show quantity row on each product card
+        function syncProductCardsWithCart() {
+          fetch('/cart.js').then(function(r) { return r.json(); }).then(function(cart) {
+            var items = cart.items || [];
+            var forms = document.querySelectorAll('form.product-card__form');
+            for (var i = 0; i < forms.length; i++) {
+              var form = forms[i];
+              var idInput = form.querySelector('input[name="id"]');
+              var variantId = idInput ? idInput.value : null;
+              if (!variantId) continue;
+              var item = items.find(function(it) { return String(it.variant_id) === String(variantId) || String(it.id) === String(variantId); });
+              if (item) showProductCardQtyRow(form, item.key, item.quantity);
+            }
+          }).catch(function() {});
+        }
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', syncProductCardsWithCart);
+        } else {
+          syncProductCardsWithCart();
+        }
+        document.addEventListener('cart:updated', syncProductCardsWithCart);
       })();
     </script>
     {%- comment -%} Product page: thumbnail gallery + zoom lightbox (inline so it always runs after DOM) {%- endcomment -%}
