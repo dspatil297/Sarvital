@@ -1710,6 +1710,7 @@
     var variantSelect = document.getElementById('product-variant-select');
     var configEl = document.querySelector('#product-form [data-product-config]');
     var isGst5 = configEl && configEl.getAttribute('data-gst5') === 'true';
+    var initialCart = {{ cart | json }};
     
     for (var bi = 0; bi < variantButtons.length; bi++) {
       (function(btn) {
@@ -1745,6 +1746,24 @@
       if (!idInput) return null;
       if (idInput.tagName === 'SELECT') return idInput.value || (idInput.options[idInput.selectedIndex] && idInput.options[idInput.selectedIndex].value);
       return idInput.value;
+    }
+    function syncProductFormWithInitialCart() {
+      if (!productForm || !initialCart) return;
+      var variantId = getCurrentVariantIdFromForm();
+      if (!variantId) return;
+      var qtyInput = productForm.querySelector('input[name="quantity"]');
+      if (!qtyInput) return;
+      var items = initialCart.items || [];
+      var item = items.find(function(i) { return String(i.variant_id) === String(variantId) || String(i.id) === String(variantId); });
+      if (item) {
+        qtyInput.value = Math.min(Math.max(item.quantity, 1), parseInt(qtyInput.getAttribute('max'), 10) || 10);
+        productForm.setAttribute('data-line-key', item.key);
+        productForm.setAttribute('data-line-key-variant-id', String(variantId));
+      } else {
+        qtyInput.value = 1;
+        productForm.removeAttribute('data-line-key');
+        productForm.removeAttribute('data-line-key-variant-id');
+      }
     }
     function syncProductFormWithCart() {
       if (!productForm) return;
@@ -1963,6 +1982,8 @@
         variantSelect.dispatchEvent(new Event('change'));
       }
       // Sync quantity with cart (show existing cart qty for this variant)
+      syncProductFormWithInitialCart();
+      // Then refresh from latest AJAX cart (in case cart changed after page render)
       syncProductFormWithCart();
     }
 
