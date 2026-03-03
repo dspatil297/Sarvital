@@ -1907,15 +1907,50 @@
     var buyNowBtn = document.getElementById('buy-now-btn');
     if (buyNowBtn) {
       buyNowBtn.addEventListener('click', function() {
-        var form = document.getElementById('product-form');
-        if (form) {
-          var buyNowInput = document.createElement('input');
-          buyNowInput.type = 'hidden';
-          buyNowInput.name = 'return_to';
-          buyNowInput.value = '/checkout';
-          form.appendChild(buyNowInput);
-          var submitBtn = form.querySelector('button[type="submit"]');
-          if (submitBtn) submitBtn.click();
+        if (!productForm) return;
+        var idInput = productForm.querySelector('input[name="id"], select[name="id"]');
+        var qtyInput = productForm.querySelector('input[name="quantity"]');
+        var variantId = idInput ? (idInput.value || (idInput.options && idInput.options[idInput.selectedIndex] && idInput.options[idInput.selectedIndex].value)) : null;
+        var quantity = (qtyInput && parseInt(qtyInput.value, 10)) || 1;
+        if (!variantId || quantity <= 0) return;
+        var originalText = buyNowBtn.textContent;
+        buyNowBtn.disabled = true;
+        buyNowBtn.textContent = 'Processing...';
+        var lineKey = productForm.getAttribute('data-line-key');
+        var lineKeyVariantId = productForm.getAttribute('data-line-key-variant-id');
+        var isUpdate = lineKey && lineKeyVariantId && String(lineKeyVariantId) === String(variantId);
+        function goCheckout() {
+          window.location.href = '/checkout';
+        }
+        function fail(msg) {
+          alert(msg || 'Could not start checkout. Please try again.');
+          buyNowBtn.disabled = false;
+          buyNowBtn.textContent = originalText;
+        }
+        if (isUpdate) {
+          fetch('/cart/change.js', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: lineKey, quantity: quantity })
+          }).then(function(res) { return res.json().then(function(data) { return { ok: res.ok, data: data }; }); }).then(function(result) {
+            if (result.ok) {
+              goCheckout();
+            } else {
+              fail(result.data && (result.data.description || result.data.message));
+            }
+          }).catch(function() { fail(); });
+        } else {
+          fetch('/cart/add.js', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: variantId, quantity: quantity })
+          }).then(function(res) { return res.json().then(function(data) { return { ok: res.ok, data: data }; }); }).then(function(result) {
+            if (result.ok) {
+              goCheckout();
+            } else {
+              fail(result.data && result.data.message);
+            }
+          }).catch(function() { fail(); });
         }
       });
     }
