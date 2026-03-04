@@ -467,10 +467,14 @@
             var newQty = action === 'increase' ? (cur < max ? cur + 1 : cur) : (cur > 0 ? cur - 1 : 0);
             if (action === 'increase' && cur >= max) return;
             btn.disabled = true;
+            // Prefer updating cart line by variant id for broader compatibility; fall back to line key if needed
+            var idInput = form.querySelector('input[name=\"id\"]');
+            var variantId = idInput ? idInput.value : null;
+            var changePayload = { id: variantId || lineKey, quantity: newQty };
             fetch('/cart/change.js', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ id: lineKey, quantity: newQty })
+              body: JSON.stringify(changePayload)
             }).then(function(r) { return r.json().then(function(data) { return { ok: r.ok, data: data }; }); }).then(function(result) {
               if (result.ok) {
                 inp.value = newQty;
