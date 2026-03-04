@@ -69,7 +69,7 @@
       <label for="qty-{{ product.id }}" class="product-card__qty-label">Qty</label>
       <div class="product-card__quantity-selector">
         <button type="button" class="product-card__qty-btn" data-action="decrease" aria-label="Decrease quantity">−</button>
-        <input type="number" id="qty-{{ product.id }}" name="quantity" value="1" min="0" max="10" class="product-card__qty-input" aria-label="Quantity">
+        <input type="number" id="qty-{{ product.id }}" name="quantity" value="1" min="0" max="10" class="product-card__qty-input" aria-label="Quantity" readonly>
         <button type="button" class="product-card__qty-btn" data-action="increase" aria-label="Increase quantity">+</button>
       </div>
     </div>
