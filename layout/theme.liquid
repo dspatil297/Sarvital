@@ -90,6 +90,54 @@
       }
     })();
     </script>
+    {%- comment -%} GoKwik: intercept checkout clicks and open cart drawer (or their checkout API) so popup works instead of redirect. {%- endcomment -%}
+    <script>
+    (function() {
+      function openGokwikCheckout() {
+        if (typeof window.KwikCheckout !== 'undefined') {
+          if (typeof window.KwikCheckout.open === 'function') { window.KwikCheckout.open(); return; }
+          if (typeof window.KwikCheckout.show === 'function') { window.KwikCheckout.show(); return; }
+        }
+        if (typeof window.GoKwik !== 'undefined' && typeof window.GoKwik.openCheckout === 'function') {
+          window.GoKwik.openCheckout(); return;
+        }
+        document.dispatchEvent(new CustomEvent('gokwik-open-checkout'));
+        if (typeof window.KwikCart !== 'undefined') {
+          if (typeof window.KwikCart.open === 'function') window.KwikCart.open();
+          if (typeof window.KwikCart.show === 'function') window.KwikCart.show();
+          if (typeof window.KwikCart.openCart === 'function') window.KwikCart.openCart();
+          return;
+        }
+        if (typeof window.openCartDrawer === 'function') {
+          window.openCartDrawer();
+        } else {
+          var url = new URL(window.location.href);
+          url.searchParams.set('open_cart', '1');
+          url.searchParams.set('openCart', '1');
+          window.location.href = url.pathname + url.search;
+        }
+      }
+      window.openGokwikCheckout = openGokwikCheckout;
+      document.addEventListener('click', function(e) {
+        var t = e.target;
+        while (t && t !== document.body) {
+          if (t.nodeName === 'A' && (t.getAttribute('href') === '/checkout' || (t.getAttribute('href') || '').indexOf('/checkout') !== -1)) {
+            e.preventDefault();
+            e.stopPropagation();
+            openGokwikCheckout();
+            return;
+          }
+          if (t.id === 'cart-checkout-btn' || t.getAttribute('data-gokwik-checkout') === 'true') {
+            e.preventDefault();
+            e.stopPropagation();
+            openGokwikCheckout();
+            return;
+          }
+          t = t.parentElement;
+        }
+      }, true);
+    })();
+    </script>
     {%- comment -%} openCartDrawer for add-to-cart only. Cart icon uses normal link so GoKwik opens on load (no freeze). {%- endcomment -%}
     <script>
     (function() {

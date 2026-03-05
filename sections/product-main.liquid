@@ -1919,17 +1919,28 @@
         var lineKey = productForm.getAttribute('data-line-key');
         var lineKeyVariantId = productForm.getAttribute('data-line-key-variant-id');
         var isUpdate = lineKey && lineKeyVariantId && String(lineKeyVariantId) === String(variantId);
-        /** Open GoKwik checkout: simulate click on /checkout link so GoKwik app can intercept and show popup. */
+        /** Open GoKwik checkout popup or cart drawer (theme intercept in theme.liquid also opens drawer for /checkout links). */
         function goCheckout() {
-          var a = document.createElement('a');
-          a.href = '/checkout';
-          a.setAttribute('data-gokwik-checkout', 'true');
-          a.style.cssText = 'position:absolute;left:-9999px;';
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
           buyNowBtn.disabled = false;
           buyNowBtn.textContent = originalText;
+          if (typeof window.openGokwikCheckout === 'function') {
+            window.openGokwikCheckout();
+            return;
+          }
+          if (typeof window.KwikCart !== 'undefined') {
+            if (typeof window.KwikCart.open === 'function') window.KwikCart.open();
+            if (typeof window.KwikCart.show === 'function') window.KwikCart.show();
+            if (typeof window.KwikCart.openCart === 'function') window.KwikCart.openCart();
+            return;
+          }
+          if (typeof window.openCartDrawer === 'function') {
+            window.openCartDrawer();
+          } else {
+            var url = new URL(window.location.href);
+            url.searchParams.set('open_cart', '1');
+            url.searchParams.set('openCart', '1');
+            window.location.href = url.pathname + url.search;
+          }
         }
         function fail(msg) {
           alert(msg || 'Could not start checkout. Please try again.');
