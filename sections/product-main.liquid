@@ -1919,8 +1919,17 @@
         var lineKey = productForm.getAttribute('data-line-key');
         var lineKeyVariantId = productForm.getAttribute('data-line-key-variant-id');
         var isUpdate = lineKey && lineKeyVariantId && String(lineKeyVariantId) === String(variantId);
+        /** Open GoKwik checkout: simulate click on /checkout link so GoKwik app can intercept and show popup. */
         function goCheckout() {
-          window.location.href = '/checkout';
+          var a = document.createElement('a');
+          a.href = '/checkout';
+          a.setAttribute('data-gokwik-checkout', 'true');
+          a.style.cssText = 'position:absolute;left:-9999px;';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          buyNowBtn.disabled = false;
+          buyNowBtn.textContent = originalText;
         }
         function fail(msg) {
           alert(msg || 'Could not start checkout. Please try again.');

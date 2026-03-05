@@ -176,9 +176,10 @@
               {% comment %} Delivery date will be shown on order confirmation page {% endcomment %}
               
               <div class="cart-summary__actions">
-                <button type="submit" name="checkout" class="btn btn-primary btn-large cart-summary__checkout">
+                {% comment %} Link to /checkout so GoKwik can intercept click and open checkout popup (theme checkout button disabled). {% endcomment %}
+                <a href="/checkout" class="btn btn-primary btn-large cart-summary__checkout" id="cart-checkout-btn" data-gokwik-checkout="true">
                   Proceed to Checkout
-                </button>
+                </a>
                 <a href="{{ routes.all_products_collection_url }}" class="cart-summary__continue">
                   Continue Shopping
                 </a>
