@@ -1923,6 +1923,10 @@
         function goCheckout() {
           buyNowBtn.disabled = false;
           buyNowBtn.textContent = originalText;
+          if (typeof window.triggerGoKwikCheckout === 'function') {
+            window.triggerGoKwikCheckout();
+            return;
+          }
           if (typeof window.openGokwikCheckout === 'function') {
             window.openGokwikCheckout();
             return;

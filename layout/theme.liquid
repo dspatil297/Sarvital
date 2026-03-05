@@ -121,23 +121,30 @@
       }
     })();
     </script>
-    {%- comment -%} GoKwik: intercept checkout clicks and open cart drawer (or their checkout API) so popup works instead of redirect. {%- endcomment -%}
+    {%- comment -%} GoKwik: block default Shopify checkout; only trigger GoKwik (popup/drawer). {%- endcomment -%}
     <script>
     (function() {
-      function openGokwikCheckout() {
-        if (typeof window.KwikCheckout !== 'undefined') {
+      function triggerGoKwikCheckout(event) {
+        if (event) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        if (typeof window.gokwikCheckout !== 'undefined' && window.gokwikCheckout && typeof window.gokwikCheckout.open === 'function') {
+          window.gokwikCheckout.open();
+          return;
+        }
+        if (typeof window.GoKwik !== 'undefined' && window.GoKwik && typeof window.GoKwik.openCheckout === 'function') {
+          window.GoKwik.openCheckout();
+          return;
+        }
+        if (typeof window.KwikCheckout !== 'undefined' && window.KwikCheckout) {
           if (typeof window.KwikCheckout.open === 'function') { window.KwikCheckout.open(); return; }
           if (typeof window.KwikCheckout.show === 'function') { window.KwikCheckout.show(); return; }
+          if (typeof window.KwikCheckout.init === 'function') { window.KwikCheckout.init(); return; }
         }
-        if (typeof window.GoKwik !== 'undefined' && typeof window.GoKwik.openCheckout === 'function') {
-          window.GoKwik.openCheckout(); return;
-        }
-        if (typeof window.gokwikCheckout !== 'undefined' && typeof window.gokwikCheckout.init === 'function') {
-          window.gokwikCheckout.init(); return;
-        }
-        var gkBtn = document.querySelector('[data-gokwik-checkout], [data-gkc], .gokwik-checkout-btn, #gokwik-checkout-btn');
-        if (gkBtn) {
-          gkBtn.click();
+        var gkTrigger = document.querySelector('[data-gokwik-trigger], [data-gokwik-checkout], [data-gkc], .gokwik-checkout-btn, #gokwik-checkout-btn');
+        if (gkTrigger) {
+          gkTrigger.click();
           return;
         }
         document.dispatchEvent(new CustomEvent('gokwik-open-checkout'));
@@ -149,39 +156,61 @@
         }
         if (typeof window.openCartDrawer === 'function') {
           window.openCartDrawer();
-        } else {
-          var url = new URL(window.location.href);
-          url.searchParams.set('open_cart', '1');
-          url.searchParams.set('openCart', '1');
-          window.location.href = url.pathname + url.search;
+          return;
         }
+        var url = new URL(window.location.href);
+        url.searchParams.set('open_cart', '1');
+        url.searchParams.set('openCart', '1');
+        window.location.href = url.pathname + url.search;
       }
-      window.openGokwikCheckout = openGokwikCheckout;
+      window.triggerGoKwikCheckout = triggerGoKwikCheckout;
+      window.openGokwikCheckout = function() { triggerGoKwikCheckout(); };
+
       document.addEventListener('click', function(e) {
         var t = e.target;
         while (t && t !== document.body) {
           if (t.id === 'cart-checkout-btn' || t.getAttribute('data-gokwik-checkout') === 'true') {
             e.preventDefault();
             e.stopPropagation();
-            openGokwikCheckout();
+            triggerGoKwikCheckout(e);
             return;
           }
           if (t.nodeName === 'A' && (t.getAttribute('href') === '/checkout' || (t.getAttribute('href') || '').indexOf('/checkout') !== -1)) {
             e.preventDefault();
             e.stopPropagation();
-            openGokwikCheckout();
+            triggerGoKwikCheckout(e);
+            return;
+          }
+          if ((t.nodeName === 'BUTTON' || t.nodeName === 'INPUT') && t.getAttribute('name') === 'checkout') {
+            e.preventDefault();
+            e.stopPropagation();
+            triggerGoKwikCheckout(e);
             return;
           }
           t = t.parentElement;
         }
       }, true);
+
+      document.addEventListener('submit', function(e) {
+        var form = e.target;
+        if (!form || form.nodeName !== 'FORM') return;
+        var action = (form.getAttribute('action') || '').toLowerCase();
+        var submitter = e.submitter;
+        if (action.indexOf('checkout') !== -1 || (submitter && (submitter.getAttribute('name') === 'checkout' || submitter.name === 'checkout'))) {
+          e.preventDefault();
+          e.stopPropagation();
+          triggerGoKwikCheckout(e);
+          return false;
+        }
+      }, true);
+
       document.addEventListener('DOMContentLoaded', function() {
         var cartBtn = document.getElementById('cart-checkout-btn');
         if (cartBtn) {
           cartBtn.addEventListener('click', function(ev) {
             ev.preventDefault();
             ev.stopPropagation();
-            openGokwikCheckout();
+            triggerGoKwikCheckout(ev);
           });
         }
       });
