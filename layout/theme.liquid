@@ -90,6 +90,37 @@
       }
     })();
     </script>
+    {%- comment -%} GoKwik: debug – add ?gokwik_debug=1 to any page URL and check console for exposed globals. {%- endcomment -%}
+    <script>
+    (function() {
+      if (typeof window.location !== 'undefined' && window.location.search.indexOf('gokwik_debug=1') !== -1) {
+        function logGokwik() {
+          var w = window;
+          console.log('[GoKwik debug] Globals (check after page + app scripts load):', {
+            GoKwik: w.GoKwik,
+            KwikCheckout: w.KwikCheckout,
+            gokwik: w.gokwik,
+            kwikCheckout: w.kwikCheckout,
+            gokwikCheckout: w.gokwikCheckout,
+            KwikCart: w.KwikCart
+          });
+          if (w.KwikCheckout && typeof w.KwikCheckout === 'object') {
+            console.log('[GoKwik debug] KwikCheckout keys:', Object.keys(w.KwikCheckout));
+          }
+          if (w.GoKwik && typeof w.GoKwik === 'object') {
+            console.log('[GoKwik debug] GoKwik keys:', Object.keys(w.GoKwik));
+          }
+          var btn = document.querySelector('[data-gokwik-checkout], [data-gkc], [class*="gokwik"][class*="checkout"], [id*="gokwik"][id*="checkout"]');
+          console.log('[GoKwik debug] Checkout element in DOM:', btn);
+        }
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', function() { setTimeout(logGokwik, 1500); });
+        } else {
+          setTimeout(logGokwik, 1500);
+        }
+      }
+    })();
+    </script>
     {%- comment -%} GoKwik: intercept checkout clicks and open cart drawer (or their checkout API) so popup works instead of redirect. {%- endcomment -%}
     <script>
     (function() {
@@ -100,6 +131,14 @@
         }
         if (typeof window.GoKwik !== 'undefined' && typeof window.GoKwik.openCheckout === 'function') {
           window.GoKwik.openCheckout(); return;
+        }
+        if (typeof window.gokwikCheckout !== 'undefined' && typeof window.gokwikCheckout.init === 'function') {
+          window.gokwikCheckout.init(); return;
+        }
+        var gkBtn = document.querySelector('[data-gokwik-checkout], [data-gkc], .gokwik-checkout-btn, #gokwik-checkout-btn');
+        if (gkBtn) {
+          gkBtn.click();
+          return;
         }
         document.dispatchEvent(new CustomEvent('gokwik-open-checkout'));
         if (typeof window.KwikCart !== 'undefined') {
