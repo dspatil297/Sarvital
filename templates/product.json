@@ -48,6 +48,25 @@
         "view_all_text": "View All Products"
       }
     },
+    "177278119430235932": {
+      "type": "apps",
+      "blocks": {
+        "kwik_cod_checkout_buy_now_button_L7hTtN": {
+          "type": "shopify://apps/kwik-cod-checkout/blocks/buy_now_button/74f36c20-677c-4aa2-b179-1769aa61abaa",
+          "settings": {
+            "gkc_button_text": "Buy Now",
+            "gkc_button_subtext": "",
+            "gkc_button_bg": "#000000",
+            "gkc_text_color": "#ffffff",
+            "gk_image": true
+          }
+        }
+      },
+      "block_order": [
+        "kwik_cod_checkout_buy_now_button_L7hTtN"
+      ],
+      "settings": {}
+    },
     "product_faq": {
       "type": "product-faq",
       "settings": {}
@@ -103,6 +122,7 @@
     "product_trust_badges_compact",
     "product_image_banner",
     "related_products",
+    "177278119430235932",
     "product_faq",
     "1769418164e60d6e16"
   ]
