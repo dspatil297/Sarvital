@@ -79,5 +79,24 @@
         "default": 4
       }
     ]
+  },
+  {
+    "name": "GoKwik",
+    "settings": [
+      {
+        "type": "header",
+        "content": "GoKwik theme helpers"
+      },
+      {
+        "type": "checkbox",
+        "id": "gokwik_theme_helpers_enabled",
+        "label": "Enable theme GoKwik helper code (drawer open + z-index + hide theme drawer)",
+        "default": true
+      },
+      {
+        "type": "paragraph",
+        "content": "Turn this OFF to test GoKwik with no custom theme helper scripts/styles. If GoKwik works only when this is OFF, our theme code is interfering."
+      }
+    ]
   }
 ]

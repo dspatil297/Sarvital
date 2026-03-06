@@ -63,112 +63,114 @@
 
     {% sections 'footer-group' %}
 
-    {%- comment -%} Theme cart drawer hidden. GoKwik drawer: ensure it stacks above theme (common app selectors). {%- endcomment -%}
-    <style>
-      #cart-drawer {
-        display: none !important;
-        visibility: hidden !important;
-        pointer-events: none !important;
-      }
-      [id*="kwik"], [id*="Kwik"], [class*="kwik-cart"], [class*="KwikCart"], [class*="gokwik"], [class*="slide-cart"] {
-        z-index: 999999 !important;
-      }
-    </style>
-    <script>
-    (function() {
-      function keepThemeCartClosed() {
-        var el = document.getElementById('cart-drawer');
-        if (el) {
-          el.classList.remove('active');
-          el.setAttribute('aria-hidden', 'true');
-          el.style.setProperty('display', 'none', 'important');
+    {% if settings.gokwik_theme_helpers_enabled %}
+      {%- comment -%} Theme cart drawer hidden. GoKwik drawer: ensure it stacks above theme (common app selectors). {%- endcomment -%}
+      <style>
+        #cart-drawer {
+          display: none !important;
+          visibility: hidden !important;
+          pointer-events: none !important;
         }
-      }
-      keepThemeCartClosed();
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', keepThemeCartClosed);
-      }
-    })();
-    </script>
-    {%- comment -%} openCartDrawer for add-to-cart only. Cart icon uses normal link so GoKwik opens on load (no freeze). {%- endcomment -%}
-    <script>
-    (function() {
-      if (!window.lockBodyScroll) {
-        window.lockBodyScroll = function() {
-          var scrollY = window.pageYOffset || document.documentElement.scrollTop;
-          document.body.style.position = 'fixed';
-          document.body.style.top = '-' + scrollY + 'px';
-          document.body.style.left = '0';
-          document.body.style.right = '0';
-          document.body.style.overflow = 'hidden';
-          document.body.setAttribute('data-scroll-position', String(scrollY));
-        };
-      }
-      if (!window.unlockBodyScroll) {
-        window.unlockBodyScroll = function() {
-          var scrollY = document.body.getAttribute('data-scroll-position') || '0';
-          document.body.style.position = '';
-          document.body.style.top = '';
-          document.body.style.left = '';
-          document.body.style.right = '';
-          document.body.style.overflow = '';
-          document.body.removeAttribute('data-scroll-position');
-          window.scrollTo(0, parseInt(scrollY, 10));
-        };
-      }
-      /** Open GoKwik drawer (after add-to-cart). Navigate to ?open_cart=1 so drawer opens on load. */
-      window.openCartDrawer = function() {
-        var url = new URL(window.location.href);
-        if (!url.searchParams.has('open_cart')) url.searchParams.set('open_cart', '1');
-        if (!url.searchParams.has('openCart')) url.searchParams.set('openCart', '1');
-        var newUrl = url.pathname + (url.search ? url.search : '');
-        window.location.href = newUrl;
-      };
-    })();
-    </script>
-    {%- comment -%} On load with open_cart/openCart: try every way to open GoKwik drawer; unfreeze after 4s if stuck. {%- endcomment -%}
-    <script>
-    (function() {
-      var q = window.location.search || '';
-      if (q.indexOf('open_cart=') === -1 && q.indexOf('openCart=') === -1) return;
-      var attempts = 0;
-      var maxAttempts = 25;
-      function tryOpen() {
-        attempts++;
-        if (typeof window.KwikCart !== 'undefined') {
-          if (typeof window.KwikCart.open === 'function') window.KwikCart.open();
-          if (typeof window.KwikCart.show === 'function') window.KwikCart.show();
-          if (typeof window.KwikCart.openCart === 'function') window.KwikCart.openCart();
+        [id*="kwik"], [id*="Kwik"], [class*="kwik-cart"], [class*="KwikCart"], [class*="gokwik"], [class*="slide-cart"] {
+          z-index: 999999 !important;
         }
-        if (attempts === 3) {
-          document.dispatchEvent(new CustomEvent('open-cart-drawer'));
-          document.dispatchEvent(new CustomEvent('openCart'));
-          document.dispatchEvent(new CustomEvent('cart:open'));
-        }
-        if (attempts < maxAttempts) setTimeout(tryOpen, 250);
-      }
-      function unfreezeIfNeeded() {
-        if (document.body && document.body.style && document.body.style.position === 'fixed') {
-          if (typeof window.unlockBodyScroll === 'function') window.unlockBodyScroll();
-          else {
-            document.body.style.position = '';
-            document.body.style.top = '';
-            document.body.style.overflow = '';
-            document.body.removeAttribute('data-scroll-position');
+      </style>
+      <script>
+      (function() {
+        function keepThemeCartClosed() {
+          var el = document.getElementById('cart-drawer');
+          if (el) {
+            el.classList.remove('active');
+            el.setAttribute('aria-hidden', 'true');
+            el.style.setProperty('display', 'none', 'important');
           }
         }
-      }
-      function run() {
-        tryOpen();
-        setTimeout(unfreezeIfNeeded, 4000);
-      }
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', run);
-      } else {
-        run();
-      }
-    })();
-    </script>
+        keepThemeCartClosed();
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', keepThemeCartClosed);
+        }
+      })();
+      </script>
+      {%- comment -%} openCartDrawer for add-to-cart only. Cart icon uses normal link so GoKwik opens on load (no freeze). {%- endcomment -%}
+      <script>
+      (function() {
+        if (!window.lockBodyScroll) {
+          window.lockBodyScroll = function() {
+            var scrollY = window.pageYOffset || document.documentElement.scrollTop;
+            document.body.style.position = 'fixed';
+            document.body.style.top = '-' + scrollY + 'px';
+            document.body.style.left = '0';
+            document.body.style.right = '0';
+            document.body.style.overflow = 'hidden';
+            document.body.setAttribute('data-scroll-position', String(scrollY));
+          };
+        }
+        if (!window.unlockBodyScroll) {
+          window.unlockBodyScroll = function() {
+            var scrollY = document.body.getAttribute('data-scroll-position') || '0';
+            document.body.style.position = '';
+            document.body.style.top = '';
+            document.body.style.left = '';
+            document.body.style.right = '';
+            document.body.style.overflow = '';
+            document.body.removeAttribute('data-scroll-position');
+            window.scrollTo(0, parseInt(scrollY, 10));
+          };
+        }
+        /** Open GoKwik drawer (after add-to-cart). Navigate to ?open_cart=1 so drawer opens on load. */
+        window.openCartDrawer = function() {
+          var url = new URL(window.location.href);
+          if (!url.searchParams.has('open_cart')) url.searchParams.set('open_cart', '1');
+          if (!url.searchParams.has('openCart')) url.searchParams.set('openCart', '1');
+          var newUrl = url.pathname + (url.search ? url.search : '');
+          window.location.href = newUrl;
+        };
+      })();
+      </script>
+      {%- comment -%} On load with open_cart/openCart: try every way to open GoKwik drawer; unfreeze after 4s if stuck. {%- endcomment -%}
+      <script>
+      (function() {
+        var q = window.location.search || '';
+        if (q.indexOf('open_cart=') === -1 && q.indexOf('openCart=') === -1) return;
+        var attempts = 0;
+        var maxAttempts = 25;
+        function tryOpen() {
+          attempts++;
+          if (typeof window.KwikCart !== 'undefined') {
+            if (typeof window.KwikCart.open === 'function') window.KwikCart.open();
+            if (typeof window.KwikCart.show === 'function') window.KwikCart.show();
+            if (typeof window.KwikCart.openCart === 'function') window.KwikCart.openCart();
+          }
+          if (attempts === 3) {
+            document.dispatchEvent(new CustomEvent('open-cart-drawer'));
+            document.dispatchEvent(new CustomEvent('openCart'));
+            document.dispatchEvent(new CustomEvent('cart:open'));
+          }
+          if (attempts < maxAttempts) setTimeout(tryOpen, 250);
+        }
+        function unfreezeIfNeeded() {
+          if (document.body && document.body.style && document.body.style.position === 'fixed') {
+            if (typeof window.unlockBodyScroll === 'function') window.unlockBodyScroll();
+            else {
+              document.body.style.position = '';
+              document.body.style.top = '';
+              document.body.style.overflow = '';
+              document.body.removeAttribute('data-scroll-position');
+            }
+          }
+        }
+        function run() {
+          tryOpen();
+          setTimeout(unfreezeIfNeeded, 4000);
+        }
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', run);
+        } else {
+          run();
+        }
+      })();
+      </script>
+    {% endif %}
 
     {%- comment -%} Move mobile menu drawer to end of body so it always stacks above hero/carousel {%- endcomment -%}
     <script>
