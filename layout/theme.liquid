@@ -124,6 +124,14 @@
     {%- comment -%} GoKwik: block default Shopify checkout; only trigger GoKwik (popup/drawer). {%- endcomment -%}
     <script>
     (function() {
+      // Hard-block Shopify checkout navigation (/checkout, /checkouts/*) from theme buttons/JS.
+      // If GoKwik doesn't open a popup, it might still redirect; this ensures our buttons never do.
+      function _isShopifyCheckoutUrl(u) {
+        if (!u) return false;
+        var s = String(u);
+        return s.indexOf('/checkouts/') !== -1 || s.indexOf('/checkout') !== -1;
+      }
+
       function triggerGoKwikCheckout(event) {
         if (event) {
           event.preventDefault();
@@ -166,24 +174,61 @@
       window.triggerGoKwikCheckout = triggerGoKwikCheckout;
       window.openGokwikCheckout = function() { triggerGoKwikCheckout(); };
 
+      // Block programmatic redirects (best-effort; some browsers restrict overriding).
+      (function() {
+        try {
+          var loc = window.location;
+          var _assign = loc.assign && loc.assign.bind(loc);
+          var _replace = loc.replace && loc.replace.bind(loc);
+          if (_assign) {
+            loc.assign = function(u) {
+              if (_isShopifyCheckoutUrl(u)) return triggerGoKwikCheckout();
+              return _assign(u);
+            };
+          }
+          if (_replace) {
+            loc.replace = function(u) {
+              if (_isShopifyCheckoutUrl(u)) return triggerGoKwikCheckout();
+              return _replace(u);
+            };
+          }
+        } catch (err) {}
+        try {
+          var _submit = HTMLFormElement && HTMLFormElement.prototype && HTMLFormElement.prototype.submit;
+          if (_submit) {
+            HTMLFormElement.prototype.submit = function() {
+              var action = (this.getAttribute('action') || '').toLowerCase();
+              if (action.indexOf('checkout') !== -1) {
+                triggerGoKwikCheckout();
+                return;
+              }
+              return _submit.apply(this, arguments);
+            };
+          }
+        } catch (err2) {}
+      })();
+
       document.addEventListener('click', function(e) {
         var t = e.target;
         while (t && t !== document.body) {
           if (t.id === 'cart-checkout-btn' || t.getAttribute('data-gokwik-checkout') === 'true') {
             e.preventDefault();
             e.stopPropagation();
+            if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
             triggerGoKwikCheckout(e);
             return;
           }
           if (t.nodeName === 'A' && (t.getAttribute('href') === '/checkout' || (t.getAttribute('href') || '').indexOf('/checkout') !== -1)) {
             e.preventDefault();
             e.stopPropagation();
+            if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
             triggerGoKwikCheckout(e);
             return;
           }
           if ((t.nodeName === 'BUTTON' || t.nodeName === 'INPUT') && t.getAttribute('name') === 'checkout') {
             e.preventDefault();
             e.stopPropagation();
+            if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
             triggerGoKwikCheckout(e);
             return;
           }
@@ -199,6 +244,7 @@
         if (action.indexOf('checkout') !== -1 || (submitter && (submitter.getAttribute('name') === 'checkout' || submitter.name === 'checkout'))) {
           e.preventDefault();
           e.stopPropagation();
+          if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
           triggerGoKwikCheckout(e);
           return false;
         }
