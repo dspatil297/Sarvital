@@ -171,6 +171,89 @@
       })();
       </script>
 
+      {%- comment -%} GoKwik cart drawer: make Checkout button open GoKwik popup instead of redirecting to Shopify checkout. {%- endcomment -%}
+      <script>
+      (function() {
+        'use strict';
+        function openGoKwikPopup() {
+          if (typeof window.buyNowCheckoutClick === 'function') {
+            try { window.buyNowCheckoutClick(); return true; } catch (e) {}
+          }
+          if (window.gokwikSdk && typeof window.gokwikSdk.initCheckout === 'function') {
+            try {
+              window.gokwikSdk.initCheckout(window.merchantInfo || window.merchantParams || {});
+              return true;
+            } catch (e) {}
+          }
+          if (window.KwikCheckout && typeof window.KwikCheckout.open === 'function') {
+            try { window.KwikCheckout.open(); return true; } catch (e) {}
+          }
+          if (window.GoKwik && typeof window.GoKwik.openCheckout === 'function') {
+            try { window.GoKwik.openCheckout(); return true; } catch (e) {}
+          }
+          return false;
+        }
+        function isInGoKwikCart(el) {
+          if (!el || !el.closest) return false;
+          return Boolean(el.closest('[id*="kwik"], [class*="kwik"], [class*="Kwik"], [id*="gokwik"], [class*="gokwik"], [class*="slide-cart"], [class*="slideCart"], [data-kwik-cart], [data-gokwik], [data-kwik]'));
+        }
+        function looksLikeCheckout(el) {
+          if (!el) return false;
+          var href = (el.getAttribute && el.getAttribute('href')) ? String(el.getAttribute('href')) : '';
+          if (href.indexOf('/checkout') !== -1 || href.indexOf('/checkouts/') !== -1) return true;
+          var name = (el.getAttribute && el.getAttribute('name')) ? String(el.getAttribute('name')) : '';
+          if (name && name.toLowerCase() === 'checkout') return true;
+          var id = (el.id != null) ? String(el.id).toLowerCase() : '';
+          var cls = (el.className != null) ? String(el.className).toLowerCase() : '';
+          if (id.indexOf('checkout') !== -1 || cls.indexOf('checkout') !== -1) return true;
+          var txt = (el.textContent || '').trim().toLowerCase();
+          return txt === 'checkout' || txt === 'checkout now' || txt.indexOf('checkout') !== -1;
+        }
+        document.addEventListener('click', function(e) {
+          var t = e.target;
+          var clickable = t && t.closest ? t.closest('a, button, input[type="submit"], input[type="button"], [role="button"]') : null;
+          if (!clickable || !looksLikeCheckout(clickable) || !isInGoKwikCart(clickable)) return;
+          e.preventDefault();
+          e.stopPropagation();
+          if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
+          openGoKwikPopup();
+        }, true);
+        var loc = window.location;
+        var nativeAssign = loc.assign && loc.assign.bind(loc);
+        var nativeReplace = loc.replace && loc.replace.bind(loc);
+        if (nativeAssign) {
+          loc.assign = function(u) {
+            var url = (u && String(u)) || '';
+            if (url.indexOf('/checkout') !== -1 || url.indexOf('/checkouts/') !== -1) {
+              openGoKwikPopup();
+              return;
+            }
+            nativeAssign(u);
+          };
+        }
+        if (nativeReplace) {
+          loc.replace = function(u) {
+            var url = (u && String(u)) || '';
+            if (url.indexOf('/checkout') !== -1 || url.indexOf('/checkouts/') !== -1) {
+              openGoKwikPopup();
+              return;
+            }
+            nativeReplace(u);
+          };
+        }
+        window.cartCheckoutClick = function() {
+          openGoKwikPopup();
+          return false;
+        };
+        var reapply = 0;
+        var tid = setInterval(function() {
+          reapply++;
+          window.cartCheckoutClick = function() { openGoKwikPopup(); return false; };
+          if (reapply >= 20) clearInterval(tid);
+        }, 500);
+      })();
+      </script>
+
     {% endif %}
 
     {%- comment -%} Move mobile menu drawer to end of body so it always stacks above hero/carousel {%- endcomment -%}
