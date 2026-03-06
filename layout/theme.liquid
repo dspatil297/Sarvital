@@ -170,6 +170,81 @@
         }
       })();
       </script>
+
+      {%- comment -%}
+        GoKwik drawer checkout override (best-effort):
+        Some GoKwik setups expose a storefront SDK `gokwikSdk.initCheckout(merchantInfo)` which opens their checkout popup.
+        We intercept ONLY clicks that look like "Checkout" inside GoKwik/Kwik cart drawer elements and call that SDK.
+      {%- endcomment -%}
+      <script>
+      (function() {
+        function isInGoKwikDrawer(el) {
+          if (!el || !el.closest) return false;
+          return Boolean(
+            el.closest('[id*="kwik"], [class*="kwik"], [class*="Kwik"], [id*="gokwik"], [class*="gokwik"], [class*="slide-cart"], [class*="slideCart"]')
+          );
+        }
+        function looksLikeCheckout(el) {
+          if (!el) return false;
+          var href = (el.getAttribute && el.getAttribute('href')) ? String(el.getAttribute('href')) : '';
+          if (href.indexOf('/checkout') !== -1 || href.indexOf('/checkouts/') !== -1) return true;
+          var name = (el.getAttribute && el.getAttribute('name')) ? String(el.getAttribute('name')) : '';
+          if (name.toLowerCase() === 'checkout') return true;
+          var id = (el.id || '').toLowerCase();
+          var cls = (el.className || '').toString().toLowerCase();
+          if (id.indexOf('checkout') !== -1 || cls.indexOf('checkout') !== -1) return true;
+          var txt = (el.textContent || '').trim().toLowerCase();
+          return txt === 'checkout' || txt === 'checkout now' || txt === 'proceed to checkout' || txt.indexOf('checkout') !== -1;
+        }
+        function openGoKwikPopup() {
+          var w = window;
+          // Pattern seen in 3rd party integrations: gokwikSdk.initCheckout(merchantInfo)
+          if (w.gokwikSdk && typeof w.gokwikSdk.initCheckout === 'function') {
+            var merchantInfo =
+              w.merchantInfo ||
+              w.merchantParams ||
+              w.gokwikMerchantInfo ||
+              w.__gokwikMerchantInfo ||
+              w.__merchantInfo ||
+              w.__merchantParams;
+            try {
+              w.gokwikSdk.initCheckout(merchantInfo);
+              return true;
+            } catch (e1) {
+              try {
+                w.gokwikSdk.initCheckout();
+                return true;
+              } catch (e2) {}
+            }
+          }
+          // Other possible globals
+          if (w.KwikCheckout && typeof w.KwikCheckout.open === 'function') { w.KwikCheckout.open(); return true; }
+          if (w.KwikCheckout && typeof w.KwikCheckout.show === 'function') { w.KwikCheckout.show(); return true; }
+          if (w.GoKwik && typeof w.GoKwik.openCheckout === 'function') { w.GoKwik.openCheckout(); return true; }
+          return false;
+        }
+        document.addEventListener('click', function(e) {
+          var t = e.target;
+          if (!t) return;
+          var clickable = t.closest ? t.closest('a, button, input[type="submit"], input[type="button"]') : null;
+          if (!clickable) return;
+          if (!isInGoKwikDrawer(clickable)) return;
+          if (!looksLikeCheckout(clickable)) return;
+
+          // Stop redirect to Shopify checkout from drawer button
+          e.preventDefault();
+          e.stopPropagation();
+          if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
+
+          var opened = openGoKwikPopup();
+          if (!opened) {
+            // If GoKwik doesn't expose a popup API, do nothing (prevents redirect loop).
+            // Merchant can still use GoKwik settings to enable popup, or revert this behavior by disabling helpers.
+            try { console.warn('[GoKwik] No popup API found (gokwikSdk/KwikCheckout/GoKwik).'); } catch (err) {}
+          }
+        }, true);
+      })();
+      </script>
     {% endif %}
 
     {%- comment -%} Move mobile menu drawer to end of body so it always stacks above hero/carousel {%- endcomment -%}
