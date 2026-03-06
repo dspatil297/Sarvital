@@ -796,7 +796,7 @@
 
           var isCheckout = (target.getAttribute && target.getAttribute('name') === 'checkout') ||
             (target.classList && target.classList.contains && target.classList.contains('checkout')) ||
-            (target.id && target.id.indexOf('checkout') !== -1) ||
+            (target.id != null && String(target.id).indexOf('checkout') !== -1) ||
             (target.textContent && target.textContent.trim().toLowerCase() === 'checkout') ||
             (target.textContent && target.textContent.trim().toLowerCase().indexOf('checkout') !== -1);
 
