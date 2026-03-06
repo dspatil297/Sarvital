@@ -753,5 +753,52 @@
       })();
     </script>
     {% endif %}
+
+    {%- comment -%} TEMPORARY: Cart checkout in GoKwik drawer → use same flow as Buy Now (popup) while waiting for GoKwik support. {%- endcomment -%}
+    <script>
+    (function() {
+      document.addEventListener('click', function(e) {
+        var target = e.target;
+        if (!target) return;
+        var isCheckoutBtn = (target.getAttribute && target.getAttribute('name') === 'checkout') ||
+          (target.closest && target.closest('[name="checkout"]')) ||
+          (target.textContent && target.textContent.toLowerCase().indexOf('checkout') !== -1);
+        if (!isCheckoutBtn) return;
+        var isInKwikCart = (target.closest && (
+          target.closest('[class*="gokwik"]') ||
+          target.closest('[class*="kwik"]') ||
+          target.closest('[id*="kwik"]') ||
+          target.closest('[class*="Kwik"]') ||
+          target.closest('[class*="slide-cart"]')
+        ));
+        if (!isInKwikCart) return;
+
+        e.preventDefault();
+        e.stopPropagation();
+        if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
+
+        var opened = false;
+        if (typeof window.buyNowCheckoutClick === 'function') {
+          window.buyNowCheckoutClick();
+          opened = true;
+        }
+        if (!opened && typeof window.gokwikSdk !== 'undefined' && window.gokwikSdk && typeof window.gokwikSdk.initCheckout === 'function') {
+          try {
+            window.gokwikSdk.initCheckout(window.merchantInfo || window.merchantParams);
+            opened = true;
+          } catch (err) {}
+        }
+        if (!opened && window.KwikCheckout && typeof window.KwikCheckout.open === 'function') {
+          window.KwikCheckout.open();
+          opened = true;
+        }
+        if (!opened && window.GoKwik && typeof window.GoKwik.openCheckout === 'function') {
+          window.GoKwik.openCheckout();
+          opened = true;
+        }
+        return false;
+      }, true);
+    })();
+    </script>
   </body>
 </html>
