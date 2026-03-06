@@ -12,19 +12,15 @@
     "product_main": {
       "type": "product-main",
       "blocks": {
-        "kwik_cod_checkout_buy_now_button_L7hTtN": {
-          "type": "shopify://apps/kwik-cod-checkout/blocks/buy_now_button/74f36c20-677c-4aa2-b179-1769aa61abaa",
+        "buy_now_button_theme": {
+          "type": "buy_now_button",
           "settings": {
-            "gkc_button_text": "Buy Now",
-            "gkc_button_subtext": "",
-            "gkc_button_bg": "#000000",
-            "gkc_text_color": "#ffffff",
-            "gk_image": true
+            "button_text": "Buy Now"
           }
         }
       },
       "block_order": [
-        "kwik_cod_checkout_buy_now_button_L7hTtN"
+        "buy_now_button_theme"
       ],
       "settings": {}
     },

@@ -304,12 +304,24 @@
           </span>
         </button>
 
-        {%- comment -%} GoKwik: Theme Buy Now app block renders here (disable theme Buy Now). {%- endcomment -%}
-        {% if product.selected_or_first_available_variant.available and section.blocks.size > 0 %}
-          <div class="product-gokwik-buttons">
+        {%- comment -%} Buy Now area: controlled by blocks. Add "Buy Now button" (theme) or an app block (e.g. GoKwik) from Theme editor > Product template > Product Main > Add block. {%- endcomment -%}
+        {% if product.selected_or_first_available_variant.available %}
+          <div class="product-buy-now-blocks">
             {% for block in section.blocks %}
-              <div {{ block.shopify_attributes }}>
-                {% render block %}
+              <div class="product-buy-now-block" {{ block.shopify_attributes }}>
+                {% case block.type %}
+                  {% when 'buy_now_button' %}
+                    <button
+                      type="button"
+                      class="cta-button cta-button--secondary"
+                      id="buy-now-btn"
+                      data-buy-now-button
+                    >
+                      {{ block.settings.button_text | default: 'Buy Now' }}
+                    </button>
+                  {% when '@app' %}
+                    {% render block %}
+                {% endcase %}
               </div>
             {% endfor %}
           </div>
@@ -1003,6 +1015,17 @@
   a.cta-button--secondary:hover {
     background: rgba(74, 124, 44, 0.05);
     color: var(--forest-green);
+  }
+
+  .product-buy-now-blocks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 8px;
+  }
+
+  .product-buy-now-block {
+    display: inline-block;
   }
 
   /* Trust Message */
@@ -2115,13 +2138,34 @@
   "name": "Product Main",
   "blocks": [
     {
+      "type": "buy_now_button",
+      "name": "Buy Now button",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "button_text",
+          "label": "Button text",
+          "default": "Buy Now"
+        }
+      ]
+    },
+    {
       "type": "@app"
     }
   ],
   "settings": [],
   "presets": [
     {
-      "name": "Product Main"
+      "name": "Product Main",
+      "blocks": [
+        {
+          "type": "buy_now_button",
+          "settings": {
+            "button_text": "Buy Now"
+          }
+        }
+      ]
     }
   ]
 }
