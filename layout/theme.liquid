@@ -781,13 +781,12 @@
         return false;
       }
 
-      if (typeof window.cartCheckoutClick !== 'undefined') {
-        window.cartCheckoutClick = function() {
-          try { console.log('Cart checkout intercepted - using Buy Now instead'); } catch (e) {}
-          runBuyNowCheckout();
-          return false;
-        };
-      }
+      window.cartCheckoutClick = function() {
+        if (typeof buyNowCheckoutClick === 'function') {
+          buyNowCheckoutClick();
+        }
+        return false;
+      };
 
       document.addEventListener('click', function(e) {
         var target = e.target;
