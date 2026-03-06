@@ -37,7 +37,7 @@
       },
       "6089946381803635929": {
         "type": "shopify://apps/kwik-cod-checkout/blocks/app-embed/74f36c20-677c-4aa2-b179-1769aa61abaa",
-        "disabled": false,
+        "disabled": true,
         "settings": {
           "gkc_button_text": "Checkout Now",
           "gkc_button_subtext": "",
