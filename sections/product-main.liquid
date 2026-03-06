@@ -303,16 +303,16 @@
             {% endif %}
           </span>
         </button>
-        
-        <!-- Buy Now Button -->
-        {% if product.selected_or_first_available_variant.available %}
-          <button 
-            type="button" 
-            class="cta-button cta-button--secondary"
-            id="buy-now-btn"
-          >
-            Buy Now
-          </button>
+
+        {%- comment -%} GoKwik: Theme Buy Now app block renders here (disable theme Buy Now). {%- endcomment -%}
+        {% if product.selected_or_first_available_variant.available and section.blocks.size > 0 %}
+          <div class="product-gokwik-buttons">
+            {% for block in section.blocks %}
+              <div {{ block.shopify_attributes }}>
+                {% render block %}
+              </div>
+            {% endfor %}
+          </div>
         {% endif %}
       {% endform %}
 
@@ -2113,6 +2113,11 @@
 {% schema %}
 {
   "name": "Product Main",
+  "blocks": [
+    {
+      "type": "@app"
+    }
+  ],
   "settings": [],
   "presets": [
     {

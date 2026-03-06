@@ -176,10 +176,18 @@
               {% comment %} Delivery date will be shown on order confirmation page {% endcomment %}
               
               <div class="cart-summary__actions">
-                {% comment %} Button only – no href so browser never navigates to /checkout; opens GoKwik popup/drawer via theme script. {% endcomment %}
-                <button type="button" class="btn btn-primary btn-large cart-summary__checkout" id="cart-checkout-btn" data-gokwik-checkout="true" aria-label="Proceed to Checkout" onclick="typeof triggerGoKwikCheckout === 'function' && triggerGoKwikCheckout(event); return false;">
-                  Proceed to Checkout
-                </button>
+                {%- comment -%} GoKwik: Theme Checkout Now app block renders here (disable theme checkout button). {%- endcomment -%}
+                {% if section.blocks.size > 0 %}
+                  {% for block in section.blocks %}
+                    <div {{ block.shopify_attributes }}>
+                      {% render block %}
+                    </div>
+                  {% endfor %}
+                {% else %}
+                  <button type="button" class="btn btn-primary btn-large cart-summary__checkout" disabled aria-disabled="true">
+                    Checkout
+                  </button>
+                {% endif %}
                 <a href="{{ routes.all_products_collection_url }}" class="cart-summary__continue">
                   Continue Shopping
                 </a>
@@ -856,6 +864,11 @@
 {% schema %}
 {
   "name": "Cart Page",
+  "blocks": [
+    {
+      "type": "@app"
+    }
+  ],
   "settings": [
     {
       "type": "checkbox",
