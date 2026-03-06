@@ -132,6 +132,24 @@
         return s.indexOf('/checkouts/') !== -1 || s.indexOf('/checkout') !== -1;
       }
 
+      // Guard: if storefront theme is being rendered on a /checkout or /checkouts/* URL,
+      // bounce back to cart and attempt GoKwik. (Shopify hosted checkout normally doesn't run theme.liquid,
+      // but some setups/apps can route /checkouts/* through storefront.)
+      (function() {
+        try {
+          var p = window.location && window.location.pathname ? String(window.location.pathname) : '';
+          var isCheckoutPath = p === '/checkout' || p.indexOf('/checkouts/') === 0;
+          var q = window.location && window.location.search ? String(window.location.search) : '';
+          var allow = q.indexOf('allow_checkout=1') !== -1;
+          if (isCheckoutPath && !allow) {
+            // Replace so user can't hit back into the checkout URL loop.
+            if (window.location && typeof window.location.replace === 'function') {
+              window.location.replace('/cart?open_cart=1&blocked_checkout=1');
+            }
+          }
+        } catch (e) {}
+      })();
+
       function triggerGoKwikCheckout(event) {
         if (event) {
           event.preventDefault();
@@ -193,6 +211,24 @@
             };
           }
         } catch (err) {}
+        // Attempt to block direct href setter (best-effort; may be non-configurable).
+        try {
+          var proto = window.Location && window.Location.prototype;
+          if (proto) {
+            var d = Object.getOwnPropertyDescriptor(proto, 'href');
+            if (d && d.configurable && typeof d.set === 'function') {
+              Object.defineProperty(proto, 'href', {
+                configurable: true,
+                enumerable: d.enumerable,
+                get: d.get,
+                set: function(u) {
+                  if (_isShopifyCheckoutUrl(u)) return triggerGoKwikCheckout();
+                  return d.set.call(this, u);
+                }
+              });
+            }
+          }
+        } catch (errHref) {}
         try {
           var _submit = HTMLFormElement && HTMLFormElement.prototype && HTMLFormElement.prototype.submit;
           if (_submit) {
@@ -218,12 +254,15 @@
             triggerGoKwikCheckout(e);
             return;
           }
-          if (t.nodeName === 'A' && (t.getAttribute('href') === '/checkout' || (t.getAttribute('href') || '').indexOf('/checkout') !== -1)) {
-            e.preventDefault();
-            e.stopPropagation();
-            if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
-            triggerGoKwikCheckout(e);
-            return;
+          if (t.nodeName === 'A') {
+            var href = t.getAttribute('href') || '';
+            if (href === '/checkout' || href.indexOf('/checkout') !== -1 || href.indexOf('/checkouts/') !== -1) {
+              e.preventDefault();
+              e.stopPropagation();
+              if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
+              triggerGoKwikCheckout(e);
+              return;
+            }
           }
           if ((t.nodeName === 'BUTTON' || t.nodeName === 'INPUT') && t.getAttribute('name') === 'checkout') {
             e.preventDefault();
