@@ -1019,13 +1019,23 @@
 
   .product-buy-now-blocks {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
+    width: 100%;
     gap: 0.75rem;
     margin-top: 8px;
   }
 
   .product-buy-now-block {
-    display: inline-block;
+    width: 100%;
+  }
+
+  /* Make any Buy Now block (theme/app) match Add-to-Cart width */
+  .product-buy-now-blocks :is(button, a, input[type="button"], input[type="submit"]) {
+    width: 100% !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
   }
 
   /* Trust Message */
