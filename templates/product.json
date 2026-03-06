@@ -11,6 +11,17 @@
   "sections": {
     "product_main": {
       "type": "product-main",
+      "blocks": {
+        "buy_now_button_theme": {
+          "type": "buy_now_button",
+          "settings": {
+            "button_text": "Buy Now"
+          }
+        }
+      },
+      "block_order": [
+        "buy_now_button_theme"
+      ],
       "settings": {}
     },
     "product_benefits_compact": {
@@ -47,10 +58,6 @@
         "show_view_all": false,
         "view_all_text": "View All Products"
       }
-    },
-    "177278119430235932": {
-      "type": "apps",
-      "settings": {}
     },
     "product_faq": {
       "type": "product-faq",
@@ -107,7 +114,6 @@
     "product_trust_badges_compact",
     "product_image_banner",
     "related_products",
-    "177278119430235932",
     "product_faq",
     "1769418164e60d6e16"
   ]
