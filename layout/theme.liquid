@@ -178,10 +178,15 @@
       {%- endcomment -%}
       <script>
       (function() {
+        var debug = false;
+        try {
+          debug = (window.location && window.location.search && window.location.search.indexOf('gokwik_debug=1') !== -1);
+        } catch (e0) {}
+
         function isInGoKwikDrawer(el) {
           if (!el || !el.closest) return false;
           return Boolean(
-            el.closest('[id*="kwik"], [class*="kwik"], [class*="Kwik"], [id*="gokwik"], [class*="gokwik"], [class*="slide-cart"], [class*="slideCart"]')
+            el.closest('[id*="kwik"], [class*="kwik"], [class*="Kwik"], [id*="gokwik"], [class*="gokwik"], [class*="slide-cart"], [class*="slideCart"], [data-kwik-cart], [data-gokwik], [data-kwik]')
           );
         }
         function looksLikeCheckout(el) {
@@ -223,13 +228,64 @@
           if (w.GoKwik && typeof w.GoKwik.openCheckout === 'function') { w.GoKwik.openCheckout(); return true; }
           return false;
         }
+
+        // Debug visibility: confirm script is running and show available globals.
+        if (debug) {
+          try {
+            console.log('[GoKwik debug] Drawer checkout override active');
+            console.log('[GoKwik debug] Globals:', {
+              gokwikSdk: window.gokwikSdk,
+              merchantInfo: window.merchantInfo,
+              merchantParams: window.merchantParams,
+              GoKwik: window.GoKwik,
+              KwikCheckout: window.KwikCheckout,
+              KwikCart: window.KwikCart
+            });
+          } catch (eDbg) {}
+          // Best-effort: log programmatic redirects to checkout
+          try {
+            var loc = window.location;
+            var _assign = loc.assign && loc.assign.bind(loc);
+            var _replace = loc.replace && loc.replace.bind(loc);
+            if (_assign) {
+              loc.assign = function(u) {
+                try { console.log('[GoKwik debug] location.assign', u); } catch (e) {}
+                return _assign(u);
+              };
+            }
+            if (_replace) {
+              loc.replace = function(u) {
+                try { console.log('[GoKwik debug] location.replace', u); } catch (e2) {}
+                return _replace(u);
+              };
+            }
+          } catch (eNav) {}
+        }
+
         document.addEventListener('click', function(e) {
           var t = e.target;
           if (!t) return;
           var clickable = t.closest ? t.closest('a, button, input[type="submit"], input[type="button"]') : null;
           if (!clickable) return;
-          if (!isInGoKwikDrawer(clickable)) return;
-          if (!looksLikeCheckout(clickable)) return;
+          var inDrawer = isInGoKwikDrawer(clickable);
+          var isCheckout = looksLikeCheckout(clickable);
+          if (!isCheckout) return;
+          // In normal mode: only touch GoKwik drawer CTAs. In debug: intercept any checkout-looking click so we can observe.
+          if (!inDrawer && !debug) return;
+
+          if (debug) {
+            try {
+              console.log('[GoKwik debug] Intercepted checkout click', {
+                inDrawer: inDrawer,
+                node: clickable.nodeName,
+                id: clickable.id,
+                className: clickable.className,
+                href: clickable.getAttribute && clickable.getAttribute('href'),
+                name: clickable.getAttribute && clickable.getAttribute('name'),
+                text: (clickable.textContent || '').trim().slice(0, 120)
+              });
+            } catch (eLog) {}
+          }
 
           // Stop redirect to Shopify checkout from drawer button
           e.preventDefault();
@@ -240,7 +296,15 @@
           if (!opened) {
             // If GoKwik doesn't expose a popup API, do nothing (prevents redirect loop).
             // Merchant can still use GoKwik settings to enable popup, or revert this behavior by disabling helpers.
-            try { console.warn('[GoKwik] No popup API found (gokwikSdk/KwikCheckout/GoKwik).'); } catch (err) {}
+            try {
+              console.warn('[GoKwik] No popup API found (gokwikSdk/KwikCheckout/GoKwik).');
+              if (debug) console.log('[GoKwik debug] Available:', {
+                gokwikSdk: window.gokwikSdk,
+                GoKwik: window.GoKwik,
+                KwikCheckout: window.KwikCheckout,
+                KwikCart: window.KwikCart
+              });
+            } catch (err) {}
           }
         }, true);
       })();
