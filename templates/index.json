@@ -83,7 +83,7 @@
           "type": "usp_item",
           "settings": {
             "icon_name": "natural",
-            "title": "100% Natural",
+            "title": "Natural",
             "description": "Pure, additive-free formulations with no artificial ingredients or preservatives."
           }
         },
@@ -205,7 +205,7 @@
           "type": "badge",
           "settings": {
             "icon_name": "natural",
-            "title": "100% Natural",
+            "title": "Natural",
             "description": "Natural ingredients sourced from trusted suppliers."
           }
         },
