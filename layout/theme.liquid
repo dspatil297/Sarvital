@@ -36,6 +36,18 @@
     {% render 'meta-tags' %}
 
     {{content_for_header}}
+    <style>
+      /* Force-hide Shopify Inbox chat widget globally */
+      #shopify-chat,
+      div#shopify-chat,
+      iframe#ShopifyChat,
+      iframe#dummy-chat-button-iframe {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+      }
+    </style>
   </head>
 
   <body class="template-{{ request.page_type | handle }}">
