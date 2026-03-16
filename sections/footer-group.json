@@ -33,7 +33,7 @@
         "disclaimer_text": "Disclaimer: This product is a health supplement and is not for medicinal use. Not intended to diagnose, treat, cure, or prevent any disease. Consult your healthcare provider if pregnant, nursing, or on medication.",
         "company_legal_name": "Sarvital Sarvadnya Foodtech Pvt Ltd",
         "show_scroll_top": true,
-        "show_chat": true,
+        "show_chat": false,
         "chat_url": ""
       }
     }
