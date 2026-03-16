@@ -134,12 +134,13 @@
 </footer>
 
 {%- comment -%} Floating action buttons {%- endcomment -%}
-<a href="/cart" class="footer-fab footer-fab--cart" aria-label="Cart">
+<a href="/cart" class="footer-fab footer-fab--cart" aria-label="Cart" id="footer-cart-fab">
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
     <circle cx="9" cy="21" r="1"></circle>
     <circle cx="20" cy="21" r="1"></circle>
     <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
   </svg>
+  <span class="footer-fab__badge" aria-hidden="true" data-footer-cart-count>0</span>
 </a>
 {% if section.settings.show_scroll_top %}
   <button type="button" class="footer-fab footer-fab--scroll" aria-label="Scroll to top" id="footer-scroll-top">
@@ -155,6 +156,37 @@
         window.scrollTo({ top: 0, behavior: 'smooth' });
       });
     }
+  })();
+</script>
+
+<script>
+  (function() {
+    var badge = document.querySelector('[data-footer-cart-count]');
+    var fab = document.getElementById('footer-cart-fab');
+    if (!badge || !fab) return;
+
+    function setCount(n) {
+      var count = parseInt(n, 10) || 0;
+      badge.textContent = String(count);
+      if (count > 0) {
+        badge.style.display = 'inline-flex';
+        fab.setAttribute('aria-label', 'Cart (' + count + ' items)');
+      } else {
+        badge.style.display = 'none';
+        fab.setAttribute('aria-label', 'Cart');
+      }
+    }
+
+    function refresh() {
+      fetch('/cart.js', { credentials: 'same-origin' })
+        .then(function(r) { return r.json(); })
+        .then(function(cart) { setCount(cart && cart.item_count); })
+        .catch(function() { /* ignore */ });
+    }
+
+    setCount({{ cart.item_count | default: 0 }});
+    refresh();
+    document.addEventListener('cart:updated', refresh);
   })();
 </script>
 
@@ -486,6 +518,27 @@
     color: #fff;
   }
 
+  .footer-fab__badge {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: 999px;
+    background: #ffffff;
+    color: var(--forest-green);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 800;
+    line-height: 1;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+    border: 2px solid rgba(26, 31, 26, 0.2);
+    pointer-events: none;
+  }
+
   .footer-fab:hover {
     transform: scale(1.05);
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
@@ -498,7 +551,17 @@
 
   .footer-fab--cart {
     bottom: 140px; /* above scroll-to-top */
-    background: var(--forest-green);
+    background: radial-gradient(120% 120% at 20% 10%, #7ac457 0%, var(--forest-green) 45%, #1f3a10 100%);
+    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.25), 0 2px 0 rgba(255, 255, 255, 0.18) inset;
+  }
+
+  .footer-fab--cart:hover {
+    transform: translateY(-2px) scale(1.06);
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.28), 0 2px 0 rgba(255, 255, 255, 0.22) inset;
+  }
+
+  .footer-fab--cart:active {
+    transform: translateY(0) scale(0.98);
   }
 
   .footer-fab--chat {
@@ -532,6 +595,12 @@
       right: var(--spacing-md);
       width: 44px;
       height: 44px;
+    }
+
+    .footer-fab__badge {
+      top: -7px;
+      right: -7px;
+      transform: scale(0.95);
     }
     .footer-fab--scroll {
       bottom: 72px;
