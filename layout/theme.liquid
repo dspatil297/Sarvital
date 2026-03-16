@@ -515,6 +515,11 @@
           }
           var qtyInput = form.querySelector('.product-card__qty-input');
           if (qtyInput) qtyInput.value = quantity || 1;
+          // When quantity controls are visible, hide the Add to Cart button to avoid confusion
+          var addBtn = form.querySelector('.product-card__add-to-cart');
+          if (addBtn) {
+            addBtn.style.display = 'none';
+          }
         }
         function doProductCardAddToCart(form) {
           var idInput = form.querySelector('input[name="id"]');
@@ -612,6 +617,11 @@
                     qtyRow.classList.add('product-card__quantity-row--hidden');
                     qtyRow.style.display = '';
                     qtyRow.style.visibility = '';
+                  }
+                  // When quantity is zero/row hidden, show the Add to Cart button again
+                  var addBtn = form.querySelector('.product-card__add-to-cart');
+                  if (addBtn) {
+                    addBtn.style.display = '';
                   }
                 }
               } else {
