@@ -47,6 +47,14 @@
         opacity: 0 !important;
         pointer-events: none !important;
       }
+
+      /* Disable GoKwik floating/sticky cart bar (Svelte) */
+      .sticky-cart {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+      }
     </style>
   </head>
 
@@ -400,6 +408,26 @@
 
     {%- comment -%} Base JavaScript. Error at scripts.js:760 is in compiled_assets/scripts.js; theme loads application.js so that file is not used here. {%- endcomment -%}
     <script src="{{ 'application.js' | asset_url }}" defer></script>
+    {%- comment -%} Remove GoKwik sticky cart node if injected (defensive) {%- endcomment -%}
+    <script>
+      (function() {
+        function removeStickyCart() {
+          var els = document.querySelectorAll('.sticky-cart');
+          for (var i = 0; i < els.length; i++) {
+            if (els[i] && els[i].parentNode) els[i].parentNode.removeChild(els[i]);
+          }
+        }
+        removeStickyCart();
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', removeStickyCart);
+        }
+        try {
+          var mo = new MutationObserver(function() { removeStickyCart(); });
+          mo.observe(document.documentElement, { childList: true, subtree: true });
+          setTimeout(function() { try { mo.disconnect(); } catch (e) {} }, 8000);
+        } catch (e) {}
+      })();
+    </script>
     {%- comment -%} Cart page +/- and remove: event delegation in capture phase so it runs before other handlers {%- endcomment -%}
     <script>
       (function() {

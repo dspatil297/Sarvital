@@ -134,6 +134,13 @@
 </footer>
 
 {%- comment -%} Floating action buttons {%- endcomment -%}
+<a href="/cart" class="footer-fab footer-fab--cart" aria-label="Cart">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+    <circle cx="9" cy="21" r="1"></circle>
+    <circle cx="20" cy="21" r="1"></circle>
+    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+  </svg>
+</a>
 {% if section.settings.show_scroll_top %}
   <button type="button" class="footer-fab footer-fab--scroll" aria-label="Scroll to top" id="footer-scroll-top">
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 15l-6-6-6 6"/></svg>
@@ -489,6 +496,11 @@
     background: var(--sage-green);
   }
 
+  .footer-fab--cart {
+    bottom: 140px; /* above scroll-to-top */
+    background: var(--forest-green);
+  }
+
   .footer-fab--chat {
     bottom: var(--spacing-lg);
     background: var(--sage-green);
@@ -523,6 +535,10 @@
     }
     .footer-fab--scroll {
       bottom: 72px;
+    }
+
+    .footer-fab--cart {
+      bottom: 128px; /* above scroll-to-top on mobile */
     }
   }
 {% endstylesheet %}
