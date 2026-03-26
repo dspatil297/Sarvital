@@ -1949,10 +1949,15 @@
         var lineKey = productForm.getAttribute('data-line-key');
         var lineKeyVariantId = productForm.getAttribute('data-line-key-variant-id');
         var isUpdate = lineKey && lineKeyVariantId && String(lineKeyVariantId) === String(variantId);
-        /** Standard Buy Now: redirect to Shopify checkout after adding to cart. */
+        /** Buy Now: prefer GoKwik checkout when available; fallback to Shopify checkout. */
         function goCheckout() {
           buyNowBtn.disabled = false;
           buyNowBtn.textContent = originalText;
+          if (typeof window.triggerGoKwikCheckout === 'function') {
+            var ok = false;
+            try { ok = window.triggerGoKwikCheckout(); } catch (e) { ok = false; }
+            if (ok) return;
+          }
           window.location.href = '/checkout';
         }
         function fail(msg) {

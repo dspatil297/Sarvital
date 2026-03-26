@@ -47,14 +47,6 @@
         opacity: 0 !important;
         pointer-events: none !important;
       }
-
-      /* Disable GoKwik floating/sticky cart bar (Svelte) */
-      .sticky-cart {
-        display: none !important;
-        visibility: hidden !important;
-        opacity: 0 !important;
-        pointer-events: none !important;
-      }
     </style>
   </head>
 
@@ -95,6 +87,37 @@
           z-index: 999999 !important;
         }
       </style>
+      <script>
+      (function() {
+        'use strict';
+        /**
+         * Trigger GoKwik checkout when available.
+         * Returns true if a GoKwik handler was invoked, else false.
+         */
+        window.triggerGoKwikCheckout = function() {
+          if (typeof window.buyNowCheckoutClick === 'function') {
+            try { window.buyNowCheckoutClick(); return true; } catch (e) {}
+          }
+          if (window.gokwikSdk && typeof window.gokwikSdk.initCheckout === 'function') {
+            try {
+              window.gokwikSdk.initCheckout(window.merchantInfo || window.merchantParams || {});
+              return true;
+            } catch (e) {}
+          }
+          if (window.KwikCheckout && typeof window.KwikCheckout.open === 'function') {
+            try { window.KwikCheckout.open(); return true; } catch (e) {}
+          }
+          if (window.GoKwik && typeof window.GoKwik.openCheckout === 'function') {
+            try { window.GoKwik.openCheckout(); return true; } catch (e) {}
+          }
+          return false;
+        };
+        window.cartCheckoutClick = function() {
+          window.triggerGoKwikCheckout();
+          return false;
+        };
+      })();
+      </script>
       <script>
       (function() {
         function keepThemeCartClosed() {
@@ -195,24 +218,6 @@
       <script>
       (function() {
         'use strict';
-        function openGoKwikPopup() {
-          if (typeof window.buyNowCheckoutClick === 'function') {
-            try { window.buyNowCheckoutClick(); return true; } catch (e) {}
-          }
-          if (window.gokwikSdk && typeof window.gokwikSdk.initCheckout === 'function') {
-            try {
-              window.gokwikSdk.initCheckout(window.merchantInfo || window.merchantParams || {});
-              return true;
-            } catch (e) {}
-          }
-          if (window.KwikCheckout && typeof window.KwikCheckout.open === 'function') {
-            try { window.KwikCheckout.open(); return true; } catch (e) {}
-          }
-          if (window.GoKwik && typeof window.GoKwik.openCheckout === 'function') {
-            try { window.GoKwik.openCheckout(); return true; } catch (e) {}
-          }
-          return false;
-        }
         function isInGoKwikCart(el) {
           if (!el || !el.closest) return false;
           return Boolean(el.closest('[id*="kwik"], [class*="kwik"], [class*="Kwik"], [id*="gokwik"], [class*="gokwik"], [class*="slide-cart"], [class*="slideCart"], [data-kwik-cart], [data-gokwik], [data-kwik]'));
@@ -236,41 +241,8 @@
           e.preventDefault();
           e.stopPropagation();
           if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
-          openGoKwikPopup();
+          if (typeof window.triggerGoKwikCheckout === 'function') window.triggerGoKwikCheckout();
         }, true);
-        var loc = window.location;
-        var nativeAssign = loc.assign && loc.assign.bind(loc);
-        var nativeReplace = loc.replace && loc.replace.bind(loc);
-        if (nativeAssign) {
-          loc.assign = function(u) {
-            var url = (u && String(u)) || '';
-            if (url.indexOf('/checkout') !== -1 || url.indexOf('/checkouts/') !== -1) {
-              openGoKwikPopup();
-              return;
-            }
-            nativeAssign(u);
-          };
-        }
-        if (nativeReplace) {
-          loc.replace = function(u) {
-            var url = (u && String(u)) || '';
-            if (url.indexOf('/checkout') !== -1 || url.indexOf('/checkouts/') !== -1) {
-              openGoKwikPopup();
-              return;
-            }
-            nativeReplace(u);
-          };
-        }
-        window.cartCheckoutClick = function() {
-          openGoKwikPopup();
-          return false;
-        };
-        var reapply = 0;
-        var tid = setInterval(function() {
-          reapply++;
-          window.cartCheckoutClick = function() { openGoKwikPopup(); return false; };
-          if (reapply >= 20) clearInterval(tid);
-        }, 500);
       })();
       </script>
 
@@ -408,26 +380,6 @@
 
     {%- comment -%} Base JavaScript. Error at scripts.js:760 is in compiled_assets/scripts.js; theme loads application.js so that file is not used here. {%- endcomment -%}
     <script src="{{ 'application.js' | asset_url }}" defer></script>
-    {%- comment -%} Remove GoKwik sticky cart node if injected (defensive) {%- endcomment -%}
-    <script>
-      (function() {
-        function removeStickyCart() {
-          var els = document.querySelectorAll('.sticky-cart');
-          for (var i = 0; i < els.length; i++) {
-            if (els[i] && els[i].parentNode) els[i].parentNode.removeChild(els[i]);
-          }
-        }
-        removeStickyCart();
-        if (document.readyState === 'loading') {
-          document.addEventListener('DOMContentLoaded', removeStickyCart);
-        }
-        try {
-          var mo = new MutationObserver(function() { removeStickyCart(); });
-          mo.observe(document.documentElement, { childList: true, subtree: true });
-          setTimeout(function() { try { mo.disconnect(); } catch (e) {} }, 8000);
-        } catch (e) {}
-      })();
-    </script>
     {%- comment -%} Cart page +/- and remove: event delegation in capture phase so it runs before other handlers {%- endcomment -%}
     <script>
       (function() {
