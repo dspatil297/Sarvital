@@ -58,7 +58,7 @@
               <span>{{ 'customers.login.remember_me' | t | default: 'Remember me' }}</span>
             </label>
           {% endif %}
-          <a href="{{ routes.account_recover_url }}" class="login-form__forgot">
+          <a href="https://sarvital.com/pages/kp-account/profile" class="login-form__forgot">
             {{ 'customers.login.forgot_password' | t | default: 'Forgot your password?' }}
           </a>
         </div>
@@ -73,7 +73,7 @@
       {% if shop.customer_accounts_optional and section.settings.show_register_link %}
         <p class="login-section__register">
           {{ 'customers.login.new_customer' | t | default: "Don't have an account?" }}
-          <a href="{{ routes.account_register_url }}" class="login-section__register-link">
+          <a href="https://sarvital.com/pages/kp-account/profile" class="login-section__register-link">
             {{ 'customers.login.create_account' | t | default: 'Create account' }}
           </a>
         </p>
