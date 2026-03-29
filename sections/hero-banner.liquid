@@ -58,6 +58,7 @@
                 width="{{ block.settings.image.width }}"
                 height="{{ block.settings.image.height }}"
                 loading="eager"
+                decoding="async"
                 fetchpriority="{% if forloop.first %}high{% else %}low{% endif %}"
                 onerror="this.classList.add('image-error'); this.alt='Image failed to load';"
               >
@@ -84,6 +85,7 @@
             width="{{ section.settings.hero_image.width }}"
             height="{{ section.settings.hero_image.height }}"
             loading="eager"
+            decoding="async"
             fetchpriority="high"
             onerror="this.classList.add('image-error'); this.alt='Image failed to load';"
           >
@@ -270,20 +272,14 @@
     transition: opacity 0.3s ease;
   }
 
+  /* No fade-in on hero image: opacity animation delays LCP paint in Lighthouse */
   .hero-banner__slide-img {
-    opacity: 0;
-    animation: fadeInImage 0.5s ease forwards;
+    opacity: 1;
   }
 
   .hero-banner__slide-img.image-error {
     opacity: 0.5;
     background: rgba(245, 245, 245, 0.8);
-  }
-
-  @keyframes fadeInImage {
-    to {
-      opacity: 1;
-    }
   }
 
   .hero-banner__slide-placeholder {
