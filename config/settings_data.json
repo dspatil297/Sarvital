@@ -17,6 +17,7 @@
     "btnBClr": "#FFFFFF",
     "btnTextClr": "#2d5016",
     "enableLogo": true,
+    "gokwik_inject_ga4_gtag": false,
     "content_for_index": [],
     "blocks": {
       "14060646107696862457": {
@@ -31,7 +32,7 @@
       },
       "15683396631634586217": {
         "type": "shopify://apps/inbox/blocks/chat/841fc607-4181-4ad1-842d-e24d7f8bad6b",
-        "disabled": false,
+        "disabled": true,
         "settings": {
           "button_color": "#2d5016",
           "secondary_color": "#FFFFFF",

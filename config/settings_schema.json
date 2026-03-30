@@ -116,7 +116,14 @@
      "type": "text",
      "id": "ga4Gokwik",
      "label": "Enter Google Analytics ID (GA4)",
-     "placeholder": "Starts with GA- ...."
+     "placeholder": "Starts with G- ... (leave empty if GA4 is only in GTM)"
+   },
+   {
+     "type": "checkbox",
+     "id": "gokwik_inject_ga4_gtag",
+     "label": "Load gtag.js for GA4 from this theme",
+     "default": true,
+     "info": "Turn OFF if GA4 is already loaded via Google Tag Manager or Shopify Customer events. Loading twice duplicates ~150KB+ of gtag.js and increases blocking time."
    },
    {
      "type": "text",

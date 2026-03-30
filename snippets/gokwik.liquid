@@ -43,8 +43,12 @@ document.addEventListener("DOMContentLoaded", getCountryData);
 </script>
 {% endif %}
  <script src="https://{{ env }}.gokwik.co/merchant-integration/build/merchant.integration.js?v4" defer></script>
+{%- comment -%}
+  Optional second gtag load: disable when GA4 is already served by GTM / Shopify (avoids duplicate gtag.js + long tasks).
+  Theme settings → Gokwik → "Load gtag.js for GA4 from this theme" = off.
+{%- endcomment -%}
 <script>
-   if (gaTag.ga4 && gaTag.ga4 !== 'undefined' &&  gaTag.ga4  !== '') {
+   if ({% if settings.gokwik_inject_ga4_gtag == false %}false{% else %}true{% endif %} && gaTag.ga4 && gaTag.ga4 !== 'undefined' && gaTag.ga4 !== '') {
        const script = document.createElement('script');
        script.src = "https://www.googletagmanager.com/gtag/js?id="+ window.gaTag.ga4;
        script.defer = true;
