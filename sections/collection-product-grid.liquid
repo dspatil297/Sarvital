@@ -4,7 +4,8 @@
       {% if collection.products.size > 0 %}
         <div class="collection-product-grid__grid" id="product-grid">
           {% for product in collection.products %}
-            {% render 'product-card', product: product, card_instance: section.id | append: '-col-' | append: forloop.index %}
+            {% assign product_card_uid = section.id | append: '-col-' | append: forloop.index %}
+            {% render 'product-card', product: product, card_instance: product_card_uid %}
             {% render 'quick-view', product: product %}
           {% endfor %}
         </div>

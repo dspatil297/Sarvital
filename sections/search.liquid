@@ -54,7 +54,8 @@
             <div class="search-page__grid">
               {% for item in search.results %}
                 {% if item.object_type == 'product' %}
-                  {% render 'product-card', product: item, card_instance: section.id | append: '-q-' | append: forloop.index %}
+                  {% assign product_card_uid = section.id | append: '-q-' | append: forloop.index %}
+                  {% render 'product-card', product: item, card_instance: product_card_uid %}
                 {% else %}
                   <div class="search-result-card">
                     {% if item.featured_image %}

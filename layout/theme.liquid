@@ -22,11 +22,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <link rel="icon" type="image/png" href="{{ 'Logo.png' | asset_url }}" sizes="any">
     
-    {%- comment -%} Performance: Resource hints (preconnect covers DNS+TLS; avoid duplicate dns-prefetch to same origins). Judge.me is on the critical path for reviews widget. {%- endcomment -%}
+    {%- comment -%} Max ~4 preconnects (Lighthouse). fonts.googleapis + fonts.gstatic only; Judge.me uses dns-prefetch (cheaper than preconnect). Removed fonts.shopifycdn (often unused when using Google Fonts CSS). {%- endcomment -%}
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="dns-prefetch" href="https://cdnwidget.judge.me">
-    <link rel="preconnect" href="https://cdnwidget.judge.me" crossorigin>
     
     {%- comment -%} Performance: Font Loading Optimization {%- endcomment -%}
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&family=Inter:wght@300;400;500;600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
@@ -35,16 +34,7 @@
     {%- comment -%} Inlined CSS Variables {%- endcomment -%}
     {% render 'css-variables' %}
 
-    {%- comment -%}
-      Font preloading:
-      1. Preconnect to font CDN for faster connection
-      2. Preload only the critical font variant (base weight)
-      3. Additional variants load on-demand via @font-face
-    {%- endcomment -%}
-    {% unless settings.type_primary_font.system? %}
-      <link rel="preconnect" href="https://fonts.shopifycdn.com" crossorigin>
-      {{ settings.type_primary_font | font_url | preload_tag: as: 'font', crossorigin: 'anonymous' }}
-    {% endunless %}
+    {%- comment -%} Primary typography: Poppins + Inter via Google Fonts link above (avoids duplicate Shopify font CDN + variable Inter requests). {%- endcomment -%}
 
     {%- comment -%} Critical CSS - load normally to avoid "preloaded but not used" console warning {%- endcomment -%}
     {{ 'critical.css' | asset_url | stylesheet_tag }}

@@ -9,7 +9,9 @@
     <div class="product-card__image-wrapper">
       {% if product.featured_image %}
         <img 
-          src="{{ product.featured_image | image_url: width: 600, format: 'webp' }}" 
+          src="{{ product.featured_image | image_url: width: 360, format: 'webp' }}" 
+          srcset="{{ product.featured_image | image_url: width: 200, format: 'webp' }} 200w, {{ product.featured_image | image_url: width: 280, format: 'webp' }} 280w, {{ product.featured_image | image_url: width: 360, format: 'webp' }} 360w, {{ product.featured_image | image_url: width: 480, format: 'webp' }} 480w, {{ product.featured_image | image_url: width: 600, format: 'webp' }} 600w"
+          sizes="(max-width: 600px) 50vw, (max-width: 1024px) 33vw, 280px"
           alt="{{ product.featured_image.alt | default: product.title }}"
           class="product-card__image"
           loading="lazy"
