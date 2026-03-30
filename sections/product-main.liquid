@@ -311,14 +311,15 @@
               <div class="product-buy-now-block" {{ block.shopify_attributes }}>
                 {% case block.type %}
                   {% when 'buy_now_button' %}
-                    <button
+                    {% comment %} <button
                       type="button"
                       class="cta-button cta-button--secondary"
                       id="buy-now-btn"
                       data-buy-now-button
                     >
                       {{ block.settings.button_text | default: 'Buy Now' }}
-                    </button>
+                    </button> {% endcomment %}
+                    {% render 'gokwik-buy-now' %}
                   {% when '@app' %}
                     {% render block %}
                 {% endcase %}
@@ -1949,15 +1950,10 @@
         var lineKey = productForm.getAttribute('data-line-key');
         var lineKeyVariantId = productForm.getAttribute('data-line-key-variant-id');
         var isUpdate = lineKey && lineKeyVariantId && String(lineKeyVariantId) === String(variantId);
-        /** Buy Now: prefer GoKwik checkout when available; fallback to Shopify checkout. */
+        /** Standard Buy Now: redirect to Shopify checkout after adding to cart. */
         function goCheckout() {
           buyNowBtn.disabled = false;
           buyNowBtn.textContent = originalText;
-          if (typeof window.triggerGoKwikCheckout === 'function') {
-            var ok = false;
-            try { ok = window.triggerGoKwikCheckout(); } catch (e) { ok = false; }
-            if (ok) return;
-          }
           window.location.href = '/checkout';
         }
         function fail(msg) {
