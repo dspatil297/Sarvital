@@ -606,8 +606,9 @@
       bottom: 72px;
     }
 
-    .footer-fab--cart {
-      bottom: 128px; /* above scroll-to-top on mobile */
+    /* Cart FAB: hidden on small screens only */
+    #footer-cart-fab.footer-fab--cart {
+      display: none !important;
     }
   }
 {% endstylesheet %}
