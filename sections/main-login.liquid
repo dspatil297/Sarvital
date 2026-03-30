@@ -54,7 +54,7 @@
         <div class="login-form__row">
           {% if section.settings.show_remember %}
             <label class="login-form__checkbox-label">
-              <input type="checkbox" name="customer[remember_me]" value="1" class="login-form__checkbox">
+              <input type="checkbox" id="remember-me-{{ section.id }}" name="customer[remember_me]" value="1" class="login-form__checkbox">
               <span>{{ 'customers.login.remember_me' | t | default: 'Remember me' }}</span>
             </label>
           {% endif %}

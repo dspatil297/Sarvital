@@ -44,7 +44,7 @@
 
         <div class="login-form__row">
           <label class="login-form__checkbox-label">
-            <input type="checkbox" name="customer[remember_me]" value="1" class="login-form__checkbox">
+            <input type="checkbox" id="CustomerRememberMe" name="customer[remember_me]" value="1" class="login-form__checkbox">
             <span>{{ 'customers.login.remember_me' | t | default: 'Remember me' }}</span>
           </label>
           <a href="{{ routes.account_recover_url }}" class="login-form__forgot">

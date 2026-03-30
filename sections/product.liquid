@@ -34,7 +34,7 @@
       {% endfor %}
     </select>
 
-    <input type="text" name="quantity" min="1" value="1">
+    <input id="product-section-quantity" type="number" name="quantity" min="1" value="1" inputmode="numeric">
 
     <input type="submit" value="Add to cart">
     {%- comment -%} Shopify dynamic checkout disabled – use GoKwik only (triggerGoKwikCheckout in theme.liquid). {%- endcomment -%}

@@ -12,12 +12,14 @@
       {% form 'customer', class: 'newsletter-cta__form', id: 'newsletter-form' %}
         <div class="newsletter-cta__input-group">
           <input 
+            id="newsletter-email-{{ section.id }}"
             type="email" 
             name="contact[email]" 
             placeholder="{{ section.settings.placeholder | default: 'Your email address' }}"
             class="newsletter-cta__input"
             required
             aria-label="Email address"
+            autocomplete="email"
           >
           <button type="submit" class="btn btn-primary newsletter-cta__submit">
             {{ section.settings.button_text | default: 'Subscribe' }}
