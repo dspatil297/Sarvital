@@ -55,7 +55,7 @@
         pointer-events: none !important;
       }
 
-      /* Disable GoKwik floating/sticky cart bar (Svelte) */
+      /* GoKwik mobile sticky bar: if ever in light DOM, hide duplicate (drawer has its own UI). Shadow bar is styled via script below. */
       .sticky-cart {
         display: none !important;
         visibility: hidden !important;
@@ -415,23 +415,51 @@
 
     {%- comment -%} Base JavaScript. Error at scripts.js:760 is in compiled_assets/scripts.js; theme loads application.js so that file is not used here. {%- endcomment -%}
     <script src="{{ 'application.js' | asset_url }}" defer></script>
-    {%- comment -%} Remove GoKwik sticky cart node if injected (defensive) {%- endcomment -%}
+    {%- comment -%} GoKwik sticky bar lives in shadow DOM — theme CSS cannot style it; inject readable bar + button colors. {%- endcomment -%}
     <script>
       (function() {
-        function removeStickyCart() {
-          var els = document.querySelectorAll('.sticky-cart');
-          for (var i = 0; i < els.length; i++) {
-            if (els[i] && els[i].parentNode) els[i].parentNode.removeChild(els[i]);
+        var MARK = 'data-sarvital-gokwik-sticky-fix';
+        var css =
+          '.sticky-cart{' +
+          'background:#2d5016!important;background-color:#2d5016!important;color:#fff!important;' +
+          '}' +
+          '.sticky-cart button{' +
+          'background:#fff!important;background-color:#fff!important;color:#1a1a1a!important;' +
+          'font-weight:600!important;' +
+          '}' +
+          '.sticky-cart .item-count{color:#1a1a1a!important;background:#fff!important;}' +
+          '.sticky-cart svg{color:currentColor!important;fill:currentColor!important;}';
+        function injectIntoShadowRoot(shadow) {
+          if (!shadow || shadow.querySelector('style[' + MARK + ']')) return;
+          if (!shadow.querySelector('.sticky-cart')) return;
+          var s = document.createElement('style');
+          s.setAttribute(MARK, '1');
+          s.textContent = css;
+          shadow.appendChild(s);
+        }
+        function walk(node) {
+          if (!node) return;
+          if (node.nodeType === 1 && node.shadowRoot) {
+            injectIntoShadowRoot(node.shadowRoot);
+            walk(node.shadowRoot);
+          }
+          var c = node.firstChild;
+          while (c) {
+            walk(c);
+            c = c.nextSibling;
           }
         }
-        removeStickyCart();
+        function apply() {
+          walk(document.documentElement);
+        }
+        apply();
         if (document.readyState === 'loading') {
-          document.addEventListener('DOMContentLoaded', removeStickyCart);
+          document.addEventListener('DOMContentLoaded', apply);
         }
         try {
-          var mo = new MutationObserver(function() { removeStickyCart(); });
+          var mo = new MutationObserver(function() { apply(); });
           mo.observe(document.documentElement, { childList: true, subtree: true });
-          setTimeout(function() { try { mo.disconnect(); } catch (e) {} }, 8000);
+          setTimeout(function() { try { mo.disconnect(); } catch (e) {} }, 20000);
         } catch (e) {}
       })();
     </script>
