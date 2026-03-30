@@ -1,18 +1,21 @@
 {% comment %}
   Product Card Snippet - Reusable product card component
+  card_instance: unique suffix when the same product appears twice (e.g. carousel duplicate track); avoids duplicate DOM ids.
 {% endcomment %}
+{% assign qty_field_suffix = card_instance | default: '0' %}
 
 <div class="product-card" data-product-card>
   <a href="{{ product.url }}" class="product-card__link">
     <div class="product-card__image-wrapper">
       {% if product.featured_image %}
         <img 
-          src="{{ product.featured_image | image_url: width: 600 }}" 
+          src="{{ product.featured_image | image_url: width: 600, format: 'webp' }}" 
           alt="{{ product.featured_image.alt | default: product.title }}"
           class="product-card__image"
           loading="lazy"
           width="600"
           height="600"
+          decoding="async"
         >
       {% else %}
         <div class="product-card__image-placeholder">
@@ -66,10 +69,10 @@
   <form action="/cart/add" method="post" enctype="multipart/form-data" class="product-card__form" data-product-card-form>
     <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
     <div class="product-card__quantity-row product-card__quantity-row--hidden" data-product-card-qty-row>
-      <label for="qty-{{ product.id }}" class="product-card__qty-label">Qty</label>
+      <label for="qty-{{ product.id }}-{{ qty_field_suffix }}" class="product-card__qty-label">Qty</label>
       <div class="product-card__quantity-selector">
         <button type="button" class="product-card__qty-btn" data-action="decrease" aria-label="Decrease quantity">−</button>
-        <input type="number" id="qty-{{ product.id }}" name="quantity" value="1" min="0" max="10" class="product-card__qty-input" aria-label="Quantity" readonly>
+        <input type="number" id="qty-{{ product.id }}-{{ qty_field_suffix }}" name="quantity" value="1" min="0" max="10" class="product-card__qty-input" aria-label="Quantity" readonly>
         <button type="button" class="product-card__qty-btn" data-action="increase" aria-label="Increase quantity">+</button>
       </div>
     </div>

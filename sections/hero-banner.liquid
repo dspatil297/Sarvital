@@ -7,6 +7,7 @@
       break
     endif
   endfor
+  assign lcp_hero_image_done = false
 -%}
 
 <section
@@ -20,6 +21,28 @@
     data-paused="false"
   {% endif %}
 >
+  {%- comment -%} Early LCP hint: first slide with an image (not necessarily blocks[0]). Improves discovery before parser reaches <picture>. {%- endcomment -%}
+  {% if has_carousel_slides %}
+    {% for block in slide_blocks %}
+      {% if block.settings.image != blank %}
+        {% assign preload_mobile = block.settings.mobile_image | default: block.settings.image %}
+        <link
+          rel="preload"
+          as="image"
+          imagesrcset="{{ preload_mobile | image_url: width: 480 }} 480w, {{ preload_mobile | image_url: width: 768 }} 768w, {{ block.settings.image | image_url: width: 1024 }} 1024w, {{ block.settings.image | image_url: width: 1280 }} 1280w"
+          imagesizes="100vw"
+        >
+        {% break %}
+      {% endif %}
+    {% endfor %}
+  {% elsif section.settings.hero_image != blank %}
+    <link
+      rel="preload"
+      as="image"
+      imagesrcset="{{ section.settings.hero_image | image_url: width: 960 }} 960w, {{ section.settings.hero_image | image_url: width: 1280 }} 1280w, {{ section.settings.hero_image | image_url: width: 1920 }} 1920w"
+      imagesizes="100vw"
+    >
+  {% endif %}
   <div class="hero-banner__image">
     {% if has_carousel_slides %}
       {%- assign first_image_done = false -%}
@@ -33,6 +56,11 @@
         >
           {%- if block.settings.image != blank -%}
             {%- assign mobile_img = block.settings.mobile_image | default: block.settings.image -%}
+            {%- assign is_lcp_hero_slide = false -%}
+            {%- unless lcp_hero_image_done -%}
+              {%- assign lcp_hero_image_done = true -%}
+              {%- assign is_lcp_hero_slide = true -%}
+            {%- endunless -%}
             <picture class="hero-banner__slide-picture">
               <source
                 media="(max-width: 768px)"
@@ -58,7 +86,8 @@
                 width="{{ block.settings.image.width }}"
                 height="{{ block.settings.image.height }}"
                 loading="eager"
-                fetchpriority="{% if forloop.first %}high{% else %}low{% endif %}"
+                fetchpriority="{% if is_lcp_hero_slide %}high{% else %}low{% endif %}"
+                decoding="{% if is_lcp_hero_slide %}sync{% else %}async{% endif %}"
                 onerror="this.classList.add('image-error'); this.alt='Image failed to load';"
               >
             </picture>
@@ -85,6 +114,7 @@
             height="{{ section.settings.hero_image.height }}"
             loading="eager"
             fetchpriority="high"
+            decoding="sync"
             onerror="this.classList.add('image-error'); this.alt='Image failed to load';"
           >
         </div>

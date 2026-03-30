@@ -24,7 +24,7 @@
             {% if products_shown >= section.settings.products_to_show %}{% break %}{% endif %}
             {% unless product and product_item.id == product.id %}
               {% assign products_shown = products_shown | plus: 1 %}
-              {% render 'product-card', product: product_item %}
+              {% render 'product-card', product: product_item, card_instance: section.id | append: '-d-' | append: forloop.index %}
               {% render 'quick-view', product: product_item %}
             {% endunless %}
           {% endfor %}
@@ -50,7 +50,7 @@
                   {% unless product and product_item.id == product.id %}
                     {% assign products_shown = products_shown | plus: 1 %}
                     <div class="product-grid-section__carousel-slide">
-                      {% render 'product-card', product: product_item %}
+                      {% render 'product-card', product: product_item, card_instance: section.id | append: '-c-' | append: loop_index | append: '-' | append: forloop.index %}
                       {% render 'quick-view', product: product_item %}
                     </div>
                   {% endunless %}
@@ -66,7 +66,7 @@
             {% if products_shown >= section.settings.products_to_show %}{% break %}{% endif %}
             {% unless product and product_item.id == product.id %}
               {% assign products_shown = products_shown | plus: 1 %}
-              {% render 'product-card', product: product_item %}
+              {% render 'product-card', product: product_item, card_instance: section.id | append: '-g-' | append: forloop.index %}
               {% render 'quick-view', product: product_item %}
             {% endunless %}
           {% endfor %}

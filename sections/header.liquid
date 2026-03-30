@@ -5,19 +5,25 @@
       <a href="{{ routes.root_url }}" class="logo-link" aria-label="{{ shop.name }} - Home">
         {% if section.settings.logo %}
           <img
-            src="{{ section.settings.logo | image_url: width: 200 }}"
+            src="{{ section.settings.logo | image_url: width: 240 }}"
+            srcset="{{ section.settings.logo | image_url: width: 120 }} 120w, {{ section.settings.logo | image_url: width: 240 }} 240w"
+            sizes="(max-width: 768px) 120px, 160px"
             alt="{{ shop.name }}"
             width="{{ section.settings.logo.width }}"
             height="{{ section.settings.logo.height }}"
             loading="eager"
+            fetchpriority="low"
+            decoding="async"
           >
         {% else %}
           <img
             src="{{ 'Logo.png' | asset_url }}"
             alt="{{ shop.name }}"
-            width="200"
-            height=""
+            width="184"
+            height="88"
             loading="eager"
+            fetchpriority="low"
+            decoding="async"
             style="height: auto; max-height: 50px; width: auto;"
           >
         {% endif %}

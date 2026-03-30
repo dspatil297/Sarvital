@@ -214,7 +214,7 @@
           <div class="cart-page__recommended-grid">
             {% assign recommended_collection = collections[section.settings.recommended_collection] | default: collections.all %}
             {% for product in recommended_collection.products limit: 4 %}
-              {% render 'product-card', product: product %}
+              {% render 'product-card', product: product, card_instance: section.id | append: '-rec-' | append: forloop.index %}
             {% endfor %}
           </div>
         </div>
