@@ -1,70 +1,80 @@
 {% comment %}
-  Product Reviews Section - Minimalist Design
+  Product Reviews Section
 {% endcomment %}
 
-<section class="product-reviews">
+{% assign average_rating = section.settings.average_rating | default: 4.8 | times: 1 %}
+{% assign average_rating_floor = average_rating | floor %}
+{% assign average_rating_next_star = average_rating_floor | plus: 1 %}
+{% assign average_rating_decimal = average_rating | minus: average_rating_floor %}
+
+<section class="product-reviews" id="product-reviews">
   <div class="product-reviews__container">
     {% if section.settings.title != blank %}
-      <h2 class="product-reviews__title">{{ section.settings.title }}</h2>
+      <header class="product-reviews__header">
+        <h2 class="product-reviews__title">{{ section.settings.title }}</h2>
+      </header>
     {% endif %}
-    
+
     {% if section.settings.show_rating_summary %}
-      <div class="product-reviews__summary">
-        <div class="rating-summary">
-          <div class="rating-summary__average">
-            <span class="rating-summary__number">{{ section.settings.average_rating | default: "4.8" }}</span>
-            <div class="rating-summary__stars">
-              {% assign rating = section.settings.average_rating | default: 4.8 | times: 1 %}
-              {% assign rating_floor = rating | floor %}
-              {% assign next_star = rating_floor | plus: 1 %}
-              {% assign rating_decimal = rating | minus: rating_floor %}
-              {% for i in (1..5) %}
-                {% if i <= rating_floor %}
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
-                  </svg>
-                {% elsif i == next_star and rating_decimal >= 0.5 %}
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
-                    <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="currentColor" clip-path="inset(0 50% 0 0)"/>
-                  </svg>
-                {% else %}
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
-                  </svg>
-                {% endif %}
-              {% endfor %}
-            </div>
-            <span class="rating-summary__count">Based on {{ section.settings.review_count | default: "127" }} reviews</span>
+      <div class="reviews-summary">
+        <div class="reviews-summary__score">
+          <p class="reviews-summary__label">Average rating</p>
+          <div class="reviews-summary__value-line">
+            <span class="reviews-summary__value">{{ average_rating }}</span>
+            <span class="reviews-summary__out-of">/ 5.0</span>
           </div>
+          <div class="reviews-summary__stars" aria-hidden="true">
+            {% for i in (1..5) %}
+              {% if i <= average_rating_floor %}
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+                </svg>
+              {% elsif i == average_rating_next_star and average_rating_decimal >= 0.5 %}
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+                  <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="currentColor" clip-path="inset(0 50% 0 0)"/>
+                </svg>
+              {% else %}
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+                </svg>
+              {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="reviews-summary__meta">
+          <p class="reviews-summary__count">{{ section.settings.review_count | default: "127" }} reviews</p>
+          <p class="reviews-summary__copy">Real stories from customers using this product in daily life.</p>
         </div>
       </div>
     {% endif %}
-    
+
     {% if section.blocks.size > 0 %}
-      <div class="product-reviews__list">
+      <div class="product-reviews__grid">
         {% for block in section.blocks %}
-          <div class="review-card" {{ block.shopify_attributes }}>
-            <div class="review-card__header">
+          {% assign card_rating = block.settings.rating | default: 5 | times: 1 %}
+          <article class="review-card" {{ block.shopify_attributes }}>
+            <div class="review-card__top">
               <div class="review-card__author">
-                <div class="review-card__avatar">
+                <span class="review-card__avatar">
                   {% if block.settings.customer_initials != blank %}
-                    {{ block.settings.customer_initials }}
+                    {{ block.settings.customer_initials | upcase }}
                   {% else %}
-                    {{ block.settings.customer_name | slice: 0 | upcase }}
+                    {{ block.settings.customer_name | default: "Customer" | slice: 0 | upcase }}
                   {% endif %}
-                </div>
-                <div class="review-card__info">
-                  <div class="review-card__name">{{ block.settings.customer_name | default: "Customer" }}</div>
+                </span>
+                <div class="review-card__identity">
+                  <p class="review-card__name">{{ block.settings.customer_name | default: "Customer" }}</p>
                   {% if block.settings.verified_purchase %}
-                    <span class="review-card__verified">Verified Purchase</span>
+                    <span class="review-card__verified">Verified purchase</span>
                   {% endif %}
                 </div>
               </div>
-              <div class="review-card__rating">
-                {% assign rating = block.settings.rating | default: 5 | times: 1 %}
+
+              <div class="review-card__rating" aria-hidden="true">
                 {% for i in (1..5) %}
-                  {% if i <= rating %}
+                  {% if i <= card_rating %}
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
                     </svg>
@@ -76,19 +86,15 @@
                 {% endfor %}
               </div>
             </div>
-            
+
             {% if block.settings.review_text != blank %}
-              <div class="review-card__text">
-                {{ block.settings.review_text }}
-              </div>
+              <div class="review-card__text">{{ block.settings.review_text }}</div>
             {% endif %}
-            
+
             {% if block.settings.review_date != blank %}
-              <div class="review-card__date">
-                {{ block.settings.review_date }}
-              </div>
+              <p class="review-card__date">{{ block.settings.review_date }}</p>
             {% endif %}
-          </div>
+          </article>
         {% endfor %}
       </div>
     {% endif %}
@@ -99,8 +105,10 @@
   .product-reviews {
     width: 100%;
     max-width: 100%;
-    padding: 100px 40px;
-    background: var(--bg);
+    padding: 96px 40px;
+    background:
+      radial-gradient(circle at top right, rgba(74, 124, 44, 0.08) 0%, rgba(74, 124, 44, 0) 45%),
+      var(--bg);
     box-sizing: border-box;
   }
 
@@ -109,168 +117,221 @@
     margin: 0 auto;
   }
 
+  .product-reviews__header {
+    margin-bottom: 36px;
+    text-align: center;
+  }
+
   .product-reviews__title {
-    text-align: center;
+    margin: 0;
     font-family: var(--font-heading);
-    font-size: 42px;
-    font-weight: 600;
-    color: var(--text);
-    margin-bottom: 50px;
+    font-size: clamp(2rem, 4.8vw, 2.8rem);
+    font-weight: 700;
+    line-height: 1.15;
     letter-spacing: -0.02em;
-    line-height: 1.2;
+    color: var(--text);
   }
 
-  .product-reviews__summary {
-    margin-bottom: 60px;
+  .reviews-summary {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 18px;
+    margin-bottom: 40px;
+    padding: 28px;
+    border: 1px solid rgba(74, 124, 44, 0.18);
+    border-radius: 22px;
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.96), rgba(247, 250, 244, 0.96));
+    box-shadow: 0 16px 34px rgba(21, 33, 13, 0.08);
   }
 
-  .rating-summary {
-    text-align: center;
-    padding: 48px;
+  .reviews-summary__score {
+    border-radius: 16px;
+    padding: 22px;
     background: var(--white);
-    border-radius: 12px;
-    border: 1px solid var(--border-color);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(74, 124, 44, 0.14);
   }
 
-  .rating-summary__average {
+  .reviews-summary__label {
+    margin: 0 0 10px;
+    font-size: 0.82rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(26, 26, 26, 0.6);
+  }
+
+  .reviews-summary__value-line {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 16px;
-  }
-
-  .rating-summary__number {
-    font-family: var(--font-heading);
-    font-size: 64px;
-    font-weight: 600;
-    color: var(--sage-green);
-    line-height: 1;
-  }
-
-  .rating-summary__stars {
-    display: flex;
+    align-items: baseline;
     gap: 6px;
+    margin-bottom: 10px;
+  }
+
+  .reviews-summary__value {
+    font-size: clamp(2rem, 5vw, 2.8rem);
+    line-height: 1;
+    font-weight: 700;
+    color: var(--forest-green);
+  }
+
+  .reviews-summary__out-of {
+    font-size: 1rem;
+    color: rgba(26, 26, 26, 0.55);
+  }
+
+  .reviews-summary__stars {
+    display: flex;
+    gap: 4px;
     color: var(--sage-green);
   }
 
-  .rating-summary__count {
-    font-size: 16px;
-    color: rgba(26, 26, 26, 0.7);
-    font-weight: 400;
-  }
-
-  .product-reviews__list {
+  .reviews-summary__meta {
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    justify-content: center;
+    gap: 10px;
+    border-radius: 16px;
+    padding: 22px;
+    background: rgba(45, 80, 22, 0.04);
+  }
+
+  .reviews-summary__count {
+    margin: 0;
+    font-size: clamp(1.05rem, 2vw, 1.35rem);
+    font-weight: 650;
+    color: var(--forest-green);
+  }
+
+  .reviews-summary__copy {
+    margin: 0;
+    font-size: 0.96rem;
+    line-height: 1.55;
+    color: rgba(26, 26, 26, 0.72);
+  }
+
+  .product-reviews__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
   }
 
   .review-card {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-height: 100%;
+    border-radius: 18px;
+    padding: 24px;
+    border: 1px solid rgba(74, 124, 44, 0.18);
     background: var(--white);
-    padding: 40px;
-    border-radius: 12px;
-    border: 1px solid var(--border-color);
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 10px 24px rgba(18, 32, 11, 0.06);
+    transition: transform 0.24s ease, box-shadow 0.24s ease, border-color 0.24s ease;
   }
 
   .review-card:hover {
-    box-shadow: 0 8px 24px rgba(74, 124, 44, 0.1);
-    border-color: var(--sage-green);
     transform: translateY(-2px);
+    border-color: rgba(74, 124, 44, 0.35);
+    box-shadow: 0 16px 30px rgba(18, 32, 11, 0.1);
   }
 
-  .review-card__header {
+  .review-card__top {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-    gap: 16px;
+    gap: 14px;
   }
 
   .review-card__author {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 12px;
+    min-width: 0;
   }
 
   .review-card__avatar {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    background: var(--forest-green);
-    display: flex;
+    width: 44px;
+    height: 44px;
+    flex: 0 0 44px;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
+    border-radius: 50%;
+    background: linear-gradient(145deg, var(--forest-green), var(--sage-green));
     color: var(--white);
-    font-weight: 600;
-    font-size: 18px;
+    font-size: 0.95rem;
+    font-weight: 700;
   }
 
-  .review-card__info {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
+  .review-card__identity {
+    min-width: 0;
   }
 
   .review-card__name {
-    font-weight: 600;
-    color: var(--forest-green);
-    font-size: 16px;
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 650;
+    line-height: 1.3;
+    color: var(--text);
   }
 
   .review-card__verified {
-    font-size: 13px;
+    display: inline-flex;
+    align-items: center;
+    margin-top: 3px;
+    font-size: 0.78rem;
+    font-weight: 600;
     color: var(--sage-green);
-    font-weight: 400;
+    letter-spacing: 0.02em;
   }
 
   .review-card__rating {
-    display: flex;
+    display: inline-flex;
     gap: 2px;
     color: var(--sage-green);
+    padding-top: 2px;
   }
 
   .review-card__text {
-    font-size: 16px;
-    line-height: 1.8;
-    color: rgba(26, 26, 26, 0.8);
-    margin-bottom: 16px;
-    font-weight: 300;
+    margin: 0;
+    font-size: 0.98rem;
+    line-height: 1.65;
+    color: rgba(26, 26, 26, 0.82);
   }
 
   .review-card__date {
-    font-size: 14px;
-    color: rgba(26, 26, 26, 0.5);
-    font-weight: 300;
+    margin: auto 0 0;
+    padding-top: 4px;
+    border-top: 1px dashed rgba(74, 124, 44, 0.22);
+    font-size: 0.83rem;
+    color: rgba(26, 26, 26, 0.58);
+  }
+
+  @media (max-width: 900px) {
+    .product-reviews {
+      padding: 72px 24px;
+    }
+
+    .reviews-summary {
+      grid-template-columns: 1fr;
+    }
   }
 
   @media (max-width: 768px) {
     .product-reviews {
-      padding: 60px 20px;
+      padding: 58px 18px;
     }
 
-    .product-reviews__title {
-      font-size: 36px;
-      margin-bottom: 40px;
+    .product-reviews__header {
+      margin-bottom: 24px;
     }
 
-    .rating-summary {
-      padding: 32px 24px;
-    }
-
-    .rating-summary__number {
-      font-size: 48px;
+    .product-reviews__grid {
+      grid-template-columns: 1fr;
+      gap: 14px;
     }
 
     .review-card {
-      padding: 32px 24px;
-    }
-
-    .review-card__header {
-      flex-direction: column;
+      padding: 20px;
+      border-radius: 14px;
     }
   }
 {% endstylesheet %}

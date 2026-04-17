@@ -15,20 +15,37 @@
       {% assign has_nutrition = true %}
     {% endif %}
     
-    <!-- Always show nutrition section -->
-    <div class="nutrition-section">
-      <div class="section-header">
-        <div class="section-icon">
+    <div class="pdp-nutrition-shell">
+      <button
+        type="button"
+        class="pdp-nutrition-shell__toggle"
+        id="pdp-nutrition-toggle"
+        aria-expanded="false"
+        aria-controls="pdp-nutrition-panel"
+      >
+        <span class="pdp-nutrition-shell__icon">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M6 9H4a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V11a2 2 0 0 0-2-2h-2"/>
             <rect x="6" y="1" width="12" height="8" rx="1" ry="1"/>
             <path d="M8 13h8M8 17h8M8 21h4"/>
           </svg>
-        </div>
-        <h2 class="section-title">Nutrition Facts</h2>
-      </div>
-      
-      <div class="nutrition-table-wrapper">
+        </span>
+        <span class="pdp-nutrition-shell__copy">
+          <span class="pdp-nutrition-shell__eyebrow">Nutrition clarity</span>
+          <span class="pdp-nutrition-shell__title">Nutrition facts panel</span>
+          <span class="pdp-nutrition-shell__subtitle">Fast scan values per 100 g and % RDA per serve.</span>
+        </span>
+        <span class="pdp-nutrition-shell__action" aria-hidden="true">View nutrition</span>
+      </button>
+
+      <div
+        class="pdp-nutrition-shell__panel"
+        id="pdp-nutrition-panel"
+        role="region"
+        aria-labelledby="pdp-nutrition-toggle"
+        hidden
+      >
+        <div class="pdp-nutrition-table-wrapper">
         <table class="nutrition-table" 
                data-nutrition="{{ nutrition_value | escape }}"
                {% if nutrition_value %}data-nutrition-json="{{ nutrition_value | json | escape }}"{% endif %}>
@@ -164,6 +181,7 @@
             {% endif %}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
 
@@ -173,6 +191,22 @@
 <script>
   ;(function() {
     'use strict';
+    var nutritionToggle = document.getElementById('pdp-nutrition-toggle');
+    var nutritionPanel = document.getElementById('pdp-nutrition-panel');
+    if (nutritionToggle && nutritionPanel) {
+      var nutritionAction = nutritionToggle.querySelector('.pdp-nutrition-shell__action');
+      function setNutritionExpanded(expanded) {
+        nutritionToggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+        nutritionPanel.hidden = !expanded;
+        if (nutritionAction) nutritionAction.textContent = expanded ? 'Hide nutrition' : 'View nutrition';
+      }
+      setNutritionExpanded(nutritionToggle.getAttribute('aria-expanded') === 'true');
+      nutritionToggle.addEventListener('click', function() {
+        var expanded = nutritionToggle.getAttribute('aria-expanded') === 'true';
+        setNutritionExpanded(!expanded);
+      });
+    }
+
     var nutritionTable = document.querySelector('.nutrition-table tbody');
     var tableElement = document.querySelector('.nutrition-table');
     
@@ -244,6 +278,7 @@
             nutritionData = nutritionRaw;
           }
         }
+      }
       }
       
       if (nutritionData) {
@@ -566,139 +601,107 @@
     margin: 0 auto;
   }
 
-  .nutrition-section {
-    background: linear-gradient(145deg, var(--white) 0%, rgba(255, 255, 255, 0.95) 100%);
-    border-radius: 24px;
-    padding: 32px 32px;
-    box-shadow: 
-      0 10px 40px rgba(45, 80, 22, 0.08),
-      0 4px 12px rgba(0, 0, 0, 0.04),
-      inset 0 1px 0 rgba(255, 255, 255, 0.9);
-    border: 2px solid rgba(74, 124, 44, 0.12);
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
+  .pdp-nutrition-shell {
+    background: linear-gradient(160deg, rgba(255, 255, 255, 0.95), rgba(74, 124, 44, 0.06));
+    border: 1px solid rgba(45, 80, 22, 0.14);
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(45, 80, 22, 0.08);
     overflow: hidden;
   }
 
-  .nutrition-section::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, var(--forest-green), var(--sage-green));
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .nutrition-section:hover::before {
-    transform: scaleX(1);
-  }
-
-  .nutrition-section:hover {
-    box-shadow: 
-      0 20px 60px rgba(45, 80, 22, 0.15),
-      0 8px 24px rgba(0, 0, 0, 0.08),
-      inset 0 1px 0 rgba(255, 255, 255, 0.9);
-    transform: translateY(-8px) scale(1.01);
-    border-color: rgba(74, 124, 44, 0.25);
-  }
-
-  .section-header {
+  .pdp-nutrition-shell__toggle {
+    width: 100%;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 20px;
-    margin-bottom: 36px;
-    padding-bottom: 28px;
-    border-bottom: 3px solid;
-    border-image: linear-gradient(90deg, var(--forest-green), var(--sage-green), transparent) 1;
-    position: relative;
+    gap: 14px;
+    padding: 18px 20px;
+    text-align: left;
+    border-bottom: 1px solid rgba(26, 26, 26, 0.08);
   }
 
-  .section-header::after {
-    content: '';
-    position: absolute;
-    bottom: -3px;
-    left: 0;
-    width: 60px;
-    height: 3px;
-    background: linear-gradient(90deg, var(--sage-green), rgba(74, 124, 44, 0.3));
-    border-radius: 2px;
+  .pdp-nutrition-shell__toggle:focus-visible {
+    outline: 2px solid var(--forest-green);
+    outline-offset: -2px;
   }
 
-  .section-icon {
-    width: 64px;
-    height: 64px;
-    display: flex;
+  .pdp-nutrition-shell__icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, var(--forest-green) 0%, var(--sage-green) 100%);
-    border-radius: 18px;
-    color: var(--white);
+    color: var(--forest-green);
+    background: rgba(74, 124, 44, 0.14);
     flex-shrink: 0;
-    box-shadow: 
-      0 8px 20px rgba(45, 80, 22, 0.25),
-      inset 0 1px 0 rgba(255, 255, 255, 0.2);
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-    overflow: hidden;
   }
 
-  .section-icon::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-    transform: rotate(45deg);
-    transition: all 0.6s;
+  .pdp-nutrition-shell__copy {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+    flex: 1;
   }
 
-  .nutrition-section:hover .section-icon::before {
-    animation: shine 1.5s ease-in-out;
-  }
-
-  @keyframes shine {
-    0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
-    100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
-  }
-
-  .section-icon svg {
-    width: 28px;
-    height: 28px;
-    position: relative;
-    z-index: 1;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
-  }
-
-  .nutrition-section:hover .section-icon {
-    transform: rotate(5deg) scale(1.1);
-    box-shadow: 
-      0 12px 30px rgba(45, 80, 22, 0.35),
-      inset 0 1px 0 rgba(255, 255, 255, 0.2);
-  }
-
-  .section-title {
-    font-family: var(--font-heading);
-    font-size: 32px;
+  .pdp-nutrition-shell__eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
     font-weight: 700;
-    background: linear-gradient(135deg, var(--forest-green) 0%, var(--sage-green) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin: 0;
-    letter-spacing: -0.02em;
-    line-height: 1.2;
-    text-shadow: 0 2px 4px rgba(45, 80, 22, 0.1);
+    color: rgba(45, 80, 22, 0.72);
   }
 
-  .nutrition-table-wrapper {
+  .pdp-nutrition-shell__title {
+    font-family: var(--font-heading);
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.2;
+  }
+
+  .pdp-nutrition-shell__subtitle {
+    font-size: 13px;
+    line-height: 1.45;
+    color: rgba(26, 26, 26, 0.62);
+  }
+
+  .pdp-nutrition-shell__action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 9px 14px;
+    border-radius: 999px;
+    background: rgba(74, 124, 44, 0.14);
+    color: var(--forest-green);
+    font-size: 13px;
+    line-height: 1;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .pdp-nutrition-shell__toggle[aria-expanded='true'] .pdp-nutrition-shell__action {
+    background: rgba(45, 80, 22, 0.2);
+  }
+
+  .pdp-nutrition-shell__panel {
+    padding: 16px 20px 20px;
+  }
+
+  .pdp-nutrition-shell__panel[hidden] {
+    display: none !important;
+    padding: 0;
+    border: 0;
+  }
+
+  .pdp-nutrition-table-wrapper {
     overflow-x: auto;
     border-radius: 12px;
+    border: 1px solid rgba(26, 26, 26, 0.08);
+    background: var(--white);
   }
 
   .nutrition-table {
@@ -714,7 +717,7 @@
   }
 
   .nutrition-table thead {
-    background: linear-gradient(135deg, var(--forest-green) 0%, var(--sage-green) 100%);
+    background: var(--forest-green);
   }
 
   .nutrition-table th {
@@ -724,9 +727,9 @@
     font-size: 16px;
     font-weight: 700;
     color: var(--white);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+    text-transform: none;
+    letter-spacing: 0.01em;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.18);
   }
 
   .nutrition-table th:first-child {
@@ -784,22 +787,16 @@
       padding: 40px 20px;
     }
 
-    .nutrition-section {
-      padding: 28px 24px;
+    .pdp-nutrition-shell__toggle {
+      padding: 16px;
     }
 
-    .section-title {
-      font-size: 28px;
+    .pdp-nutrition-shell__title {
+      font-size: 20px;
     }
 
-    .section-icon {
-      width: 56px;
-      height: 56px;
-    }
-
-    .section-icon svg {
-      width: 24px;
-      height: 24px;
+    .pdp-nutrition-shell__panel {
+      padding: 14px 16px 16px;
     }
 
     .nutrition-table th,
@@ -814,30 +811,31 @@
       padding: 30px 16px;
     }
 
-    .nutrition-section {
-      padding: 24px 20px;
-      border-radius: 20px;
+    .pdp-nutrition-shell {
+      border-radius: 14px;
     }
 
-    .section-header {
-      margin-bottom: 28px;
-      padding-bottom: 24px;
-      gap: 16px;
+    .pdp-nutrition-shell__toggle {
+      padding: 14px;
+      gap: 10px;
     }
 
-    .section-icon {
-      width: 52px;
-      height: 52px;
-      border-radius: 16px;
+    .pdp-nutrition-shell__icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
     }
 
-    .section-icon svg {
-      width: 22px;
-      height: 22px;
+    .pdp-nutrition-shell__title {
+      font-size: 18px;
     }
 
-    .section-title {
-      font-size: 26px;
+    .pdp-nutrition-shell__subtitle {
+      font-size: 12px;
+    }
+
+    .pdp-nutrition-shell__panel {
+      padding: 12px 14px 14px;
     }
 
     .nutrition-table th,
@@ -856,33 +854,7 @@
       padding: 24px 16px;
     }
 
-    .nutrition-section {
-      padding: 20px 16px;
-      border-radius: 16px;
-    }
-
-    .section-header {
-      gap: 12px;
-      margin-bottom: 24px;
-      padding-bottom: 20px;
-    }
-
-    .section-icon {
-      width: 48px;
-      height: 48px;
-      border-radius: 14px;
-    }
-
-    .section-icon svg {
-      width: 20px;
-      height: 20px;
-    }
-
-    .section-title {
-      font-size: 22px;
-    }
-
-    .nutrition-table-wrapper {
+    .pdp-nutrition-table-wrapper {
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
     }

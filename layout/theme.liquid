@@ -38,6 +38,9 @@
 
     {%- comment -%} Critical CSS - load normally to avoid "preloaded but not used" console warning {%- endcomment -%}
     {{ 'critical.css' | asset_url | stylesheet_tag }}
+    {%- if request.page_type == 'product' -%}
+      {{ 'reviews-carousel-product.css' | asset_url | stylesheet_tag }}
+    {%- endif -%}
 
     {%- comment -%} SEO Meta Tags {%- endcomment -%}
     {% render 'meta-tags' %}

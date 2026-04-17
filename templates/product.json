@@ -33,10 +33,6 @@
       "name": "Ingredients & Nutrition",
       "settings": {}
     },
-    "product_trust_badges_compact": {
-      "type": "product-trust-badges-compact",
-      "settings": {}
-    },
     "product_image_banner": {
       "type": "product-image-banner",
       "settings": {
@@ -111,10 +107,9 @@
     "product_main",
     "product_benefits_compact",
     "product_ingredients_nutrition_y7n8pk",
-    "product_trust_badges_compact",
     "product_image_banner",
+    "1769418164e60d6e16",
     "related_products",
-    "product_faq",
-    "1769418164e60d6e16"
+    "product_faq"
   ]
 }

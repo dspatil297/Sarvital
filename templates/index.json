@@ -15,29 +15,29 @@
         "slide_Nq893k": {
           "type": "slide",
           "settings": {
-            "image": "shopify://shop_images/WhatsApp_Image_2026-01-30_at_11.50.09.jpg",
-            "mobile_image": "shopify://shop_images/WhatsApp_Image_2026-01-30_at_11.50.09_1f4d78e9-90f0-40ab-8e56-190e431adecf.jpg"
+            "image": "shopify://shop_images/WhatsApp_Image_2026-01-30_at_11.50.09_14ac557d-a7ca-4612-accf-6ccaf47acc0d.webp",
+            "mobile_image": "shopify://shop_images/WhatsApp_Image_2026-01-30_at_11.50.09.webp"
           }
         },
         "slide_4NXNRf": {
           "type": "slide",
           "settings": {
-            "image": "shopify://shop_images/WhatsApp_Image_2026-01-31_at_13.44.35.jpg",
-            "mobile_image": "shopify://shop_images/WhatsApp_Image_2026-01-31_at_13.44.35_06cef7b8-8227-4568-a326-2bfd3b461eec.jpg"
+            "image": "shopify://shop_images/WhatsApp_Image_2026-01-31_at_13.44.35_a64133cf-50f0-4be1-8fe0-0556bae000f2.webp",
+            "mobile_image": "shopify://shop_images/WhatsApp_Image_2026-01-31_at_13.44.35.webp"
           }
         },
         "slide_hMhcUm": {
           "type": "slide",
           "settings": {
-            "image": "shopify://shop_images/WhatsApp_Image_2026-01-31_at_13.44.35_1.jpg",
-            "mobile_image": "shopify://shop_images/WhatsApp_Image_2026-01-31_at_13.44.35_1_4cb17f7c-1ee6-44e8-ae16-afe36b9bb64e.jpg"
+            "image": "shopify://shop_images/WhatsApp_Image_2026-01-31_at_13.44.34_1_f5d4b477-adf5-49d1-ad4d-f933dd613f41.webp",
+            "mobile_image": "shopify://shop_images/WhatsApp_Image_2026-01-31_at_13.44.34_1.webp"
           }
         },
         "slide_knjxEJ": {
           "type": "slide",
           "settings": {
-            "image": "shopify://shop_images/WhatsApp_Image_2026-01-31_at_13.44.34.jpg",
-            "mobile_image": "shopify://shop_images/WhatsApp_Image_2026-01-31_at_13.44.34_81636a0b-d116-4848-b962-35e323b6fec7.jpg"
+            "image": "shopify://shop_images/WhatsApp_Image_2026-01-31_at_13.44.35_1_226df6b3-7767-4273-8743-18131fd0a5a8.webp",
+            "mobile_image": "shopify://shop_images/WhatsApp_Image_2026-01-31_at_13.44.35_1.webp"
           }
         }
       },
@@ -48,7 +48,6 @@
         "slide_knjxEJ"
       ],
       "settings": {
-        "hero_image": "shopify://shop_images/WhatsApp_Image_2026-01-30_at_11.50.09.jpg",
         "heading": "Transform Your Health with Nature's Finest",
         "subheading": "Premium natural fruit & vegetable powders. Lab-tested, sustainably sourced, and packed with natural goodness.",
         "cta_text": "Shop Now",
@@ -288,10 +287,10 @@
   "order": [
     "hero_banner",
     "usp_icons",
+    "176943494681be9f0a",
     "featured_products",
     "lifestyle_usage",
     "quality_assurance",
-    "176943494681be9f0a",
     "home_faq"
   ]
 }

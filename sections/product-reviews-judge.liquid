@@ -1,26 +1,20 @@
 {% comment %}
-  Product Reviews Section - Judge.me Review Widget Integration
-  Shows star ratings and text reviews with basic user info
+  Product Reviews Section - Judge.me
 {% endcomment %}
 
 <section class="product-reviews-judge" id="product-reviews">
   <div class="product-reviews-judge__container">
-    <h2 class="reviews-title">Customer Reviews</h2>
-    
-    {% comment %} Judge.me Review Widget - Standard Integration {% endcomment %}
-    <div class="judge-me-reviews-wrapper">
-      {% comment %} Method 1: Standard Judge.me Review Widget {% endcomment %}
-      <div id="judgeme_product_reviews" data-product-id="{{ product.id }}">
-        {% comment %} Judge.me will populate this automatically {% endcomment %}
-      </div>
-      
-      {% comment %} Method 2: If Judge.me snippet exists {% endcomment %}
+    <header class="product-reviews-judge__header">
+      <h2 class="product-reviews-judge__title">Customer reviews</h2>
+      <p class="product-reviews-judge__subtitle">Real feedback from verified buyers and product users.</p>
+    </header>
+
+    <div class="judge-me-shell">
       {% if snippets['judge-me-product-reviews'] %}
         {% render 'judge-me-product-reviews', product: product %}
+      {% else %}
+        <div class="jdgm-widget jdgm-review-widget" data-id="{{ product.id }}"></div>
       {% endif %}
-      
-      {% comment %} Method 3: Alternative widget container {% endcomment %}
-      <div class="jdgm-widget jdgm-review-widget" data-id="{{ product.id }}"></div>
     </div>
   </div>
 </section>
@@ -29,8 +23,10 @@
   .product-reviews-judge {
     width: 100%;
     max-width: 100%;
-    padding: 40px 40px;
-    background: linear-gradient(135deg, rgba(45, 80, 22, 0.02) 0%, rgba(74, 124, 44, 0.03) 100%);
+    padding: 96px 40px;
+    background:
+      radial-gradient(circle at top right, rgba(74, 124, 44, 0.08) 0%, rgba(74, 124, 44, 0) 45%),
+      var(--bg);
     box-sizing: border-box;
   }
 
@@ -39,182 +35,256 @@
     margin: 0 auto;
   }
 
-  .reviews-title {
-    font-family: var(--font-heading);
-    font-size: 32px;
-    font-weight: 700;
+  .product-reviews-judge__header {
     text-align: center;
-    margin: 0 0 32px 0;
-    background: linear-gradient(135deg, var(--forest-green) 0%, var(--sage-green) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    margin-bottom: 30px;
   }
 
-  .judge-me-reviews-wrapper {
-    background: var(--white);
-    border-radius: 24px;
-    padding: 40px;
-    box-shadow: 
-      0 10px 40px rgba(45, 80, 22, 0.08),
-      0 4px 12px rgba(0, 0, 0, 0.04),
-      inset 0 1px 0 rgba(255, 255, 255, 0.9);
-    border: 2px solid rgba(74, 124, 44, 0.12);
+  .product-reviews-judge__title {
+    margin: 0;
+    font-family: var(--font-heading);
+    font-size: clamp(2rem, 4.8vw, 2.8rem);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: var(--text);
   }
 
-  {% comment %} Judge.me Widget Styling Overrides {% endcomment %}
-  .judge-me-reviews-wrapper .jdgm-widget,
-  .judge-me-reviews-wrapper .jdgm-review-widget,
-  .judge-me-reviews-wrapper .jdgm-rev-widget {
+  .product-reviews-judge__subtitle {
+    margin: 10px 0 0;
+    font-size: 1rem;
+    line-height: 1.55;
+    color: rgba(26, 26, 26, 0.72);
+  }
+
+  .judge-me-shell {
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.96), rgba(247, 250, 244, 0.96));
+    border-radius: 22px;
+    padding: 28px;
+    border: 1px solid rgba(74, 124, 44, 0.18);
+    box-shadow: 0 16px 34px rgba(21, 33, 13, 0.08);
+  }
+
+  .judge-me-shell .jdgm-widget,
+  .judge-me-shell .jdgm-review-widget,
+  .judge-me-shell .jdgm-rev-widget {
     font-family: inherit;
   }
 
-  .judge-me-reviews-wrapper .jdgm-rev-widget {
+  .judge-me-shell .jdgm-rev-widget {
     padding: 0;
   }
 
-  .judge-me-reviews-wrapper .jdgm-rev__header {
-    padding: 20px 0;
-    border-bottom: 1px solid rgba(74, 124, 44, 0.1);
+  .judge-me-shell .jdgm-row-stars,
+  .judge-me-shell .jdgm-histogram,
+  .judge-me-shell .jdgm-rev-widg__summary {
+    width: 100%;
+    max-width: 100%;
   }
 
-  .judge-me-reviews-wrapper .jdgm-rev__body {
-    padding: 20px 0;
-    color: rgba(26, 26, 26, 0.8);
-    line-height: 1.7;
+  .judge-me-shell .jdgm-rev-widg {
+    margin: 0;
+    border-radius: 16px;
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(74, 124, 44, 0.14);
   }
 
-  .judge-me-reviews-wrapper .jdgm-rev__rating {
+  .judge-me-shell .jdgm-rev__rating,
+  .judge-me-shell .jdgm-star {
     color: var(--sage-green);
   }
 
-  .judge-me-reviews-wrapper .jdgm-rev__author {
+  .judge-me-shell .jdgm-rev__author {
     font-weight: 600;
     color: var(--text);
   }
 
-  .judge-me-reviews-wrapper .jdgm-rev__timestamp {
+  .judge-me-shell .jdgm-rev__timestamp {
     color: rgba(26, 26, 26, 0.6);
-    font-size: 14px;
+    font-size: 0.84rem;
   }
 
-  .judge-me-reviews-wrapper .jdgm-rev__icon {
-    color: var(--forest-green);
+  .judge-me-shell .jdgm-rev {
+    margin: 0;
+    padding: 22px 0;
+    border-bottom: 1px solid rgba(74, 124, 44, 0.16);
   }
 
-  .judge-me-reviews-wrapper .jdgm-rev-widget {
-    background: transparent;
-  }
-
-  .judge-me-reviews-wrapper .jdgm-rev {
-    padding: 24px 0;
-    border-bottom: 1px solid rgba(74, 124, 44, 0.1);
-  }
-
-  .judge-me-reviews-wrapper .jdgm-rev:last-child {
+  .judge-me-shell .jdgm-rev:last-child {
     border-bottom: none;
   }
 
-  .judge-me-reviews-wrapper .jdgm-paginate {
-    margin-top: 32px;
-    padding-top: 24px;
-    border-top: 1px solid rgba(74, 124, 44, 0.1);
+  .judge-me-shell .jdgm-rev__header {
+    padding: 0;
+    border-bottom: none;
+    margin-bottom: 10px;
   }
 
-  .judge-me-reviews-wrapper .jdgm-paginate__page {
+  .judge-me-shell .jdgm-rev__title {
+    margin: 0 0 8px;
+    font-size: 1.04rem;
+    line-height: 1.4;
+    color: var(--text);
+  }
+
+  .judge-me-shell .jdgm-rev__body {
+    padding: 0;
+    color: rgba(26, 26, 26, 0.82);
+    font-size: 0.98rem;
+    line-height: 1.68;
+  }
+
+  .judge-me-shell .jdgm-paginate {
+    margin-top: 20px;
+    padding-top: 18px;
+    border-top: 1px solid rgba(74, 124, 44, 0.16);
+  }
+
+  .judge-me-shell .jdgm-paginate__page {
     color: var(--forest-green);
-    border-color: rgba(74, 124, 44, 0.2);
+    border-color: rgba(74, 124, 44, 0.25);
+    border-radius: 8px;
   }
 
-  .judge-me-reviews-wrapper .jdgm-paginate__page:hover,
-  .judge-me-reviews-wrapper .jdgm-paginate__page.jdgm-paginate__page--current {
+  .judge-me-shell .jdgm-paginate__page:hover,
+  .judge-me-shell .jdgm-paginate__page.jdgm-paginate__page--current {
     background: var(--forest-green);
     color: var(--white);
     border-color: var(--forest-green);
   }
 
-  .judge-me-reviews-wrapper .jdgm-form {
-    margin-top: 32px;
-    padding-top: 32px;
-    border-top: 2px solid rgba(74, 124, 44, 0.15);
+  .judge-me-shell .jdgm-form {
+    margin-top: 26px;
+    padding-top: 26px;
+    border-top: 1px solid rgba(74, 124, 44, 0.2);
   }
 
-  .judge-me-reviews-wrapper .jdgm-form__title {
+  .judge-me-shell .jdgm-form__title {
     font-family: var(--font-heading);
-    font-size: 24px;
+    font-size: 1.4rem;
     font-weight: 600;
     color: var(--text);
-    margin-bottom: 20px;
+    margin-bottom: 14px;
   }
 
-  .judge-me-reviews-wrapper .jdgm-form__field input,
-  .judge-me-reviews-wrapper .jdgm-form__field textarea {
-    border: 2px solid rgba(74, 124, 44, 0.2);
-    border-radius: 8px;
-    padding: 12px 16px;
+  .judge-me-shell .jdgm-form__field input,
+  .judge-me-shell .jdgm-form__field textarea {
+    border: 1px solid rgba(74, 124, 44, 0.26);
+    border-radius: 10px;
+    padding: 12px 14px;
     font-size: 14px;
     transition: all 0.3s ease;
   }
 
-  .judge-me-reviews-wrapper .jdgm-form__field input:focus,
-  .judge-me-reviews-wrapper .jdgm-form__field textarea:focus {
+  .judge-me-shell .jdgm-form__field input:focus,
+  .judge-me-shell .jdgm-form__field textarea:focus {
     border-color: var(--forest-green);
     outline: none;
     box-shadow: 0 0 0 3px rgba(74, 124, 44, 0.1);
   }
 
-  .judge-me-reviews-wrapper .jdgm-form__submit {
-    background: linear-gradient(135deg, var(--forest-green) 0%, var(--sage-green) 100%);
+  .judge-me-shell .jdgm-form__submit {
+    background: linear-gradient(145deg, var(--forest-green), var(--sage-green));
     color: var(--white);
     border: none;
-    border-radius: 8px;
-    padding: 14px 32px;
+    border-radius: 10px;
+    padding: 12px 24px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
   }
 
-  .judge-me-reviews-wrapper .jdgm-form__submit:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(74, 124, 44, 0.3);
+  .judge-me-shell .jdgm-form__submit:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 18px rgba(74, 124, 44, 0.25);
   }
 
-  @media (max-width: 968px) {
+  @media (max-width: 900px) {
     .product-reviews-judge {
-      padding: 30px 20px;
+      padding: 72px 24px;
     }
 
-    .judge-me-reviews-wrapper {
-      padding: 32px 24px;
+    .judge-me-shell {
+      padding: 22px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .product-reviews-judge {
+      padding: 58px 18px;
     }
 
-    .reviews-title {
-      font-size: 28px;
-      margin-bottom: 24px;
+    .product-reviews-judge__header {
+      margin-bottom: 20px;
+    }
+
+    .judge-me-shell {
+      padding: 16px;
+      border-radius: 14px;
     }
   }
 
   @media (max-width: 480px) {
-    .product-reviews-judge {
-      padding: 24px 16px;
+    .judge-me-shell .jdgm-rev-widg {
+      padding: 12px;
     }
 
-    .judge-me-reviews-wrapper {
-      padding: 24px 20px;
-      border-radius: 20px;
+    .judge-me-shell .jdgm-rev {
+      padding: 16px 0;
     }
 
-    .reviews-title {
-      font-size: 24px;
-      margin-bottom: 20px;
+    .judge-me-shell .jdgm-row-stars,
+    .judge-me-shell .jdgm-histogram,
+    .judge-me-shell .jdgm-histogram__bar-content {
+      max-width: 100%;
+      overflow-x: auto;
     }
 
-    .judge-me-reviews-wrapper :global(.jdgm-rev) {
-      padding: 20px 0;
+    .judge-me-shell .jdgm-rev__body {
+      font-size: 14px;
+      line-height: 1.6;
+      word-break: break-word;
+      overflow-wrap: anywhere;
     }
 
-    .judge-me-reviews-wrapper :global(.jdgm-form__title) {
-      font-size: 20px;
+    .judge-me-shell .jdgm-rev__author,
+    .judge-me-shell .jdgm-rev__timestamp {
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .judge-me-shell .jdgm-rev__title {
+      font-size: 15px;
+      line-height: 1.4;
+      word-break: break-word;
+    }
+
+    .judge-me-shell .jdgm-form {
+      margin-top: 20px;
+      padding-top: 20px;
+    }
+
+    .judge-me-shell .jdgm-form__title {
+      font-size: 18px;
+      margin-bottom: 12px;
+    }
+
+    .judge-me-shell .jdgm-form__field input,
+    .judge-me-shell .jdgm-form__field textarea {
+      font-size: 14px;
+      padding: 10px 12px;
+    }
+
+    .judge-me-shell .jdgm-form__submit {
+      width: 100%;
+      padding: 12px 16px;
+      text-align: center;
+    }
+
+    .judge-me-shell .jdgm-paginate {
+      margin-top: 16px;
+      padding-top: 16px;
     }
   }
 {% endstylesheet %}

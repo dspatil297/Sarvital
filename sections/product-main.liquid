@@ -358,17 +358,6 @@
         {% endif %}
       {% endif %}
 
-      <!-- Trust Message -->
-      <div class="product-trust-message">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-        </svg>
-        <div>
-          <strong>Secure Checkout</strong>
-          <span>SSL encrypted & secure payment</span>
-        </div>
-      </div>
-
       <!-- Delivery Estimator (pincode-based, pan-India) -->
       <div class="delivery-estimator"{% if product %} data-product-id="{{ product.id }}"{% endif %}>
         <label for="delivery-estimator-pincode" class="delivery-estimator__label">Check delivery time</label>
@@ -391,6 +380,25 @@
         </div>
         <div id="delivery-estimator-result" class="delivery-estimator__result" aria-live="polite"></div>
       </div>
+
+      <div class="delivery-trust-grid" aria-label="Trust highlights">
+        <div class="delivery-trust-grid__item">
+          <span class="delivery-trust-grid__title">Free Shipping</span>
+          <span class="delivery-trust-grid__copy">On qualifying orders</span>
+        </div>
+        <div class="delivery-trust-grid__item">
+          <span class="delivery-trust-grid__title">Secure Checkout</span>
+          <span class="delivery-trust-grid__copy">SSL encrypted payment</span>
+        </div>
+        <div class="delivery-trust-grid__item">
+          <span class="delivery-trust-grid__title">Fast Dispatch</span>
+          <span class="delivery-trust-grid__copy">Ships within 24 hours</span>
+        </div>
+        <div class="delivery-trust-grid__item">
+          <span class="delivery-trust-grid__title">Expert Support</span>
+          <span class="delivery-trust-grid__copy">Help from nutrition team</span>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -403,10 +411,59 @@
 {% if product and product.description != blank %}
   <section class="product-description-section" id="product-description">
     <div class="product-description-section__container">
-      <div class="product-description-content">
-        <h2 class="product-description-title">Product Description</h2>
-        <div class="product-description-text">
-          {{ product.description }}
+      <div class="pdp-description-shell">
+        <button
+          type="button"
+          class="pdp-description-shell__toggle"
+          id="pdp-description-toggle"
+          aria-expanded="false"
+          aria-controls="pdp-description-panel"
+        >
+          <span class="pdp-description-shell__toggle-icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 3l7 4v10l-7 4-7-4V7l7-4z"/>
+              <path d="M12 9v6M9 12h6"/>
+            </svg>
+          </span>
+          <span class="pdp-description-shell__toggle-copy">
+            <span class="pdp-description-shell__eyebrow">Inside this pack</span>
+            <span class="pdp-description-shell__title">Product deep dive</span>
+          </span>
+          <span class="pdp-description-shell__toggle-action" aria-hidden="true">View detail</span>
+        </button>
+        <div
+          class="pdp-description-shell__panel"
+          id="pdp-description-panel"
+          role="region"
+          aria-labelledby="pdp-description-toggle"
+          hidden
+        >
+          <div class="pdp-description-layout">
+            <div class="pdp-description-layout__content">
+              <h2 class="pdp-description-layout__heading">Why this product works</h2>
+              <div class="pdp-description-prose">
+                {{ product.description }}
+              </div>
+            </div>
+            <aside class="pdp-description-layout__rail" aria-label="Product highlights">
+              <div class="pdp-description-quickfacts">
+                <p class="pdp-description-quickfacts__title">Quick highlights</p>
+                <ul class="pdp-description-quickfacts__list">
+                  {% if product.tags.size > 0 %}
+                    {% for tag in product.tags limit: 4 %}
+                      <li>{{ tag | replace: '-', ' ' }}</li>
+                    {% endfor %}
+                  {% else %}
+                    <li>Clean ingredients profile</li>
+                    <li>Fits daily wellness routine</li>
+                    <li>Simple preparation format</li>
+                    <li>Shipped fresh from source</li>
+                  {% endif %}
+                </ul>
+                <a href="#product-ingredients-nutrition" class="pdp-description-quickfacts__link">See nutrition panel</a>
+              </div>
+            </aside>
+          </div>
         </div>
       </div>
     </div>
@@ -1141,6 +1198,37 @@
     color: #c62828;
   }
 
+  .delivery-trust-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 14px;
+  }
+
+  .delivery-trust-grid__item {
+    padding: 12px 10px;
+    border: 1px solid rgba(45, 80, 22, 0.2);
+    border-radius: 10px;
+    background: rgba(74, 124, 44, 0.05);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    text-align: center;
+  }
+
+  .delivery-trust-grid__title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--forest-green);
+    line-height: 1.2;
+  }
+
+  .delivery-trust-grid__copy {
+    font-size: 12px;
+    color: rgba(26, 26, 26, 0.75);
+    line-height: 1.35;
+  }
+
   /* Product Description Section */
   .product-description-section {
     width: 100%;
@@ -1155,66 +1243,138 @@
     margin: 0 auto;
   }
 
-  .product-description-content {
-    background: linear-gradient(145deg, var(--white) 0%, rgba(255, 255, 255, 0.95) 100%);
-    border-radius: 24px;
-    padding: 32px 32px;
-    box-shadow: 
-      0 10px 40px rgba(45, 80, 22, 0.08),
-      0 4px 12px rgba(0, 0, 0, 0.04),
-      inset 0 1px 0 rgba(255, 255, 255, 0.9);
-    border: 2px solid rgba(74, 124, 44, 0.12);
+  .pdp-description-shell {
+    background: radial-gradient(circle at top right, rgba(74, 124, 44, 0.18), rgba(255, 255, 255, 0.96) 44%);
+    border: 1px solid rgba(45, 80, 22, 0.14);
+    border-radius: 22px;
+    box-shadow: 0 12px 32px rgba(19, 43, 8, 0.08);
+    overflow: hidden;
   }
 
-  .product-description-title {
-    font-family: var(--font-heading);
-    font-size: 32px;
+  .pdp-description-shell__toggle {
+    width: 100%;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 20px 24px;
+    text-align: left;
+    border-bottom: 1px solid rgba(26, 26, 26, 0.08);
+  }
+
+  .pdp-description-shell__toggle:focus-visible {
+    outline: 2px solid var(--forest-green);
+    outline-offset: -2px;
+  }
+
+  .pdp-description-shell__toggle-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--forest-green);
+    background: rgba(74, 124, 44, 0.12);
+    flex-shrink: 0;
+  }
+
+  .pdp-description-shell__toggle-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+    flex: 1;
+  }
+
+  .pdp-description-shell__eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(45, 80, 22, 0.72);
     font-weight: 700;
-    background: linear-gradient(135deg, var(--forest-green) 0%, var(--sage-green) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin: 0 0 32px 0;
-    letter-spacing: -0.02em;
+  }
+
+  .pdp-description-shell__title {
+    font-size: 24px;
     line-height: 1.2;
-    padding-bottom: 24px;
-    border-bottom: 3px solid;
-    border-image: linear-gradient(90deg, var(--forest-green), var(--sage-green), transparent) 1;
-    position: relative;
+    color: var(--text);
+    font-family: var(--font-heading);
+    font-weight: 600;
   }
 
-  .product-description-title::after {
-    content: '';
-    position: absolute;
-    bottom: -3px;
-    left: 0;
-    width: 60px;
-    height: 3px;
-    background: linear-gradient(90deg, var(--sage-green), rgba(74, 124, 44, 0.3));
-    border-radius: 2px;
+  .pdp-description-shell__toggle-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 9px 14px;
+    border-radius: 999px;
+    background: rgba(74, 124, 44, 0.14);
+    color: var(--forest-green);
+    font-size: 13px;
+    line-height: 1;
+    font-weight: 700;
+    flex-shrink: 0;
   }
 
-  .product-description-text {
-    font-size: 17px;
-    line-height: 1.8;
+  .pdp-description-shell__toggle[aria-expanded='true'] .pdp-description-shell__toggle-action {
+    background: rgba(45, 80, 22, 0.2);
+  }
+
+  .pdp-description-shell__panel {
+    padding: 20px 24px 24px;
+  }
+
+  .pdp-description-shell__panel[hidden] {
+    display: none !important;
+    padding: 0;
+    border: 0;
+  }
+
+  .pdp-description-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.75fr) minmax(260px, 0.85fr);
+    gap: 22px;
+    align-items: start;
+  }
+
+  .pdp-description-layout__content {
+    min-width: 0;
+  }
+
+  .pdp-description-layout__heading {
+    margin: 0 0 14px;
+    font-family: var(--font-heading);
+    font-size: 30px;
+    font-weight: 600;
+    color: var(--forest-green);
+    letter-spacing: -0.01em;
+  }
+
+  .product-description-prose {
+    font-size: 16px;
+    line-height: 1.78;
     color: rgba(26, 26, 26, 0.9);
     font-weight: 400;
+    max-width: 74ch;
   }
 
-  .product-description-text p {
+  .product-description-prose p {
     margin: 0 0 20px 0;
   }
 
-  .product-description-text p:last-child {
+  .product-description-prose p:last-child {
     margin-bottom: 0;
   }
 
-  .product-description-text h1,
-  .product-description-text h2,
-  .product-description-text h3,
-  .product-description-text h4,
-  .product-description-text h5,
-  .product-description-text h6 {
+  .product-description-prose h1,
+  .product-description-prose h2,
+  .product-description-prose h3,
+  .product-description-prose h4,
+  .product-description-prose h5,
+  .product-description-prose h6 {
     font-family: var(--font-heading);
     color: var(--forest-green);
     margin-top: 32px;
@@ -1222,37 +1382,81 @@
     font-weight: 600;
   }
 
-  .product-description-text h1:first-child,
-  .product-description-text h2:first-child,
-  .product-description-text h3:first-child {
+  .product-description-prose h1:first-child,
+  .product-description-prose h2:first-child,
+  .product-description-prose h3:first-child {
     margin-top: 0;
   }
 
-  .product-description-text ul,
-  .product-description-text ol {
+  .product-description-prose ul,
+  .product-description-prose ol {
     margin: 20px 0;
     padding-left: 24px;
   }
 
-  .product-description-text li {
+  .product-description-prose li {
     margin-bottom: 12px;
   }
 
-  .product-description-text a {
+  .product-description-prose a {
     color: var(--forest-green);
     text-decoration: underline;
     transition: color 0.3s ease;
   }
 
-  .product-description-text a:hover {
+  .product-description-prose a:hover {
     color: var(--sage-green);
   }
 
-  .product-description-text img {
+  .product-description-prose img {
     max-width: 100%;
     height: auto;
     border-radius: 12px;
     margin: 24px 0;
+  }
+
+  .pdp-description-layout__rail {
+    min-width: 0;
+  }
+
+  .pdp-description-quickfacts {
+    background: linear-gradient(160deg, rgba(74, 124, 44, 0.12), rgba(74, 124, 44, 0.03));
+    border: 1px solid rgba(45, 80, 22, 0.12);
+    border-radius: 16px;
+    padding: 16px;
+  }
+
+  .pdp-description-quickfacts__title {
+    margin: 0 0 10px;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 700;
+    color: rgba(45, 80, 22, 0.85);
+  }
+
+  .pdp-description-quickfacts__list {
+    margin: 0;
+    padding-left: 18px;
+    display: grid;
+    gap: 8px;
+    font-size: 14px;
+    color: rgba(26, 26, 26, 0.84);
+  }
+
+  .pdp-description-quickfacts__link {
+    margin-top: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+    color: var(--forest-green);
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .pdp-description-quickfacts__link:hover {
+    color: var(--sage-green);
   }
 
   /* Sticky Cart Bar (Mobile) */
@@ -1510,15 +1714,28 @@
       padding: 30px 20px;
     }
 
-    .product-description-content {
-      padding: 28px 24px;
+    .pdp-description-shell__toggle {
+      padding: 18px 18px;
     }
 
-    .product-description-title {
-      font-size: 28px;
+    .pdp-description-shell__title {
+      font-size: 20px;
     }
 
-    .product-description-text {
+    .pdp-description-shell__panel {
+      padding: 16px 18px 18px;
+    }
+
+    .pdp-description-layout {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    .pdp-description-layout__heading {
+      font-size: 24px;
+    }
+
+    .product-description-prose {
       font-size: 16px;
     }
 
@@ -1650,25 +1867,36 @@
       padding: 24px 16px;
     }
 
-    .product-description-content {
-      padding: 24px 20px;
-      border-radius: 20px;
+    .pdp-description-shell {
+      border-radius: 16px;
     }
 
-    .product-description-title {
-      font-size: 26px;
-      margin-bottom: 24px;
-      padding-bottom: 20px;
+    .pdp-description-shell__toggle {
+      padding: 14px;
+      gap: 10px;
     }
 
-    .product-description-text {
+    .pdp-description-shell__toggle-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+    }
+
+    .pdp-description-shell__title {
+      font-size: 18px;
+    }
+
+    .pdp-description-shell__panel {
+      padding: 14px;
+    }
+
+    .pdp-description-layout__heading {
+      font-size: 20px;
+    }
+
+    .product-description-prose {
       font-size: 15px;
       line-height: 1.7;
-    }
-
-    .product-trust-message {
-      padding: 12px 14px;
-      font-size: 12px;
     }
 
     /* Delivery Estimator Styles */
@@ -1733,6 +1961,23 @@
     }
     .delivery-estimator__result.delivery-error {
       color: #c62828;
+    }
+
+    .delivery-trust-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .delivery-trust-grid__item {
+      padding: 10px 8px;
+    }
+
+    .delivery-trust-grid__title {
+      font-size: 12px;
+    }
+
+    .delivery-trust-grid__copy {
+      font-size: 11px;
     }
   }
 {% endstylesheet %}
@@ -2058,6 +2303,24 @@
       syncProductFormWithInitialCart();
       // Then refresh from latest AJAX cart (in case cart changed after page render)
       syncProductFormWithCart();
+      initDescriptionToggle();
+    }
+
+    function initDescriptionToggle() {
+      var toggleButton = document.getElementById('pdp-description-toggle');
+      var panel = document.getElementById('pdp-description-panel');
+      var actionText = toggleButton ? toggleButton.querySelector('.pdp-description-shell__toggle-action') : null;
+      if (!toggleButton || !panel) return;
+      function setExpanded(isExpanded) {
+        toggleButton.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
+        panel.hidden = !isExpanded;
+        if (actionText) actionText.textContent = isExpanded ? 'Hide detail' : 'View detail';
+      }
+      setExpanded(toggleButton.getAttribute('aria-expanded') === 'true');
+      toggleButton.addEventListener('click', function() {
+        var expanded = toggleButton.getAttribute('aria-expanded') === 'true';
+        setExpanded(!expanded);
+      });
     }
 
     // Delivery Estimator - Inline initialization
