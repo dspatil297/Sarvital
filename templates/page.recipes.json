@@ -17,7 +17,8 @@
           "settings": {
             "image": "shopify://shop_images/sattu-sharbat.jpg",
             "title": "Classic Sattu Sharbat",
-            "caption": "Traditional sattu sharbat - a cooling, protein-rich drink rooted in Indian wellness heritage."
+            "caption": "Traditional sattu sharbat - a cooling, protein-rich drink rooted in Indian wellness heritage.",
+            "product": "sattu-powder-150-grams"
           }
         },
         "recipe_1": {
@@ -25,7 +26,8 @@
           "settings": {
             "image": "shopify://shop_images/Moringa-Banana-Smoothie.jpg",
             "title": "Moringa Banana Smothie",
-            "caption": "Vibrant moringa meets creamy banana for a nutrient-packed green smoothie that energizes naturally."
+            "caption": "Vibrant moringa meets creamy banana for a nutrient-packed green smoothie that energizes naturally.",
+            "product": "moringa-powder"
           }
         }
       },
