@@ -18,28 +18,46 @@
         {% case block.type %}
           {% when 'recipe' %}
             <div class="recipe-card" {{ block.shopify_attributes }}>
-              <div class="recipe-card__image-wrapper">
-                {% if block.settings.image != blank %}
-                  <img
-                    src="{{ block.settings.image | image_url: width: 800 }}"
-                    srcset="{{ block.settings.image | image_url: width: 400 }} 400w,
-                            {{ block.settings.image | image_url: width: 600 }} 600w,
-                            {{ block.settings.image | image_url: width: 800 }} 800w"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, {{ 100 | divided_by: section.settings.columns }}vw"
-                    alt="{{ block.settings.title | default: 'Recipe image' | escape }}"
-                    class="recipe-card__image"
-                    loading="lazy"
-                    width="800"
-                    height="800"
-                  >
-                {% else %}
-                  <div class="recipe-card__placeholder">
-                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                      <rect x="3" y="3" width="18" height="18" rx="2"/>
-                      <circle cx="8.5" cy="8.5" r="1.5"/>
-                      <path d="M21 15l-5-5L5 21"/>
-                    </svg>
-                    <span>Recipe image</span>
+              <div class="recipe-card__carousel">
+                {% assign has_images = false %}
+                {% for i in (1..5) %}
+                  {% case i %}
+                    {% when 1 %}{% assign img = block.settings.image %}
+                    {% when 2 %}{% assign img = block.settings.image_2 %}
+                    {% when 3 %}{% assign img = block.settings.image_3 %}
+                    {% when 4 %}{% assign img = block.settings.image_4 %}
+                    {% when 5 %}{% assign img = block.settings.image_5 %}
+                  {% endcase %}
+                  
+                  {% if img != blank %}
+                    {% assign has_images = true %}
+                    <div class="recipe-card__image-wrapper">
+                      <img
+                        src="{{ img | image_url: width: 800 }}"
+                        srcset="{{ img | image_url: width: 400 }} 400w,
+                                {{ img | image_url: width: 600 }} 600w,
+                                {{ img | image_url: width: 800 }} 800w"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, {{ 100 | divided_by: section.settings.columns }}vw"
+                        alt="{{ block.settings.title | default: 'Recipe image' | escape }}"
+                        class="recipe-card__image"
+                        loading="lazy"
+                        width="800"
+                        height="800"
+                      >
+                    </div>
+                  {% endif %}
+                {% endfor %}
+
+                {% if has_images == false %}
+                  <div class="recipe-card__image-wrapper">
+                    <div class="recipe-card__placeholder">
+                      <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <rect x="3" y="3" width="18" height="18" rx="2"/>
+                        <circle cx="8.5" cy="8.5" r="1.5"/>
+                        <path d="M21 15l-5-5L5 21"/>
+                      </svg>
+                      <span>Recipe image</span>
+                    </div>
                   </div>
                 {% endif %}
               </div>
@@ -49,6 +67,9 @@
                 {% endif %}
                 {% if block.settings.caption != blank %}
                   <p class="recipe-card__caption">{{ block.settings.caption }}</p>
+                {% endif %}
+                {% if block.settings.product != blank %}
+                  <a href="{{ block.settings.product.url }}" class="recipe-card__product">Shop {{ block.settings.product.title }}</a>
                 {% endif %}
               </div>
             </div>
@@ -122,7 +143,21 @@
     transform: translateY(-4px);
   }
 
+  .recipe-card__carousel {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .recipe-card__carousel::-webkit-scrollbar {
+    display: none;
+  }
+
   .recipe-card__image-wrapper {
+    flex: 0 0 100%;
+    scroll-snap-align: start;
     position: relative;
     width: 100%;
     padding-top: 100%;
@@ -173,6 +208,24 @@
     color: rgba(26, 26, 26, 0.7);
     margin: 0;
     line-height: 1.5;
+  }
+
+  .recipe-card__product {
+    display: inline-block;
+    margin-top: 16px;
+    font-size: 14px;
+    color: var(--forest-green);
+    border: 1px solid var(--forest-green);
+    padding: 8px 16px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background 0.3s ease, color 0.3s ease;
+  }
+
+  .recipe-card__product:hover {
+    background: var(--forest-green);
+    color: var(--white);
   }
 
   .recipe-gallery__empty {
@@ -239,7 +292,27 @@
         {
           "type": "image_picker",
           "id": "image",
-          "label": "Recipe image"
+          "label": "Recipe image 1"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_2",
+          "label": "Recipe image 2 (optional)"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_3",
+          "label": "Recipe image 3 (optional)"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_4",
+          "label": "Recipe image 4 (optional)"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_5",
+          "label": "Recipe image 5 (optional)"
         },
         {
           "type": "text",
@@ -250,6 +323,11 @@
           "type": "textarea",
           "id": "caption",
           "label": "Caption (optional)"
+        },
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Link a product"
         }
       ]
     }
