@@ -1,8 +1,18 @@
 <!doctype html>
 <html lang="{{ request.locale.iso_code }}">
   <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <link rel="icon" type="image/png" href="{{ 'Logo.png' | asset_url }}" sizes="any">
 
-
+    {% render 'lcp-hero-preload' %}
+    <link rel="preconnect" href="https://cdn.shopify.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.shopifycdn.com" crossorigin>
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com">
+    <link rel="dns-prefetch" href="https://connect.facebook.net">
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="dns-prefetch" href="https://cdnwidget.judge.me">
 
 <!-- Gokwik theme code start -->
 
@@ -18,15 +28,6 @@
 
 
 
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <link rel="icon" type="image/png" href="{{ 'Logo.png' | asset_url }}" sizes="any">
-    
-    {%- comment -%} Max ~4 preconnects (Lighthouse). fonts.googleapis + fonts.gstatic only; Judge.me uses dns-prefetch (cheaper than preconnect). Removed fonts.shopifycdn (often unused when using Google Fonts CSS). {%- endcomment -%}
-    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="dns-prefetch" href="https://cdnwidget.judge.me">
-    
     {%- comment -%} Performance: Font Loading Optimization {%- endcomment -%}
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&family=Inter:wght@300;400;500;600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"></noscript>
@@ -39,7 +40,13 @@
     {%- comment -%} Critical CSS - load normally to avoid "preloaded but not used" console warning {%- endcomment -%}
     {{ 'critical.css' | asset_url | stylesheet_tag }}
     {%- if request.page_type == 'product' -%}
-      {{ 'reviews-carousel-product.css' | asset_url | stylesheet_tag }}
+      <link
+        rel="stylesheet"
+        href="{{ 'reviews-carousel-product.css' | asset_url }}"
+        media="print"
+        onload="this.media='all'"
+      >
+      <noscript>{{ 'reviews-carousel-product.css' | asset_url | stylesheet_tag }}</noscript>
     {%- endif -%}
 
     {%- comment -%} SEO Meta Tags {%- endcomment -%}
@@ -455,15 +462,21 @@
         function apply() {
           walk(document.documentElement);
         }
-        apply();
-        if (document.readyState === 'loading') {
-          document.addEventListener('DOMContentLoaded', apply);
+        function runApply() {
+          apply();
+          try {
+            var mo = new MutationObserver(function() { apply(); });
+            mo.observe(document.documentElement, { childList: true, subtree: true });
+            setTimeout(function() { try { mo.disconnect(); } catch (e) {} }, 4000);
+          } catch (e) {}
         }
-        try {
-          var mo = new MutationObserver(function() { apply(); });
-          mo.observe(document.documentElement, { childList: true, subtree: true });
-          setTimeout(function() { try { mo.disconnect(); } catch (e) {} }, 20000);
-        } catch (e) {}
+        if ('requestIdleCallback' in window) {
+          requestIdleCallback(runApply, { timeout: 2000 });
+        } else if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', runApply);
+        } else {
+          setTimeout(runApply, 0);
+        }
       })();
     </script>
     {%- comment -%} Cart page +/- and remove: event delegation in capture phase so it runs before other handlers {%- endcomment -%}

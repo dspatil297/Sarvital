@@ -1,0 +1,313 @@
+{% comment %}
+  PDP: horizontal testimonial video carousel (Shopify-hosted videos).
+  Add blocks in Theme editor → Product pages; same section shows on every product.
+{% endcomment %}
+
+{%- assign video_blocks = section.blocks | where: 'type', 'testimonial_video' -%}
+{%- assign has_any_video = false -%}
+{%- for block in section.blocks -%}
+  {%- if block.type == 'testimonial_video' and block.settings.video != blank -%}
+    {%- assign has_any_video = true -%}
+    {%- break -%}
+  {%- endif -%}
+{%- endfor -%}
+
+{% if has_any_video %}
+<link
+  rel="stylesheet"
+  href="{{ 'product-testimonial-videos.css' | asset_url }}"
+  media="print"
+  onload="this.media='all'"
+>
+<noscript>{{ 'product-testimonial-videos.css' | asset_url | stylesheet_tag }}</noscript>
+<section
+  class="pdp-testimonial-videos fade-in-up"
+  id="shopify-section-{{ section.id }}"
+  data-testimonial-videos-root
+  {% if section.settings.heading != blank %}
+    aria-labelledby="pdp-testimonial-videos-heading-{{ section.id }}"
+  {% else %}
+    aria-label="{{ section.settings.heading | default: 'Testimonial videos' | escape }}"
+  {% endif %}
+>
+  <div class="pdp-testimonial-videos__inner">
+    {% if section.settings.heading != blank %}
+      <h2 class="pdp-testimonial-videos__heading" id="pdp-testimonial-videos-heading-{{ section.id }}">
+        {{ section.settings.heading | escape }}
+      </h2>
+    {% endif %}
+    {% if section.settings.subheading != blank %}
+      <p class="pdp-testimonial-videos__subheading">{{ section.settings.subheading | escape }}</p>
+    {% endif %}
+
+    <div
+      class="pdp-testimonial-videos__wrap"
+      id="pdp-testimonial-wrap-{{ section.id }}"
+      data-tv-wrap
+      data-section-id="{{ section.id }}"
+    >
+      <button
+        type="button"
+        class="pdp-testimonial-videos__arrow pdp-testimonial-videos__arrow--prev"
+        data-tv-prev
+        aria-controls="pdp-testimonial-scroll-{{ section.id }}"
+        aria-label="Previous videos"
+      >
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <button
+        type="button"
+        class="pdp-testimonial-videos__arrow pdp-testimonial-videos__arrow--next"
+        data-tv-next
+        aria-controls="pdp-testimonial-scroll-{{ section.id }}"
+        aria-label="Next videos"
+      >
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+
+      <div
+        class="pdp-testimonial-videos__scroll"
+        id="pdp-testimonial-scroll-{{ section.id }}"
+        data-tv-scroll
+        tabindex="-1"
+        role="group"
+        aria-roledescription="carousel"
+        aria-label="{{ section.settings.heading | default: 'Testimonial videos' | strip | escape }}"
+      >
+        <div class="pdp-testimonial-videos__track" data-tv-track>
+          {% for block in video_blocks %}
+            {% if block.settings.video == blank %}{% continue %}{% endif -%}
+            {% assign vid = block.settings.video %}
+            {% assign poster = block.settings.poster | default: vid.preview_image %}
+            {% assign primary_url = '' %}
+            {% assign primary_type = 'video/mp4' %}
+            {% for source in vid.sources %}
+              {% if source.mime_type == 'video/mp4' or source.format == 'mp4' %}
+                {% assign primary_url = source.url %}
+                {% assign primary_type = source.mime_type | default: 'video/mp4' %}
+                {% break %}
+              {% endif %}
+            {% endfor %}
+            {% if primary_url == '' and vid.sources.size > 0 %}
+              {% assign primary_url = vid.sources.first.url %}
+              {% assign primary_type = vid.sources.first.mime_type | default: 'video/mp4' %}
+            {% endif %}
+            {% if primary_url == blank %}{% continue %}{% endif %}
+            {% assign img_alt = block.settings.caption | default: section.settings.heading | default: 'Testimonial video' | strip %}
+
+            <div class="pdp-testimonial-videos__slide" {{ block.shopify_attributes }} data-tv-slide>
+              <div class="pdp-testimonial-videos__card">
+                <span class="pdp-testimonial-videos__media">
+                  <video
+                    class="pdp-testimonial-videos__inline-video"
+                    data-tv-inline-video
+                    muted
+                    playsinline
+                    autoplay
+                    loop
+                    preload="metadata"
+                    {% if poster != blank %}
+                      poster="{{ poster | image_url: width: 720 }}"
+                    {% endif %}
+                    aria-label="{{ img_alt | escape }}"
+                  >
+                    <source src="{{ primary_url | escape }}" type="{{ primary_type | escape }}">
+                  </video>
+                  <span class="pdp-testimonial-videos__shade" aria-hidden="true"></span>
+                  {% if block.settings.caption != blank %}
+                    <span class="pdp-testimonial-videos__caption">{{ block.settings.caption | escape }}</span>
+                  {% endif %}
+                </span>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{% javascript %}
+  (function() {
+    function initTestimonialVideos(root) {
+      var scrollEl = root.querySelector('[data-tv-scroll]');
+      var track = root.querySelector('[data-tv-track]');
+      var prevBtn = root.querySelector('[data-tv-prev]');
+      var nextBtn = root.querySelector('[data-tv-next]');
+      var inlineVideos = root.querySelectorAll('[data-tv-inline-video]');
+
+      if (!scrollEl || !track) return;
+
+      var mqReduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)');
+
+      function tryPlayInlineVideos() {
+        if (mqReduce && mqReduce.matches) {
+          inlineVideos.forEach(function(v) {
+            try {
+              v.pause();
+              v.removeAttribute('autoplay');
+            } catch (e) {}
+          });
+          return;
+        }
+        inlineVideos.forEach(function(v) {
+          try {
+            var p = v.play();
+            if (p && typeof p.then === 'function') p.catch(function() {});
+          } catch (e) {}
+        });
+      }
+
+      function getStep() {
+        var slide = track.querySelector('[data-tv-slide]');
+        if (!slide) return 200;
+        var w = slide.offsetWidth;
+        var cs = window.getComputedStyle(track);
+        var gap = parseFloat(cs.columnGap || cs.gap) || 0;
+        return w + gap;
+      }
+
+      function updateArrows() {
+        var max = Math.max(0, scrollEl.scrollWidth - scrollEl.clientWidth - 1);
+        var overflow = max > 2;
+        if (prevBtn) {
+          prevBtn.style.visibility = overflow ? '' : 'hidden';
+          prevBtn.style.pointerEvents = overflow ? '' : 'none';
+          prevBtn.tabIndex = overflow ? 0 : -1;
+        }
+        if (nextBtn) {
+          nextBtn.style.visibility = overflow ? '' : 'hidden';
+          nextBtn.style.pointerEvents = overflow ? '' : 'none';
+          nextBtn.tabIndex = overflow ? 0 : -1;
+        }
+        if (!overflow) return;
+        if (prevBtn) {
+          var atStart = scrollEl.scrollLeft <= 2;
+          prevBtn.disabled = atStart;
+          prevBtn.setAttribute('aria-disabled', atStart ? 'true' : 'false');
+        }
+        if (nextBtn) {
+          var atEnd = scrollEl.scrollLeft >= max - 1;
+          nextBtn.disabled = atEnd;
+          nextBtn.setAttribute('aria-disabled', atEnd ? 'true' : 'false');
+        }
+      }
+
+      function scrollByDir(dir) {
+        var step = getStep();
+        var max = Math.max(0, scrollEl.scrollWidth - scrollEl.clientWidth);
+        var nextLeft = scrollEl.scrollLeft + dir * step;
+        nextLeft = Math.max(0, Math.min(max, nextLeft));
+        scrollEl.scrollTo({ left: nextLeft, behavior: mqReduce && mqReduce.matches ? 'auto' : 'smooth' });
+      }
+
+      function onArrowClick(e, dir) {
+        e.preventDefault();
+        e.stopPropagation();
+        scrollByDir(dir);
+      }
+
+      if (prevBtn) prevBtn.addEventListener('click', function(e) { onArrowClick(e, -1); });
+      if (nextBtn) nextBtn.addEventListener('click', function(e) { onArrowClick(e, 1); });
+
+      scrollEl.addEventListener(
+        'scroll',
+        function() {
+          if (window.requestAnimationFrame) {
+            window.requestAnimationFrame(updateArrows);
+          } else {
+            updateArrows();
+          }
+        },
+        { passive: true }
+      );
+
+      window.addEventListener('resize', function() {
+        updateArrows();
+      });
+
+      scrollEl.addEventListener(
+        'wheel',
+        function(e) {
+          if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) e.preventDefault();
+        },
+        { passive: false }
+      );
+
+      tryPlayInlineVideos();
+      updateArrows();
+      window.setTimeout(function() {
+        updateArrows();
+        tryPlayInlineVideos();
+      }, 100);
+    }
+
+    document.querySelectorAll('[data-testimonial-videos-root]').forEach(initTestimonialVideos);
+  })();
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Testimonial videos",
+  "tag": "section",
+  "class": "section-product-testimonial-videos",
+  "enabled_on": {
+    "templates": ["product", "index"]
+  },
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Tried & trusted"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading (optional)",
+      "default": "Real stories from people who use Sarvital."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "testimonial_video",
+      "name": "Video",
+      "settings": [
+        {
+          "type": "video",
+          "id": "video",
+          "label": "Video",
+          "info": "Choose a video from your theme library (upload videos in Shopify admin: Content → Files)."
+        },
+        {
+          "type": "image_picker",
+          "id": "poster",
+          "label": "Custom poster (optional)",
+          "info": "Overrides the automatic frame from Shopify."
+        },
+        {
+          "type": "text",
+          "id": "caption",
+          "label": "Short label on thumbnail",
+          "info": "Optional; keep to one line for best results."
+        }
+      ]
+    }
+  ],
+  "max_blocks": 15,
+  "presets": [
+    {
+      "name": "Testimonial videos",
+      "settings": {
+        "heading": "Tried & trusted",
+        "subheading": "Real stories from people who use Sarvital."
+      }
+    }
+  ]
+}
+{% endschema %}

@@ -21,28 +21,6 @@
     data-paused="false"
   {% endif %}
 >
-  {%- comment -%} Early LCP hint: first slide with an image (not necessarily blocks[0]). Improves discovery before parser reaches <picture>. {%- endcomment -%}
-  {% if has_carousel_slides %}
-    {% for block in slide_blocks %}
-      {% if block.settings.image != blank %}
-        {% assign preload_mobile = block.settings.mobile_image | default: block.settings.image %}
-        <link
-          rel="preload"
-          as="image"
-          imagesrcset="{{ preload_mobile | image_url: width: 480 }} 480w, {{ preload_mobile | image_url: width: 768 }} 768w, {{ block.settings.image | image_url: width: 1024 }} 1024w, {{ block.settings.image | image_url: width: 1280 }} 1280w"
-          imagesizes="100vw"
-        >
-        {% break %}
-      {% endif %}
-    {% endfor %}
-  {% elsif section.settings.hero_image != blank %}
-    <link
-      rel="preload"
-      as="image"
-      imagesrcset="{{ section.settings.hero_image | image_url: width: 960 }} 960w, {{ section.settings.hero_image | image_url: width: 1280 }} 1280w, {{ section.settings.hero_image | image_url: width: 1920 }} 1920w"
-      imagesizes="100vw"
-    >
-  {% endif %}
   <div class="hero-banner__image">
     {% if has_carousel_slides %}
       {%- assign first_image_done = false -%}
@@ -65,29 +43,31 @@
               <source
                 media="(max-width: 768px)"
                 srcset="
-                  {{ mobile_img | image_url: width: 480 }} 480w,
-                  {{ mobile_img | image_url: width: 768 }} 768w,
-                  {{ mobile_img | image_url: width: 1024 }} 1024w,
-                  {{ mobile_img | image_url: width: 1280 }} 1280w
+                  {{ mobile_img | image_url: width: 375, format: 'webp' }} 375w,
+                  {{ mobile_img | image_url: width: 750, format: 'webp' }} 750w,
+                  {{ mobile_img | image_url: width: 1100, format: 'webp' }} 1100w,
+                  {{ mobile_img | image_url: width: 1500, format: 'webp' }} 1500w
                 "
                 sizes="100vw"
               >
               <img
                 class="hero-banner__slide-img"
-                src="{{ block.settings.image | image_url: width: 1920 }}"
+                src="{{ block.settings.image | image_url: width: 1100, format: 'webp' }}"
                 srcset="
-                  {{ block.settings.image | image_url: width: 960 }} 960w,
-                  {{ block.settings.image | image_url: width: 1280 }} 1280w,
-                  {{ block.settings.image | image_url: width: 1920 }} 1920w,
-                  {{ block.settings.image | image_url: width: 2560 }} 2560w
+                  {{ block.settings.image | image_url: width: 375, format: 'webp' }} 375w,
+                  {{ block.settings.image | image_url: width: 750, format: 'webp' }} 750w,
+                  {{ block.settings.image | image_url: width: 1100, format: 'webp' }} 1100w,
+                  {{ block.settings.image | image_url: width: 1500, format: 'webp' }} 1500w,
+                  {{ block.settings.image | image_url: width: 1920, format: 'webp' }} 1920w,
+                  {{ block.settings.image | image_url: width: 2560, format: 'webp' }} 2560w
                 "
-                sizes="100vw"
+                sizes="(max-width: 768px) 100vw, min(100vw, 1920px)"
                 alt="{{ block.settings.image.alt | default: '' }}"
                 width="{{ block.settings.image.width }}"
                 height="{{ block.settings.image.height }}"
                 loading="eager"
                 fetchpriority="{% if is_lcp_hero_slide %}high{% else %}low{% endif %}"
-                decoding="{% if is_lcp_hero_slide %}sync{% else %}async{% endif %}"
+                decoding="async"
                 onerror="this.classList.add('image-error'); this.alt='Image failed to load';"
               >
             </picture>
@@ -101,20 +81,22 @@
         <div class="hero-banner__slide hero-banner__slide--active">
           <img
             class="hero-banner__slide-img"
-            src="{{ section.settings.hero_image | image_url: width: 1920 }}"
+            src="{{ section.settings.hero_image | image_url: width: 1100, format: 'webp' }}"
             srcset="
-              {{ section.settings.hero_image | image_url: width: 960 }} 960w,
-              {{ section.settings.hero_image | image_url: width: 1280 }} 1280w,
-              {{ section.settings.hero_image | image_url: width: 1920 }} 1920w,
-              {{ section.settings.hero_image | image_url: width: 2560 }} 2560w
+              {{ section.settings.hero_image | image_url: width: 375, format: 'webp' }} 375w,
+              {{ section.settings.hero_image | image_url: width: 750, format: 'webp' }} 750w,
+              {{ section.settings.hero_image | image_url: width: 1100, format: 'webp' }} 1100w,
+              {{ section.settings.hero_image | image_url: width: 1500, format: 'webp' }} 1500w,
+              {{ section.settings.hero_image | image_url: width: 1920, format: 'webp' }} 1920w,
+              {{ section.settings.hero_image | image_url: width: 2560, format: 'webp' }} 2560w
             "
-            sizes="100vw"
+            sizes="(max-width: 768px) 100vw, min(100vw, 1920px)"
             alt="{{ section.settings.hero_image.alt | default: section.settings.heading }}"
             width="{{ section.settings.hero_image.width }}"
             height="{{ section.settings.hero_image.height }}"
             loading="eager"
             fetchpriority="high"
-            decoding="sync"
+            decoding="async"
             onerror="this.classList.add('image-error'); this.alt='Image failed to load';"
           >
         </div>
@@ -303,6 +285,11 @@
   .hero-banner__slide-img {
     opacity: 0;
     animation: fadeInImage 0.5s ease forwards;
+  }
+
+  .hero-banner__slide--active .hero-banner__slide-img {
+    opacity: 1;
+    animation: none;
   }
 
   .hero-banner__slide-img.image-error {
@@ -695,9 +682,9 @@
 
   @media (max-width: 768px) {
     .hero-banner {
-      height: 85vh;
-      min-height: 500px;
-      max-height: 700px;
+      height: 80vh;
+      min-height: 420px;
+      max-height: 640px;
     }
 
     .hero-banner__content {
@@ -823,6 +810,7 @@
     }
     if (!section || !section.classList.contains('hero-banner--carousel')) return;
 
+    function initHeroCarousel() {
     var slides = section.querySelectorAll('.hero-banner__slide:not(.hero-banner__slide--empty)');
     var dots = section.querySelectorAll('.hero-banner__carousel-dot');
     slides = Array.prototype.slice.call(slides);
@@ -890,6 +878,13 @@
     }
 
     startAutoplay();
+    }
+
+    if ('requestIdleCallback' in window) {
+      requestIdleCallback(initHeroCarousel, { timeout: 2000 });
+    } else {
+      setTimeout(initHeroCarousel, 0);
+    }
   })();
 </script>
 

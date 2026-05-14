@@ -1,0 +1,36 @@
+{%- comment -%}
+  Head-only LCP preload for home hero (valid in <head>; avoids preload inside <section>).
+  Mirrors sections/hero-banner.liquid first-slide logic using the same section instance.
+{%- endcomment -%}
+{%- if request.page_type == 'index' and sections['hero_banner'] -%}
+  {%- assign hb = sections['hero_banner'] -%}
+  {%- assign slide_blocks = hb.blocks | where: 'type', 'slide' -%}
+  {%- assign has_carousel = false -%}
+  {%- for block in slide_blocks -%}
+    {%- if block.settings.image != blank -%}
+      {%- assign has_carousel = true -%}
+      {%- break -%}
+    {%- endif -%}
+  {%- endfor -%}
+  {%- if has_carousel -%}
+    {%- for block in slide_blocks -%}
+      {%- if block.settings.image != blank -%}
+        {%- assign preload_mobile = block.settings.mobile_image | default: block.settings.image -%}
+        <link
+          rel="preload"
+          as="image"
+          imagesrcset="{{ preload_mobile | image_url: width: 375, format: 'webp' }} 375w, {{ preload_mobile | image_url: width: 750, format: 'webp' }} 750w, {{ preload_mobile | image_url: width: 1100, format: 'webp' }} 1100w, {{ preload_mobile | image_url: width: 1500, format: 'webp' }} 1500w, {{ block.settings.image | image_url: width: 1920, format: 'webp' }} 1920w, {{ block.settings.image | image_url: width: 2560, format: 'webp' }} 2560w"
+          imagesizes="(max-width: 768px) 100vw, min(100vw, 1920px)"
+        >
+        {%- break -%}
+      {%- endif -%}
+    {%- endfor -%}
+  {%- elsif hb.settings.hero_image != blank -%}
+    <link
+      rel="preload"
+      as="image"
+      imagesrcset="{{ hb.settings.hero_image | image_url: width: 375, format: 'webp' }} 375w, {{ hb.settings.hero_image | image_url: width: 750, format: 'webp' }} 750w, {{ hb.settings.hero_image | image_url: width: 1100, format: 'webp' }} 1100w, {{ hb.settings.hero_image | image_url: width: 1500, format: 'webp' }} 1500w, {{ hb.settings.hero_image | image_url: width: 1920, format: 'webp' }} 1920w, {{ hb.settings.hero_image | image_url: width: 2560, format: 'webp' }} 2560w"
+      imagesizes="(max-width: 768px) 100vw, min(100vw, 1920px)"
+    >
+  {%- endif -%}
+{%- endif -%}

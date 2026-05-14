@@ -105,6 +105,98 @@
         "title": "Why Choose Sarvital"
       }
     },
+    "home_testimonial_videos": {
+      "type": "product-testimonial-videos",
+      "blocks": {
+        "testimonial_video_zmpXj6": {
+          "type": "testimonial_video",
+          "settings": {
+            "video": "shopify://files/videos/Video-530.mp4",
+            "caption": ""
+          }
+        },
+        "testimonial_video_9UaGTG": {
+          "type": "testimonial_video",
+          "settings": {
+            "video": "shopify://files/videos/Video-306.mp4",
+            "caption": ""
+          }
+        },
+        "testimonial_video_qAfwht": {
+          "type": "testimonial_video",
+          "settings": {
+            "video": "shopify://files/videos/Video-48.mp4",
+            "caption": ""
+          }
+        },
+        "testimonial_video_qXzL3w": {
+          "type": "testimonial_video",
+          "settings": {
+            "video": "shopify://files/videos/Video-853.mp4",
+            "caption": ""
+          }
+        },
+        "testimonial_video_ANMbcB": {
+          "type": "testimonial_video",
+          "settings": {
+            "video": "shopify://files/videos/Video-946.mp4",
+            "caption": ""
+          }
+        }
+      },
+      "block_order": [
+        "testimonial_video_zmpXj6",
+        "testimonial_video_9UaGTG",
+        "testimonial_video_qAfwht",
+        "testimonial_video_qXzL3w",
+        "testimonial_video_ANMbcB"
+      ],
+      "name": "Testimonial videos",
+      "settings": {
+        "heading": "Tried & trusted",
+        "subheading": "Real stories from people who use Sarvital."
+      }
+    },
+    "176943494681be9f0a": {
+      "type": "apps",
+      "blocks": {
+        "judge_me_reviews_cards_carousel_V4bCgm": {
+          "type": "shopify://apps/judge-me-reviews/blocks/cards_carousel/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8",
+          "settings": {
+            "show_sample_reviews": true,
+            "reviews_selection": "all",
+            "products": [],
+            "star_rating": "4_to_5_star",
+            "show_review_media": false,
+            "display_order": "media_first",
+            "no_image_fallback": "review_text_only",
+            "max_reviews": 20,
+            "review_length": "medium",
+            "text_size": "medium",
+            "image_ratio": "1",
+            "reviews_shown": 3,
+            "show_reviewer_name": true,
+            "show_product_name": true,
+            "hide_arrows_mobile": true,
+            "arrows_position": "sides",
+            "max_width": 1100,
+            "corner_styling": "soft",
+            "header_text_color": "#2d5016",
+            "text_color": "#1a1a1a",
+            "card_color": "#ffffff",
+            "stars_color": "#4a7c2c",
+            "arrows_color": "#1a1a1a",
+            "transition_speed": 5,
+            "header_text": "What Our Customers Say",
+            "show_average_rating": false
+          }
+        }
+      },
+      "block_order": [
+        "judge_me_reviews_cards_carousel_V4bCgm"
+      ],
+      "settings": {}
+    },
     "featured_products": {
       "type": "product-grid",
       "settings": {
@@ -237,46 +329,6 @@
         "promise_text": "Every product is lab-tested, certified, and guaranteed to meet our premium quality standards."
       }
     },
-    "176943494681be9f0a": {
-      "type": "apps",
-      "blocks": {
-        "judge_me_reviews_cards_carousel_V4bCgm": {
-          "type": "shopify://apps/judge-me-reviews/blocks/cards_carousel/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8",
-          "settings": {
-            "show_sample_reviews": true,
-            "reviews_selection": "all",
-            "products": [],
-            "star_rating": "4_to_5_star",
-            "show_review_media": false,
-            "display_order": "media_first",
-            "no_image_fallback": "review_text_only",
-            "max_reviews": 20,
-            "review_length": "medium",
-            "text_size": "medium",
-            "image_ratio": "1",
-            "reviews_shown": 3,
-            "show_reviewer_name": true,
-            "show_product_name": true,
-            "hide_arrows_mobile": true,
-            "arrows_position": "sides",
-            "max_width": 1100,
-            "corner_styling": "soft",
-            "header_text_color": "#2d5016",
-            "text_color": "#1a1a1a",
-            "card_color": "#ffffff",
-            "stars_color": "#4a7c2c",
-            "arrows_color": "#1a1a1a",
-            "transition_speed": 5,
-            "header_text": "What Our Customers Say",
-            "show_average_rating": false
-          }
-        }
-      },
-      "block_order": [
-        "judge_me_reviews_cards_carousel_V4bCgm"
-      ],
-      "settings": {}
-    },
     "home_faq": {
       "type": "home-faq",
       "settings": {
@@ -287,6 +339,7 @@
   "order": [
     "hero_banner",
     "usp_icons",
+    "home_testimonial_videos",
     "176943494681be9f0a",
     "featured_products",
     "lifestyle_usage",
