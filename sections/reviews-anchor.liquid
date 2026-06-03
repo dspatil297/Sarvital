@@ -1,0 +1,78 @@
+{% comment %}
+  Scroll target for #product-reviews deep links (Judge.me widget is in the apps section below).
+{% endcomment %}
+
+<span
+  id="product-reviews"
+  class="product-reviews-anchor"
+  tabindex="-1"
+  aria-hidden="true"
+></span>
+
+{% stylesheet %}
+  #product-reviews.product-reviews-anchor {
+    display: block;
+    position: relative;
+    width: 100%;
+    height: 0;
+    scroll-margin-top: 96px;
+  }
+
+  @media (max-width: 768px) {
+    #product-reviews.product-reviews-anchor {
+      scroll-margin-top: 72px;
+    }
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  (function () {
+    var REVIEWS_HASH = '#product-reviews';
+    var HEADER_OFFSET = 96;
+
+    function scrollToReviews(smooth) {
+      var target = document.getElementById('product-reviews');
+      if (!target) return false;
+
+      var top = target.getBoundingClientRect().top + window.pageYOffset - HEADER_OFFSET;
+      window.scrollTo({
+        top: Math.max(0, top),
+        behavior: smooth ? 'smooth' : 'auto',
+      });
+      return true;
+    }
+
+    if (window.location.hash === REVIEWS_HASH) {
+      var scrollOnLoad = function () {
+        scrollToReviews(false);
+      };
+      document.addEventListener('DOMContentLoaded', scrollOnLoad);
+      document.addEventListener('jdgm.doneSetup', scrollOnLoad);
+      window.addEventListener('load', scrollOnLoad);
+    }
+
+    document.addEventListener('click', function (event) {
+      var link = event.target.closest('a[href="' + REVIEWS_HASH + '"]');
+      if (!link) return;
+      if (!scrollToReviews(true)) return;
+      event.preventDefault();
+      if (history.replaceState) {
+        history.replaceState(null, '', REVIEWS_HASH);
+      } else {
+        window.location.hash = REVIEWS_HASH.slice(1);
+      }
+    });
+  })();
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Reviews anchor",
+  "settings": [],
+  "presets": [
+    {
+      "name": "Reviews anchor"
+    }
+  ]
+}
+{% endschema %}

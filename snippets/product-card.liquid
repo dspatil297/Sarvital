@@ -1,11 +1,16 @@
-{% comment %}
-  Product Card Snippet - Reusable product card component
-  card_instance: unique suffix when the same product appears twice (e.g. carousel duplicate track); avoids duplicate DOM ids.
-{% endcomment %}
+{% doc %}
+  Renders a reusable product card.
+
+  @param {product} product - Product to render.
+  @param {string} [card_instance] - Unique suffix when the same product appears twice (e.g. carousel duplicate track); avoids duplicate DOM ids.
+
+  @example
+  {% render 'product-card', product: product, card_instance: section.id %}
+{% enddoc %}
 {% assign qty_field_suffix = card_instance | default: '0' %}
 
 <div class="product-card" data-product-card>
-  <a href="{{ product.url }}" class="product-card__link">
+  <a href="{{ product.url }}" class="product-card__link" aria-label="{{ product.title | escape }}">
     <div class="product-card__image-wrapper">
       {% if product.featured_image %}
         <img 
@@ -28,9 +33,9 @@
       {% if product.compare_at_price > product.price %}
         <span class="product-card__badge product-card__badge--sale">Sale</span>
       {% endif %}
-      
+
       {% if product.tags contains 'new' %}
-        <span class="product-card__badge product-card__badge--new">New</span>
+        <span class="product-card__badge product-card__badge--new {% if product.compare_at_price > product.price %}product-card__badge--stacked{% endif %}">New</span>
       {% endif %}
       
       <div class="product-card__overlay">
@@ -39,9 +44,12 @@
         </button>
       </div>
     </div>
+  </a>
     
-    <div class="product-card__info">
-      <h3 class="product-card__title">{{ product.title }}</h3>
+  <div class="product-card__info">
+    <h3 class="product-card__title">
+      <a href="{{ product.url }}" class="product-card__title-link">{{ product.title }}</a>
+    </h3>
       
       {% if product.tags.size > 0 %}
         <div class="product-card__tags">
@@ -52,12 +60,15 @@
         </div>
       {% endif %}
       
-      <div class="product-card__price">
+      <div class="product-card__price" data-product-card-price>
         <div class="product-card__price-row">
-          {% if product.compare_at_price > product.price %}
-            <span class="product-card__price--compare">{{ product.compare_at_price | money }}</span>
-          {% endif %}
-          <span class="product-card__price--current">{{ product.price | money }}</span>
+          <span
+            class="product-card__price--compare {% unless product.compare_at_price > product.price %}product-card__price--compare-hidden{% endunless %}"
+            data-product-card-compare-price
+          >
+            {{ product.compare_at_price | money }}
+          </span>
+          <span class="product-card__price--current" data-product-card-current-price>{{ product.price | money }}</span>
         </div>
         <div class="product-card__price-meta">
           <span class="product-card__price--gst">Incl. GST</span>
@@ -66,10 +77,65 @@
           <span class="product-card__price--gst-note">GST 5% for fruit and vegetables Dehydrated products.</span>
         {% endif %}
       </div>
-    </div>
-  </a>
+
+      {% if product.variants.size > 1 %}
+        {% assign variant_cols = product.variants.size | at_most: 4 %}
+        <div
+          class="product-card__variants"
+          role="radiogroup"
+          aria-label="Available options"
+          style="--variant-cols: {{ variant_cols }};"
+          data-product-card-variants
+        >
+          {% liquid
+            assign size_option_index = -1
+            for opt in product.options_with_values
+              assign opt_name = opt.name | downcase
+              if opt_name contains 'weight' or opt_name contains 'size'
+                assign size_option_index = forloop.index0
+                break
+              endif
+            endfor
+          %}
+          {% for variant in product.variants %}
+            {% liquid
+              assign is_recommended = variant.metafields.custom.variant_recommended.value
+              if is_recommended == blank
+                assign is_recommended = variant.metafields.custom.variant_recommended
+              endif
+
+              assign variant_label = variant.title
+              if size_option_index == 0
+                assign variant_label = variant.option1
+              elsif size_option_index == 1
+                assign variant_label = variant.option2
+              elsif size_option_index == 2
+                assign variant_label = variant.option3
+              endif
+            %}
+
+            <button
+              type="button"
+              class="product-card__variant-pill {% unless variant.available %}product-card__variant-pill--disabled{% endunless %} {% if is_recommended == true %}product-card__variant-pill--recommended{% endif %}"
+              data-variant-id="{{ variant.id }}"
+              data-variant-available="{% if variant.available %}true{% else %}false{% endif %}"
+              data-variant-price="{{ variant.price }}"
+              data-variant-price-formatted="{{ variant.price | money }}"
+              data-variant-compare="{{ variant.compare_at_price }}"
+              data-variant-compare-formatted="{{ variant.compare_at_price | money }}"
+              role="radio"
+              aria-checked="false"
+              {% unless variant.available %}disabled{% endunless %}
+            >
+              <span class="product-card__variant-pill-text">{{ variant_label }}</span>
+              {% if is_recommended == true %}<span class="product-card__variant-pill-star" aria-hidden="true">★</span>{% endif %}
+            </button>
+          {% endfor %}
+        </div>
+      {% endif %}
+  </div>
   <form action="/cart/add" method="post" enctype="multipart/form-data" class="product-card__form" data-product-card-form>
-    <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+    <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}" data-product-card-variant-input>
     <div class="product-card__quantity-row product-card__quantity-row--hidden" data-product-card-qty-row>
       <label for="qty-{{ product.id }}-{{ qty_field_suffix }}" class="product-card__qty-label">Qty</label>
       <div class="product-card__quantity-selector">
@@ -109,8 +175,7 @@
     color: inherit;
     display: flex;
     flex-direction: column;
-    flex: 1;
-    min-height: 0;
+    flex: 0 0 auto;
   }
 
   .product-card__image-wrapper {
@@ -170,6 +235,11 @@
     background: linear-gradient(135deg, var(--gold) 0%, #e8c547 100%);
     color: var(--text);
     box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+  }
+
+  /* Prevent overlapping badges when both are present */
+  .product-card__badge--stacked {
+    top: 44px;
   }
 
   .product-card__overlay {
@@ -239,6 +309,16 @@
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    min-height: calc(1.35em * 2);
+  }
+
+  .product-card__title-link {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .product-card__title-link:hover {
+    text-decoration: underline;
   }
 
   .product-card:hover .product-card__title {
@@ -271,6 +351,110 @@
     gap: 4px;
     margin-bottom: 16px;
     margin-top: auto;
+  }
+
+  .product-card__variants {
+    display: grid;
+    grid-template-columns: repeat(var(--variant-cols, 3), minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 12px;
+    width: 100%;
+    align-items: stretch;
+    max-width: 260px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .product-card__variant-pill {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 10px;
+    border-radius: 12px;
+    border: 1px solid rgba(74, 124, 44, 0.22);
+    background: rgba(255, 255, 255, 0.96);
+    color: rgba(26, 26, 26, 0.86);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 800;
+    line-height: 1.1;
+    min-height: 38px;
+    width: 100%;
+    box-sizing: border-box;
+    position: relative;
+    box-shadow: 0 2px 10px rgba(45, 80, 22, 0.06);
+  }
+
+  .product-card__variant-pill:hover {
+    border-color: rgba(74, 124, 44, 0.35);
+    color: var(--forest-green);
+    background: rgba(74, 124, 44, 0.06);
+  }
+
+  .product-card__variant-pill--disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  .product-card__variant-pill-text {
+    white-space: nowrap;
+  }
+
+  .product-card__variant-pill-star {
+    position: absolute;
+    top: -7px;
+    right: -7px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 999px;
+    background: var(--gold);
+    color: rgba(26, 26, 26, 0.92);
+    font-size: 12px;
+    line-height: 1;
+    flex-shrink: 0;
+    box-shadow: 0 3px 10px rgba(212, 175, 55, 0.35);
+  }
+
+  @media (max-width: 420px) {
+    .product-card__variants {
+      gap: 8px;
+      grid-template-columns: repeat(auto-fit, minmax(52px, 1fr));
+    }
+
+    .product-card__variant-pill {
+      padding: 9px 10px;
+      font-size: 12px;
+      min-height: 36px;
+    }
+
+    .product-card__variant-pill-text {
+      white-space: nowrap;
+    }
+  }
+
+  .product-card__variant-pill--recommended {
+    border-color: rgba(74, 124, 44, 0.22);
+    background: rgba(255, 255, 255, 0.96);
+    color: rgba(26, 26, 26, 0.86);
+  }
+
+  .product-card__variant-pill--recommended:hover {
+    border-color: rgba(74, 124, 44, 0.35);
+    color: var(--forest-green);
+    background: rgba(74, 124, 44, 0.06);
+  }
+
+  .product-card__variant-pill[aria-checked="true"] {
+    border-color: rgba(45, 80, 22, 0.55);
+    background: rgba(74, 124, 44, 0.12);
+    color: rgba(26, 26, 26, 0.95);
+  }
+
+  .product-card__price--compare-hidden {
+    display: none;
   }
 
   .product-card__price-row {
@@ -450,4 +634,75 @@
     }
   }
 {% endstylesheet %}
+
+{% javascript %}
+  (function () {
+    function setVariantSelected(card, variantId) {
+      var variantInput = card.querySelector('[data-product-card-variant-input]');
+      var currentPriceEl = card.querySelector('[data-product-card-current-price]');
+      var comparePriceEl = card.querySelector('[data-product-card-compare-price]');
+      if (!variantInput || !currentPriceEl || !comparePriceEl) return;
+
+      var options = card.querySelectorAll('[data-product-card-variants] [data-variant-id]');
+      var selected = null;
+      options.forEach(function (btn) {
+        var isSelected = btn.getAttribute('data-variant-id') === String(variantId);
+        btn.setAttribute('aria-checked', isSelected ? 'true' : 'false');
+        if (isSelected) selected = btn;
+      });
+      if (!selected) return;
+
+      var available = selected.getAttribute('data-variant-available') === 'true';
+      var priceFormatted = selected.getAttribute('data-variant-price-formatted') || '';
+      var compareRaw = parseInt(selected.getAttribute('data-variant-compare') || '0', 10) || 0;
+      var priceRaw = parseInt(selected.getAttribute('data-variant-price') || '0', 10) || 0;
+      var compareFormatted = selected.getAttribute('data-variant-compare-formatted') || '';
+
+      variantInput.value = selected.getAttribute('data-variant-id');
+      currentPriceEl.textContent = priceFormatted;
+
+      if (compareRaw > priceRaw) {
+        comparePriceEl.textContent = compareFormatted;
+        comparePriceEl.classList.remove('product-card__price--compare-hidden');
+      } else {
+        comparePriceEl.classList.add('product-card__price--compare-hidden');
+      }
+
+      var addBtn = card.querySelector('.product-card__add-to-cart');
+      if (addBtn) {
+        addBtn.disabled = !available;
+        addBtn.setAttribute('aria-disabled', (!available).toString());
+      }
+    }
+
+    function initCard(card) {
+      var variantInput = card.querySelector('[data-product-card-variant-input]');
+      if (!variantInput) return;
+      setVariantSelected(card, variantInput.value);
+    }
+
+    function initAll() {
+      document.querySelectorAll('[data-product-card]').forEach(initCard);
+    }
+
+    document.addEventListener('click', function (e) {
+      var btn = e.target && e.target.closest ? e.target.closest('[data-product-card-variants] [data-variant-id]') : null;
+      if (!btn) return;
+      var card = btn.closest('[data-product-card]');
+      if (!card) return;
+      var available = btn.getAttribute('data-variant-available') === 'true';
+      if (!available) return;
+      setVariantSelected(card, btn.getAttribute('data-variant-id'));
+    });
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initAll);
+    } else {
+      initAll();
+    }
+
+    setTimeout(initAll, 500);
+    setTimeout(initAll, 1500);
+  })();
+{% endjavascript %}
 

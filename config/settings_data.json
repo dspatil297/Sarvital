@@ -11,13 +11,13 @@
   "current": {
     "mid": "19skju4u8nu2",
     "envType": "production",
+    "gokwik_inject_ga4_gtag": false,
     "goEnable": true,
     "priClr": "#4a7c2c",
     "goBuynowEnable": true,
     "btnBClr": "#FFFFFF",
     "btnTextClr": "#2d5016",
     "enableLogo": true,
-    "gokwik_inject_ga4_gtag": false,
     "content_for_index": [],
     "blocks": {
       "14060646107696862457": {
@@ -59,6 +59,16 @@
           "gkc_text_color": "#ffffff",
           "gk_image": true
         }
+      },
+      "2567389343055140935": {
+        "type": "shopify://apps/microsoft-clarity/blocks/clarity_js/31c3d126-8116-4b4a-8ba1-baeda7c4aeea",
+        "disabled": false,
+        "settings": {}
+      },
+      "2200952712151285029": {
+        "type": "shopify://apps/microsoft-clarity/blocks/brandAgents_js/31c3d126-8116-4b4a-8ba1-baeda7c4aeea",
+        "disabled": false,
+        "settings": {}
       }
     }
   }

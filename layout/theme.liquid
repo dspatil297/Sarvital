@@ -34,19 +34,16 @@
     
     {%- comment -%} Inlined CSS Variables {%- endcomment -%}
     {% render 'css-variables' %}
+    {%- if request.page_type == 'product' -%}
+      {% render 'judge-me-theme-styles' %}
+    {%- endif -%}
 
     {%- comment -%} Primary typography: Poppins + Inter via Google Fonts link above (avoids duplicate Shopify font CDN + variable Inter requests). {%- endcomment -%}
 
     {%- comment -%} Critical CSS - load normally to avoid "preloaded but not used" console warning {%- endcomment -%}
     {{ 'critical.css' | asset_url | stylesheet_tag }}
     {%- if request.page_type == 'product' -%}
-      <link
-        rel="stylesheet"
-        href="{{ 'reviews-carousel-product.css' | asset_url }}"
-        media="print"
-        onload="this.media='all'"
-      >
-      <noscript>{{ 'reviews-carousel-product.css' | asset_url | stylesheet_tag }}</noscript>
+      {{ 'reviews-carousel-product.css' | asset_url | stylesheet_tag }}
     {%- endif -%}
 
     {%- comment -%} SEO Meta Tags {%- endcomment -%}
@@ -762,39 +759,145 @@
       #product-image-lightbox .product-lightbox-close:hover {
         background: rgba(255, 255, 255, 0.35);
       }
+      #product-image-lightbox .product-lightbox-nav {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 48px;
+        height: 48px;
+        border: none;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.2);
+        color: #fff;
+        font-size: 28px;
+        line-height: 1;
+        cursor: pointer;
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s;
+      }
+      #product-image-lightbox .product-lightbox-nav:hover {
+        background: rgba(255, 255, 255, 0.35);
+      }
+      #product-image-lightbox .product-lightbox-prev {
+        left: max(12px, env(safe-area-inset-left));
+      }
+      #product-image-lightbox .product-lightbox-next {
+        right: max(12px, env(safe-area-inset-right));
+      }
+      #product-image-lightbox .product-lightbox-counter {
+        position: absolute;
+        bottom: max(20px, env(safe-area-inset-bottom));
+        left: 50%;
+        transform: translateX(-50%);
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 14px;
+        font-weight: 500;
+        z-index: 10;
+        pointer-events: none;
+      }
     </style>
     <script>
       (function() {
-        function openLightbox(src, alt) {
-          if (document.getElementById('product-image-lightbox')) return;
+        var lightboxPrevLabel = {{ 'products.media.previous_image' | t | json }};
+        var lightboxNextLabel = {{ 'products.media.next_image' | t | json }};
+        var lightboxCloseLabel = {{ 'products.media.close_zoom' | t | json }};
+        var lightboxDialogLabel = {{ 'products.media.zoomed_gallery' | t | json }};
+        var lightboxCounterTemplate = {{ 'products.media.image_counter' | t: index: '__INDEX__', count: '__COUNT__' | json }};
+
+        function openLightbox(src, alt, index, images) {
+          var existing = document.getElementById('product-image-lightbox');
+          if (existing && existing.parentNode) existing.parentNode.removeChild(existing);
+
+          var gallery = images && images.length ? images : [{ src: src, alt: alt || '' }];
+          var currentIndex = typeof index === 'number' ? index : 0;
+          currentIndex = Math.max(0, Math.min(currentIndex, gallery.length - 1));
+          var hasMultiple = gallery.length > 1;
+
           var overlay = document.createElement('div');
           overlay.id = 'product-image-lightbox';
           overlay.setAttribute('role', 'dialog');
           overlay.setAttribute('aria-modal', 'true');
-          overlay.setAttribute('aria-label', 'Zoomed product image');
-          overlay.innerHTML = '<button type="button" class="product-lightbox-close" aria-label="Close">&times;</button><div class="product-lightbox-inner"><img src="" alt="" class="product-lightbox-img"></div>';
+          overlay.setAttribute('aria-label', lightboxDialogLabel);
+
+          var html = '<button type="button" class="product-lightbox-close" aria-label="' + lightboxCloseLabel + '">&times;</button>';
+          if (hasMultiple) {
+            html += '<button type="button" class="product-lightbox-nav product-lightbox-prev" aria-label="' + lightboxPrevLabel + '">&#8249;</button>';
+            html += '<button type="button" class="product-lightbox-nav product-lightbox-next" aria-label="' + lightboxNextLabel + '">&#8250;</button>';
+            html += '<div class="product-lightbox-counter" aria-live="polite"></div>';
+          }
+          html += '<div class="product-lightbox-inner"><img src="" alt="" class="product-lightbox-img"></div>';
+          overlay.innerHTML = html;
+
           var im = overlay.querySelector('.product-lightbox-img');
-          im.src = src;
-          im.alt = alt;
+          var counterEl = overlay.querySelector('.product-lightbox-counter');
+          var prevBtn = overlay.querySelector('.product-lightbox-prev');
+          var nextBtn = overlay.querySelector('.product-lightbox-next');
+
+          function updateCounter() {
+            if (!counterEl) return;
+            counterEl.textContent = lightboxCounterTemplate
+              .replace('__INDEX__', String(currentIndex + 1))
+              .replace('__COUNT__', String(gallery.length));
+          }
+
+          function showAt(nextIndex) {
+            currentIndex = (nextIndex + gallery.length) % gallery.length;
+            var item = gallery[currentIndex];
+            im.src = item.src;
+            im.alt = item.alt || '';
+            updateCounter();
+            if (window.productImageGallery && typeof window.productImageGallery.goTo === 'function') {
+              window.productImageGallery.goTo(currentIndex);
+            }
+          }
+
+          showAt(currentIndex);
           document.body.appendChild(overlay);
           if (window.lockBodyScroll) window.lockBodyScroll();
           else document.body.style.overflow = 'hidden';
+
           function closeLightbox() {
             if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
             if (window.unlockBodyScroll) window.unlockBodyScroll();
             else document.body.style.overflow = '';
             document.removeEventListener('keydown', onKey);
           }
+
           function onKey(ev) {
             if (ev.key === 'Escape') closeLightbox();
+            else if (hasMultiple && ev.key === 'ArrowLeft') showAt(currentIndex - 1);
+            else if (hasMultiple && ev.key === 'ArrowRight') showAt(currentIndex + 1);
           }
+
           overlay.addEventListener('click', function(ev) {
             if (ev.target === overlay || ev.target.classList.contains('product-lightbox-close')) closeLightbox();
           });
+          if (prevBtn) prevBtn.addEventListener('click', function(ev) { ev.stopPropagation(); showAt(currentIndex - 1); });
+          if (nextBtn) nextBtn.addEventListener('click', function(ev) { ev.stopPropagation(); showAt(currentIndex + 1); });
+
+          var touchStartX = 0;
+          overlay.addEventListener('touchstart', function(ev) {
+            if (ev.touches.length) touchStartX = ev.touches[0].clientX;
+          }, { passive: true });
+          overlay.addEventListener('touchend', function(ev) {
+            if (!hasMultiple || !ev.changedTouches || !ev.changedTouches.length) return;
+            var diff = touchStartX - ev.changedTouches[0].clientX;
+            if (diff > 50) showAt(currentIndex + 1);
+            else if (diff < -50) showAt(currentIndex - 1);
+          }, { passive: true });
+
           document.addEventListener('keydown', onKey);
         }
+
+        window.openProductImageLightbox = window.openProductImageLightbox || openLightbox;
+
         document.addEventListener('product-zoom-image', function(e) {
-          if (e.detail && e.detail.src) openLightbox(e.detail.src, e.detail.alt || '');
+          if (!e.detail || !e.detail.src) return;
+          var openFn = window.openProductImageLightbox || openLightbox;
+          openFn(e.detail.src, e.detail.alt || '', e.detail.index, e.detail.images);
         });
       })();
     </script>

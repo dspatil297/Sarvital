@@ -2,7 +2,11 @@
   Product Reviews Section - Judge.me
 {% endcomment %}
 
-<section class="product-reviews-judge" id="product-reviews">
+<section
+  class="product-reviews-judge"
+  id="product-reviews"
+  data-hide-with-carousel="{% if section.settings.hide_with_carousel %}true{% else %}false{% endif %}"
+>
   <div class="product-reviews-judge__container">
     <header class="product-reviews-judge__header">
       <h2 class="product-reviews-judge__title">Customer reviews</h2>
@@ -10,11 +14,7 @@
     </header>
 
     <div class="judge-me-shell">
-      {% if snippets['judge-me-product-reviews'] %}
-        {% render 'judge-me-product-reviews', product: product %}
-      {% else %}
-        <div class="jdgm-widget jdgm-review-widget" data-id="{{ product.id }}"></div>
-      {% endif %}
+      {% render 'judge-me-product-reviews', product: product %}
     </div>
   </div>
 </section>
@@ -91,8 +91,10 @@
   }
 
   .judge-me-shell .jdgm-rev__rating,
-  .judge-me-shell .jdgm-star {
-    color: var(--sage-green);
+  .judge-me-shell .jdgm-star,
+  .judge-me-shell .jdgm-star::before,
+  .judge-me-shell .jdgm-star.jdgm--on {
+    color: var(--sage-green) !important;
   }
 
   .judge-me-shell .jdgm-rev__author {
@@ -103,6 +105,184 @@
   .judge-me-shell .jdgm-rev__timestamp {
     color: rgba(26, 26, 26, 0.6);
     font-size: 0.84rem;
+  }
+
+  /* Native Judge.me carousel is used on product template — hide duplicate widget UI */
+  .product-reviews-judge--carousel-mode:not(.product-reviews-judge--form-open):not(.product-reviews-judge--write-access) .judge-me-shell {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* Off-screen but functional so Judge.me can bind the write-review popup */
+  .product-reviews-judge--carousel-mode.product-reviews-judge--write-access:not(.product-reviews-judge--form-open) .judge-me-shell {
+    position: fixed;
+    left: -10000px;
+    top: 0;
+    width: 420px;
+    max-width: 100vw;
+    height: auto;
+    margin: 0;
+    padding: 16px;
+    overflow: visible;
+    clip: auto;
+    clip-path: none;
+    white-space: normal;
+    border: 0;
+    opacity: 0.001;
+    pointer-events: auto;
+    z-index: 0;
+  }
+
+  .product-reviews-judge--review-modal-open {
+    position: fixed;
+    inset: 0;
+    z-index: 10060;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 24px 16px;
+    overflow-y: auto;
+    background: rgba(26, 26, 26, 0.55);
+  }
+
+  .product-reviews-judge--review-modal-open .product-reviews-judge__container {
+    width: 100%;
+    max-width: 640px;
+    margin: auto;
+  }
+
+  .product-reviews-judge--review-modal-open .product-reviews-judge__header {
+    display: none;
+  }
+
+  .product-reviews-judge--review-modal-open .judge-me-shell {
+    position: static;
+    width: auto;
+    height: auto;
+    margin: 0;
+    overflow: visible;
+    clip: auto;
+    clip-path: none;
+    white-space: normal;
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .product-reviews-judge--carousel-mode.product-reviews-judge--form-open .judge-me-shell {
+    position: static;
+    width: auto;
+    height: auto;
+    margin: 0;
+    overflow: visible;
+    clip: auto;
+    clip-path: none;
+    white-space: normal;
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .product-reviews-judge--carousel-mode.product-reviews-judge--form-open #judgeme_product_reviews .jdgm-form,
+  .product-reviews-judge--carousel-mode.product-reviews-judge--form-open #judgeme_product_reviews .jdgm-rev-widg__form {
+    display: block !important;
+    visibility: visible !important;
+  }
+
+  .product-reviews-judge--carousel-mode:not(.product-reviews-judge--form-open) {
+    padding-top: 0;
+    padding-bottom: 0;
+    background: transparent;
+  }
+
+  .product-reviews-judge--carousel-mode.product-reviews-judge--form-open {
+    padding: 32px 40px 64px;
+    background:
+      radial-gradient(circle at top right, rgba(74, 124, 44, 0.08) 0%, rgba(74, 124, 44, 0) 45%),
+      var(--bg);
+  }
+
+  .product-reviews-judge--carousel-mode #judgeme_product_reviews .jdgm-rev-widg__summary,
+  .product-reviews-judge--carousel-mode #judgeme_product_reviews .jdgm-histogram,
+  .product-reviews-judge--carousel-mode #judgeme_product_reviews .jdgm-row-stars,
+  .product-reviews-judge--carousel-mode #judgeme_product_reviews .jdgm-rev-widg__title,
+  .product-reviews-judge--carousel-mode #judgeme_product_reviews .jdgm-rev-widg__reviews,
+  .product-reviews-judge--carousel-mode #judgeme_product_reviews .jdgm-paginate,
+  .product-reviews-judge--carousel-mode #judgeme_product_reviews .jdgm-rev {
+    display: none !important;
+  }
+
+  .judge-me-shell .sarvital-reviews-carousel {
+    position: relative;
+    margin: 24px 0 8px;
+    padding: 0 44px;
+  }
+
+  .judge-me-shell .sarvital-reviews-carousel__viewport {
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .judge-me-shell .sarvital-reviews-carousel__viewport::-webkit-scrollbar {
+    display: none;
+  }
+
+  .judge-me-shell .jdgm-rev-widg__reviews {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    gap: 16px;
+    margin: 0 !important;
+    padding: 4px 0 12px !important;
+    border: none !important;
+  }
+
+  .judge-me-shell .jdgm-rev-widg__reviews .jdgm-rev {
+    flex: 0 0 min(320px, calc(100vw - 96px));
+    scroll-snap-align: start;
+    margin: 0 !important;
+    padding: 16px !important;
+    border: 1px solid rgba(74, 124, 44, 0.18) !important;
+    border-radius: 12px !important;
+    background: #ffffff !important;
+    box-shadow: 0 8px 20px rgba(21, 33, 13, 0.06);
+  }
+
+  .judge-me-shell .sarvital-reviews-carousel__btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid rgba(74, 124, 44, 0.25);
+    background: #ffffff;
+    color: #2d5016;
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .judge-me-shell .sarvital-reviews-carousel__btn--prev {
+    left: 0;
+  }
+
+  .judge-me-shell .sarvital-reviews-carousel__btn--next {
+    right: 0;
   }
 
   .judge-me-shell .jdgm-rev {
@@ -184,10 +364,13 @@
     box-shadow: 0 0 0 3px rgba(74, 124, 44, 0.1);
   }
 
-  .judge-me-shell .jdgm-form__submit {
-    background: linear-gradient(145deg, var(--forest-green), var(--sage-green));
-    color: var(--white);
-    border: none;
+  .judge-me-shell .jdgm-form__submit,
+  .judge-me-shell .jdgm-btn--solid,
+  .judge-me-shell .jdgm-write-rev-link {
+    background: linear-gradient(145deg, var(--forest-green), var(--sage-green)) !important;
+    background-color: var(--forest-green) !important;
+    border-color: var(--forest-green) !important;
+    color: var(--white) !important;
     border-radius: 10px;
     padding: 12px 24px;
     font-weight: 600;
@@ -292,7 +475,15 @@
 {% schema %}
 {
   "name": "Reviews (Judge.me)",
-  "settings": [],
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "hide_with_carousel",
+      "label": "Hide review list when cards carousel is used",
+      "default": true,
+      "info": "When on and a Judge.me cards carousel is on this page, the review list below is hidden and Write a review appears on the carousel. Turn off to always show the full review widget."
+    }
+  ],
   "presets": [
     {
       "name": "Reviews (Judge.me)"

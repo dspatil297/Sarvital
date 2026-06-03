@@ -82,5 +82,22 @@
     "submit": "Search",
     "no_results_html": "No results found for {{ terms }}",
     "results_for_html": "{{ count }} results found for {{ terms }}"
+  },
+  "products": {
+    "reviews": {
+      "anchor_heading": "Customer reviews",
+      "write_review": "Write a review"
+    },
+    "media": {
+      "gallery": "Product images",
+      "open_image": "Open image in full screen",
+      "load_image": "Show image {{ index }} of {{ count }}",
+      "go_to_image": "Go to image {{ index }}",
+      "previous_image": "Previous image",
+      "next_image": "Next image",
+      "close_zoom": "Close",
+      "zoomed_gallery": "Product image gallery",
+      "image_counter": "{{ index }} of {{ count }}"
+    }
   }
 }

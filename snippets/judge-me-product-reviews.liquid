@@ -1,0 +1,672 @@
+{% doc %}
+  Renders Judge.me product review widget markup for the current product.
+
+  @param {product} product - The product whose reviews are displayed
+
+  @example
+  {% render 'judge-me-product-reviews', product: product %}
+{% enddoc %}
+
+{%- liquid
+  assign has_legacy = false
+  if product.metafields.judgeme.widget.size > 20
+    assign has_legacy = true
+  endif
+-%}
+
+<!-- Start of Judge.me code -->
+<div style="clear: both"></div>
+<div
+  id="judgeme_product_reviews"
+  class="jdgm-widget jdgm-review-widget"
+  data-product-title="{{ product.title | escape }}"
+  data-id="{{ product.id }}"
+  data-product-id="{{ product.id }}"
+  data-widget="review"
+  data-auto-install="false"
+  data-shop-reviews-count="{{ shop.metafields.judgeme.shop_reviews_count | default: 0 | escape }}"
+  data-entry-point="review_widget.js"
+  data-entry-key="review-widget/main.js"
+  data-write-review-label="{{ 'products.reviews.write_review' | t | escape }}"
+>
+  {%- if has_legacy -%}
+    <div class="jdgm-legacy-widget-content" style="display: none;">
+      {{ product.metafields.judgeme.widget }}
+    </div>
+  {%- endif -%}
+</div>
+{%- if product.metafields.judgeme.review_widget_data -%}
+  <script>
+    jdgm.data ||= {};
+    jdgm.data.reviewWidget ||= {};
+    jdgm.data.reviewWidget[{{ product.id }}] = {{ product.metafields.judgeme.review_widget_data }};
+  </script>
+{%- endif -%}
+<!-- End of Judge.me code -->
+
+{% stylesheet %}
+  #judgeme_product_reviews {
+    --jdgm-primary-color: #2d5016;
+    --jdgm-secondary-color: #4a7c2c;
+    --jdgm-star-color: #4a7c2c;
+  }
+
+  #judgeme_product_reviews .jdgm-star,
+  #judgeme_product_reviews .jdgm-star::before,
+  #judgeme_product_reviews .jdgm-star.jdgm--on,
+  #judgeme_product_reviews .jdgm-star.jdgm--off,
+  #judgeme_product_reviews .jdgm-histogram .jdgm-star {
+    color: #4a7c2c !important;
+  }
+
+  #judgeme_product_reviews .jdgm-histogram__bar-content {
+    background: linear-gradient(90deg, #2d5016, #4a7c2c) !important;
+  }
+
+  #judgeme_product_reviews .jdgm-histogram__bar {
+    background: rgba(74, 124, 44, 0.12) !important;
+  }
+
+  #judgeme_product_reviews .jdgm-rev-widg__title {
+    display: block;
+    flex: 0 0 100%;
+    order: -1;
+    width: 100%;
+    margin: 0 0 10px;
+    padding: 0;
+    text-align: center;
+    font-family: var(--font-heading);
+    color: #1a1a1a !important;
+  }
+
+  #judgeme_product_reviews .jdgm-rev-widg__header {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  #judgeme_product_reviews .jdgm-rev__author,
+  #judgeme_product_reviews .jdgm-rev-widg__summary-text {
+    color: #1a1a1a !important;
+  }
+
+  #judgeme_product_reviews .jdgm-rev__body,
+  #judgeme_product_reviews .jdgm-rev__timestamp {
+    color: rgba(26, 26, 26, 0.82) !important;
+  }
+
+  #judgeme_product_reviews .jdgm-btn--solid,
+  #judgeme_product_reviews .jdgm-form__submit,
+  #judgeme_product_reviews .jdgm-submit-rev,
+  #judgeme_product_reviews input[type='submit'].jdgm-btn--solid {
+    background: linear-gradient(145deg, #2d5016, #4a7c2c) !important;
+    background-color: #2d5016 !important;
+    border-color: #2d5016 !important;
+    color: #ffffff !important;
+  }
+
+  @media (max-width: 768px) {
+    #judgeme_product_reviews .jdgm-write-rev-link,
+    #judgeme_product_reviews .jdgm-rev-widg__write-btn,
+    #judgeme_product_reviews a.jdgm-write-rev-link,
+    #judgeme_product_reviews button.jdgm-write-rev-link {
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      width: auto !important;
+      min-width: 8.75rem !important;
+      min-height: 40px !important;
+      padding: 10px 14px !important;
+      font-size: 0.875rem !important;
+      font-weight: 600 !important;
+      line-height: 1.2 !important;
+      white-space: nowrap !important;
+      border-radius: 6px !important;
+      background: #2d5016 !important;
+      background-color: #2d5016 !important;
+      color: #ffffff !important;
+      border: 1px solid #2d5016 !important;
+    }
+  }
+
+  #judgeme_product_reviews .jdgm-paginate__page {
+    color: #2d5016 !important;
+    border-color: rgba(74, 124, 44, 0.25) !important;
+  }
+
+  #judgeme_product_reviews .jdgm-paginate__page.jdgm-paginate__page--current,
+  #judgeme_product_reviews .jdgm-paginate__page:hover {
+    background: #2d5016 !important;
+    border-color: #2d5016 !important;
+    color: #ffffff !important;
+  }
+
+  /* Avoid duplicate headings when native carousel is above */
+  .product-reviews-judge--carousel-mode .product-reviews-judge__header {
+    display: none !important;
+  }
+
+  .jdgm-carousel-write-review {
+    display: flex;
+    justify-content: center;
+    margin: 0 0 28px;
+    padding: 0 16px;
+  }
+
+  .jdgm-carousel-write-review__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    padding: 12px 28px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(145deg, #2d5016, #4a7c2c);
+    color: #ffffff;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.2;
+    cursor: pointer;
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+  }
+
+  .jdgm-carousel-write-review__btn:hover {
+    box-shadow: 0 10px 18px rgba(74, 124, 44, 0.25);
+    transform: translateY(-1px);
+  }
+
+  .jdgm-carousel-write-review__btn:focus-visible {
+    outline: 2px solid #2d5016;
+    outline-offset: 3px;
+  }
+
+  /* Judge.me write-review uses Magnific Popup (jm-mfp) — keep above theme UI */
+  body.template-product .mfp-bg,
+  body.template-product .mfp-wrap,
+  body.template-product .mfp-container,
+  body.template-product .jdgm-rev-popup,
+  body.template-product .jdgm-rev-popup .jm-mfp-content {
+    z-index: 10050 !important;
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  (function () {
+    var FOREST = '#2d5016';
+    var SAGE = '#4a7c2c';
+
+    function paintJudgeMe(root) {
+      if (!root) return;
+
+      root.style.setProperty('--jdgm-primary-color', FOREST);
+      root.style.setProperty('--jdgm-secondary-color', SAGE);
+      root.style.setProperty('--jdgm-star-color', SAGE);
+
+      root.querySelectorAll('.jdgm-star').forEach(function (star) {
+        star.style.setProperty('color', SAGE, 'important');
+      });
+
+      root.querySelectorAll(
+        '.jdgm-btn--solid, .jdgm-form__submit, .jdgm-submit-rev, input.jdgm-btn--solid'
+      ).forEach(function (button) {
+        button.style.setProperty('background-color', FOREST, 'important');
+        button.style.setProperty('border-color', FOREST, 'important');
+        button.style.setProperty('color', '#ffffff', 'important');
+      });
+
+      root.querySelectorAll('.jdgm-histogram__bar-content').forEach(function (bar) {
+        bar.style.setProperty('background', 'linear-gradient(90deg, ' + FOREST + ', ' + SAGE + ')', 'important');
+      });
+
+      root
+        .querySelectorAll(
+          '.jdgm-write-rev-link, .jdgm-rev-widg__write-btn, a.jdgm-write-rev-link, button.jdgm-write-rev-link'
+        )
+        .forEach(function (writeBtn) {
+          writeBtn.style.setProperty('width', 'auto', 'important');
+          writeBtn.style.setProperty('min-width', '8.75rem', 'important');
+          writeBtn.style.setProperty('height', 'auto', 'important');
+          writeBtn.style.setProperty('min-height', '40px', 'important');
+          writeBtn.style.setProperty('padding', '10px 14px', 'important');
+          writeBtn.style.setProperty('font-size', '0.875rem', 'important');
+          writeBtn.style.setProperty('white-space', 'nowrap', 'important');
+          writeBtn.style.setProperty('background-color', FOREST, 'important');
+          writeBtn.style.setProperty('border-color', FOREST, 'important');
+          writeBtn.style.setProperty('color', '#ffffff', 'important');
+        });
+    }
+
+    function getReviewsSection() {
+      return document.getElementById('product-reviews');
+    }
+
+    function isHideWithCarouselEnabled() {
+      var section = getReviewsSection();
+      return !!(section && section.dataset.hideWithCarousel === 'true');
+    }
+
+    function isCarouselLayout() {
+      var section = getReviewsSection();
+      return !!(section && section.classList.contains('product-reviews-judge--carousel-mode'));
+    }
+
+    function initListCarousel(root) {
+      if (isCarouselLayout()) return;
+
+      var list = root.querySelector('.jdgm-rev-widg__reviews');
+      if (!list || list.classList.contains('sarvital-reviews-carousel--ready')) return;
+
+      var items = list.querySelectorAll('.jdgm-rev');
+      if (items.length < 2) return;
+
+      list.classList.add('sarvital-reviews-carousel--ready');
+
+      var widget = root.querySelector('.jdgm-rev-widg');
+      if (!widget) return;
+
+      var carousel = document.createElement('div');
+      carousel.className = 'sarvital-reviews-carousel';
+
+      var viewport = document.createElement('div');
+      viewport.className = 'sarvital-reviews-carousel__viewport';
+
+      var prev = document.createElement('button');
+      prev.type = 'button';
+      prev.className = 'sarvital-reviews-carousel__btn sarvital-reviews-carousel__btn--prev';
+      prev.setAttribute('aria-label', 'Previous review');
+      prev.innerHTML = '&#8249;';
+
+      var next = document.createElement('button');
+      next.type = 'button';
+      next.className = 'sarvital-reviews-carousel__btn sarvital-reviews-carousel__btn--next';
+      next.setAttribute('aria-label', 'Next review');
+      next.innerHTML = '&#8250;';
+
+      list.parentNode.insertBefore(carousel, list);
+      carousel.appendChild(prev);
+      carousel.appendChild(viewport);
+      carousel.appendChild(next);
+      viewport.appendChild(list);
+
+      var paginate = widget.querySelector('.jdgm-paginate');
+      if (paginate) paginate.style.display = 'none';
+
+      function scrollReviews(direction) {
+        var card = list.querySelector('.jdgm-rev');
+        var amount = card ? card.getBoundingClientRect().width + 16 : 320;
+        viewport.scrollBy({ left: direction * amount, behavior: 'smooth' });
+      }
+
+      prev.addEventListener('click', function () {
+        scrollReviews(-1);
+      });
+
+      next.addEventListener('click', function () {
+        scrollReviews(1);
+      });
+    }
+
+    function getCarouselAppsSection() {
+      var sections = document.querySelectorAll('.shopify-section');
+      for (var i = 0; i < sections.length; i++) {
+        if (sections[i].querySelector('#product-reviews')) continue;
+        if (
+          sections[i].querySelector('[class*="jdgm-carousel"]') ||
+          sections[i].querySelector('[id*="judge_me_reviews_cards_carousel"]')
+        ) {
+          return sections[i];
+        }
+        if (sections[i].querySelector('.slick-slider')) return sections[i];
+      }
+      return null;
+    }
+
+    function hasNativeCarousel() {
+      return !!getCarouselAppsSection();
+    }
+
+    function removeCarouselWriteReviewButton() {
+      document.querySelectorAll('.jdgm-carousel-write-review').forEach(function (node) {
+        node.remove();
+      });
+    }
+
+    function applyCarouselLayout() {
+      var section = getReviewsSection();
+      if (!section) return;
+
+      var shouldUseCarouselLayout = isHideWithCarouselEnabled() && hasNativeCarousel();
+
+      if (shouldUseCarouselLayout) {
+        section.classList.add('product-reviews-judge--carousel-mode');
+      } else {
+        section.classList.remove('product-reviews-judge--carousel-mode');
+        section.classList.remove('product-reviews-judge--form-open');
+        removeCarouselWriteReviewButton();
+      }
+    }
+
+    function getWriteReviewTrigger() {
+      var root = document.getElementById('judgeme_product_reviews');
+      var selectors =
+        '.jdgm-write-rev-link, .jdgm-rev-widg__write-btn, a.jdgm-write-rev-link, button.jdgm-write-rev-link, [data-jdgm-write-review], [class*="write-review"]';
+
+      if (root) {
+        var inRoot = root.querySelector(selectors);
+        if (inRoot) return inRoot;
+      }
+
+      return document.querySelector('#judgeme_product_reviews ' + selectors + ', ' + selectors);
+    }
+
+    function getWriteReviewForm(root) {
+      if (!root) return null;
+      return root.querySelector('.jdgm-form, .jdgm-rev-widg__form, form.jdgm-form');
+    }
+
+    function installReviewWidgetIfNeeded(root) {
+      if (!root || root.dataset.sarvitalJdgmInstallQueued === 'true') return;
+      root.dataset.sarvitalJdgmInstallQueued = 'true';
+
+      if (!window.jdgm) return;
+
+      if (typeof window.jdgm.installWidgets === 'function') {
+        window.jdgm.installWidgets();
+      }
+
+      if (typeof window.jdgm.installAllWidgets === 'function') {
+        window.jdgm.installAllWidgets();
+      }
+
+      if (typeof window.jdgm.runInstallation === 'function') {
+        window.jdgm.runInstallation();
+      }
+    }
+
+    function unlockWriteReviewAccess(section) {
+      if (section) section.classList.add('product-reviews-judge--write-access');
+    }
+
+    function lockWriteReviewAccess(section) {
+      if (section) section.classList.remove('product-reviews-judge--write-access');
+    }
+
+    function revealWriteReviewForm(root) {
+      var form = getWriteReviewForm(root);
+      if (!form) return false;
+
+      form.style.removeProperty('display');
+      form.style.setProperty('display', 'block', 'important');
+      form.style.setProperty('visibility', 'visible', 'important');
+      form.removeAttribute('hidden');
+      form.setAttribute('aria-hidden', 'false');
+
+      var widget = root.querySelector('.jdgm-rev-widg');
+      if (widget) widget.classList.add('jdgm-rev-widg--form-open');
+
+      return true;
+    }
+
+    function closeWriteReviewModal() {
+      var section = getReviewsSection();
+      if (!section) return;
+
+      section.classList.remove('product-reviews-judge--review-modal-open');
+      section.classList.remove('product-reviews-judge--form-open');
+      document.body.classList.remove('sarvital-jdgm-review-modal-open');
+    }
+
+    function openWriteReviewModalFallback(root) {
+      var section = getReviewsSection();
+      if (!section || !root) return false;
+
+      var trigger = getWriteReviewTrigger();
+      if (trigger) clickWriteReviewTrigger(trigger);
+
+      revealWriteReviewForm(root);
+
+      if (!getWriteReviewForm(root) && !trigger) return false;
+
+      section.classList.add('product-reviews-judge--review-modal-open');
+      section.classList.add('product-reviews-judge--form-open');
+      document.body.classList.add('sarvital-jdgm-review-modal-open');
+
+      return true;
+    }
+
+    function isJudgeMePopupOpen() {
+      return !!document.querySelector(
+        '.mfp-wrap, .mfp-bg, .mfp-ready, .jdgm-rev-popup, [class*="jm-mfp-wrap"]'
+      );
+    }
+
+    function clickWriteReviewTrigger(trigger) {
+      if (!trigger) return;
+
+      if (window.jdgm && window.jdgm.$) {
+        try {
+          window.jdgm.$(trigger).trigger('click');
+        } catch (error) {
+          /* fall through */
+        }
+      }
+
+      trigger.dispatchEvent(
+        new MouseEvent('click', { bubbles: true, cancelable: true, view: window })
+      );
+
+      if (typeof trigger.click === 'function') {
+        trigger.click();
+      }
+    }
+
+    function tryJudgeMeWriteApis(root) {
+      if (!window.jdgm || !root) return false;
+
+      var productId = root.dataset.productId || root.dataset.id;
+
+      if (typeof window.jdgm.showReviewForm === 'function') {
+        try {
+          window.jdgm.showReviewForm(productId);
+          return true;
+        } catch (error) {
+          /* continue */
+        }
+      }
+
+      if (typeof window.jdgm._openReviewTab === 'function') {
+        try {
+          window.jdgm._openReviewTab();
+          return true;
+        } catch (error) {
+          /* continue */
+        }
+      }
+
+      return false;
+    }
+
+    function openWriteReviewPopup() {
+      var reviewsSection = getReviewsSection();
+      var root = document.getElementById('judgeme_product_reviews');
+      if (!root) return;
+
+      reviewsSection && reviewsSection.classList.remove('product-reviews-judge--review-modal-open');
+      reviewsSection && reviewsSection.classList.remove('product-reviews-judge--form-open');
+      document.body.classList.remove('sarvital-jdgm-review-modal-open');
+
+      unlockWriteReviewAccess(reviewsSection);
+      installReviewWidgetIfNeeded(root);
+
+      function finishAttempt(tryCount, trigger) {
+        window.setTimeout(function () {
+          if (isJudgeMePopupOpen()) {
+            lockWriteReviewAccess(reviewsSection);
+            return;
+          }
+
+          if (tryCount < 10 && trigger) {
+            clickWriteReviewTrigger(trigger);
+            window.setTimeout(function () {
+              attemptOpen(tryCount + 1);
+            }, 220);
+            return;
+          }
+
+          lockWriteReviewAccess(reviewsSection);
+
+          if (!isJudgeMePopupOpen()) {
+            openWriteReviewModalFallback(root);
+          }
+        }, 180);
+      }
+
+      function attemptOpen(tryCount) {
+        installReviewWidgetIfNeeded(root);
+
+        var trigger = getWriteReviewTrigger();
+
+        if (!trigger && tryCount < 30) {
+          window.setTimeout(function () {
+            attemptOpen(tryCount + 1);
+          }, 150);
+          return;
+        }
+
+        if (!trigger) {
+          lockWriteReviewAccess(reviewsSection);
+          openWriteReviewModalFallback(root);
+          return;
+        }
+
+        tryJudgeMeWriteApis(root);
+        clickWriteReviewTrigger(trigger);
+        finishAttempt(tryCount, trigger);
+      }
+
+      attemptOpen(0);
+    }
+
+    function findCarouselRatingAnchor(carouselSection) {
+      var carouselRoot =
+        carouselSection.querySelector('[class*="jdgm-carousel"]') ||
+        carouselSection.querySelector('[class*="judge-me"]');
+
+      if (carouselRoot) {
+        var children = carouselRoot.children;
+        var lastHeaderBlock = null;
+
+        for (var i = 0; i < children.length; i++) {
+          var child = children[i];
+          if (!child || child.nodeType !== 1) continue;
+          if (child.querySelector('.slick-slider, .slick-list, [class*="slick"]')) continue;
+
+          if (
+            child.querySelector('.jdgm-star, [class*="average"], [class*="verified"]') ||
+            /header|summary|rating|average/i.test(child.className)
+          ) {
+            lastHeaderBlock = child;
+          }
+        }
+
+        if (lastHeaderBlock) return lastHeaderBlock;
+      }
+
+      var slider = carouselSection.querySelector('.slick-slider, .slick-list');
+      if (slider) {
+        var sliderWrap = slider.closest('[class*="carousel"]') || slider.parentElement;
+        if (sliderWrap && sliderWrap.previousElementSibling) {
+          return sliderWrap.previousElementSibling;
+        }
+      }
+
+      var header = carouselSection.querySelector(
+        '[class*="carousel"][class*="header"], [class*="jdgm"][class*="header"], [class*="average-rating"]'
+      );
+      if (header) return header;
+
+      var topStars = carouselSection.querySelector(
+        '.jdgm-star:not(.slick-slide .jdgm-star), [class*="jdgm"][class*="star"]:not(.slick-slide *)'
+      );
+      if (topStars) {
+        var row = topStars.closest(
+          '[class*="header"], [class*="summary"], [class*="rating"], [class*="average"]'
+        );
+        return row || topStars.parentElement;
+      }
+
+      return carouselSection.querySelector('h1, h2, [class*="header-text"]');
+    }
+
+    function initCarouselWriteReview() {
+      if (!isCarouselLayout()) return;
+
+      var carouselSection = getCarouselAppsSection();
+      if (!carouselSection) return;
+      if (carouselSection.querySelector('.jdgm-carousel-write-review')) return;
+
+      var anchor = findCarouselRatingAnchor(carouselSection);
+      if (!anchor) return;
+
+      var root = document.getElementById('judgeme_product_reviews');
+      var label = (root && root.dataset.writeReviewLabel) || 'Write a review';
+
+      var wrap = document.createElement('div');
+      wrap.className = 'jdgm-carousel-write-review';
+
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'jdgm-carousel-write-review__btn';
+      btn.textContent = label;
+      btn.addEventListener('click', function (event) {
+        event.preventDefault();
+        openWriteReviewPopup();
+      });
+
+      wrap.appendChild(btn);
+      anchor.insertAdjacentElement('afterend', wrap);
+    }
+
+    function run() {
+      applyCarouselLayout();
+
+      var root = document.getElementById('judgeme_product_reviews');
+      if (!root) return;
+      installReviewWidgetIfNeeded(root);
+      paintJudgeMe(root);
+
+      if (isCarouselLayout()) {
+        initCarouselWriteReview();
+      } else {
+        initListCarousel(root);
+      }
+    }
+
+    document.addEventListener('click', function (event) {
+      var section = getReviewsSection();
+      if (!section || !section.classList.contains('product-reviews-judge--review-modal-open')) return;
+
+      if (
+        event.target === section ||
+        event.target.closest('.jdgm-form__cancel, .jdgm-close-form, .mfp-close')
+      ) {
+        closeWriteReviewModal();
+      }
+    });
+
+    document.addEventListener('keydown', function (event) {
+      if (event.key !== 'Escape') return;
+      closeWriteReviewModal();
+    });
+
+    run();
+    document.addEventListener('jdgm.doneSetup', run);
+    document.addEventListener('DOMContentLoaded', run);
+    document.addEventListener('shopify:section:load', run);
+    document.addEventListener('shopify:section:unload', run);
+    document.addEventListener('shopify:section:select', run);
+
+    var observer = new MutationObserver(run);
+    observer.observe(document.body, { childList: true, subtree: true });
+  })();
+{% endjavascript %}

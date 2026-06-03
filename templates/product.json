@@ -22,7 +22,9 @@
       "block_order": [
         "buy_now_button_pFrqW8"
       ],
-      "settings": {}
+      "settings": {
+        "recommended_option_value": ""
+      }
     },
     "product_benefits_compact": {
       "type": "product-benefits-compact",
@@ -93,19 +95,30 @@
         "banner_link": ""
       }
     },
-    "1769418164e60d6e16": {
+    "reviews_anchor": {
+      "type": "reviews-anchor",
+      "settings": {}
+    },
+    "product_reviews_carousel": {
       "type": "apps",
       "blocks": {
-        "judge_me_reviews_cards_carousel_mmicRK": {
-          "type": "shopify://apps/judge-me-reviews/blocks/cards_carousel/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8",
+        "judge_me_reviews_review_widget_yFxPbV": {
+          "type": "shopify://apps/judge-me-reviews/blocks/review_widget/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8",
           "settings": {
-            "show_sample_reviews": true,
+            "review_data": "real_data",
+            "max_width": 1200,
+            "show_shop_reviews": false,
+            "empty_state": "other_products_reviews"
+          }
+        },
+        "judge_me_reviews_cards_carousel": {
+          "type": "shopify://apps/judge-me-reviews/blocks/cards_carousel/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8",
+          "disabled": true,
+          "settings": {
+            "show_sample_reviews": false,
             "reviews_selection": "all",
-            "products": [
-              "amla-powder",
-              "moringa-powder"
-            ],
-            "star_rating": "4_to_5_star",
+            "products": [],
+            "star_rating": "all",
             "show_review_media": false,
             "display_order": "media_first",
             "no_image_fallback": "review_text_only",
@@ -113,26 +126,27 @@
             "review_length": "medium",
             "text_size": "medium",
             "image_ratio": "1",
-            "reviews_shown": 4,
+            "reviews_shown": 3,
             "show_reviewer_name": true,
-            "show_product_name": true,
-            "hide_arrows_mobile": true,
+            "show_product_name": false,
+            "hide_arrows_mobile": false,
             "arrows_position": "sides",
-            "max_width": 1100,
+            "max_width": 1200,
             "corner_styling": "soft",
             "header_text_color": "#2d5016",
             "text_color": "#1a1a1a",
             "card_color": "#ffffff",
             "stars_color": "#4a7c2c",
-            "arrows_color": "#1a1a1a",
+            "arrows_color": "#2d5016",
             "transition_speed": 5,
-            "header_text": "Customers are saying",
-            "show_average_rating": false
+            "header_text": "Customer reviews",
+            "show_average_rating": true
           }
         }
       },
       "block_order": [
-        "judge_me_reviews_cards_carousel_mmicRK"
+        "judge_me_reviews_review_widget_yFxPbV",
+        "judge_me_reviews_cards_carousel"
       ],
       "settings": {}
     },
@@ -161,7 +175,8 @@
     "product_ingredients_nutrition_y7n8pk",
     "product_testimonial_videos",
     "product_image_banner",
-    "1769418164e60d6e16",
+    "reviews_anchor",
+    "product_reviews_carousel",
     "related_products",
     "product_faq"
   ]

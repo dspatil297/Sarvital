@@ -236,17 +236,11 @@
       gap: var(--spacing-sm);
     }
 
-    /* Carousel: one card = 100vw (same as 768px) */
-    .product-grid-section__carousel-wrap--mobile .product-grid-section__carousel-slide {
-      flex: 0 0 100vw;
-      width: 100vw;
-      min-width: 100vw;
-      max-width: 100vw;
-    }
+    /* Carousel: keep one card in view, with breathing room */
     .product-grid-section__carousel-wrap--mobile .product-grid-section__carousel-track {
-      gap: 0;
-      padding-left: 0;
-      padding-right: 0;
+      gap: var(--spacing-md);
+      padding-left: var(--spacing-md);
+      padding-right: var(--spacing-md);
     }
   }
 
@@ -305,8 +299,10 @@
     .product-grid-section__carousel-wrap--mobile .product-grid-section__carousel-scroll {
       margin-left: 0;
       margin-right: 0;
-      padding-left: 0;
-      padding-right: 0;
+      padding-left: var(--spacing-md);
+      padding-right: var(--spacing-md);
+      scroll-padding-left: var(--spacing-md);
+      scroll-padding-right: var(--spacing-md);
     }
   }
 
@@ -379,10 +375,10 @@
     box-sizing: border-box;
   }
 
-  /* Mobile: one card at a time – slide = 100vw, no gap or padding so only one card visible */
+  /* Mobile: show one card at a time with padding */
   @media (max-width: 768px) {
     .product-grid-section__carousel-wrap--mobile .product-grid-section__carousel-track {
-      gap: 0;
+      gap: var(--spacing-md);
       padding-left: 0;
       padding-right: 0;
     }
@@ -404,10 +400,10 @@
   /* Mobile: one card only – each slide = 100vw */
   @media (max-width: 768px) {
     .product-grid-section__carousel-wrap--mobile .product-grid-section__carousel-slide {
-      flex: 0 0 100vw;
-      width: 100vw;
-      min-width: 100vw;
-      max-width: 100vw;
+      flex: 0 0 calc(100vw - 2 * var(--spacing-md));
+      width: calc(100vw - 2 * var(--spacing-md));
+      min-width: calc(100vw - 2 * var(--spacing-md));
+      max-width: calc(100vw - 2 * var(--spacing-md));
     }
   }
 
@@ -422,7 +418,7 @@
   .product-grid-section__carousel-slide .product-card__link {
     display: flex;
     flex-direction: column;
-    height: 100%;
+    height: auto;
   }
 
   .product-grid-section__carousel-slide .product-card__info {
@@ -432,7 +428,7 @@
   }
 
   .product-grid-section__carousel-slide .product-card__form {
-    margin-top: auto;
+    margin-top: 0;
   }
 
   .product-grid-section__carousel-slide .product-card:hover {

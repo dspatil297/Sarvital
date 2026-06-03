@@ -1,0 +1,201 @@
+{% doc %}
+  Injects Sarvital brand colors into Judge.me widgets (stars, buttons, text, cards).
+  Rendered from layout/theme.liquid on product pages so overrides load before the widget.
+{% enddoc %}
+
+{% style %}
+  :root {
+    --jdgm-primary-color: #2d5016;
+    --jdgm-secondary-color: #4a7c2c;
+    --jdgm-star-color: #4a7c2c;
+  }
+
+  body.template-product .product-reviews-judge,
+  body.template-product .shopify-section:has([class*="jdgm"]),
+  body.template-product .shopify-section:has([class*="judge-me"]) {
+    --jdgm-primary-color: #2d5016;
+    --jdgm-secondary-color: #4a7c2c;
+    --jdgm-star-color: #4a7c2c;
+  }
+
+  body.template-product .jdgm-star,
+  body.template-product .jdgm-star::before,
+  body.template-product .jdgm-star.jdgm--on,
+  body.template-product .jdgm-star.jdgm--off,
+  body.template-product .jdgm-star.jdgm--half,
+  body.template-product .jdgm-rev__rating .jdgm-star,
+  body.template-product .jdgm-histogram .jdgm-star,
+  body.template-product .jdgm-rev-widg__summary .jdgm-star {
+    color: #4a7c2c !important;
+  }
+
+  body.template-product .jdgm-histogram__bar-content {
+    background: linear-gradient(90deg, #2d5016, #4a7c2c) !important;
+  }
+
+  body.template-product .jdgm-histogram__bar {
+    background: rgba(74, 124, 44, 0.12) !important;
+  }
+
+  body.template-product .jdgm-rev-widg,
+  body.template-product .jdgm-widget.jdgm-review-widget,
+  body.template-product .jdgm-rev-widg__reviews .jdgm-rev,
+  body.template-product .jdgm-rev {
+    color: #1a1a1a !important;
+  }
+
+  body.template-product #judgeme_product_reviews .jdgm-rev-widg__title {
+    display: block;
+    width: 100%;
+    text-align: center;
+    font-family: var(--font-heading);
+  }
+
+  body.template-product .jdgm-rev__title,
+  body.template-product .jdgm-rev__author,
+  body.template-product .jdgm-rev-widg__summary-text {
+    color: #1a1a1a !important;
+  }
+
+  body.template-product .jdgm-rev__body,
+  body.template-product .jdgm-rev__content,
+  body.template-product .jdgm-rev__timestamp {
+    color: rgba(26, 26, 26, 0.82) !important;
+  }
+
+  body.template-product .jdgm-btn--solid,
+  body.template-product .jdgm-form__submit,
+  body.template-product .jdgm-submit-rev,
+  body.template-product input[type="submit"].jdgm-btn--solid {
+    background: linear-gradient(145deg, #2d5016, #4a7c2c) !important;
+    background-color: #2d5016 !important;
+    border-color: #2d5016 !important;
+    color: #ffffff !important;
+  }
+
+  body.template-product .jdgm-btn--solid:hover,
+  body.template-product .jdgm-form__submit:hover {
+    background: #4a7c2c !important;
+    background-color: #4a7c2c !important;
+    border-color: #4a7c2c !important;
+    color: #ffffff !important;
+  }
+
+  body.template-product .jdgm-paginate__page {
+    color: #2d5016 !important;
+    border-color: rgba(74, 124, 44, 0.25) !important;
+  }
+
+  body.template-product .jdgm-paginate__page.jdgm-paginate__page--current,
+  body.template-product .jdgm-paginate__page:hover {
+    background: #2d5016 !important;
+    border-color: #2d5016 !important;
+    color: #ffffff !important;
+  }
+
+  body.template-product a.jdgm-link,
+  body.template-product .jdgm-rev a {
+    color: #2d5016 !important;
+  }
+
+  body.template-product .jdgm-form__field input,
+  body.template-product .jdgm-form__field textarea,
+  body.template-product .jdgm-form__field select {
+    border-color: rgba(74, 124, 44, 0.26) !important;
+    color: #1a1a1a !important;
+    background: #ffffff !important;
+  }
+
+  body.template-product .jdgm-form__field input:focus,
+  body.template-product .jdgm-form__field textarea:focus {
+    border-color: #2d5016 !important;
+    box-shadow: 0 0 0 3px rgba(74, 124, 44, 0.1) !important;
+  }
+
+  #judgeme_product_reviews,
+  #judgeme_product_reviews .jdgm-rev-widg {
+    --jdgm-primary-color: #2d5016;
+    --jdgm-secondary-color: #4a7c2c;
+    --jdgm-star-color: #4a7c2c;
+  }
+
+  #judgeme_product_reviews .jdgm-star,
+  #judgeme_product_reviews .jdgm-star::before {
+    color: #4a7c2c !important;
+  }
+
+  body.template-product .shopify-section:has([class*="jdgm-carousel"]) {
+    padding-top: 0;
+    background: transparent;
+  }
+
+  body.template-product [class*="jdgm-carousel"] [class*="header"],
+  body.template-product [class*="jdgm-carousel"] h2 {
+    color: #2d5016 !important;
+    font-family: var(--font-heading);
+  }
+
+  body.template-product [class*="jdgm-carousel"] .jdgm-rev,
+  body.template-product [class*="jdgm-carousel"] [class*="card"] {
+    background: #ffffff !important;
+    color: #1a1a1a !important;
+    border-color: rgba(74, 124, 44, 0.18) !important;
+  }
+
+  body.template-product [class*="jdgm-carousel"] .jdgm-star {
+    color: #4a7c2c !important;
+  }
+
+  body.template-product [class*="jdgm-carousel"] .slick-prev,
+  body.template-product [class*="jdgm-carousel"] .slick-next {
+    color: #2d5016 !important;
+  }
+
+  @media (max-width: 768px) {
+    body.template-product #judgeme_product_reviews .jdgm-row-stars,
+    body.template-product #judgeme_product_reviews .jdgm-rev-widg__header {
+      flex-direction: column !important;
+      align-items: stretch !important;
+    }
+
+    body.template-product #judgeme_product_reviews .jdgm-rev-widg__summary,
+    body.template-product #judgeme_product_reviews .jdgm-histogram {
+      width: 100% !important;
+      max-width: 100% !important;
+    }
+
+    body.template-product #judgeme_product_reviews .jdgm-write-rev-link,
+    body.template-product #judgeme_product_reviews .jdgm-rev-widg__write-btn,
+    body.template-product #judgeme_product_reviews a.jdgm-write-rev-link,
+    body.template-product #judgeme_product_reviews button.jdgm-write-rev-link {
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      width: auto !important;
+      min-width: 8.75rem !important;
+      min-height: 40px !important;
+      padding: 10px 14px !important;
+      font-size: 0.875rem !important;
+      font-weight: 600 !important;
+      line-height: 1.2 !important;
+      white-space: nowrap !important;
+      border-radius: 6px !important;
+      background: #2d5016 !important;
+      background-color: #2d5016 !important;
+      color: #ffffff !important;
+      border: 1px solid #2d5016 !important;
+      box-shadow: none !important;
+    }
+
+    body.template-product #judgeme_product_reviews .jdgm-rev-widg__reviews .jdgm-rev {
+      width: 100% !important;
+      min-width: 0 !important;
+      max-width: 100% !important;
+      padding: 8px 0 !important;
+      background: transparent !important;
+      border: none !important;
+      border-bottom: 1px solid rgba(74, 124, 44, 0.1) !important;
+      box-shadow: none !important;
+    }
+  }
+{% endstyle %}
