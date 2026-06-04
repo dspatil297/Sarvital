@@ -87,6 +87,10 @@
         "subheading": "Real stories from people who use Sarvital."
       }
     },
+    "reviews_anchor": {
+      "type": "reviews-anchor",
+      "settings": {}
+    },
     "product_image_banner": {
       "type": "product-image-banner",
       "settings": {
@@ -94,10 +98,6 @@
         "banner_alt": "Product banner",
         "banner_link": ""
       }
-    },
-    "reviews_anchor": {
-      "type": "reviews-anchor",
-      "settings": {}
     },
     "product_reviews_carousel": {
       "type": "apps",
@@ -174,9 +174,9 @@
     "product_benefits_compact",
     "product_ingredients_nutrition_y7n8pk",
     "product_testimonial_videos",
-    "product_image_banner",
     "reviews_anchor",
     "product_reviews_carousel",
+    "product_image_banner",
     "related_products",
     "product_faq"
   ]
