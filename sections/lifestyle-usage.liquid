@@ -10,16 +10,16 @@
                 <div class="lifestyle-usage__carousel-slide" {{ block.shopify_attributes }}>
                   {% if block.settings.image != blank %}
                     <img 
-                      src="{{ block.settings.image | image_url: width: 640, format: 'webp' }}" 
+                      src="{{ block.settings.image | image_url: width: 480, format: 'webp' }}" 
                       srcset="
-                        {{ block.settings.image | image_url: width: 400, format: 'webp' }} 400w,
-                        {{ block.settings.image | image_url: width: 600, format: 'webp' }} 600w,
-                        {{ block.settings.image | image_url: width: 800, format: 'webp' }} 800w,
-                        {{ block.settings.image | image_url: width: 1000, format: 'webp' }} 1000w
+                        {{ block.settings.image | image_url: width: 360, format: 'webp' }} 360w,
+                        {{ block.settings.image | image_url: width: 480, format: 'webp' }} 480w,
+                        {{ block.settings.image | image_url: width: 640, format: 'webp' }} 640w
                       "
-                      sizes="(max-width: 768px) 100vw, 50vw"
+                      sizes="(max-width: 768px) 100vw, min(50vw, 640px)"
                       alt="{{ block.settings.image.alt | default: section.settings.title }}"
-                      loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
+                      loading="lazy"
+                      decoding="async"
                       width="{{ block.settings.image.width }}"
                       height="{{ block.settings.image.height }}"
                       onerror="this.classList.add('image-error'); this.alt='Image failed to load';"

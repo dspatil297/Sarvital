@@ -8,6 +8,11 @@
  * ------------------------------------------------------------
  */
 {
+  "general": {
+    "accessibility": {
+      "skip_to_content": "Skip to main content"
+    }
+  },
   "404": {
     "title": "404",
     "not_found": "Page not found.",
@@ -82,6 +87,47 @@
     "submit": "Search",
     "no_results_html": "No results found for {{ terms }}",
     "results_for_html": "{{ count }} results found for {{ terms }}"
+  },
+  "sections": {
+    "home_faq": {
+      "title": "Frequently asked questions",
+      "view_all": "View all FAQs"
+    },
+    "collection_intro": {
+      "about_heading": "About {{ collection }}",
+      "links_label": "Shop by product",
+      "link_moringa": "Moringa powder",
+      "link_sattu": "Sattu protein powder",
+      "link_amla": "Amla powder",
+      "link_faq": "FAQ"
+    },
+    "blog": {
+      "read_article": "Read article",
+      "empty_state": "No articles yet. Check back soon for wellness guides."
+    },
+    "article_pillar": {
+      "tldr_title": "Key takeaways",
+      "cta_label": "Related links",
+      "shop_product": "Shop {{ product }}",
+      "read_faq": "Read FAQ",
+      "faq_title": "Frequently asked questions"
+    },
+    "product_sattu_protein": {
+      "heading": "Why sattu is a natural protein powder",
+      "body": "<p>Sarvital sattu powder is made from slow-roasted chana (gram), a traditional Indian superfood valued for natural plant protein, iron, and fiber. Unlike highly processed isolates, sattu delivers whole-food nutrition you can use every day — not only for workouts.</p><p>A typical 20 g serving (about 2 tablespoons) provides roughly 4 g of plant protein, plus iron and fiber. See the nutrition panel for exact values per serve. Lab-tested for purity, our sattu is vegan, gluten-free, and ideal for vegetarians, busy professionals, and anyone who wants steady energy without artificial additives.</p>",
+      "uses_heading": "Easy ways to use sattu protein",
+      "nutrition_link": "View full nutrition facts"
+    },
+    "page_faq": {
+      "name": "FAQ hub",
+      "title": "Frequently asked questions",
+      "intro": "Answers about Sarvital products, lab testing, shipping, and how to use moringa, sattu, and amla powders.",
+      "empty_state": "FAQs are being updated. Please check back soon or contact us.",
+      "no_answer": "No answer provided.",
+      "contact_cta": "Still have questions?",
+      "contact_link": "Contact us",
+      "footer_link": "FAQ"
+    }
   },
   "products": {
     "reviews": {

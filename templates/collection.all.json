@@ -1,0 +1,32 @@
+{
+  "sections": {
+    "shop_header": {
+      "type": "shop-header",
+      "settings": {
+        "show_background_image": false
+      }
+    },
+    "collection_intro": {
+      "type": "collection-intro",
+      "settings": {
+        "fallback_collection_handle": "all",
+        "show_product_links": true,
+        "moringa_url": "/products/moringa-powder",
+        "sattu_url": "/products/sattu-powder",
+        "amla_url": "/products/amla-powder",
+        "faq_url": "/pages/faq"
+      }
+    },
+    "collection_product_grid": {
+      "type": "collection-product-grid",
+      "settings": {
+        "products_per_page": 24
+      }
+    }
+  },
+  "order": [
+    "shop_header",
+    "collection_intro",
+    "collection_product_grid"
+  ]
+}

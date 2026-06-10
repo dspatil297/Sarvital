@@ -1,0 +1,232 @@
+{% comment %}
+  P1-C: Crawlable sattu protein positioning block (SEO / AEO wedge).
+  Renders only on the configured product handle (default: sattu-powder).
+  Optional override: product.metafields.custom.seo_protein_block (multi-line text).
+{% endcomment %}
+
+{% liquid
+  assign target_handle = section.settings.product_handle | default: 'sattu-powder' | strip
+%}
+
+{% if product.handle == target_handle %}
+  {% liquid
+    assign heading = section.settings.heading
+    if heading == blank
+      assign heading = 'sections.product_sattu_protein.heading' | t
+    endif
+
+    assign body_html = section.settings.body
+    assign metafield_body = product.metafields.custom.seo_protein_block | metafield_text
+    if metafield_body != blank
+      assign body_html = metafield_body | newline_to_br
+    elsif body_html == blank
+      assign body_html = 'sections.product_sattu_protein.body' | t
+    endif
+
+    assign uses_heading = section.settings.uses_heading
+    if uses_heading == blank
+      assign uses_heading = 'sections.product_sattu_protein.uses_heading' | t
+    endif
+  %}
+
+  <section
+    class="product-sattu-protein"
+    id="product-sattu-protein"
+    aria-labelledby="product-sattu-protein-heading"
+    {{ section.shopify_attributes }}
+  >
+    <div class="product-sattu-protein__container">
+      <h2 class="product-sattu-protein__title" id="product-sattu-protein-heading">
+        {{ heading | escape }}
+      </h2>
+
+      <div class="product-sattu-protein__body rte">
+        {{ body_html }}
+      </div>
+
+      {% if section.blocks.size > 0 %}
+        <h3 class="product-sattu-protein__uses-title">{{ uses_heading | escape }}</h3>
+        <ul class="product-sattu-protein__uses">
+          {% for block in section.blocks %}
+            {% if block.settings.label != blank %}
+              <li class="product-sattu-protein__use-item" {{ block.shopify_attributes }}>
+                {{ block.settings.label | escape }}
+              </li>
+            {% endif %}
+          {% endfor %}
+        </ul>
+      {% endif %}
+
+      {% if section.settings.show_nutrition_link %}
+        <p class="product-sattu-protein__nutrition-link">
+          <a href="#product-ingredients-nutrition">{{ 'sections.product_sattu_protein.nutrition_link' | t }}</a>
+        </p>
+      {% endif %}
+    </div>
+  </section>
+{% endif %}
+
+{% stylesheet %}
+  .product-sattu-protein {
+    width: 100%;
+    max-width: 100%;
+    padding: var(--spacing-2xl) var(--spacing-xl);
+    background: linear-gradient(135deg, rgba(45, 80, 22, 0.04) 0%, rgba(255, 255, 255, 0.98) 100%);
+    box-sizing: border-box;
+    border-top: 1px solid rgba(74, 124, 44, 0.1);
+    border-bottom: 1px solid rgba(74, 124, 44, 0.1);
+  }
+
+  .product-sattu-protein__container {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .product-sattu-protein__title {
+    font-family: var(--font-heading);
+    font-size: clamp(1.35rem, 2.8vw, 1.85rem);
+    font-weight: 700;
+    color: var(--forest-green);
+    margin: 0 0 var(--spacing-lg);
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+  }
+
+  .product-sattu-protein__body {
+    font-size: var(--body-normal, 1rem);
+    line-height: 1.75;
+    color: var(--text);
+    margin-bottom: var(--spacing-xl);
+  }
+
+  .product-sattu-protein__body p {
+    margin: 0 0 1rem;
+  }
+
+  .product-sattu-protein__body p:last-child {
+    margin-bottom: 0;
+  }
+
+  .product-sattu-protein__uses-title {
+    font-family: var(--font-heading);
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--forest-green);
+    margin: 0 0 var(--spacing-md);
+  }
+
+  .product-sattu-protein__uses {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--spacing-sm);
+  }
+
+  .product-sattu-protein__use-item {
+    position: relative;
+    padding: var(--spacing-md) var(--spacing-md) var(--spacing-md) calc(var(--spacing-md) + 1.5rem);
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    border: 1px solid rgba(74, 124, 44, 0.14);
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.45;
+  }
+
+  .product-sattu-protein__use-item::before {
+    content: '';
+    position: absolute;
+    left: var(--spacing-md);
+    top: 50%;
+    transform: translateY(-50%);
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--sage-green);
+  }
+
+  .product-sattu-protein__nutrition-link {
+    margin: var(--spacing-lg) 0 0;
+    font-size: 0.9375rem;
+  }
+
+  .product-sattu-protein__nutrition-link a {
+    color: var(--forest-green);
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  @media (max-width: 768px) {
+    .product-sattu-protein {
+      padding: var(--spacing-xl) var(--spacing-md);
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:sections.product_sattu_protein.name",
+  "tag": "section",
+  "class": "section-product-sattu-protein",
+  "settings": [
+    {
+      "type": "text",
+      "id": "product_handle",
+      "label": "t:sections.product_sattu_protein.settings.product_handle",
+      "default": "sattu-powder",
+      "info": "t:sections.product_sattu_protein.settings.product_handle_info"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "t:sections.product_sattu_protein.settings.heading",
+      "default": "Why sattu is a natural protein powder"
+    },
+    {
+      "type": "richtext",
+      "id": "body",
+      "label": "t:sections.product_sattu_protein.settings.body",
+      "default": "<p>Sarvital sattu powder is made from slow-roasted chana (gram), a traditional Indian superfood valued for natural plant protein, iron, and fiber. Unlike highly processed isolates, sattu delivers whole-food nutrition you can use every day — not only for workouts.</p><p>A typical 20 g serving (about 2 tablespoons) provides roughly 4 g of plant protein, plus iron and fiber. See the nutrition panel for exact values per serve. Lab-tested for purity, our sattu is vegan, gluten-free, and ideal for vegetarians, busy professionals, and anyone who wants steady energy without artificial additives.</p>"
+    },
+    {
+      "type": "text",
+      "id": "uses_heading",
+      "label": "t:sections.product_sattu_protein.settings.uses_heading",
+      "default": "Easy ways to use sattu protein"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_nutrition_link",
+      "label": "t:sections.product_sattu_protein.settings.show_nutrition_link",
+      "default": true
+    }
+  ],
+  "blocks": [
+    {
+      "type": "use",
+      "name": "t:sections.product_sattu_protein.blocks.use.name",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "t:sections.product_sattu_protein.blocks.use.settings.label",
+          "default": "Use case"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.product_sattu_protein.name",
+      "blocks": [
+        { "type": "use", "settings": { "label": "Smoothies and protein shakes" } },
+        { "type": "use", "settings": { "label": "Traditional sharbat (salted or sweet)" } },
+        { "type": "use", "settings": { "label": "Sattu chilla and savory pancakes" } },
+        { "type": "use", "settings": { "label": "Post-workout recovery drinks" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

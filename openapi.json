@@ -1,0 +1,227 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Sarvital Storefront API",
+    "version": "1.0.0",
+    "description": "Shopify Storefront REST API subset for Sarvital. Catalog, search, cart, and GoKwik checkout flow.",
+    "contact": {
+      "url": "https://sarvital.com/pages/contact"
+    },
+    "license": {
+      "name": "Shopify Partner",
+      "url": "https://shopify.dev"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://sarvital.com",
+      "description": "Sarvital Shopify storefront"
+    }
+  ],
+  "x-service-info": {
+    "categories": ["ecommerce", "health", "wellness", "natural-foods"],
+    "currency": "INR",
+    "checkout_provider": "gokwik"
+  },
+  "paths": {
+    "/products.json": {
+      "get": {
+        "operationId": "listProducts",
+        "summary": "List all products",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": { "type": "integer", "default": 20, "maximum": 250 }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": { "type": "integer", "default": 1 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Product list",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/products/{handle}.json": {
+      "get": {
+        "operationId": "getProduct",
+        "summary": "Get product by handle",
+        "parameters": [
+          {
+            "name": "handle",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Product detail",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/collections.json": {
+      "get": {
+        "operationId": "listCollections",
+        "summary": "List all collections",
+        "responses": {
+          "200": {
+            "description": "Collections list",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/search/suggest.json": {
+      "get": {
+        "operationId": "searchProducts",
+        "summary": "Search products",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "resources[type]",
+            "in": "query",
+            "schema": { "type": "string", "default": "product" }
+          },
+          {
+            "name": "resources[limit]",
+            "in": "query",
+            "schema": { "type": "integer", "default": 10 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Search results",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/cart.js": {
+      "get": {
+        "operationId": "getCart",
+        "summary": "Get current cart",
+        "responses": {
+          "200": {
+            "description": "Cart object",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/cart/add.js": {
+      "post": {
+        "operationId": "addToCart",
+        "summary": "Add items to cart",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "items": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": { "type": "integer" },
+                        "quantity": { "type": "integer" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated cart",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/cart/change.js": {
+      "post": {
+        "operationId": "changeCart",
+        "summary": "Update cart line quantities",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "type": "object" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated cart",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/checkout": {
+      "post": {
+        "operationId": "initiateCheckout",
+        "summary": "Initiate GoKwik buyer-approved checkout session",
+        "description": "Redirects buyer to GoKwik checkout. Agents must obtain explicit buyer consent before calling. Not a direct payment API.",
+        "x-payment-info": {
+          "intent": "session",
+          "method": "card",
+          "amount": 0,
+          "currency": "INR",
+          "description": "GoKwik checkout session — amount determined by cart total at checkout time"
+        },
+        "responses": {
+          "302": {
+            "description": "Redirect to GoKwik checkout"
+          }
+        }
+      }
+    }
+  }
+}

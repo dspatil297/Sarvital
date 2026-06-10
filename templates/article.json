@@ -11,7 +11,10 @@
   "sections": {
     "main": {
       "type": "article",
-      "settings": {}
+      "settings": {
+        "show_cta": true,
+        "faq_url": "/pages/faq"
+      }
     }
   },
   "order": [

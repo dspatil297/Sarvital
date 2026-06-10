@@ -1,0 +1,205 @@
+{% comment %}
+  Crawlable collection intro for SEO (P2-A).
+  Renders Shopify collection.description, or fallback copy for the All collection.
+{% endcomment %}
+
+{% liquid
+  assign intro_html = collection.description
+  assign fallback_handle = section.settings.fallback_collection_handle | default: 'all' | strip
+
+  if intro_html == blank
+    if collection.handle == fallback_handle
+      assign intro_html = section.settings.fallback_intro
+    endif
+  endif
+%}
+
+{% if intro_html != blank or section.settings.show_product_links %}
+  <section
+    class="collection-intro"
+    id="collection-intro"
+    aria-labelledby="collection-intro-heading"
+    {{ section.shopify_attributes }}
+  >
+    <div class="collection-intro__container">
+      {% if intro_html != blank %}
+        <h2 class="collection-intro__visually-hidden" id="collection-intro-heading">
+          {{ 'sections.collection_intro.about_heading' | t: collection: collection.title }}
+        </h2>
+        <div class="collection-intro__body rte">
+          {{ intro_html }}
+        </div>
+      {% endif %}
+
+      {% if section.settings.show_product_links %}
+        <nav class="collection-intro__links" aria-label="{{ 'sections.collection_intro.links_label' | t }}">
+          <ul class="collection-intro__links-list">
+            {% if section.settings.moringa_url != blank %}
+              <li>
+                <a href="{{ section.settings.moringa_url }}">{{ 'sections.collection_intro.link_moringa' | t }}</a>
+              </li>
+            {% endif %}
+            {% if section.settings.sattu_url != blank %}
+              <li>
+                <a href="{{ section.settings.sattu_url }}">{{ 'sections.collection_intro.link_sattu' | t }}</a>
+              </li>
+            {% endif %}
+            {% if section.settings.amla_url != blank %}
+              <li>
+                <a href="{{ section.settings.amla_url }}">{{ 'sections.collection_intro.link_amla' | t }}</a>
+              </li>
+            {% endif %}
+            {% if section.settings.faq_url != blank %}
+              <li>
+                <a href="{{ section.settings.faq_url }}">{{ 'sections.collection_intro.link_faq' | t }}</a>
+              </li>
+            {% endif %}
+          </ul>
+        </nav>
+      {% endif %}
+    </div>
+  </section>
+{% endif %}
+
+{% stylesheet %}
+  .collection-intro {
+    width: 100%;
+    max-width: 100%;
+    padding: var(--spacing-xl) var(--spacing-lg) var(--spacing-2xl);
+    background: var(--white);
+    border-bottom: 1px solid rgba(74, 124, 44, 0.08);
+    box-sizing: border-box;
+  }
+
+  .collection-intro__container {
+    max-width: 820px;
+    margin: 0 auto;
+  }
+
+  .collection-intro__visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .collection-intro__body {
+    font-size: var(--body-normal, 1rem);
+    line-height: 1.75;
+    color: var(--text);
+  }
+
+  .collection-intro__body p {
+    margin: 0 0 1rem;
+  }
+
+  .collection-intro__body p:last-child {
+    margin-bottom: 0;
+  }
+
+  .collection-intro__body a {
+    color: var(--forest-green);
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .collection-intro__links {
+    margin-top: var(--spacing-lg);
+    padding-top: var(--spacing-lg);
+    border-top: 1px solid rgba(74, 124, 44, 0.1);
+  }
+
+  .collection-intro__links-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm) var(--spacing-lg);
+  }
+
+  .collection-intro__links-list a {
+    color: var(--forest-green);
+    font-weight: 600;
+    text-decoration: none;
+    border-bottom: 2px solid rgba(74, 124, 44, 0.2);
+    padding-bottom: 2px;
+    transition: border-color 0.2s ease, color 0.2s ease;
+  }
+
+  .collection-intro__links-list a:hover {
+    color: var(--sage-green);
+    border-color: var(--sage-green);
+  }
+
+  @media (max-width: 768px) {
+    .collection-intro {
+      padding: var(--spacing-lg) var(--spacing-md) var(--spacing-xl);
+    }
+
+    .collection-intro__links-list {
+      flex-direction: column;
+      gap: var(--spacing-sm);
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:sections.collection_intro.name",
+  "tag": "section",
+  "class": "section-collection-intro",
+  "settings": [
+    {
+      "type": "text",
+      "id": "fallback_collection_handle",
+      "label": "t:sections.collection_intro.settings.fallback_collection_handle",
+      "default": "all",
+      "info": "t:sections.collection_intro.settings.fallback_collection_handle_info"
+    },
+    {
+      "type": "richtext",
+      "id": "fallback_intro",
+      "label": "t:sections.collection_intro.settings.fallback_intro",
+      "default": "<p>Shop Sarvital's full range of lab-tested natural superfood powders — moringa, amla (Indian gooseberry), and sattu (roasted gram) — plus curated combo packs for energy, immunity, and plant protein support.</p><p>Unlike mass-market supplements, Sarvital focuses on fruit and vegetable powders you can use every day: stir into smoothies, mix as sharbat, or add to home cooking. All products are vegan, gluten-free, and third-party lab tested for quality.</p><p><a href=\"/products/moringa-powder\">Moringa powder</a> is our bestseller for daily vitamins and antioxidants. <a href=\"/products/amla-powder\">Amla powder</a> supports vitamin C and immunity goals. <a href=\"/products/sattu-powder\">Sattu protein powder</a> delivers traditional plant protein, iron, and fiber — ideal for fitness-minded and vegetarian households across India.</p><p>Browse single 150 g packs or bundle moringa, amla, and sattu together to save. Sarvital ships across India. Questions? Read our <a href=\"/pages/faq\">FAQ</a> or contact our team.</p>"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_product_links",
+      "label": "t:sections.collection_intro.settings.show_product_links",
+      "default": true
+    },
+    {
+      "type": "url",
+      "id": "moringa_url",
+      "label": "t:sections.collection_intro.settings.moringa_url"
+    },
+    {
+      "type": "url",
+      "id": "sattu_url",
+      "label": "t:sections.collection_intro.settings.sattu_url"
+    },
+    {
+      "type": "url",
+      "id": "amla_url",
+      "label": "t:sections.collection_intro.settings.amla_url"
+    },
+    {
+      "type": "url",
+      "id": "faq_url",
+      "label": "t:sections.collection_intro.settings.faq_url"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.collection_intro.name"
+    }
+  ]
+}
+{% endschema %}

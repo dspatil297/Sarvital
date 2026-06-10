@@ -1,0 +1,11 @@
+{
+  "name": "sarvital-agent-discovery-worker",
+  "private": true,
+  "scripts": {
+    "login": "wrangler login",
+    "deploy": "wrangler deploy --config wrangler.toml"
+  },
+  "devDependencies": {
+    "wrangler": "^4.99.0"
+  }
+}

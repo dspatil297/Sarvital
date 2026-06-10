@@ -23,21 +23,21 @@
           "type": "slide",
           "settings": {
             "image": "shopify://shop_images/WhatsApp_Image_2026-01-31_at_13.44.35_a64133cf-50f0-4be1-8fe0-0556bae000f2.webp",
-            "mobile_image": "shopify://shop_images/WhatsApp_Image_2026-01-31_at_13.44.35.webp"
+            "mobile_image": "shopify://shop_images/moringa.webp"
           }
         },
         "slide_hMhcUm": {
           "type": "slide",
           "settings": {
             "image": "shopify://shop_images/WhatsApp_Image_2026-01-31_at_13.44.34_1_f5d4b477-adf5-49d1-ad4d-f933dd613f41.webp",
-            "mobile_image": "shopify://shop_images/WhatsApp_Image_2026-01-31_at_13.44.34_1.webp"
+            "mobile_image": "shopify://shop_images/amla.webp"
           }
         },
         "slide_knjxEJ": {
           "type": "slide",
           "settings": {
             "image": "shopify://shop_images/WhatsApp_Image_2026-01-31_at_13.44.35_1_226df6b3-7767-4273-8743-18131fd0a5a8.webp",
-            "mobile_image": "shopify://shop_images/WhatsApp_Image_2026-01-31_at_13.44.35_1.webp"
+            "mobile_image": "shopify://shop_images/sattu.webp"
           }
         }
       },
@@ -332,17 +332,18 @@
     "home_faq": {
       "type": "home-faq",
       "settings": {
-        "title": "Frequently Asked Questions"
+        "title": "Frequently asked questions",
+        "show_view_all_link": true
       }
     }
   },
   "order": [
     "hero_banner",
     "usp_icons",
-    "home_testimonial_videos",
     "176943494681be9f0a",
     "featured_products",
     "lifestyle_usage",
+    "home_testimonial_videos",
     "quality_assurance",
     "home_faq"
   ]

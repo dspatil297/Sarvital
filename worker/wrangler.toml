@@ -1,0 +1,49 @@
+name = "sarvital-agent-discovery"
+main = "cloudflare-agent-discovery-worker.js"
+compatibility_date = "2024-01-01"
+
+# Deploy: npx wrangler deploy --config worker/wrangler.toml
+# Prerequisite: sarvital.com DNS proxied through Cloudflare (orange cloud).
+#
+# IMPORTANT: Only discovery paths are routed to this Worker. Do NOT use sarvital.com/*
+# — proxying the full storefront breaks Shopify bot verification and guest checkout.
+#
+# After deploy, enable HTML Link headers via Cloudflare Dashboard:
+#   Rules → Transform Rules → Response Header Modification
+#   Import worker/cloudflare-link-headers-rule.json (or create manually).
+
+[[routes]]
+pattern = "sarvital.com/.well-known/*"
+zone_name = "sarvital.com"
+
+[[routes]]
+pattern = "www.sarvital.com/.well-known/*"
+zone_name = "sarvital.com"
+
+[[routes]]
+pattern = "sarvital.com/auth.md"
+zone_name = "sarvital.com"
+
+[[routes]]
+pattern = "www.sarvital.com/auth.md"
+zone_name = "sarvital.com"
+
+[[routes]]
+pattern = "sarvital.com/openapi.json"
+zone_name = "sarvital.com"
+
+[[routes]]
+pattern = "www.sarvital.com/openapi.json"
+zone_name = "sarvital.com"
+
+[[routes]]
+pattern = "sarvital.com/api/x402/demo"
+zone_name = "sarvital.com"
+
+[[routes]]
+pattern = "www.sarvital.com/api/x402/demo"
+zone_name = "sarvital.com"
+
+[vars]
+X402_WALLET = "0x0000000000000000000000000000000000000000"
+X402_FACILITATOR = "https://x402.org/facilitator"

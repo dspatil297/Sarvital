@@ -1,0 +1,14 @@
+{
+  "sections": {
+    "main": {
+      "type": "article",
+      "settings": {
+        "show_cta": true,
+        "faq_url": "/pages/faq"
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}

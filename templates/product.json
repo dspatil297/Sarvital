@@ -35,6 +35,46 @@
       "name": "Ingredients & Nutrition",
       "settings": {}
     },
+    "product_sattu_protein": {
+      "type": "product-sattu-protein",
+      "blocks": {
+        "use_smoothies": {
+          "type": "use",
+          "settings": {
+            "label": "Smoothies and protein shakes"
+          }
+        },
+        "use_sharbat": {
+          "type": "use",
+          "settings": {
+            "label": "Traditional sharbat (salted or sweet)"
+          }
+        },
+        "use_chilla": {
+          "type": "use",
+          "settings": {
+            "label": "Sattu chilla and savory pancakes"
+          }
+        },
+        "use_post_workout": {
+          "type": "use",
+          "settings": {
+            "label": "Post-workout recovery drinks"
+          }
+        }
+      },
+      "block_order": [
+        "use_smoothies",
+        "use_sharbat",
+        "use_chilla",
+        "use_post_workout"
+      ],
+      "settings": {
+        "product_handle": "sattu-powder",
+        "heading": "Why sattu is a natural protein powder",
+        "show_nutrition_link": true
+      }
+    },
     "product_testimonial_videos": {
       "type": "product-testimonial-videos",
       "blocks": {
@@ -173,6 +213,7 @@
     "product_main",
     "product_benefits_compact",
     "product_ingredients_nutrition_y7n8pk",
+    "product_sattu_protein",
     "product_testimonial_videos",
     "reviews_anchor",
     "product_reviews_carousel",

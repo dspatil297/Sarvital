@@ -1,35 +1,319 @@
 {% comment %}
-  This section is used in the blog template to render the blog page listing all
-  articles within a blog.
-
+  Blog index — article grid with hero header, cards, and pagination.
   https://shopify.dev/docs/storefronts/themes/architecture/templates/blog
 {% endcomment %}
 
-<h1>{{ blog.title }}</h1>
+{% liquid
+  assign per_page = section.settings.articles_per_page | default: 6
+  if per_page < 1
+    assign per_page = 6
+  endif
+%}
 
-{% paginate blog.articles by 5 %}
-  {% for article in blog.articles %}
-    <div>
-      {% if article.image %}
-        {{ article.image | image_url: width: 1000 | image_tag }}
+<section class="blog-index" aria-labelledby="blog-index-heading" {{ section.shopify_attributes }}>
+  <div class="blog-index__container">
+    <header class="blog-index__header">
+      <h1 class="blog-index__title" id="blog-index-heading">{{ blog.title }}</h1>
+      {% if section.settings.intro != blank %}
+        <div class="blog-index__intro rte">{{ section.settings.intro }}</div>
       {% endif %}
-      <h2>
-        {{ article.title | link_to: article.url }}
-      </h2>
-      {% assign date = article.published_at | time_tag: format: 'date' %}
-      <p>{{ 'blog.article_metadata_html' | t: date: date, author: article.author }}</p>
-      <p>{{ article.excerpt }}</p>
-    </div>
-  {% endfor %}
+    </header>
 
-  {%- if paginate.pages > 1 -%}
-    {{- paginate | default_pagination -}}
-  {%- endif -%}
-{% endpaginate %}
+    {% paginate blog.articles by per_page %}
+      {% if blog.articles.size > 0 %}
+        <div class="blog-index__grid">
+          {% for article in blog.articles %}
+            <article class="blog-index__card" itemscope itemtype="https://schema.org/BlogPosting">
+              <a class="blog-index__card-media" href="{{ article.url }}" tabindex="-1" aria-hidden="true">
+                {% if article.image %}
+                  {{
+                    article.image
+                    | image_url: width: 800
+                    | image_tag:
+                      class: 'blog-index__card-image',
+                      loading: 'lazy',
+                      widths: '400,600,800',
+                      sizes: '(max-width: 768px) 100vw, 50vw',
+                      alt: article.image.alt | default: article.title
+                  }}
+                {% else %}
+                  <div class="blog-index__card-placeholder" aria-hidden="true">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                      <rect x="3" y="3" width="18" height="18" rx="2"/>
+                      <circle cx="8.5" cy="8.5" r="1.5"/>
+                      <path d="M21 15l-5-5L5 21"/>
+                    </svg>
+                  </div>
+                {% endif %}
+              </a>
+
+              <div class="blog-index__card-body">
+                {% assign date = article.published_at | time_tag: format: 'date' %}
+                <p class="blog-index__card-meta">
+                  {% if section.settings.show_author and article.author != blank %}
+                    {{ 'blog.article_metadata_html' | t: date: date, author: article.author }}
+                  {% else %}
+                    {{ date }}
+                  {% endif %}
+                </p>
+
+                <h2 class="blog-index__card-title" itemprop="headline">
+                  <a href="{{ article.url }}" itemprop="url">{{ article.title }}</a>
+                </h2>
+
+                {% assign card_excerpt = article.excerpt | strip %}
+                {% if card_excerpt == blank %}
+                  {% assign card_excerpt = article.excerpt_or_content | strip_html | strip %}
+                {% endif %}
+                {% if card_excerpt != blank %}
+                  <p class="blog-index__card-excerpt" itemprop="description">
+                    {{ card_excerpt | truncatewords: 28 }}
+                  </p>
+                {% endif %}
+
+                <a class="blog-index__card-link" href="{{ article.url }}">
+                  {{ 'sections.blog.read_article' | t }}
+                  <span class="blog-index__card-link-icon" aria-hidden="true">→</span>
+                </a>
+              </div>
+            </article>
+          {% endfor %}
+        </div>
+
+        {% if paginate.pages > 1 %}
+          <div class="blog-index__pagination">
+            {% render 'pagination', paginate: paginate %}
+          </div>
+        {% endif %}
+      {% else %}
+        <p class="blog-index__empty">{{ 'sections.blog.empty_state' | t }}</p>
+      {% endif %}
+    {% endpaginate %}
+  </div>
+</section>
+
+{% stylesheet %}
+  .blog-index {
+    width: 100%;
+    padding: var(--spacing-3xl, 3rem) var(--spacing-lg) var(--spacing-4xl, 4rem);
+    background: linear-gradient(180deg, rgba(74, 124, 44, 0.05) 0%, var(--white) 220px);
+    box-sizing: border-box;
+  }
+
+  .blog-index__container {
+    max-width: var(--container-max-width, 1100px);
+    margin: 0 auto;
+  }
+
+  .blog-index__header {
+    text-align: center;
+    max-width: 640px;
+    margin: 0 auto var(--spacing-3xl, 3rem);
+  }
+
+  .blog-index__title {
+    font-family: var(--font-heading);
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    font-weight: 800;
+    color: var(--forest-green);
+    margin: 0 0 var(--spacing-md);
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+  }
+
+  .blog-index__intro {
+    font-size: var(--body-large, 1.0625rem);
+    line-height: 1.7;
+    color: var(--text);
+    margin: 0;
+  }
+
+  .blog-index__intro p {
+    margin: 0;
+  }
+
+  .blog-index__grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-2xl, 2rem);
+    align-items: stretch;
+  }
+
+  .blog-index__card {
+    display: flex;
+    flex-direction: column;
+    background: var(--white);
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid rgba(74, 124, 44, 0.12);
+    box-shadow: 0 4px 20px rgba(45, 80, 22, 0.06);
+    transition: box-shadow 0.3s ease, transform 0.3s ease, border-color 0.3s ease;
+  }
+
+  .blog-index__card:hover {
+    box-shadow: 0 12px 36px rgba(45, 80, 22, 0.12);
+    transform: translateY(-3px);
+    border-color: rgba(74, 124, 44, 0.22);
+  }
+
+  .blog-index__card-media {
+    display: block;
+    position: relative;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    background: linear-gradient(135deg, rgba(74, 124, 44, 0.08) 0%, rgba(74, 124, 44, 0.02) 100%);
+  }
+
+  .blog-index__card-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.4s ease;
+  }
+
+  .blog-index__card:hover .blog-index__card-image {
+    transform: scale(1.04);
+  }
+
+  .blog-index__card-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(74, 124, 44, 0.35);
+  }
+
+  .blog-index__card-body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: var(--spacing-lg) var(--spacing-xl) var(--spacing-xl);
+  }
+
+  .blog-index__card-meta {
+    font-size: var(--body-small, 0.875rem);
+    color: rgba(26, 26, 26, 0.55);
+    margin: 0 0 var(--spacing-sm);
+  }
+
+  .blog-index__card-meta-sep {
+    margin: 0 0.35rem;
+  }
+
+  .blog-index__card-title {
+    font-family: var(--font-heading);
+    font-size: clamp(1.125rem, 2.5vw, 1.35rem);
+    font-weight: 700;
+    line-height: 1.35;
+    margin: 0 0 var(--spacing-md);
+  }
+
+  .blog-index__card-title a {
+    color: var(--forest-green);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .blog-index__card-title a:hover {
+    color: var(--sage-green);
+  }
+
+  .blog-index__card-excerpt {
+    font-size: var(--body-normal, 1rem);
+    line-height: 1.65;
+    color: rgba(26, 26, 26, 0.72);
+    margin: 0 0 var(--spacing-lg);
+    flex: 1;
+  }
+
+  .blog-index__card-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--forest-green);
+    text-decoration: none;
+    margin-top: auto;
+    transition: color 0.2s ease, gap 0.2s ease;
+  }
+
+  .blog-index__card-link:hover {
+    color: var(--sage-green);
+    gap: 0.5rem;
+  }
+
+  .blog-index__card-link-icon {
+    line-height: 1;
+  }
+
+  .blog-index__pagination {
+    margin-top: var(--spacing-3xl, 3rem);
+  }
+
+  .blog-index__pagination .pagination__info {
+    display: none;
+  }
+
+  .blog-index__empty {
+    text-align: center;
+    padding: var(--spacing-3xl);
+    background: rgba(74, 124, 44, 0.05);
+    border-radius: 12px;
+    color: rgba(26, 26, 26, 0.65);
+    margin: 0;
+  }
+
+  @media (max-width: 768px) {
+    .blog-index {
+      padding: var(--spacing-2xl) var(--spacing-md) var(--spacing-3xl);
+    }
+
+    .blog-index__header {
+      margin-bottom: var(--spacing-2xl);
+      text-align: left;
+    }
+
+    .blog-index__grid {
+      grid-template-columns: 1fr;
+      gap: var(--spacing-xl);
+    }
+
+    .blog-index__card-body {
+      padding: var(--spacing-md) var(--spacing-lg) var(--spacing-lg);
+    }
+  }
+{% endstylesheet %}
 
 {% schema %}
 {
-  "name": "t:general.blog",
-  "settings": []
+  "name": "t:sections.blog.name",
+  "tag": "section",
+  "class": "section-blog-index",
+  "settings": [
+    {
+      "type": "richtext",
+      "id": "intro",
+      "label": "t:sections.blog.settings.intro",
+      "default": "<p>Practical guides on moringa, sattu, and everyday wellness — how to use lab-tested powders at home.</p>"
+    },
+    {
+      "type": "range",
+      "id": "articles_per_page",
+      "label": "t:sections.blog.settings.articles_per_page",
+      "min": 2,
+      "max": 12,
+      "step": 1,
+      "default": 6
+    },
+    {
+      "type": "checkbox",
+      "id": "show_author",
+      "label": "t:sections.blog.settings.show_author",
+      "default": true
+    }
+  ]
 }
 {% endschema %}

@@ -2,8 +2,9 @@
   Trust Badges Section - Compact Premium Design
 {% endcomment %}
 
-<section class="product-trust-badges-compact fade-in-up" id="product-trust" style="animation-delay: 0.5s;">
+<section class="product-trust-badges-compact fade-in-up" id="product-trust" style="animation-delay: 0.5s;" aria-labelledby="product-trust-heading">
   <div class="product-trust-badges-compact__container">
+    <h2 class="product-trust-badges-compact__title" id="product-trust-heading">Shop with confidence</h2>
     <div class="trust-badges-grid">
       <div class="trust-badge-item">
         <div class="trust-badge-icon">
@@ -13,7 +14,7 @@
           </svg>
         </div>
         <div class="trust-badge-content">
-          <h4 class="trust-badge-title">Free Shipping Above ₹899</h4>
+          <h3 class="trust-badge-title">Free Shipping Above ₹499</h3>
           <p class="trust-badge-text">On qualifying orders</p>
         </div>
       </div>
@@ -26,7 +27,7 @@
           </svg>
         </div>
         <div class="trust-badge-content">
-          <h4 class="trust-badge-title">Secure Checkout</h4>
+          <h3 class="trust-badge-title">Secure Checkout</h3>
           <p class="trust-badge-text">SSL encrypted checkout</p>
         </div>
       </div>
@@ -40,7 +41,7 @@
           </svg>
         </div>
         <div class="trust-badge-content">
-          <h4 class="trust-badge-title">Fast Dispatch</h4>
+          <h3 class="trust-badge-title">Fast Dispatch</h3>
           <p class="trust-badge-text">Quick delivery</p>
         </div>
       </div>
@@ -52,7 +53,7 @@
           </svg>
         </div>
         <div class="trust-badge-content">
-          <h4 class="trust-badge-title">Expert Support</h4>
+          <h3 class="trust-badge-title">Expert Support</h3>
           <p class="trust-badge-text">We're here to help</p>
         </div>
       </div>
@@ -89,6 +90,15 @@
   .product-trust-badges-compact__container {
     max-width: 1400px;
     margin: 0 auto;
+  }
+
+  .product-trust-badges-compact__title {
+    font-family: var(--font-heading);
+    font-size: clamp(1.125rem, 2vw, 1.375rem);
+    font-weight: 700;
+    color: var(--forest-green);
+    text-align: center;
+    margin: 0 0 var(--spacing-md);
   }
 
   .trust-badges-grid {

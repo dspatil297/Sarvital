@@ -18,7 +18,8 @@
   {% if has_carousel_slides %}
     data-autoplay-speed="{{ section.settings.carousel_speed | default: 1.5 | times: 1000 | round }}"
     data-transition-duration="{{ section.settings.transition_duration | default: 800 }}"
-    data-paused="false"
+    data-paused="true"
+    data-autoplay-delay="10000"
   {% endif %}
 >
   <div class="hero-banner__image">
@@ -51,22 +52,21 @@
                 sizes="100vw"
               >
               <img
-                class="hero-banner__slide-img"
-                src="{{ block.settings.image | image_url: width: 1100, format: 'webp' }}"
+                class="hero-banner__slide-img{% if is_lcp_hero_slide %} hero-banner__slide-img--lcp{% endif %}"
+                src="{% if is_lcp_hero_slide %}{{ mobile_img | image_url: width: 750, format: 'webp' }}{% else %}{{ block.settings.image | image_url: width: 1100, format: 'webp' }}{% endif %}"
                 srcset="
                   {{ block.settings.image | image_url: width: 375, format: 'webp' }} 375w,
                   {{ block.settings.image | image_url: width: 750, format: 'webp' }} 750w,
                   {{ block.settings.image | image_url: width: 1100, format: 'webp' }} 1100w,
                   {{ block.settings.image | image_url: width: 1500, format: 'webp' }} 1500w,
-                  {{ block.settings.image | image_url: width: 1920, format: 'webp' }} 1920w,
-                  {{ block.settings.image | image_url: width: 2560, format: 'webp' }} 2560w
+                  {{ block.settings.image | image_url: width: 1920, format: 'webp' }} 1920w
                 "
-                sizes="(max-width: 768px) 100vw, min(100vw, 1920px)"
+                sizes="(max-width: 768px) 100vw, min(100vw, 1500px)"
                 alt="{{ block.settings.image.alt | default: '' }}"
                 width="{{ block.settings.image.width }}"
                 height="{{ block.settings.image.height }}"
                 loading="eager"
-                fetchpriority="{% if is_lcp_hero_slide %}high{% else %}low{% endif %}"
+                fetchpriority="{% if is_lcp_hero_slide %}high{% else %}auto{% endif %}"
                 decoding="async"
                 onerror="this.classList.add('image-error'); this.alt='Image failed to load';"
               >
@@ -288,6 +288,11 @@
   }
 
   .hero-banner__slide--active .hero-banner__slide-img {
+    opacity: 1;
+    animation: none;
+  }
+
+  .hero-banner__slide-img--lcp {
     opacity: 1;
     animation: none;
   }
@@ -877,13 +882,42 @@
       })(k);
     }
 
-    startAutoplay();
+    var autoplayDelay = 10000;
+    var rawDelay = section.getAttribute('data-autoplay-delay');
+    if (rawDelay) {
+      var ad = parseInt(rawDelay, 10);
+      if (!isNaN(ad) && ad >= 0) autoplayDelay = ad;
     }
 
-    if ('requestIdleCallback' in window) {
-      requestIdleCallback(initHeroCarousel, { timeout: 2000 });
+    function beginAutoplayAfterLcpWindow() {
+      section.setAttribute('data-paused', 'false');
+      startAutoplay();
+    }
+
+    function scheduleAutoplay() {
+      if (window.sarvitalAfterPaint) {
+        window.sarvitalAfterPaint(beginAutoplayAfterLcpWindow, { delay: autoplayDelay, timeout: autoplayDelay + 5000 });
+      } else {
+        window.addEventListener('load', function () {
+          setTimeout(beginAutoplayAfterLcpWindow, autoplayDelay);
+        }, { once: true });
+      }
+    }
+
+    ['scroll', 'click', 'touchstart'].forEach(function (ev) {
+      section.addEventListener(ev, function onFirstInput() {
+        section.removeEventListener(ev, onFirstInput);
+        if (section.getAttribute('data-paused') === 'true') beginAutoplayAfterLcpWindow();
+      }, { once: true, passive: true });
+    });
+
+    scheduleAutoplay();
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initHeroCarousel);
     } else {
-      setTimeout(initHeroCarousel, 0);
+      initHeroCarousel();
     }
   })();
 </script>

@@ -39,10 +39,58 @@
  styleElement.textContent = css;
  document.head.appendChild(styleElement);
 }
-document.addEventListener("DOMContentLoaded", getCountryData);
+function runCountryData() {
+  var isIndex = document.body && document.body.classList.contains('template-index');
+  if (isIndex && window.sarvitalAfterPaint) {
+    window.sarvitalAfterPaint(getCountryData, { delay: 3000, timeout: 8000 });
+  } else if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', getCountryData);
+  } else {
+    getCountryData();
+  }
+}
+runCountryData();
 </script>
 {% endif %}
- <script src="https://{{ env }}.gokwik.co/merchant-integration/build/merchant.integration.js?v4" defer></script>
+ {%- liquid
+   assign gokwik_load_eager = false
+   if request.page_type == 'product'
+     assign gokwik_load_eager = true
+   endif
+   if request.page_type == 'cart'
+     assign gokwik_load_eager = true
+   endif
+ -%}
+ {%- if gokwik_load_eager -%}
+   <script src="https://{{ env }}.gokwik.co/merchant-integration/build/merchant.integration.js?v4" defer></script>
+ {%- else -%}
+   <script>
+     (function () {
+       var src = 'https://{{ env }}.gokwik.co/merchant-integration/build/merchant.integration.js?v4';
+       function loadGokwikIntegration() {
+         if (document.querySelector('script[data-sarvital-gokwik-integration]')) return;
+         var script = document.createElement('script');
+         script.src = src;
+         script.defer = true;
+         script.setAttribute('data-sarvital-gokwik-integration', '1');
+         document.head.appendChild(script);
+       }
+       var gokwikDelay = {% if request.page_type == 'index' %}6000{% else %}2500{% endif %};
+       function scheduleGokwik() {
+         if (window.sarvitalAfterPaint) {
+           window.sarvitalAfterPaint(loadGokwikIntegration, { delay: gokwikDelay, timeout: 12000 });
+         } else if ('requestIdleCallback' in window) {
+           requestIdleCallback(loadGokwikIntegration, { timeout: gokwikDelay + 2000 });
+         } else {
+           window.addEventListener('load', function () {
+             setTimeout(loadGokwikIntegration, gokwikDelay);
+           });
+         }
+       }
+       scheduleGokwik();
+     })();
+   </script>
+ {%- endif -%}
 {%- comment -%}
   Optional second gtag load: disable when GA4 is already served by GTM / Shopify (avoids duplicate gtag.js + long tasks).
   Theme settings → Gokwik → "Load gtag.js for GA4 from this theme" = off.

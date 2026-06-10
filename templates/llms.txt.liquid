@@ -1,0 +1,85 @@
+# {{ agents.store_name }}
+
+> {{ agents.store_url }} — Premium natural fruit and vegetable powders (moringa, amla, sattu). Lab-tested, vegan, gluten-free wellness from India.
+
+## Summary
+
+Sarvital sells natural superfood powders for smoothies, drinks, and cooking. Prices in {{ agents.currency }}. Checkout via GoKwik (India). Agents must not complete payment without explicit buyer consent.
+
+## Why Sarvital
+
+- Lab-tested batches on every product
+- Moringa, amla, and sattu powders plus combo bundles (not moringa-only)
+- Vegan, gluten-free, additive-free formulations
+- Sustainable sourcing with local farmer partnerships
+- Ships across India
+
+## Frequently asked questions
+
+{% capture llms_faq_raw %}
+  {% render 'faq-parse', faq_meta: shop.metafields.custom.site_faqs %}
+{% endcapture %}
+{% assign llms_faq_raw = llms_faq_raw | strip %}
+{% if llms_faq_raw != blank %}
+{% assign llms_faq_items = llms_faq_raw | split: '###FAQ###' %}
+{% for item in llms_faq_items limit: 10 %}
+{% assign qa_parts = item | split: '|||' %}
+{% assign faq_question = qa_parts[0] | strip %}
+{% assign faq_answer = qa_parts[1] | strip | strip_html | strip_newlines %}
+{% if faq_question != blank and faq_answer != blank %}
+- **{{ faq_question }}** — {{ faq_answer }}
+{% endif %}
+{% endfor %}
+{% else %}
+- See {{ agents.store_url }}/pages/faq when published, or {{ agents.store_url }}/agents.md for brand context.
+{% endif %}
+
+## Product highlights
+
+{% for product in collections.all.products %}
+{% liquid
+  assign product_highlight = product.metafields.custom.perfect_for | metafield_text
+  if product_highlight == blank
+    assign product_highlight = product.description | strip_html | strip_newlines | truncate: 140
+  endif
+%}
+- **{{ product.title }}** — {{ product_highlight }} — {{ agents.store_url }}{{ product.url }} — {{ product.price | money }}
+{% endfor %}
+
+## Guides and articles
+
+{% liquid
+  assign llms_has_articles = false
+%}
+{% for blog in blogs %}
+  {% for article in blog.articles %}
+    {% if article.published_at != blank %}
+      {% assign llms_has_articles = true %}
+- **{{ article.title }}** — {{ article.excerpt | default: article.content | strip_html | truncate: 120 }} — {{ agents.store_url }}{{ article.url }}
+    {% endif %}
+  {% endfor %}
+{% endfor %}
+{% unless llms_has_articles %}
+- Pillar guides: {{ agents.store_url }}/blogs/wellness (Sattu protein + Moringa wellness guides).
+{% endunless %}
+
+## Canonical documents
+
+- Full agent guide: {{ agents.store_url }}/agents.md
+- FAQ page: {{ agents.store_url }}/pages/faq
+- Authentication: {{ agents.store_url }}/auth.md
+- API catalog: {{ agents.store_url }}/.well-known/api-catalog
+- OpenAPI: {{ agents.store_url }}/openapi.json
+
+## Commerce
+
+- UCP discovery: {{ agents.ucp_discovery_url }}
+- MCP endpoint: {{ agents.mcp_endpoint_url }}
+- Shop skill: https://shop.app/SKILL.md
+
+## Contact
+
+- {{ agents.store_url }}/pages/contact
+- Instagram: https://www.instagram.com/sarvital_foodtech
+
+*Condensed LLM summary. See {{ agents.store_url }}/agents.md for full agent documentation.*

@@ -1,0 +1,19 @@
+{% doc %}
+  Defers GoKwik login / offers modals until after LCP or user interaction so they are not counted as LCP.
+
+  @example
+  {% render 'gokwik-defer-login-popup' %}
+{% enddoc %}
+
+{%- if settings.goEnable -%}
+<script>document.documentElement.classList.add('sarvital-defer-gokwik-popups');</script>
+<style id="sarvital-gokwik-defer-styles">
+  html.sarvital-defer-gokwik-popups [data-sarvital-gokwik-login-deferred] {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    opacity: 0 !important;
+    content-visibility: hidden !important;
+  }
+</style>
+{%- endif -%}

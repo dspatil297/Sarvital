@@ -1,0 +1,59 @@
+{% doc %}
+  Loads non-critical theme JS after first paint to improve FCP and LCP.
+
+  @example
+  {% render 'deferred-scripts' %}
+{% enddoc %}
+
+{%- liquid
+  assign paint_delay = 800
+  if request.page_type == 'index'
+    assign paint_delay = 2200
+  elsif request.page_type == 'collection' or request.page_type == 'blog' or request.page_type == 'article' or request.page_type == 'page'
+    assign paint_delay = 1500
+  elsif request.page_type == 'cart'
+    assign paint_delay = 300
+  endif
+
+  assign gokwik_helpers_eager = false
+  if request.page_type == 'product' or request.page_type == 'cart'
+    assign gokwik_helpers_eager = true
+  endif
+-%}
+
+<script>
+(function () {
+  function loadScript(src, marker) {
+    if (document.querySelector('script[data-sarvital-defer="' + marker + '"]')) return;
+    var s = document.createElement('script');
+    s.src = src;
+    s.defer = true;
+    s.setAttribute('data-sarvital-defer', marker);
+    document.body.appendChild(s);
+  }
+
+  function boot() {
+    loadScript({{ 'application.js' | asset_url | json }}, 'application');
+
+    loadScript({{ 'product-cards.js' | asset_url | json }}, 'product-cards');
+
+    {%- if request.page_type == 'cart' -%}
+    loadScript({{ 'cart-page.js' | asset_url | json }}, 'cart-page');
+    {%- endif -%}
+
+    {%- if settings.gokwik_theme_helpers_enabled and gokwik_helpers_eager == false -%}
+    loadScript({{ 'gokwik-theme-helpers.js' | asset_url | json }}, 'gokwik-helpers');
+    {%- endif -%}
+  }
+
+  if (window.sarvitalAfterPaint) {
+    window.sarvitalAfterPaint(boot, { delay: {{ paint_delay }}, timeout: 10000 });
+  } else if (document.readyState === 'complete') {
+    setTimeout(boot, {{ paint_delay }});
+  } else {
+    window.addEventListener('load', function () {
+      setTimeout(boot, {{ paint_delay }});
+    }, { once: true });
+  }
+})();
+</script>

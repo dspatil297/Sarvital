@@ -3,22 +3,24 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <link rel="icon" type="image/png" href="{{ 'Logo.png' | asset_url }}" sizes="any">
+    {% render 'sarvital-after-paint' %}
+    <link rel="icon" type="image/png" href="{{ 'Logo.png' | asset_img_url: width: 64 }}" sizes="any">
 
     {% render 'lcp-hero-preload' %}
+    {% render 'lcp-product-preload' %}
+    {%- comment -%} One preconnect only (Lighthouse); rest use dns-prefetch {%- endcomment -%}
     <link rel="preconnect" href="https://cdn.shopify.com" crossorigin>
-    <link rel="preconnect" href="https://fonts.shopifycdn.com" crossorigin>
+    <link rel="dns-prefetch" href="https://fonts.shopifycdn.com">
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
     <link rel="dns-prefetch" href="https://www.googletagmanager.com">
     <link rel="dns-prefetch" href="https://connect.facebook.net">
-    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="dns-prefetch" href="https://cdnwidget.judge.me">
 
 <!-- Gokwik theme code start -->
-
-
-<link rel="dns-prefetch" href="https://pdp.gokwik.co/">
-<link rel="dns-prefetch" href="https://api.gokwik.co">
+    <link rel="dns-prefetch" href="https://pdp.gokwik.co">
+    <link rel="dns-prefetch" href="https://api.gokwik.co">
+    {% render 'gokwik-defer-login-popup' %}
 {% render 'gokwik' %}
 <!-- Gokwik theme code End -->
 
@@ -29,8 +31,8 @@
 
 
     {%- comment -%} Performance: Font Loading Optimization {%- endcomment -%}
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&family=Inter:wght@300;400;500;600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"></noscript>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"></noscript>
     
     {%- comment -%} Inlined CSS Variables {%- endcomment -%}
     {% render 'css-variables' %}
@@ -49,6 +51,10 @@
     {%- comment -%} SEO Meta Tags {%- endcomment -%}
     {% render 'meta-tags' %}
 
+    {%- comment -%} RFC 8288 / RFC 9727 Link relation tags for AI agent discovery {%- endcomment -%}
+    {% render 'agent-link-headers' %}
+
+    {% render 'defer-third-party-scripts' %}
     {{content_for_header}}
     <style>
       /* Force-hide Shopify Inbox chat widget globally */
@@ -73,8 +79,14 @@
   </head>
 
   <body class="template-{{ request.page_type | handle }}">
+    {% render 'gokwik-defer-login-popup-script' %}
     {%- if request.page_type == 'index' -%}
     <style>
+      /* Below-fold sections: skip layout/paint until near viewport */
+      body.template-index #main-content > .shopify-section:not(:first-child) {
+        content-visibility: auto;
+        contain-intrinsic-size: auto 480px;
+      }
       /* Hide Judge.me floating overlay on home so it doesn't sit on hero */
       body.template-index > div[class*="jdgm"]:not([id^="shopify-section"]),
       body.template-index [class*="jdgm-preview-badge"],
@@ -98,34 +110,9 @@
     {% sections 'footer-group' %}
 
     {% if settings.gokwik_theme_helpers_enabled %}
-      {%- comment -%} Theme cart drawer hidden. GoKwik drawer: ensure it stacks above theme (common app selectors). {%- endcomment -%}
-      <style>
-        #cart-drawer {
-          display: none !important;
-          visibility: hidden !important;
-          pointer-events: none !important;
-        }
-        [id*="kwik"], [id*="Kwik"], [class*="kwik-cart"], [class*="KwikCart"], [class*="gokwik"], [class*="slide-cart"] {
-          z-index: 999999 !important;
-        }
-      </style>
-      <script>
-      (function() {
-        function keepThemeCartClosed() {
-          var el = document.getElementById('cart-drawer');
-          if (el) {
-            el.classList.remove('active');
-            el.setAttribute('aria-hidden', 'true');
-            el.style.setProperty('display', 'none', 'important');
-          }
-        }
-        keepThemeCartClosed();
-        if (document.readyState === 'loading') {
-          document.addEventListener('DOMContentLoaded', keepThemeCartClosed);
-        }
-      })();
-      </script>
-      {%- comment -%} openCartDrawer for add-to-cart only. Cart icon uses normal link so GoKwik opens on load (no freeze). {%- endcomment -%}
+      {% render 'gokwik-theme-helpers-early' %}
+      {%- if request.page_type == 'product' or request.page_type == 'cart' -%}
+      {%- comment -%} Product/cart: eager helpers so checkout and open_cart work immediately. {%- endcomment -%}
       <script>
       (function() {
         if (!window.lockBodyScroll) {
@@ -287,7 +274,7 @@
         }, 500);
       })();
       </script>
-
+      {%- endif -%}
     {% endif %}
 
     {%- comment -%} Move mobile menu drawer to end of body so it always stacks above hero/carousel {%- endcomment -%}
@@ -420,8 +407,7 @@
       })();
     </script>
 
-    {%- comment -%} Base JavaScript. Error at scripts.js:760 is in compiled_assets/scripts.js; theme loads application.js so that file is not used here. {%- endcomment -%}
-    <script src="{{ 'application.js' | asset_url }}" defer></script>
+    {%- comment -%} application.js and other non-critical scripts load via deferred-scripts after paint. {%- endcomment -%}
     {%- comment -%} GoKwik sticky bar lives in shadow DOM — theme CSS cannot style it; inject readable bar + button colors. {%- endcomment -%}
     <script>
       (function() {
@@ -476,55 +462,8 @@
         }
       })();
     </script>
-    {%- comment -%} Cart page +/- and remove: event delegation in capture phase so it runs before other handlers {%- endcomment -%}
-    <script>
-      (function() {
-        function handleCartPageClick(e) {
-          var btn = e.target && e.target.closest ? e.target.closest('button[data-cart-increase], button[data-cart-decrease], [data-cart-remove]') : null;
-          if (!btn) return;
-          var row = btn.closest ? btn.closest('.cart-item-row') : null;
-          if (!row) return;
-          e.preventDefault();
-          e.stopPropagation();
-          var key, qty;
-          if (btn.hasAttribute && btn.hasAttribute('data-cart-increase')) {
-            key = btn.getAttribute('data-cart-increase');
-            var valEl = row.querySelector('[data-cart-quantity-value]');
-            var cur = valEl ? (parseInt(valEl.textContent, 10) || 1) : 1;
-            qty = cur + 1;
-            if (valEl) valEl.textContent = qty;
-            var inp = row.querySelector('input[data-cart-quantity]');
-            if (inp) inp.value = qty;
-          } else if (btn.hasAttribute && btn.hasAttribute('data-cart-decrease')) {
-            key = btn.getAttribute('data-cart-decrease');
-            var valEl2 = row.querySelector('[data-cart-quantity-value]');
-            var cur2 = valEl2 ? (parseInt(valEl2.textContent, 10) || 1) : 1;
-            if (cur2 <= 1) return;
-            qty = cur2 - 1;
-            if (valEl2) valEl2.textContent = qty;
-            var inp2 = row.querySelector('input[data-cart-quantity]');
-            if (inp2) inp2.value = qty;
-          } else if (btn.hasAttribute && btn.hasAttribute('data-cart-remove')) {
-            key = btn.getAttribute('data-cart-remove');
-            if (!confirm('Remove this item from cart?')) return;
-            qty = 0;
-          } else return;
-          fetch('/cart/change.js', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-            body: JSON.stringify({ id: String(key), quantity: qty })
-          })
-          .then(function(r) {
-            if (!r.ok) return r.json().then(function(err) { throw new Error(err.description || 'Cart update failed'); });
-            return r.json();
-          })
-          .then(function() { window.location.reload(); })
-          .catch(function(err) { console.error('Cart update error:', err); window.location.reload(); });
-        }
-        document.addEventListener('click', handleCartPageClick, true);
-      })();
-    </script>
-    {%- comment -%} Product page quantity +/-: capture phase so it always runs {%- endcomment -%}
+    {%- if request.page_type == 'product' -%}
+    {%- comment -%} Product page quantity +/-: keep eager on PDP {%- endcomment -%}
     <script>
       (function() {
         function handleProductQuantityClick(e) {
@@ -550,167 +489,7 @@
         document.addEventListener('click', handleProductQuantityClick, true);
       })();
     </script>
-    {%- comment -%} Product cards: show quantity only after add-to-cart; +/- updates cart via change.js {%- endcomment -%}
-    <script>
-      (function() {
-        function showProductCardQtyRow(form, lineKey, quantity) {
-          if (lineKey) form.setAttribute('data-line-key', lineKey);
-          var qtyRow = form.querySelector('.product-card__quantity-row');
-          if (qtyRow) {
-            qtyRow.classList.remove('product-card__quantity-row--hidden');
-            qtyRow.style.display = 'flex';
-            qtyRow.style.visibility = 'visible';
-          }
-          var qtyInput = form.querySelector('.product-card__qty-input');
-          if (qtyInput) qtyInput.value = quantity || 1;
-          // When quantity controls are visible, hide the Add to Cart button to avoid confusion
-          var addBtn = form.querySelector('.product-card__add-to-cart');
-          if (addBtn) {
-            addBtn.style.display = 'none';
-          }
-        }
-        function doProductCardAddToCart(form) {
-          var idInput = form.querySelector('input[name="id"]');
-          var qtyInput = form.querySelector('input[name="quantity"]');
-          var variantId = idInput ? idInput.value : null;
-          if (!variantId) return;
-          var submitBtn = form.querySelector('button[type="submit"][name="add"]');
-          var originalText = submitBtn ? submitBtn.textContent : '';
-          if (submitBtn) {
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Adding...';
-          }
-          fetch('/cart/add.js', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id: variantId, quantity: 1 })
-          }).then(function(r) { return r.json().then(function(data) { return { ok: r.ok, data: data }; }); }).then(function(result) {
-            if (result.ok) {
-              var data = result.data || result;
-              var key = (data && data.key) || null;
-              var qty = (data && (data.quantity != null)) ? data.quantity : 1;
-              function done() {
-                document.dispatchEvent(new CustomEvent('cart:updated'));
-                // Do not open side cart on add — let user continue shopping; they can open cart via header icon
-              }
-              if (!key) {
-                fetch('/cart.js').then(function(r) { return r.json(); }).then(function(cart) {
-                  var item = (cart.items || []).find(function(i) { return String(i.variant_id) === String(variantId) || String(i.id) === String(variantId); });
-                  key = item ? item.key : null;
-                  showProductCardQtyRow(form, key, item ? item.quantity : qty);
-                  done();
-                }).catch(function() { showProductCardQtyRow(form, null, qty); done(); });
-              } else {
-                showProductCardQtyRow(form, key, qty);
-                done();
-              }
-            } else {
-              alert((result.data && result.data.description) || (result.description) || 'Could not add to cart.');
-            }
-          }).catch(function() { alert('Could not add to cart.'); }).then(function() {
-            if (submitBtn) {
-              submitBtn.disabled = false;
-              submitBtn.textContent = originalText;
-            }
-          });
-        }
-        document.addEventListener('click', function(e) {
-          var addBtn = e.target && e.target.closest ? e.target.closest('button.product-card__add-to-cart') : null;
-          if (addBtn) {
-            var form = addBtn.closest('form.product-card__form');
-            if (form) {
-              e.preventDefault();
-              e.stopPropagation();
-              doProductCardAddToCart(form);
-              return;
-            }
-          }
-          if (e.target && e.target.closest && e.target.closest('form.product-card__form')) {
-            e.stopPropagation();
-          }
-        }, true);
-        document.addEventListener('click', function(e) {
-          var btn = e.target && e.target.closest ? e.target.closest('.product-card__qty-btn') : null;
-          if (!btn) return;
-          var selector = btn.closest ? btn.closest('.product-card__quantity-selector') : null;
-          var inp = selector ? selector.querySelector('.product-card__qty-input') : null;
-          var form = btn.closest ? btn.closest('form.product-card__form') : null;
-          if (!inp || !form) return;
-          e.preventDefault();
-          e.stopPropagation();
-          var action = btn.getAttribute('data-action');
-          var cur = parseInt(inp.value, 10) || 1;
-          var max = parseInt(inp.getAttribute('max'), 10) || 10;
-          var lineKey = form.getAttribute('data-line-key');
-          if (lineKey) {
-            var newQty = action === 'increase' ? (cur < max ? cur + 1 : cur) : (cur > 0 ? cur - 1 : 0);
-            if (action === 'increase' && cur >= max) return;
-            btn.disabled = true;
-            // Prefer updating cart line by variant id for broader compatibility; fall back to line key if needed
-            var idInput = form.querySelector('input[name=\"id\"]');
-            var variantId = idInput ? idInput.value : null;
-            var changePayload = { id: variantId || lineKey, quantity: newQty };
-            fetch('/cart/change.js', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(changePayload)
-            }).then(function(r) { return r.json().then(function(data) { return { ok: r.ok, data: data }; }); }).then(function(result) {
-              if (result.ok) {
-                inp.value = newQty;
-                document.dispatchEvent(new CustomEvent('cart:updated'));
-                if (newQty === 0) {
-                  form.removeAttribute('data-line-key');
-                  var qtyRow = form.querySelector('.product-card__quantity-row');
-                  if (qtyRow) {
-                    qtyRow.classList.add('product-card__quantity-row--hidden');
-                    qtyRow.style.display = '';
-                    qtyRow.style.visibility = '';
-                  }
-                  // When quantity is zero/row hidden, show the Add to Cart button again
-                  var addBtn = form.querySelector('.product-card__add-to-cart');
-                  if (addBtn) {
-                    addBtn.style.display = '';
-                  }
-                }
-              } else {
-                alert(result.data && result.data.description ? result.data.description : 'Could not update cart.');
-              }
-            }).catch(function() { alert('Could not update cart.'); }).then(function() { btn.disabled = false; });
-            return;
-          }
-          var min = parseInt(inp.getAttribute('min'), 10) || 0;
-          if (action === 'increase' && cur < max) inp.value = cur + 1;
-          else if (action === 'decrease' && cur > min) inp.value = cur - 1;
-        }, true);
-        document.addEventListener('submit', function(e) {
-          if (!e.target || !e.target.classList || !e.target.classList.contains('product-card__form')) return;
-          e.preventDefault();
-          e.stopPropagation();
-          doProductCardAddToCart(e.target);
-        }, true);
-        // On load: if product is already in cart, show quantity row on each product card
-        function syncProductCardsWithCart() {
-          fetch('/cart.js').then(function(r) { return r.json(); }).then(function(cart) {
-            var items = cart.items || [];
-            var forms = document.querySelectorAll('form.product-card__form');
-            for (var i = 0; i < forms.length; i++) {
-              var form = forms[i];
-              var idInput = form.querySelector('input[name="id"]');
-              var variantId = idInput ? idInput.value : null;
-              if (!variantId) continue;
-              var item = items.find(function(it) { return String(it.variant_id) === String(variantId) || String(it.id) === String(variantId); });
-              if (item) showProductCardQtyRow(form, item.key, item.quantity);
-            }
-          }).catch(function() {});
-        }
-        if (document.readyState === 'loading') {
-          document.addEventListener('DOMContentLoaded', syncProductCardsWithCart);
-        } else {
-          syncProductCardsWithCart();
-        }
-        document.addEventListener('cart:updated', syncProductCardsWithCart);
-      })();
-    </script>
+    {%- endif -%}
     {%- comment -%} Product page: thumbnail gallery + zoom lightbox (inline so it always runs after DOM) {%- endcomment -%}
     {% if request.page_type == 'product' %}
     <style>
@@ -902,5 +681,86 @@
       })();
     </script>
     {% endif %}
+
+    {% render 'deferred-scripts' %}
+
+    {%- comment -%} WebMCP: defer until idle — not needed for storefront paint or LCP {%- endcomment -%}
+    <script>
+    (function() {
+      function initWebMcp() {
+      if (!navigator.modelContext || typeof navigator.modelContext.registerTool !== 'function') return;
+      var controller = new AbortController();
+      var origin = {{ request.origin | json }};
+
+      navigator.modelContext.registerTool({
+        name: 'search_products',
+        description: 'Search Sarvital product catalog for natural superfood powders (moringa, amla, sattu). Returns matching products with titles, prices, and URLs.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            query: { type: 'string', description: 'Search query, e.g. "moringa powder" or "immunity"' }
+          },
+          required: ['query']
+        },
+        execute: function(args) {
+          return fetch(origin + '/search/suggest.json?q=' + encodeURIComponent(args.query) + '&resources[type]=product&resources[limit]=6')
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+              var items = (data.resources && data.resources.results && data.resources.results.products) || [];
+              return items.map(function(p) {
+                return { title: p.title, price: p.price, url: origin + p.url, image: p.image };
+              });
+            });
+        },
+        signal: controller.signal
+      });
+
+      navigator.modelContext.registerTool({
+        name: 'get_cart',
+        description: 'Retrieve the current Sarvital shopping cart contents, item count, and total price.',
+        inputSchema: { type: 'object', properties: {} },
+        execute: function() {
+          return fetch(origin + '/cart.js').then(function(r) { return r.json(); });
+        },
+        signal: controller.signal
+      });
+
+      navigator.modelContext.registerTool({
+        name: 'get_product',
+        description: 'Get full details for a Sarvital product by its handle (slug). Returns title, description, price, variants, and images.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            handle: { type: 'string', description: 'Product handle/slug, e.g. "moringa-powder"' }
+          },
+          required: ['handle']
+        },
+        execute: function(args) {
+          return fetch(origin + '/products/' + encodeURIComponent(args.handle) + '.json')
+            .then(function(r) { return r.json(); })
+            .then(function(data) { return data.product; });
+        },
+        signal: controller.signal
+      });
+
+      navigator.modelContext.registerTool({
+        name: 'list_collections',
+        description: 'List all Sarvital product collections.',
+        inputSchema: { type: 'object', properties: {} },
+        execute: function() {
+          return fetch(origin + '/collections.json').then(function(r) { return r.json(); });
+        },
+        signal: controller.signal
+      });
+
+      window.addEventListener('beforeunload', function() { controller.abort(); });
+      }
+      if ('requestIdleCallback' in window) {
+        requestIdleCallback(initWebMcp, { timeout: 8000 });
+      } else {
+        window.addEventListener('load', function() { setTimeout(initWebMcp, 3000); });
+      }
+    })();
+    </script>
   </body>
 </html>

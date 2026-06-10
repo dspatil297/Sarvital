@@ -1,0 +1,128 @@
+{% doc %}
+  Body script companion to gokwik-defer-login-popup — scans for GoKwik login overlays and defers them.
+
+  @example
+  {% render 'gokwik-defer-login-popup-script' %}
+{% enddoc %}
+
+{%- if settings.goEnable -%}
+<script>
+(function () {
+  'use strict';
+  var root = document.documentElement;
+  var enabled = false;
+  var LOGIN_HINT = /login now|avail best offers|enter your (mobile|phone)|otp|verify mobile/i;
+  var DEFER_ATTR = 'data-sarvital-gokwik-login-deferred';
+  var MAX_WAIT_MS = 15000;
+  var MIN_WAIT_MS = 8000;
+
+  function enablePopups() {
+    if (enabled) return;
+    enabled = true;
+    root.classList.remove('sarvital-defer-gokwik-popups');
+    try {
+      document.querySelectorAll('[' + DEFER_ATTR + ']').forEach(function (el) {
+        el.removeAttribute(DEFER_ATTR);
+        el.style.removeProperty('visibility');
+        el.style.removeProperty('pointer-events');
+        el.style.removeProperty('opacity');
+      });
+    } catch (e) {}
+  }
+
+  function looksLikeLoginOverlay(el) {
+    if (!el || el.nodeType !== 1) return false;
+    if (el.hasAttribute && el.hasAttribute(DEFER_ATTR)) return false;
+    var tag = (el.tagName || '').toLowerCase();
+    if (tag === 'html' || tag === 'body' || tag === 'main' || tag === 'header' || tag === 'footer') return false;
+    var text = (el.textContent || '').slice(0, 600);
+    if (!LOGIN_HINT.test(text)) return false;
+    try {
+      var st = window.getComputedStyle(el);
+      if (st.display === 'none' || st.visibility === 'hidden') return false;
+      if (st.position !== 'fixed' && st.position !== 'absolute') return false;
+      var rect = el.getBoundingClientRect();
+      if (rect.width < 180 || rect.height < 120) return false;
+      return true;
+    } catch (err) {
+      return false;
+    }
+  }
+
+  function deferElement(el) {
+    if (enabled || !el || el.hasAttribute(DEFER_ATTR)) return;
+    el.setAttribute(DEFER_ATTR, '1');
+  }
+
+  function scanNode(node) {
+    if (enabled || !node) return;
+    if (node.nodeType === 1) {
+      if (looksLikeLoginOverlay(node)) deferElement(node);
+      if (node.shadowRoot) scanNode(node.shadowRoot);
+      var children = node.children;
+      if (children) {
+        for (var i = 0; i < children.length; i++) scanNode(children[i]);
+      }
+    } else if (node.nodeType === 11 && node.childNodes) {
+      for (var j = 0; j < node.childNodes.length; j++) scanNode(node.childNodes[j]);
+    }
+  }
+
+  function scanDocument() {
+    if (enabled) return;
+    scanNode(document.body || document.documentElement);
+  }
+
+  function scheduleEnable() {
+    var delay = MIN_WAIT_MS;
+    if (typeof performance !== 'undefined' && performance.getEntriesByType) {
+      var lcp = performance.getEntriesByType('largest-contentful-paint');
+      if (lcp && lcp.length) delay = Math.max(MIN_WAIT_MS, 800);
+    }
+    window.setTimeout(enablePopups, delay);
+    window.setTimeout(enablePopups, MAX_WAIT_MS);
+  }
+
+  function watchLcp() {
+    if (!('PerformanceObserver' in window)) {
+      scheduleEnable();
+      return;
+    }
+    try {
+      var po = new PerformanceObserver(function (list) {
+        if (list.getEntries().length) scheduleEnable();
+      });
+      po.observe({ type: 'largest-contentful-paint', buffered: true });
+      window.setTimeout(function () {
+        try { po.disconnect(); } catch (e) {}
+        scheduleEnable();
+      }, MAX_WAIT_MS);
+    } catch (e) {
+      scheduleEnable();
+    }
+  }
+
+  function startObserver() {
+    scanDocument();
+    try {
+      var mo = new MutationObserver(function () { scanDocument(); });
+      mo.observe(document.documentElement, { childList: true, subtree: true });
+      window.setTimeout(function () {
+        try { mo.disconnect(); } catch (e) {}
+      }, MAX_WAIT_MS + 2000);
+    } catch (e) {}
+
+    ['scroll', 'click', 'keydown', 'touchstart'].forEach(function (ev) {
+      document.addEventListener(ev, enablePopups, { once: true, passive: true, capture: true });
+    });
+
+    watchLcp();
+  }
+
+  startObserver();
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', scanDocument);
+  }
+})();
+</script>
+{%- endif -%}

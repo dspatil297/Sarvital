@@ -1,0 +1,45 @@
+{% doc %}
+  Injects RFC 8288 Link relation <link> tags into <head> for AI agent discovery.
+  Render once in theme.liquid <head>.
+
+  @example
+  {% render 'agent-link-headers' %}
+{% enddoc %}
+
+{%- comment -%}
+  RFC 8288 / RFC 9727 Link relations for agent discovery.
+  These <link> tags are the HTML equivalent of HTTP Link response headers.
+  For actual HTTP Link: headers, deploy the Cloudflare Transform Rule in:
+    worker/cloudflare-link-headers-rule.json
+  Reference: https://www.rfc-editor.org/rfc/rfc8288
+             https://www.rfc-editor.org/rfc/rfc9727#section-3
+{%- endcomment -%}
+
+{%- assign origin = request.origin -%}
+
+{%- comment -%} API Catalog (RFC 9727) {%- endcomment -%}
+<link rel="api-catalog" href="{{ origin }}/.well-known/api-catalog">
+
+{%- comment -%} OAuth Protected Resource Metadata (RFC 9728) {%- endcomment -%}
+<link rel="oauth-protected-resource" href="{{ origin }}/.well-known/oauth-protected-resource">
+
+{%- comment -%} OAuth Authorization Server + agent_auth {%- endcomment -%}
+<link rel="oauth-authorization-server" href="{{ origin }}/.well-known/oauth-authorization-server">
+
+{%- comment -%} Agent registration (auth.md) {%- endcomment -%}
+<link rel="service-doc" href="{{ origin }}/auth.md" type="text/markdown">
+
+{%- comment -%} OpenAPI service description {%- endcomment -%}
+<link rel="service-desc" href="{{ origin }}/openapi.json" type="application/vnd.oai.openapi+json;version=3.1">
+
+{%- comment -%} MCP Server Card {%- endcomment -%}
+<link rel="describedby" href="{{ origin }}/.well-known/mcp/server-card.json" type="application/json">
+
+{%- comment -%} Agent Skills discovery index {%- endcomment -%}
+<link rel="service-doc" href="{{ origin }}/.well-known/agent-skills/index.json" type="application/json">
+
+{%- comment -%} ACP discovery {%- endcomment -%}
+<link rel="service-desc" href="{{ origin }}/.well-known/acp.json" type="application/json">
+
+{%- comment -%} Agents / LLMs overview {%- endcomment -%}
+<link rel="service-doc" href="{{ origin }}/agents.md" type="text/markdown">

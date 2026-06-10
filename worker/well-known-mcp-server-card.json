@@ -1,0 +1,54 @@
+{
+  "serverInfo": {
+    "name": "Sarvital Shopify MCP",
+    "version": "1.0.0",
+    "description": "MCP server for Sarvital product catalog, cart, and commerce.",
+    "vendor": "Sarvital Sarvadnya Foodtech Pvt. Ltd.",
+    "website": "https://sarvital.com"
+  },
+  "endpoint": "https://sarvital.com/.well-known/ucp",
+  "transport": "streamable-http",
+  "capabilities": {
+    "tools": {
+      "listChanged": false,
+      "tools": [
+        {
+          "name": "search_catalog",
+          "description": "Search products by keyword or health benefit"
+        },
+        {
+          "name": "create_cart",
+          "description": "Create cart with selected variants"
+        },
+        {
+          "name": "create_checkout",
+          "description": "Initiate buyer-approved checkout"
+        },
+        {
+          "name": "get_product",
+          "description": "Get product details by handle"
+        },
+        {
+          "name": "list_collections",
+          "description": "List all collections"
+        }
+      ]
+    },
+    "resources": {
+      "listChanged": false
+    },
+    "prompts": {
+      "listChanged": false
+    }
+  },
+  "authentication": {
+    "type": "none",
+    "note": "Public catalog endpoints unauthenticated. Checkout requires GoKwik buyer approval."
+  },
+  "links": {
+    "agentDoc": "https://sarvital.com/agents.md",
+    "authDoc": "https://sarvital.com/auth.md",
+    "apiCatalog": "https://sarvital.com/.well-known/api-catalog",
+    "agentSkills": "https://sarvital.com/.well-known/agent-skills/index.json"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "$schema": "https://schemas.agentskills.io/discovery/0.2.0/schema.json",
+  "skills": [
+    {
+      "name": "sarvital-shop",
+      "type": "skill-md",
+      "description": "Browse, search, and purchase Sarvital natural superfood powders (moringa, amla, sattu). Covers product discovery, cart creation, and GoKwik checkout for Indian e-commerce.",
+      "url": "https://sarvital.com/agents.md",
+      "digest": "sha256:0f1b771db961065c10c05288c3822dd61f57eaed105f0db2232921e30bfdd2e6"
+    },
+    {
+      "name": "shopify-storefront",
+      "type": "skill-md",
+      "description": "Generic Shopify storefront skill for reading catalog, managing carts, and initiating checkout via Shopify APIs.",
+      "url": "https://shop.app/SKILL.md",
+      "digest": "sha256:3320fd4a73bd18c20230f592f354ead8caccb7e20dfc8a2dce80020f6fe53e88"
+    }
+  ]
+}

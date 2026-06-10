@@ -1,0 +1,21 @@
+{% doc %}
+  Preloads the featured product image (PDP LCP candidate) as WebP from the document head.
+
+  @example
+  {% render 'lcp-product-preload' %}
+{% enddoc %}
+
+{%- if request.page_type == 'product' and product.featured_image -%}
+  {%- assign lcp_image = product.featured_image -%}
+  <link
+    rel="preload"
+    as="image"
+    imagesrcset="
+      {{ lcp_image | image_url: width: 400, format: 'webp' }} 400w,
+      {{ lcp_image | image_url: width: 600, format: 'webp' }} 600w,
+      {{ lcp_image | image_url: width: 900, format: 'webp' }} 900w,
+      {{ lcp_image | image_url: width: 1200, format: 'webp' }} 1200w
+    "
+    imagesizes="(max-width: 768px) 100vw, 50vw"
+  >
+{%- endif -%}

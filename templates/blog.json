@@ -11,7 +11,11 @@
   "sections": {
     "main": {
       "type": "blog",
-      "settings": {}
+      "settings": {
+        "intro": "<p>Practical guides on moringa, sattu, and everyday wellness — how to use lab-tested powders at home.</p>",
+        "articles_per_page": 6,
+        "show_author": true
+      }
     }
   },
   "order": [

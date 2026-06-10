@@ -15,6 +15,13 @@
         "show_background_image": false
       }
     },
+    "collection_intro": {
+      "type": "collection-intro",
+      "settings": {
+        "fallback_collection_handle": "all",
+        "show_product_links": false
+      }
+    },
     "collection_product_grid": {
       "type": "collection-product-grid",
       "settings": {
@@ -24,6 +31,7 @@
   },
   "order": [
     "shop_header",
+    "collection_intro",
     "collection_product_grid"
   ]
 }

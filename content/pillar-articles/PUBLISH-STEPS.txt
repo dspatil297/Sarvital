@@ -1,0 +1,31 @@
+P2-B — Publish two pillar articles (Shopify Admin)
+
+Prerequisites
+- Blog created: handle "wellness", title "Wellness" (Online Store > Blog posts > Manage blogs)
+- Metafield definitions on Articles (Settings > Custom data > Articles):
+  - custom.article_tldr (Multi-line text)
+  - custom.article_faq (Multi-line text)
+  - custom.article_product (Product reference)
+- Theme pushed with article.pillar template
+
+For each article in content/pillar-articles/manifest.json (publish Sattu FIRST):
+
+1. Online Store > Blog posts > Add blog post (Wellness blog)
+2. Title: see manifest "title"
+3. URL handle: see manifest "handle"
+4. Theme template: pillar (article.pillar)
+5. Search engine listing:
+   - SEO title: see article folder or manifest
+   - Meta description: see manifest
+6. Content: paste body.html from article folder into rich text editor (HTML mode)
+7. Metafields on the article:
+   - article_tldr: paste tldr.txt (3 lines)
+   - article_faq: paste faq.txt
+   - article_product: select product from manifest "product_handle"
+8. Add featured image (product or lifestyle)
+9. Publish
+
+Verify after both are live:
+  node scripts/verify-pillar-articles.mjs
+
+Gate P2-B: 2 URLs indexed; combined >=20 organic clicks/month from non-brand queries within 90 days of publish.

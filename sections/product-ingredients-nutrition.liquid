@@ -5,9 +5,10 @@
   Uses custom.nutrition_facts metafield
 {% endcomment %}
 
-<section class="product-ingredients-nutrition" id="product-ingredients-nutrition">
+<section class="product-ingredients-nutrition" id="product-ingredients-nutrition" aria-labelledby="product-ingredients-nutrition-heading">
   <div class="product-ingredients-nutrition__container">
-    
+    <h2 class="product-ingredients-nutrition__title" id="product-ingredients-nutrition-heading">Ingredients &amp; nutrition</h2>
+
     <!-- Nutrition Facts Section -->
     {% assign nutrition_value = product.metafields.custom.nutrition_facts %}
     {% assign has_nutrition = false %}
@@ -599,6 +600,15 @@
   .product-ingredients-nutrition__container {
     max-width: 1200px;
     margin: 0 auto;
+  }
+
+  .product-ingredients-nutrition__title {
+    font-family: var(--font-heading);
+    font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+    font-weight: 700;
+    color: var(--forest-green);
+    margin: 0 0 var(--spacing-lg);
+    letter-spacing: -0.02em;
   }
 
   .pdp-nutrition-shell {

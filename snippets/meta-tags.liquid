@@ -9,11 +9,22 @@
   assign og_type = 'website'
   assign og_description = page_description | default: shop.description | default: shop.name
   assign og_image = page_image | default: shop.brand.logo | default: shop.brand.image
+  assign seo_description = page_description | default: og_description | strip_html | truncate: 160
+  assign default_og_image_url = 'Logo.png' | asset_url | prepend: 'https:'
+
+  if request.page_type == 'index' and page_description == blank and shop.description != blank
+    assign seo_description = shop.description | strip_html | truncate: 160
+    assign og_description = shop.description
+  endif
 
   if request.page_type == 'product'
     assign og_type = 'product'
     assign og_image = product.featured_image | default: og_image
-    assign og_description = product.description | strip_html | truncatewords: 25 | default: og_description
+    if page_description != blank
+      assign og_description = page_description
+    else
+      assign og_description = product.description | strip_html | truncatewords: 25 | default: og_description
+    endif
   elsif request.page_type == 'article'
     assign og_type = 'article'
     assign og_image = article.image | default: og_image
@@ -24,6 +35,18 @@
   elsif request.page_type == 'password'
     assign og_url = request.origin
   endif
+
+  assign seo_brand_name = 'Sarvital'
+  assign seo_title = page_title
+  assign shop_title_suffix = ' – ' | append: shop.name
+  if seo_title contains shop.name
+    assign seo_title = seo_title | remove: shop_title_suffix | strip
+  endif
+  assign page_title_lower = seo_title | downcase
+  assign title_has_brand = false
+  if page_title_lower contains 'sarvital'
+    assign title_has_brand = true
+  endif
 -%}
 
 {%- comment -%} Primary Meta Tags (charset/viewport live in layout/theme.liquid for early discovery) {%- endcomment -%}
@@ -32,15 +55,15 @@
 
 {%- comment -%} Title Tag {%- endcomment -%}
 <title>
-  {{ page_title }}
+  {{- seo_title -}}
   {%- if current_tags %} &ndash; {{ 'general.meta.tags' | t }}: {{ current_tags | join: ', ' }}{% endif -%}
   {%- if current_page != 1 %} &ndash; {{ 'general.meta.page' | t }} {{ current_page }}{% endif -%}
-  {%- unless page_title contains shop.name %} &ndash; {{ shop.name }}{% endunless -%}
+  {%- unless title_has_brand %} &ndash; {{ seo_brand_name }}{% endunless -%}
 </title>
 
 {%- comment -%} Meta Description {%- endcomment -%}
-{% if page_description or og_description %}
-  <meta name="description" content="{{ page_description | default: og_description | strip_html | escape | truncate: 160 }}">
+{% if seo_description != blank %}
+  <meta name="description" content="{{ seo_description | escape_once }}">
 {% endif %}
 
 {%- comment -%} Canonical URL {%- endcomment -%}
@@ -52,6 +75,7 @@
 <meta property="og:title" content="{{ og_title | escape }}">
 <meta property="og:type" content="{{ og_type }}">
 <meta property="og:description" content="{{ og_description | strip_html | escape | truncate: 200 }}">
+<meta property="og:locale" content="{{ request.locale.iso_code | replace: '-', '_' }}">
 
 {%- if og_image -%}
   <meta property="og:image" content="https:{{ og_image | image_url: width: 1200 }}">
@@ -60,8 +84,9 @@
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="{{ og_image.alt | default: og_title | escape }}">
 {%- else -%}
-  {%- comment -%} Fallback OG image {%- endcomment -%}
-  <meta property="og:image" content="{{ shop.url }}/assets/og-image.jpg">
+  <meta property="og:image" content="{{ default_og_image_url }}">
+  <meta property="og:image:secure_url" content="{{ default_og_image_url }}">
+  <meta property="og:image:alt" content="{{ shop.name | escape }}">
 {%- endif -%}
 
 {%- comment -%} Product-specific Open Graph {%- endcomment -%}
@@ -85,24 +110,45 @@
 {%- if og_image -%}
   <meta name="twitter:image" content="https:{{ og_image | image_url: width: 1200 }}">
   <meta name="twitter:image:alt" content="{{ og_image.alt | default: og_title | escape }}">
+{%- else -%}
+  <meta name="twitter:image" content="{{ default_og_image_url }}">
+  <meta name="twitter:image:alt" content="{{ shop.name | escape }}">
 {%- endif -%}
 {%- if shop.social_networks.twitter -%}
   <meta name="twitter:site" content="@{{ shop.social_networks.twitter | remove: '@' }}">
 {%- endif -%}
 
 {%- comment -%} Additional SEO Meta Tags {%- endcomment -%}
-<meta name="robots" content="{% if request.page_type == 'password' %}noindex,nofollow{% else %}index,follow{% endif %}">
-<meta name="googlebot" content="index,follow">
+{%- liquid
+  if request.page_type == 'password' or request.page_type == '404'
+    assign robots_content = 'noindex,nofollow'
+  else
+    assign robots_content = 'index,follow'
+  endif
+-%}
+<meta name="robots" content="{{ robots_content }}">
+<meta name="googlebot" content="{{ robots_content }}">
 <meta name="author" content="{{ shop.name | escape }}">
 
 {%- comment -%} Structured Data (JSON-LD) {%- endcomment -%}
 {%- if request.page_type == 'product' -%}
+  {%- liquid
+    assign schema_variant = product.selected_or_first_available_variant
+    assign schema_description = product.description | strip_html | truncatewords: 120
+    if schema_description == blank
+      assign schema_description = product.title
+    endif
+    assign review_rating = product.metafields.reviews.rating.value | default: product.metafields.reviews.rating
+    assign review_count = product.metafields.reviews.rating_count.value | default: product.metafields.reviews.rating_count
+    assign review_count_num = review_count | plus: 0
+  -%}
   <script type="application/ld+json">
     {
       "@context": "https://schema.org/",
       "@type": "Product",
       "name": {{ product.title | json }},
-      "description": {{ product.description | strip_html | truncatewords: 50 | json }},
+      "description": {{ schema_description | json }},
+      "url": {{ shop.url | append: product.url | json }},
       "image": [
         {%- for image in product.images limit: 5 -%}
           "https:{{ image | image_url: width: 1200 }}"{% unless forloop.last %},{% endunless %}
@@ -110,29 +156,48 @@
       ],
       "brand": {
         "@type": "Brand",
-        "name": {{ product.vendor | json }}
+        "name": {{ product.vendor | default: shop.name | json }}
       },
       "offers": {
         "@type": "Offer",
         "url": {{ shop.url | append: product.url | json }},
         "priceCurrency": {{ cart.currency.iso_code | json }},
-        "price": "{{ product.price | money_without_currency | strip_html }}",
-        "availability": "https://schema.org/{% if product.available %}InStock{% else %}OutOfStock{% endif %}",
+        "price": "{{ schema_variant.price | money_without_currency | strip_html }}",
+        "availability": "https://schema.org/{% if schema_variant.available %}InStock{% else %}OutOfStock{% endif %}",
+        "itemCondition": "https://schema.org/NewCondition",
         "seller": {
           "@type": "Organization",
           "name": {{ shop.name | json }}
         }
-      },
-      {%- if product.selected_or_first_available_variant.sku != blank -%}
-      "sku": {{ product.selected_or_first_available_variant.sku | json }},
+      }
+      {%- if schema_variant.sku != blank -%}
+      ,"sku": {{ schema_variant.sku | json }}
       {%- endif -%}
-      {%- if product.selected_or_first_available_variant.barcode != blank -%}
-      "gtin": {{ product.selected_or_first_available_variant.barcode | json }},
+      {%- if schema_variant.barcode != blank -%}
+      ,"gtin": {{ schema_variant.barcode | json }}
       {%- endif -%}
-      "aggregateRating": {
+      {%- if review_rating != blank and review_count_num > 0 -%}
+      ,"aggregateRating": {
         "@type": "AggregateRating",
-        "ratingValue": "4.8",
-        "reviewCount": "127"
+        "ratingValue": {{ review_rating | json }},
+        "reviewCount": {{ review_count_num | json }}
+      }
+      {%- endif -%}
+    }
+  </script>
+{%- elsif request.page_type == 'index' -%}
+  {%- assign homepage_schema_description = page_description | default: shop.description | default: og_description | strip_html | truncate: 160 -%}
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org/",
+      "@type": "WebPage",
+      "name": {{ page_title | default: shop.name | json }},
+      "description": {{ homepage_schema_description | json }},
+      "url": {{ shop.url | json }},
+      "isPartOf": {
+        "@type": "WebSite",
+        "name": {{ shop.name | json }},
+        "url": {{ shop.url | json }}
       }
     }
   </script>
@@ -173,6 +238,22 @@
 {%- endif -%}
 
 {%- comment -%} Organization Schema {%- endcomment -%}
+{%- liquid
+  assign org_same_as = ''
+  if shop.social_networks.facebook != blank
+    assign org_same_as = org_same_as | append: shop.social_networks.facebook | append: '||'
+  endif
+  if shop.social_networks.twitter != blank
+    assign org_same_as = org_same_as | append: shop.social_networks.twitter | append: '||'
+  endif
+  if shop.social_networks.instagram != blank
+    assign org_same_as = org_same_as | append: shop.social_networks.instagram | append: '||'
+  endif
+  if shop.social_networks.pinterest != blank
+    assign org_same_as = org_same_as | append: shop.social_networks.pinterest | append: '||'
+  endif
+  assign org_same_as_links = org_same_as | split: '||'
+-%}
 <script type="application/ld+json">
   {
     "@context": "https://schema.org/",
@@ -180,14 +261,19 @@
     "name": {{ shop.name | json }},
     "url": {{ shop.url | json }},
     "logo": "https:{{ shop.brand.logo | default: shop.brand.image | image_url: width: 200 }}",
-    "description": {{ shop.description | default: 'Premium natural fruit & vegetable powders. Lab-tested, sustainably sourced, and packed with natural goodness.' | json }},
-    "sameAs": [
-      {%- if shop.social_networks.facebook -%}"{{ shop.social_networks.facebook }}"{%- endif -%}
-      {%- if shop.social_networks.twitter -%},"{{ shop.social_networks.twitter }}"{%- endif -%}
-      {%- if shop.social_networks.instagram -%},"{{ shop.social_networks.instagram }}"{%- endif -%}
-      {%- if shop.social_networks.pinterest -%},"{{ shop.social_networks.pinterest }}"{%- endif -%}
-    ],
-    "contactPoint": {
+    "description": {{ shop.description | default: 'Premium natural fruit & vegetable powders. Lab-tested, sustainably sourced, and packed with natural goodness.' | json }}
+    {%- if org_same_as != blank -%}
+    ,"sameAs": [
+      {%- assign first_social_link = true -%}
+      {%- for social_url in org_same_as_links -%}
+        {%- if social_url != blank -%}
+          {%- unless first_social_link -%},{%- endunless -%}{{ social_url | json }}
+          {%- assign first_social_link = false -%}
+        {%- endif -%}
+      {%- endfor -%}
+    ]
+    {%- endif -%}
+    ,"contactPoint": {
       "@type": "ContactPoint",
       "contactType": "customer service",
       "email": {{ shop.email | json }}

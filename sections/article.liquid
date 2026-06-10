@@ -1,68 +1,383 @@
 {% comment %}
-  This section is used in the article template to render the article page, which
-  displays the full content of the blog post and can optionally include a
-  comments section for customers (not shown in this example).
-
-  https://shopify.dev/docs/storefronts/themes/architecture/templates/article
+  Pillar blog article layout: TL;DR, body, product CTA, FAQ accordion + FAQPage schema.
+  Metafields (article): custom.article_tldr, custom.article_faq, custom.article_product (product reference).
 {% endcomment %}
 
-{% if article.image %}
-  {{ article.image | image_url: width: 1000 | image_tag }}
-{% endif %}
+{% liquid
+  assign tldr_text = article.metafields.custom.article_tldr | metafield_text
+  assign linked_product = article.metafields.custom.article_product.value
+  if linked_product == blank
+    assign linked_product = article.metafields.custom.article_product
+  endif
 
-<h1>{{ article.title }}</h1>
+  assign article_faq_raw = ''
+%}
+{% capture article_faq_raw %}
+  {% render 'faq-parse', faq_meta: article.metafields.custom.article_faq %}
+{% endcapture %}
+{% liquid
+  assign article_faq_raw = article_faq_raw | strip
+  assign article_faq_items = '' | split: ''
+  if article_faq_raw != blank
+    assign article_faq_items = article_faq_raw | split: '###FAQ###'
+  endif
+%}
 
-{% assign date = article.published_at | time_tag: format: 'date' %}
-<p>{{ 'blog.article_metadata_html' | t: date: date, author: article.author }}</p>
+<article class="article-pillar" itemscope itemtype="https://schema.org/Article" {{ section.shopify_attributes }}>
+  <div class="article-pillar__container">
+    {% if article.image %}
+      <div class="article-pillar__hero">
+        {{
+          article.image
+          | image_url: width: 1400
+          | image_tag:
+            class: 'article-pillar__image',
+            loading: 'eager',
+            fetchpriority: 'high',
+            widths: '600,900,1200,1400',
+            sizes: '(max-width: 768px) 100vw, 900px',
+            alt: article.image.alt | default: article.title
+        }}
+      </div>
+    {% endif %}
 
-{{ article.content }}
+    <header class="article-pillar__header">
+      <h1 class="article-pillar__title" itemprop="headline">{{ article.title }}</h1>
+      {% assign date = article.published_at | time_tag: format: 'date' %}
+      <p class="article-pillar__meta">{{ 'blog.article_metadata_html' | t: date: date, author: article.author }}</p>
+    </header>
 
-{% if blog.comments_enabled? %}
-  <h2>{{ 'blog.article_comments' | t }}</h2>
+    {% if tldr_text != blank %}
+      <aside class="article-pillar__tldr" aria-labelledby="article-tldr-heading">
+        <h2 class="article-pillar__tldr-title" id="article-tldr-heading">{{ 'sections.article_pillar.tldr_title' | t }}</h2>
+        <ul class="article-pillar__tldr-list">
+          {% assign tldr_lines = tldr_text | newline_to_br | split: '<br />' %}
+          {% for line in tldr_lines %}
+            {% assign bullet = line | strip | remove: '•' | remove: '-' | strip %}
+            {% if bullet != blank %}
+              <li>{{ bullet | escape }}</li>
+            {% endif %}
+          {% endfor %}
+        </ul>
+      </aside>
+    {% endif %}
 
-  <div id="comments">
-    {% paginate article.comments by 10 %}
-      {% for comment in article.comments %}
-        <div>
-          <p>{{ comment.author }}</p>
-          <p>
-            {{- comment.created_at | time_tag: format: 'date' -}}
-          </p>
-          <p>{{ comment.content }}</p>
+    <div class="article-pillar__body rte" itemprop="articleBody">
+      {{ article.content }}
+    </div>
+
+    {% if section.settings.show_cta %}
+      {% liquid
+        assign faq_cta_url = section.settings.faq_url
+        if faq_cta_url == blank
+          assign faq_cta_url = '/pages/faq'
+        endif
+      %}
+      {% if linked_product != blank or faq_cta_url != blank %}
+        <nav class="article-pillar__cta" aria-label="{{ 'sections.article_pillar.cta_label' | t }}">
+          {% if linked_product != blank %}
+            <a class="article-pillar__cta-primary" href="{{ linked_product.url }}">
+              {{ 'sections.article_pillar.shop_product' | t: product: linked_product.title }}
+            </a>
+          {% endif %}
+          {% if faq_cta_url != blank %}
+            <a class="article-pillar__cta-secondary" href="{{ faq_cta_url }}">
+              {{ 'sections.article_pillar.read_faq' | t }}
+            </a>
+          {% endif %}
+        </nav>
+      {% endif %}
+    {% endif %}
+
+    {% if article_faq_items.size > 0 %}
+      <section class="article-pillar__faq" id="article-faq" aria-labelledby="article-faq-heading">
+        <h2 class="article-pillar__faq-title" id="article-faq-heading">{{ 'sections.article_pillar.faq_title' | t }}</h2>
+        <div class="article-pillar__faq-accordion home-faq__accordion" data-faq-section>
+          {% for item in article_faq_items %}
+            {% assign qa_parts = item | split: '|||' %}
+            {% assign question = qa_parts[0] | strip %}
+            {% assign answer = qa_parts[1] | strip %}
+            {% if question != blank %}
+              <div class="home-faq-item" data-faq-index="{{ forloop.index0 }}">
+                <h3 class="home-faq-item__question-heading">
+                  <button
+                    class="home-faq-item__button"
+                    type="button"
+                    aria-expanded="false"
+                    aria-controls="article-faq-answer-{{ section.id }}-{{ forloop.index0 }}"
+                  >
+                    <span class="home-faq-item__question">{{ question | escape }}</span>
+                    <span class="home-faq-item__icon" aria-hidden="true">
+                      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 7.5l5 5 5-5"/>
+                      </svg>
+                    </span>
+                  </button>
+                </h3>
+                <div class="home-faq-item__content" id="article-faq-answer-{{ section.id }}-{{ forloop.index0 }}" role="region">
+                  <div class="home-faq-item__answer">
+                    {% if answer != blank %}
+                      {{ answer | strip | newline_to_br }}
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            {% endif %}
+          {% endfor %}
         </div>
-      {% endfor %}
+      </section>
+      {% render 'faq-schema', faq_items: article_faq_items %}
+    {% endif %}
 
-      {{ paginate | default_pagination: anchor: 'comments' }}
-    {% endpaginate %}
+    {% if blog.comments_enabled? %}
+      <section class="article-pillar__comments" id="comments">
+        <h2>{{ 'blog.article_comments' | t }}</h2>
+        {% paginate article.comments by 10 %}
+          {% for comment in article.comments %}
+            <div class="article-pillar__comment">
+              <p class="article-pillar__comment-author">{{ comment.author }}</p>
+              <p class="article-pillar__comment-date">{{ comment.created_at | time_tag: format: 'date' }}</p>
+              <p>{{ comment.content }}</p>
+            </div>
+          {% endfor %}
+          {{ paginate | default_pagination: anchor: 'comments' }}
+        {% endpaginate %}
+
+        {% form 'new_comment', article %}
+          <h3>{{ 'blog.comment_form_title' | t }}</h3>
+          {{ form.errors | default_errors }}
+          <div class="article-pillar__comment-field">
+            <label for="author-{{ section.id }}">{{ 'blog.comment_form_name' | t }}</label>
+            <input type="text" name="comment[author]" id="author-{{ section.id }}" value="{{ form.author }}" required>
+          </div>
+          <div class="article-pillar__comment-field">
+            <label for="email-{{ section.id }}">{{ 'blog.comment_form_email' | t }}</label>
+            <input type="email" name="comment[email]" id="email-{{ section.id }}" value="{{ form.email }}" required>
+          </div>
+          <div class="article-pillar__comment-field">
+            <label for="body-{{ section.id }}">{{ 'blog.comment_form_body' | t }}</label>
+            <textarea name="comment[body]" id="body-{{ section.id }}" required>{{ form.body }}</textarea>
+          </div>
+          <button type="submit">{{ 'blog.comment_form_submit' | t }}</button>
+        {% endform %}
+      </section>
+    {% endif %}
   </div>
+</article>
 
-  {% form 'new_comment', article %}
-    <h2>{{ 'blog.comment_form_title' | t }}</h2>
-
-    {{ form.errors | default_errors }}
-
-    <div>
-      <label for="author">{{ 'blog.comment_form_name' | t }}</label>
-      <input type="text" name="comment[author]" id="author" value="{{ form.author }}" required>
-    </div>
-
-    <div>
-      <label for="email">{{ 'blog.comment_form_email' | t }}</label>
-      <input type="email" name="comment[email]" id="email" value="{{ form.email }}" required>
-    </div>
-
-    <div>
-      <label for="body">{{ 'blog.comment_form_body' | t }}</label>
-      <textarea name="comment[body]" id="body" required>{{ form.body }}</textarea>
-    </div>
-
-    <input type="submit" value="{{ 'blog.comment_form_submit' | t }}">
-  {% endform %}
+{% if article_faq_items.size > 0 %}
+  {% render 'faq-accordion-styles' %}
+  {% render 'faq-accordion-script' %}
 {% endif %}
+
+{% stylesheet %}
+  .article-pillar {
+    width: 100%;
+    padding: var(--spacing-xl) var(--spacing-lg) var(--spacing-3xl, 4rem);
+    background: var(--white);
+    box-sizing: border-box;
+  }
+
+  .article-pillar__container {
+    max-width: 760px;
+    margin: 0 auto;
+  }
+
+  .article-pillar__hero {
+    margin-bottom: var(--spacing-xl);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .article-pillar__image {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .article-pillar__title {
+    font-size: clamp(1.75rem, 4vw, 2.25rem);
+    line-height: 1.2;
+    color: var(--forest-green);
+    margin: 0 0 var(--spacing-sm);
+  }
+
+  .article-pillar__meta {
+    color: var(--text-muted, #5a6b52);
+    font-size: 0.95rem;
+    margin: 0 0 var(--spacing-xl);
+  }
+
+  .article-pillar__tldr {
+    margin-bottom: var(--spacing-xl);
+    padding: var(--spacing-lg);
+    background: rgba(74, 124, 44, 0.06);
+    border-left: 4px solid var(--forest-green);
+    border-radius: 0 8px 8px 0;
+  }
+
+  .article-pillar__tldr-title {
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--forest-green);
+    margin: 0 0 var(--spacing-md);
+  }
+
+  .article-pillar__tldr-list {
+    margin: 0;
+    padding-left: 1.25rem;
+    line-height: 1.7;
+  }
+
+  .article-pillar__tldr-list li {
+    margin-bottom: 0.5rem;
+  }
+
+  .article-pillar__body {
+    font-size: 1.0625rem;
+    line-height: 1.8;
+    color: var(--text);
+  }
+
+  .article-pillar__body h2 {
+    font-size: 1.35rem;
+    color: var(--forest-green);
+    margin: 2rem 0 1rem;
+  }
+
+  .article-pillar__body h3 {
+    font-size: 1.1rem;
+    margin: 1.5rem 0 0.75rem;
+  }
+
+  .article-pillar__body p {
+    margin: 0 0 1rem;
+  }
+
+  .article-pillar__body a {
+    color: var(--forest-green);
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .article-pillar__body ul,
+  .article-pillar__body ol {
+    margin: 0 0 1rem;
+    padding-left: 1.5rem;
+  }
+
+  .article-pillar__cta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+    margin: var(--spacing-2xl) 0;
+    padding: var(--spacing-lg);
+    background: rgba(74, 124, 44, 0.04);
+    border-radius: 12px;
+  }
+
+  .article-pillar__cta-primary,
+  .article-pillar__cta-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1.25rem;
+    border-radius: 999px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+
+  .article-pillar__cta-primary {
+    background: var(--forest-green);
+    color: var(--white);
+  }
+
+  .article-pillar__cta-primary:hover {
+    background: var(--sage-green);
+    color: var(--white);
+  }
+
+  .article-pillar__cta-secondary {
+    border: 2px solid var(--forest-green);
+    color: var(--forest-green);
+  }
+
+  .article-pillar__cta-secondary:hover {
+    background: var(--forest-green);
+    color: var(--white);
+  }
+
+  .article-pillar__faq {
+    margin-top: var(--spacing-2xl);
+    padding-top: var(--spacing-xl);
+    border-top: 1px solid rgba(74, 124, 44, 0.12);
+  }
+
+  .article-pillar__faq-title {
+    font-size: 1.5rem;
+    color: var(--forest-green);
+    margin: 0 0 var(--spacing-lg);
+  }
+
+  .article-pillar__comments {
+    margin-top: var(--spacing-2xl);
+    padding-top: var(--spacing-xl);
+    border-top: 1px solid rgba(74, 124, 44, 0.12);
+  }
+
+  .article-pillar__comment-field {
+    margin-bottom: var(--spacing-md);
+  }
+
+  .article-pillar__comment-field label {
+    display: block;
+    margin-bottom: 0.35rem;
+    font-weight: 600;
+  }
+
+  .article-pillar__comment-field input,
+  .article-pillar__comment-field textarea {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  @media (max-width: 768px) {
+    .article-pillar {
+      padding: var(--spacing-lg) var(--spacing-md) var(--spacing-2xl);
+    }
+
+    .article-pillar__cta {
+      flex-direction: column;
+    }
+
+    .article-pillar__cta-primary,
+    .article-pillar__cta-secondary {
+      width: 100%;
+    }
+  }
+{% endstylesheet %}
 
 {% schema %}
 {
-  "name": "t:general.article",
-  "settings": []
+  "name": "t:sections.article_pillar.name",
+  "tag": "section",
+  "class": "section-article-pillar",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_cta",
+      "label": "t:sections.article_pillar.settings.show_cta",
+      "default": true
+    },
+    {
+      "type": "url",
+      "id": "faq_url",
+      "label": "t:sections.article_pillar.settings.faq_url"
+    }
+  ]
 }
 {% endschema %}

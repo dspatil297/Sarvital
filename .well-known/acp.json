@@ -1,0 +1,42 @@
+{
+  "protocol": {
+    "name": "acp",
+    "version": "1.0"
+  },
+  "api_base_url": "https://sarvital.com",
+  "transports": [
+    "https"
+  ],
+  "capabilities": {
+    "services": [
+      "catalog",
+      "cart",
+      "checkout",
+      "search",
+      "product-details",
+      "collections"
+    ]
+  },
+  "endpoints": {
+    "products": "/products.json",
+    "collections": "/collections.json",
+    "search": "/search/suggest.json",
+    "cart": "/cart.js",
+    "cart_add": "/cart/add.js",
+    "cart_change": "/cart/change.js",
+    "checkout": "/checkout",
+    "agent_doc": "/agents.md",
+    "auth_doc": "/auth.md",
+    "sitemap": "/sitemap.xml"
+  },
+  "authentication": {
+    "required": false,
+    "note": "Public catalog and cart endpoints are unauthenticated. Checkout uses GoKwik with buyer approval required."
+  },
+  "store": {
+    "name": "Sarvital",
+    "description": "Premium natural superfood powders — moringa, amla, sattu. Lab-tested, vegan, gluten-free. India.",
+    "currency": "INR",
+    "language": "en"
+  }
+}

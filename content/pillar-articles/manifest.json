@@ -1,0 +1,50 @@
+{
+  "blog_handle": "wellness",
+  "blog_title": "Wellness",
+  "article_template": "pillar",
+  "required_metafields": [
+    {
+      "namespace": "custom",
+      "key": "article_tldr",
+      "type": "Multi-line text",
+      "note": "One bullet per line (3 lines)."
+    },
+    {
+      "namespace": "custom",
+      "key": "article_faq",
+      "type": "Multi-line text",
+      "note": "Q:/A: blocks — same format as site_faqs."
+    },
+    {
+      "namespace": "custom",
+      "key": "article_product",
+      "type": "Product reference",
+      "note": "Powers Shop CTA on article."
+    }
+  ],
+  "articles": [
+    {
+      "title": "Sattu protein powder: benefits & how to use",
+      "handle": "sattu-protein-powder-benefits-how-to-use",
+      "publish_first": true,
+      "seo_title": "Sattu protein powder: benefits & how to use | Sarvital",
+      "seo_description": "Learn how sattu delivers plant protein, iron & fiber. Traditional Indian uses, sharbat & chilla ideas, and how to choose lab-tested sattu powder in India.",
+      "product_handle": "sattu-powder",
+      "content_dir": "sattu-protein-powder-benefits-how-to-use",
+      "tldr_probe": "plant protein",
+      "body_must_include": ["sattu", "protein"],
+      "internal_links": ["/products/sattu-powder", "/pages/faq"]
+    },
+    {
+      "title": "Moringa powder guide for daily wellness",
+      "handle": "moringa-powder-guide-daily-wellness",
+      "seo_title": "Moringa powder guide for daily wellness (India) | Sarvital",
+      "seo_description": "How to use moringa powder daily — benefits, simple recipes, and what to look for in lab-tested moringa powder from India.",
+      "product_handle": "moringa-powder",
+      "content_dir": "moringa-powder-guide-daily-wellness",
+      "tldr_probe": "daily wellness",
+      "body_must_include": ["moringa"],
+      "internal_links": ["/products/moringa-powder", "/pages/faq"]
+    }
+  ]
+}

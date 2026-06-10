@@ -1,0 +1,60 @@
+{% doc %}
+  Defines window.sarvitalAfterPaint(fn, opts) — runs callbacks after load + idle delay, or on first user interaction.
+
+  @example
+  {% render 'sarvital-after-paint' %}
+{% enddoc %}
+
+<script>
+(function () {
+  if (window.sarvitalAfterPaint) return;
+
+  window.sarvitalAfterPaint = function (fn, opts) {
+    if (typeof fn !== 'function') return;
+    opts = opts || {};
+    var delay = typeof opts.delay === 'number' ? opts.delay : 1200;
+    var maxWait = typeof opts.timeout === 'number' ? opts.timeout : 8000;
+    var ran = false;
+    var eagerEvents = ['scroll', 'click', 'touchstart', 'keydown'];
+
+    function run() {
+      if (ran) return;
+      ran = true;
+      eagerEvents.forEach(function (ev) {
+        document.removeEventListener(ev, run, true);
+      });
+      function invoke() {
+        try {
+          fn();
+        } catch (e) {}
+      }
+      if ('requestIdleCallback' in window) {
+        requestIdleCallback(invoke, { timeout: 2500 });
+      } else {
+        setTimeout(invoke, 0);
+      }
+    }
+
+    eagerEvents.forEach(function (ev) {
+      document.addEventListener(ev, run, { once: true, passive: true, capture: true });
+    });
+
+    function schedule() {
+      if (document.readyState === 'complete') {
+        setTimeout(run, delay);
+      } else {
+        window.addEventListener(
+          'load',
+          function () {
+            setTimeout(run, delay);
+          },
+          { once: true }
+        );
+      }
+    }
+
+    schedule();
+    setTimeout(run, maxWait);
+  };
+})();
+</script>

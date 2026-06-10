@@ -1,0 +1,44 @@
+{% doc %}
+  Accordion toggle for FAQ sections marked with `data-faq-section`.
+{% enddoc %}
+
+{% javascript %}
+  function handleFaqAccordionClick(e) {
+    var target = e.target;
+    var button = target.closest ? target.closest('.home-faq-item__button') : null;
+    if (!button) return;
+
+    var item = button.closest('.home-faq-item');
+    if (!item) return;
+
+    var section = item.closest('[data-faq-section]');
+    if (!section) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    var isOpen = item.classList.contains('active');
+    var allItems = section.querySelectorAll('.home-faq-item');
+
+    for (var j = 0; j < allItems.length; j++) {
+      allItems[j].classList.remove('active');
+      var b = allItems[j].querySelector('.home-faq-item__button');
+      if (b) b.setAttribute('aria-expanded', 'false');
+    }
+
+    if (!isOpen) {
+      item.classList.add('active');
+      button.setAttribute('aria-expanded', 'true');
+    }
+  }
+
+  function initFaqAccordions() {
+    document.addEventListener('click', handleFaqAccordionClick, true);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initFaqAccordions);
+  } else {
+    initFaqAccordions();
+  }
+{% endjavascript %}

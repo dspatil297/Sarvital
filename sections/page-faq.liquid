@@ -1,0 +1,166 @@
+{% comment %}
+  FAQ hub page — full site FAQs from shop.metafields.custom.site_faqs.
+  Assign via template page.faq on a Page with handle "faq".
+{% endcomment %}
+
+{% capture faq_items_raw %}
+  {% render 'faq-parse', faq_meta: shop.metafields.custom.site_faqs %}
+{% endcapture %}
+
+{% liquid
+  assign faq_items = '' | split: ''
+  assign faq_items_raw = faq_items_raw | strip
+  if faq_items_raw != blank
+    assign faq_items = faq_items_raw | split: '###FAQ###'
+  endif
+
+  if section.settings.use_page_title
+    assign faq_heading = page.title
+  else
+    assign faq_heading = section.settings.title
+  endif
+  if faq_heading == blank
+    assign faq_heading = 'sections.page_faq.title' | t
+  endif
+
+  assign faq_intro = section.settings.intro
+  if faq_intro == blank
+    assign faq_intro = 'sections.page_faq.intro' | t
+  endif
+
+  assign contact_url = section.settings.contact_url
+  if contact_url == blank
+    assign contact_url = '/pages/contact'
+  endif
+%}
+
+<section
+  class="home-faq page-faq"
+  id="page-faq-{{ section.id }}"
+  data-faq-section
+  {{ section.shopify_attributes }}
+>
+  <div class="home-faq__container">
+    <div class="home-faq__header">
+      <div class="home-faq__icon" aria-hidden="true">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+          <line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+      </div>
+      <h1 class="home-faq__title">{{ faq_heading | escape }}</h1>
+    </div>
+
+    {% if section.settings.show_intro %}
+      <p class="home-faq__intro">{{ faq_intro | escape }}</p>
+    {% endif %}
+
+    {% if faq_items.size > 0 %}
+      <div class="home-faq__accordion">
+        {% for item in faq_items %}
+          {% assign qa_parts = item | split: '|||' %}
+          {% assign question = qa_parts[0] | strip %}
+          {% assign answer = qa_parts[1] | strip %}
+
+          {% if question != blank %}
+            <div class="home-faq-item" data-faq-index="{{ forloop.index0 }}">
+              <h2 class="home-faq-item__question-heading">
+                <button
+                  class="home-faq-item__button"
+                  type="button"
+                  aria-expanded="false"
+                  aria-controls="page-faq-answer-{{ section.id }}-{{ forloop.index0 }}"
+                >
+                  <span class="home-faq-item__question">{{ question | escape }}</span>
+                  <span class="home-faq-item__icon" aria-hidden="true">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M5 7.5l5 5 5-5"/>
+                    </svg>
+                  </span>
+                </button>
+              </h2>
+              <div
+                class="home-faq-item__content"
+                id="page-faq-answer-{{ section.id }}-{{ forloop.index0 }}"
+                role="region"
+              >
+                <div class="home-faq-item__answer">
+                  {% if answer != blank %}
+                    {{ answer | strip | newline_to_br }}
+                  {% else %}
+                    <p>{{ 'sections.page_faq.no_answer' | t }}</p>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+
+      {% render 'faq-schema', faq_items: faq_items %}
+    {% else %}
+      <p class="home-faq__empty">{{ 'sections.page_faq.empty_state' | t }}</p>
+    {% endif %}
+
+    {% if section.settings.show_contact_cta %}
+      <p class="home-faq__contact">
+        {{ 'sections.page_faq.contact_cta' | t }}
+        <a href="{{ contact_url }}">{{ 'sections.page_faq.contact_link' | t }}</a>
+      </p>
+    {% endif %}
+  </div>
+</section>
+
+{% render 'faq-accordion-styles' %}
+{% render 'faq-accordion-script' %}
+
+{% schema %}
+{
+  "name": "t:sections.page_faq.name",
+  "tag": "section",
+  "class": "section-page-faq",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "use_page_title",
+      "label": "t:sections.page_faq.settings.use_page_title",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "t:sections.page_faq.settings.title",
+      "default": "Frequently asked questions"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_intro",
+      "label": "t:sections.page_faq.settings.show_intro",
+      "default": true
+    },
+    {
+      "type": "textarea",
+      "id": "intro",
+      "label": "t:sections.page_faq.settings.intro",
+      "default": "Answers about Sarvital products, lab testing, shipping, and how to use moringa, sattu, and amla powders."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_contact_cta",
+      "label": "t:sections.page_faq.settings.show_contact_cta",
+      "default": true
+    },
+    {
+      "type": "url",
+      "id": "contact_url",
+      "label": "t:sections.page_faq.settings.contact_url"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.page_faq.name"
+    }
+  ]
+}
+{% endschema %}

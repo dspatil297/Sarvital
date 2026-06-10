@@ -105,18 +105,17 @@
                   <video
                     class="pdp-testimonial-videos__inline-video"
                     data-tv-inline-video
+                    data-tv-video-src="{{ primary_url | escape }}"
+                    data-tv-video-type="{{ primary_type | escape }}"
+                    {% if poster != blank %}
+                      data-tv-poster="{{ poster | image_url: width: 280, format: 'webp' }}"
+                    {% endif %}
                     muted
                     playsinline
-                    autoplay
                     loop
-                    preload="metadata"
-                    {% if poster != blank %}
-                      poster="{{ poster | image_url: width: 720 }}"
-                    {% endif %}
+                    preload="none"
                     aria-label="{{ img_alt | escape }}"
-                  >
-                    <source src="{{ primary_url | escape }}" type="{{ primary_type | escape }}">
-                  </video>
+                  ></video>
                   <span class="pdp-testimonial-videos__shade" aria-hidden="true"></span>
                   {% if block.settings.caption != blank %}
                     <span class="pdp-testimonial-videos__caption">{{ block.settings.caption | escape }}</span>
@@ -145,22 +144,94 @@
 
       var mqReduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)');
 
-      function tryPlayInlineVideos() {
+      function pauseVideo(v) {
+        try {
+          v.pause();
+        } catch (e) {}
+      }
+
+      function attachVideoPoster(v) {
+        if (!v || v.getAttribute('data-tv-poster-attached') === '1') return;
+        var posterUrl = v.getAttribute('data-tv-poster');
+        if (!posterUrl) return;
+        v.setAttribute('poster', posterUrl);
+        v.setAttribute('data-tv-poster-attached', '1');
+      }
+
+      function attachVideoSource(v) {
+        if (!v || v.getAttribute('data-tv-source-attached') === '1') return;
+        var src = v.getAttribute('data-tv-video-src');
+        if (!src) return;
+        attachVideoPoster(v);
+        var source = document.createElement('source');
+        source.src = src;
+        source.type = v.getAttribute('data-tv-video-type') || 'video/mp4';
+        v.appendChild(source);
+        v.setAttribute('data-tv-source-attached', '1');
+        try {
+          v.load();
+        } catch (e) {}
+      }
+
+      function playVideo(v) {
         if (mqReduce && mqReduce.matches) {
-          inlineVideos.forEach(function(v) {
-            try {
-              v.pause();
-              v.removeAttribute('autoplay');
-            } catch (e) {}
-          });
+          pauseVideo(v);
           return;
         }
+        attachVideoSource(v);
+        try {
+          var p = v.play();
+          if (p && typeof p.then === 'function') p.catch(function() {});
+        } catch (e) {}
+      }
+
+      function visibleRatioInScroll(el) {
+        if (!el || !scrollEl) return 0;
+        var slideRect = el.getBoundingClientRect();
+        var scrollRect = scrollEl.getBoundingClientRect();
+        var overlap = Math.min(slideRect.right, scrollRect.right) - Math.max(slideRect.left, scrollRect.left);
+        if (overlap <= 0 || slideRect.width <= 0) return 0;
+        return overlap / slideRect.width;
+      }
+
+      function syncPlaybackToVisibleSlides() {
+        var best = null;
+        var bestRatio = 0;
         inlineVideos.forEach(function(v) {
-          try {
-            var p = v.play();
-            if (p && typeof p.then === 'function') p.catch(function() {});
-          } catch (e) {}
+          var slide = v.closest ? v.closest('[data-tv-slide]') : null;
+          var ratio = slide ? visibleRatioInScroll(slide) : 0;
+          if (ratio > bestRatio) {
+            bestRatio = ratio;
+            best = v;
+          }
         });
+        inlineVideos.forEach(function(v) {
+          if (v === best && bestRatio >= 0.45) {
+            playVideo(v);
+          } else {
+            pauseVideo(v);
+          }
+        });
+      }
+
+      function observeInlineVideos() {
+        if (!('IntersectionObserver' in window)) {
+          syncPlaybackToVisibleSlides();
+          return;
+        }
+        var sectionIo = new IntersectionObserver(
+          function(entries) {
+            entries.forEach(function(entry) {
+              if (entry.isIntersecting) {
+                syncPlaybackToVisibleSlides();
+              } else {
+                inlineVideos.forEach(pauseVideo);
+              }
+            });
+          },
+          { root: null, rootMargin: '80px', threshold: 0.05 }
+        );
+        sectionIo.observe(root);
       }
 
       function getStep() {
@@ -219,9 +290,13 @@
         'scroll',
         function() {
           if (window.requestAnimationFrame) {
-            window.requestAnimationFrame(updateArrows);
+            window.requestAnimationFrame(function() {
+              updateArrows();
+              syncPlaybackToVisibleSlides();
+            });
           } else {
             updateArrows();
+            syncPlaybackToVisibleSlides();
           }
         },
         { passive: true }
@@ -239,15 +314,23 @@
         { passive: false }
       );
 
-      tryPlayInlineVideos();
+      observeInlineVideos();
       updateArrows();
-      window.setTimeout(function() {
-        updateArrows();
-        tryPlayInlineVideos();
-      }, 100);
+      window.setTimeout(updateArrows, 100);
     }
 
-    document.querySelectorAll('[data-testimonial-videos-root]').forEach(initTestimonialVideos);
+    function bootTestimonialSection(root) {
+      var run = function() {
+        initTestimonialVideos(root);
+      };
+      if (document.body.classList.contains('template-index') && window.sarvitalAfterPaint) {
+        window.sarvitalAfterPaint(run, { delay: 4000, timeout: 12000 });
+        return;
+      }
+      run();
+    }
+
+    document.querySelectorAll('[data-testimonial-videos-root]').forEach(bootTestimonialSection);
   })();
 {% endjavascript %}
 

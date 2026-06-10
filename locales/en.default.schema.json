@@ -71,6 +71,66 @@
       "title": "Title",
       "subtitle": "Subtitle",
       "normal": "Normal text"
+    }
+  },
+  "sections": {
+    "page_faq": {
+      "name": "FAQ hub",
+      "settings": {
+        "use_page_title": "Use page title as heading",
+        "title": "Heading",
+        "show_intro": "Show introduction",
+        "intro": "Introduction",
+        "show_contact_cta": "Show contact link",
+        "contact_url": "Contact page"
+      }
     },
+    "blog": {
+      "name": "Blog",
+      "settings": {
+        "intro": "Introduction",
+        "articles_per_page": "Articles per page",
+        "show_author": "Show author"
+      }
+    },
+    "article_pillar": {
+      "name": "Article (pillar)",
+      "settings": {
+        "show_cta": "Show product and FAQ links",
+        "faq_url": "FAQ page URL"
+      }
+    },
+    "collection_intro": {
+      "name": "Collection intro",
+      "settings": {
+        "fallback_collection_handle": "Fallback collection handle",
+        "fallback_collection_handle_info": "Shows fallback intro when collection description is empty (default: all).",
+        "fallback_intro": "Fallback intro copy",
+        "show_product_links": "Show product quick links",
+        "moringa_url": "Moringa product URL",
+        "sattu_url": "Sattu product URL",
+        "amla_url": "Amla product URL",
+        "faq_url": "FAQ page URL"
+      }
+    },
+    "product_sattu_protein": {
+      "name": "Sattu protein block",
+      "settings": {
+        "product_handle": "Product handle",
+        "product_handle_info": "Section only appears on this product (default: sattu-powder).",
+        "heading": "Heading",
+        "body": "Body copy",
+        "uses_heading": "Uses subheading",
+        "show_nutrition_link": "Link to nutrition panel"
+      },
+      "blocks": {
+        "use": {
+          "name": "Use case",
+          "settings": {
+            "label": "Label"
+          }
+        }
+      }
+    }
   }
 }

@@ -1,0 +1,27 @@
+{
+  "issuer": "https://sarvital.com",
+  "authorization_endpoint": "https://sarvital.com/account/login",
+  "token_endpoint": "https://sarvital.com/account",
+  "registration_endpoint": "https://sarvital.com/account/register",
+  "scopes_supported": [
+    "read_products",
+    "read_collections",
+    "write_cart",
+    "read_orders"
+  ],
+  "agent_auth": {
+    "skill": "https://workos.com/auth.md",
+    "register_uri": "https://sarvital.com/account/register",
+    "claim_uri": "https://sarvital.com/account",
+    "revocation_uri": null,
+    "identity_types_supported": [
+      "anonymous"
+    ],
+    "anonymous": {
+      "credential_types_supported": [
+        "none"
+      ]
+    },
+    "events_supported": []
+  }
+}

@@ -60,7 +60,7 @@
 <section class="product-hero" id="product-hero">
   <div class="product-hero__container">
     <!-- Left Column - Product Images (carousel: slide to view) -->
-    <div class="product-images fade-in-up" style="animation-delay: 0.1s;">
+    <div class="product-images">
       {% if product.featured_image or product.images.size > 0 %}
         <div class="product-image-main product-image-carousel-wrapper">
           <div class="product-image-carousel" id="product-image-carousel">
@@ -68,19 +68,20 @@
               {% for image in product.images %}
                 <div class="product-carousel-slide" id="product-carousel-slide-{{ forloop.index0 }}" data-index="{{ forloop.index0 }}">
                   <img
-                    src="{{ image | image_url: width: 1200 }}"
-                    data-zoom-src="{{ image | image_url: width: 2000 }}"
+                    src="{{ image | image_url: width: 900, format: 'webp' }}"
+                    data-zoom-src="{{ image | image_url: width: 2000, format: 'webp' }}"
                     srcset="
-                      {{ image | image_url: width: 300 }} 300w,
-                      {{ image | image_url: width: 600 }} 600w,
-                      {{ image | image_url: width: 900 }} 900w,
-                      {{ image | image_url: width: 1200 }} 1200w,
-                      {{ image | image_url: width: 1500 }} 1500w
+                      {{ image | image_url: width: 300, format: 'webp' }} 300w,
+                      {{ image | image_url: width: 600, format: 'webp' }} 600w,
+                      {{ image | image_url: width: 900, format: 'webp' }} 900w,
+                      {{ image | image_url: width: 1200, format: 'webp' }} 1200w,
+                      {{ image | image_url: width: 1500, format: 'webp' }} 1500w
                     "
                     sizes="(max-width: 768px) 100vw, 50vw"
                     alt="{{ image.alt | default: product.title }}"
                     class="product-image-main__img"
                     {% if forloop.first %}loading="eager" fetchpriority="high"{% else %}loading="lazy"{% endif %}
+                    decoding="async"
                     width="{{ image.width }}"
                     height="{{ image.height }}"
                     onerror="this.classList.add('image-error'); this.alt='Product image failed to load';"
@@ -134,7 +135,7 @@
               >
                 {{
                   image
-                  | image_url: width: 160, height: 160, crop: 'center'
+                  | image_url: width: 160, height: 160, crop: 'center', format: 'webp'
                   | image_tag:
                     class: 'product-thumbnail__img',
                     alt: image.alt | default: product.title,
@@ -418,7 +419,7 @@
             <path d="M1 3h15v13H1V3zm16 8h4l3 3v4h-7v-7z"/>
             <path d="M5 21a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm12 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/>
           </svg>
-          Free Shipping Above ₹899
+          Free Shipping Above ₹499
         </span>
       </div>
       
@@ -856,6 +857,14 @@
     opacity: 0;
   }
 
+  @media (prefers-reduced-motion: reduce) {
+    .fade-in-up {
+      animation: none;
+      opacity: 1;
+      transform: none;
+    }
+  }
+
   /* Main Container */
   .product-hero {
     width: 100%;
@@ -901,7 +910,8 @@
   .product-image-carousel-wrapper {
     position: relative;
     width: 100%;
-    aspect-ratio: unset; /* Let slides control aspect ratio */
+    aspect-ratio: 1;
+    min-height: 0;
   }
 
   .product-image-carousel {
@@ -2130,6 +2140,9 @@
 
     .product-image-carousel-wrapper {
       margin-bottom: 0;
+      aspect-ratio: 1;
+      width: 100%;
+      max-width: 100%;
     }
 
     .product-image-carousel {

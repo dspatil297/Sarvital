@@ -1,0 +1,135 @@
+{% doc %}
+  Defers non-critical third-party scripts and styles until after first paint on the homepage.
+  Analytics still load (delayed); dataLayer and fbq queues are preserved where possible.
+
+  @example
+  {% render 'defer-third-party-scripts' %}
+{% enddoc %}
+
+{%- liquid
+  assign defer_delay = 1800
+  assign defer_timeout = 12000
+  if request.page_type == 'index'
+    assign defer_delay = 4500
+    assign defer_timeout = 14000
+  elsif request.page_type == 'product' or request.page_type == 'cart'
+    assign defer_delay = 1200
+    assign defer_timeout = 10000
+  endif
+-%}
+
+<script>
+(function () {
+  if (window.__sarvitalDefer3p) return;
+  window.__sarvitalDefer3p = true;
+
+  window.dataLayer = window.dataLayer || [];
+  window.fbq =
+    window.fbq ||
+    function () {
+      (window.fbq.q = window.fbq.q || []).push(arguments);
+    };
+  window.fbq.q = window.fbq.q || [];
+
+  var PAGE = {{ request.page_type | json }};
+  var DELAY = {{ defer_delay }};
+  var MAX_WAIT = {{ defer_timeout }};
+
+  var SCRIPT_MATCH =
+    /scripts\.clarity\.ms|connect\.facebook\.net\/|fbevents\.js|googletagmanager\.com\/gtag\/js|translate\.googleapis\.com|translate\.google\.com|gstatic\.com\/|capi-automation\.s3\.|trustpilot\.com|invitejs\.trustpilot|ecommplugins-scripts\.trustpilot|media_carousel\.js|cdn\.jsdelivr\.net\/npm\/@shopify\/media-carousel/;
+
+  var SCRIPT_INDEX_EXTRA =
+    /kwikcart\.gokwik\.co\/side-cart\.js|pdp\.gokwik\.co\/.*\/chunks\/app-/;
+
+  var LINK_MATCH = /carousels\.css|widget_v3_base\.css|kp-main\/kwikpass\.css/;
+
+  var queued = [];
+
+  function shouldDeferScript(src) {
+    if (!src) return false;
+    if (SCRIPT_MATCH.test(src)) return true;
+    if (PAGE === 'index' && SCRIPT_INDEX_EXTRA.test(src)) return true;
+    return false;
+  }
+
+  function shouldDeferLink(href) {
+    if (!href) return false;
+    if (LINK_MATCH.test(href)) return true;
+    return false;
+  }
+
+  function deferStylesheet(link) {
+    if (link.getAttribute('data-sarvital-deferred-css')) return;
+    link.setAttribute('data-sarvital-deferred-css', '1');
+    link.media = 'print';
+    link.onload = function () {
+      this.media = 'all';
+    };
+  }
+
+  function holdScript(node) {
+    if (node.getAttribute('data-sarvital-held')) return;
+    node.setAttribute('data-sarvital-held', '1');
+    var src = node.src || '';
+    var entry = { src: src, text: node.text || node.textContent || '', async: node.async, defer: node.defer };
+    queued.push(entry);
+    node.type = 'text/plain';
+    if (src) node.removeAttribute('src');
+  }
+
+  function releaseQueued() {
+    if (window.__sarvitalDefer3pReleased) return;
+    window.__sarvitalDefer3pReleased = true;
+    queued.forEach(function (entry) {
+      var s = document.createElement('script');
+      if (entry.src) {
+        s.src = entry.src;
+        s.async = entry.async !== false;
+        if (entry.defer) s.defer = true;
+      } else if (entry.text) {
+        s.text = entry.text;
+      }
+      document.head.appendChild(s);
+    });
+    queued = [];
+  }
+
+  function inspectNode(node) {
+    if (!node || node.nodeType !== 1) return;
+    if (node.tagName === 'SCRIPT' && shouldDeferScript(node.src)) {
+      holdScript(node);
+    }
+    if (node.tagName === 'LINK' && node.rel === 'stylesheet' && shouldDeferLink(node.href)) {
+      deferStylesheet(node);
+    }
+  }
+
+  var observer = new MutationObserver(function (mutations) {
+    mutations.forEach(function (m) {
+      m.addedNodes.forEach(inspectNode);
+    });
+  });
+
+  observer.observe(document.documentElement, { childList: true, subtree: true });
+
+  document.querySelectorAll('script[src]').forEach(inspectNode);
+  document.querySelectorAll('link[rel="stylesheet"]').forEach(inspectNode);
+
+  function scheduleRelease() {
+    if (window.sarvitalAfterPaint) {
+      window.sarvitalAfterPaint(releaseQueued, { delay: DELAY, timeout: MAX_WAIT });
+    } else {
+      window.addEventListener(
+        'load',
+        function () {
+          setTimeout(releaseQueued, DELAY);
+        },
+        { once: true }
+      );
+      setTimeout(releaseQueued, MAX_WAIT);
+    }
+  }
+
+  scheduleRelease();
+})();
+</script>

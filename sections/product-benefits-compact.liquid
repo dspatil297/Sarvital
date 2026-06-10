@@ -2,8 +2,9 @@
   Product Benefits Section - Compact Conversion-Focused Design
 {% endcomment %}
 
-<section class="product-benefits-compact" id="product-benefits">
+<section class="product-benefits-compact" id="product-benefits" aria-labelledby="product-benefits-heading">
   <div class="product-benefits-compact__container">
+    <h2 class="product-benefits-compact__title" id="product-benefits-heading">Key benefits</h2>
     <div class="benefits-grid fade-in-up" style="animation-delay: 0.3s;">
       <div class="benefit-card">
         <div class="benefit-icon">
@@ -79,6 +80,16 @@
   .product-benefits-compact__container {
     max-width: var(--container-max-width);
     margin: 0 auto;
+  }
+
+  .product-benefits-compact__title {
+    font-family: var(--font-heading);
+    font-size: clamp(1.25rem, 2.5vw, 1.5rem);
+    font-weight: 700;
+    color: var(--forest-green);
+    text-align: center;
+    margin: 0 0 var(--spacing-lg);
+    letter-spacing: -0.02em;
   }
 
   .benefits-grid {

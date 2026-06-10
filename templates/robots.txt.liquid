@@ -1,0 +1,62 @@
+{% comment %}
+  Sarvital robots.txt — search engine defaults + AI visibility.
+  Served at /robots.txt. Pair with templates/agents.md.liquid for /llms.txt.
+{% endcomment %}
+# Sarvital — robots.txt
+# {{ shop.name }} | {{ request.origin }}
+# AI agent discovery: {{ request.origin }}/agents.md
+# LLMs summary: {{ request.origin }}/llms.txt
+# UCP discovery: {{ request.origin }}/.well-known/ucp
+# Last updated: {{ 'now' | date: '%Y-%m-%d' }}
+
+# Content Signals (draft-romm-aipref-contentsignals)
+# Reference: https://contentsignals.org/
+Content-Signal: ai-train=no, search=yes, ai-input=yes
+
+{% liquid
+  assign ai_crawlers = 'GPTBot|ChatGPT-User|Claude-Web|ClaudeBot|anthropic-ai|Google-Extended|GoogleOther|PerplexityBot|DeepSeek-Crawler|Grok|meta-externalagent|cohere-ai|Applebot-Extended|YouBot' | split: '|'
+%}
+
+# --- AI & answer-engine crawlers (explicit allow for product discovery & citations) ---
+{% for crawler in ai_crawlers %}
+User-agent: {{ crawler }}
+Allow: /
+Allow: /products/
+Allow: /collections/
+Allow: /blogs/
+Allow: /pages/
+Allow: /policies/
+Allow: /llms.txt
+Allow: /agents.md
+Allow: /llms-full.txt
+Allow: /auth.md
+Allow: /openapi.json
+Allow: /.well-known/
+Allow: /.well-known/ucp
+Disallow: /checkout
+Disallow: /checkouts/
+Disallow: /cart/
+Disallow: /account/
+Disallow: /admin/
+Disallow: /orders
+Crawl-delay: 2
+
+{% endfor %}
+
+# --- Shopify default crawl rules (checkout, filters, sitemap, etc.) ---
+{% for group in robots.default_groups %}
+{{- group.user_agent }}
+
+{% for rule in group.rules %}
+{{- rule }}
+{% endfor %}
+
+{%- if group.sitemap != blank -%}
+{{ group.sitemap }}
+{%- endif -%}
+
+{% endfor %}
+
+# Supplemental discovery for AI assistants (not XML sitemaps)
+# LLMs: {{ request.origin }}/llms.txt
+# Agents: {{ request.origin }}/agents.md
