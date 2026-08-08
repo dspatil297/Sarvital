@@ -128,7 +128,8 @@
    {
      "type": "text",
      "id": "fbpixel",
-     "label": "FB Pixel"
+     "label": "FB Pixel",
+     "info": "Must match the pixel in Settings → Customer events (Facebook & Instagram). Used by GoKwik for checkout attribution; leave empty only if GoKwik does not need Meta."
    },
    {
      "type": "text",

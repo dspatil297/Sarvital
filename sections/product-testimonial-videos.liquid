@@ -13,15 +13,9 @@
 {%- endfor -%}
 
 {% if has_any_video %}
-<link
-  rel="stylesheet"
-  href="{{ 'product-testimonial-videos.css' | asset_url }}"
-  media="print"
-  onload="this.media='all'"
->
-<noscript>{{ 'product-testimonial-videos.css' | asset_url | stylesheet_tag }}</noscript>
+{{ 'product-testimonial-videos.css' | asset_url | stylesheet_tag }}
 <section
-  class="pdp-testimonial-videos fade-in-up"
+  class="pdp-testimonial-videos"
   id="shopify-section-{{ section.id }}"
   data-testimonial-videos-root
   {% if section.settings.heading != blank %}
@@ -98,6 +92,12 @@
             {% endif %}
             {% if primary_url == blank %}{% continue %}{% endif %}
             {% assign img_alt = block.settings.caption | default: section.settings.heading | default: 'Testimonial video' | strip %}
+            {% assign poster_url = '' %}
+            {% if poster != blank %}
+              {% assign poster_url = poster | image_url: width: 560, format: 'webp' %}
+            {% elsif vid.preview_image != blank %}
+              {% assign poster_url = vid.preview_image | image_url: width: 560, format: 'webp' %}
+            {% endif %}
 
             <div class="pdp-testimonial-videos__slide" {{ block.shopify_attributes }} data-tv-slide>
               <div class="pdp-testimonial-videos__card">
@@ -107,13 +107,14 @@
                     data-tv-inline-video
                     data-tv-video-src="{{ primary_url | escape }}"
                     data-tv-video-type="{{ primary_type | escape }}"
-                    {% if poster != blank %}
-                      data-tv-poster="{{ poster | image_url: width: 280, format: 'webp' }}"
-                    {% endif %}
                     muted
-                    playsinline
                     loop
+                    playsinline
+                    disablepictureinpicture
                     preload="none"
+                    {% if poster_url != blank %}
+                      poster="{{ poster_url }}"
+                    {% endif %}
                     aria-label="{{ img_alt | escape }}"
                   ></video>
                   <span class="pdp-testimonial-videos__shade" aria-hidden="true"></span>
@@ -129,48 +130,63 @@
     </div>
   </div>
 </section>
-{% endif %}
 
-{% javascript %}
+<script>
   (function() {
     function initTestimonialVideos(root) {
+      if (root.getAttribute('data-tv-initialized') === 'true') return;
+      root.setAttribute('data-tv-initialized', 'true');
+
       var scrollEl = root.querySelector('[data-tv-scroll]');
       var track = root.querySelector('[data-tv-track]');
       var prevBtn = root.querySelector('[data-tv-prev]');
       var nextBtn = root.querySelector('[data-tv-next]');
-      var inlineVideos = root.querySelectorAll('[data-tv-inline-video]');
+      var slides = track ? track.querySelectorAll('[data-tv-slide]') : [];
 
       if (!scrollEl || !track) return;
 
       var mqReduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)');
 
-      function pauseVideo(v) {
-        try {
-          v.pause();
-        } catch (e) {}
+      function getInlineVideos() {
+        return root.querySelectorAll('[data-tv-inline-video]');
       }
 
-      function attachVideoPoster(v) {
-        if (!v || v.getAttribute('data-tv-poster-attached') === '1') return;
-        var posterUrl = v.getAttribute('data-tv-poster');
-        if (!posterUrl) return;
-        v.setAttribute('poster', posterUrl);
-        v.setAttribute('data-tv-poster-attached', '1');
+      function prepareVideo(v) {
+        v.muted = true;
+        v.defaultMuted = true;
+        v.playsInline = true;
+        v.setAttribute('muted', '');
+        v.setAttribute('playsinline', '');
+        v.setAttribute('webkit-playsinline', '');
       }
 
       function attachVideoSource(v) {
-        if (!v || v.getAttribute('data-tv-source-attached') === '1') return;
+        if (!v || v.getAttribute('data-tv-source-attached') === '1') return false;
         var src = v.getAttribute('data-tv-video-src');
-        if (!src) return;
-        attachVideoPoster(v);
+        if (!src) return false;
         var source = document.createElement('source');
         source.src = src;
         source.type = v.getAttribute('data-tv-video-type') || 'video/mp4';
         v.appendChild(source);
         v.setAttribute('data-tv-source-attached', '1');
+        return true;
+      }
+
+      function ensureVideoLoaded(v) {
+        if (v.getAttribute('data-tv-loaded') === 'true') return;
+        attachVideoSource(v);
+        if (!v.querySelector('source')) return;
+        v.setAttribute('data-tv-loaded', 'true');
         try {
           v.load();
         } catch (e) {}
+      }
+
+      function pauseVideo(v) {
+        try {
+          v.pause();
+        } catch (e) {}
+        v.classList.remove('is-playing');
       }
 
       function playVideo(v) {
@@ -178,16 +194,46 @@
           pauseVideo(v);
           return;
         }
+        prepareVideo(v);
         attachVideoSource(v);
-        try {
-          var p = v.play();
-          if (p && typeof p.then === 'function') p.catch(function() {});
-        } catch (e) {}
+        if (!v.querySelector('source')) return;
+        ensureVideoLoaded(v);
+
+        function attemptPlay() {
+          prepareVideo(v);
+          try {
+            var p = v.play();
+            if (p && typeof p.then === 'function') {
+              p.then(function() {
+                v.classList.add('is-playing');
+              }).catch(function() {
+                window.setTimeout(function() {
+                  if (!v.paused) return;
+                  prepareVideo(v);
+                  var retry = v.play();
+                  if (retry && typeof retry.then === 'function') {
+                    retry.then(function() {
+                      v.classList.add('is-playing');
+                    }).catch(function() {});
+                  }
+                }, 200);
+              });
+            } else {
+              v.classList.add('is-playing');
+            }
+          } catch (e) {}
+        }
+
+        if (v.readyState >= 2) {
+          attemptPlay();
+        } else {
+          v.addEventListener('loadeddata', attemptPlay, { once: true });
+          v.addEventListener('canplay', attemptPlay, { once: true });
+        }
       }
 
-      function visibleRatioInScroll(el) {
-        if (!el || !scrollEl) return 0;
-        var slideRect = el.getBoundingClientRect();
+      function slideVisibilityRatio(slide) {
+        var slideRect = slide.getBoundingClientRect();
         var scrollRect = scrollEl.getBoundingClientRect();
         var overlap = Math.min(slideRect.right, scrollRect.right) - Math.max(slideRect.left, scrollRect.left);
         if (overlap <= 0 || slideRect.width <= 0) return 0;
@@ -195,18 +241,10 @@
       }
 
       function syncPlaybackToVisibleSlides() {
-        var best = null;
-        var bestRatio = 0;
-        inlineVideos.forEach(function(v) {
-          var slide = v.closest ? v.closest('[data-tv-slide]') : null;
-          var ratio = slide ? visibleRatioInScroll(slide) : 0;
-          if (ratio > bestRatio) {
-            bestRatio = ratio;
-            best = v;
-          }
-        });
-        inlineVideos.forEach(function(v) {
-          if (v === best && bestRatio >= 0.45) {
+        slides.forEach(function(slide) {
+          var v = slide.querySelector('[data-tv-inline-video]');
+          if (!v) return;
+          if (slideVisibilityRatio(slide) >= 0.2) {
             playVideo(v);
           } else {
             pauseVideo(v);
@@ -216,22 +254,28 @@
 
       function observeInlineVideos() {
         if (!('IntersectionObserver' in window)) {
+          getInlineVideos().forEach(ensureVideoLoaded);
           syncPlaybackToVisibleSlides();
           return;
         }
+
         var sectionIo = new IntersectionObserver(
           function(entries) {
             entries.forEach(function(entry) {
               if (entry.isIntersecting) {
                 syncPlaybackToVisibleSlides();
               } else {
-                inlineVideos.forEach(pauseVideo);
+                getInlineVideos().forEach(pauseVideo);
               }
             });
           },
-          { root: null, rootMargin: '80px', threshold: 0.05 }
+          { root: null, rootMargin: '120px', threshold: 0.01 }
         );
         sectionIo.observe(root);
+
+        getInlineVideos().forEach(function(video) {
+          video.addEventListener('loadeddata', syncPlaybackToVisibleSlides, { once: true });
+        });
       }
 
       function getStep() {
@@ -283,8 +327,20 @@
         scrollByDir(dir);
       }
 
-      if (prevBtn) prevBtn.addEventListener('click', function(e) { onArrowClick(e, -1); });
-      if (nextBtn) nextBtn.addEventListener('click', function(e) { onArrowClick(e, 1); });
+      if (prevBtn) {
+        prevBtn.addEventListener('click', function(e) {
+          onArrowClick(e, -1);
+          window.setTimeout(syncPlaybackToVisibleSlides, 80);
+          window.setTimeout(syncPlaybackToVisibleSlides, 400);
+        });
+      }
+      if (nextBtn) {
+        nextBtn.addEventListener('click', function(e) {
+          onArrowClick(e, 1);
+          window.setTimeout(syncPlaybackToVisibleSlides, 80);
+          window.setTimeout(syncPlaybackToVisibleSlides, 400);
+        });
+      }
 
       scrollEl.addEventListener(
         'scroll',
@@ -314,25 +370,71 @@
         { passive: false }
       );
 
+      getInlineVideos().forEach(function(video) {
+        video.addEventListener('error', function() {
+          video.setAttribute('data-tv-loaded', 'false');
+          video.setAttribute('data-tv-source-attached', '0');
+          video.querySelectorAll('source').forEach(function(s) {
+            s.remove();
+          });
+          window.setTimeout(function() {
+            syncPlaybackToVisibleSlides();
+          }, 300);
+        });
+        video.addEventListener('click', function() {
+          prepareVideo(video);
+          attachVideoSource(video);
+          ensureVideoLoaded(video);
+          playVideo(video);
+        });
+      });
+
       observeInlineVideos();
       updateArrows();
-      window.setTimeout(updateArrows, 100);
+      syncPlaybackToVisibleSlides();
+      window.setTimeout(syncPlaybackToVisibleSlides, 300);
+      window.setTimeout(syncPlaybackToVisibleSlides, 1000);
     }
 
-    function bootTestimonialSection(root) {
-      var run = function() {
-        initTestimonialVideos(root);
-      };
-      if (document.body.classList.contains('template-index') && window.sarvitalAfterPaint) {
-        window.sarvitalAfterPaint(run, { delay: 4000, timeout: 12000 });
-        return;
+    function boot() {
+      document.querySelectorAll('[data-testimonial-videos-root]').forEach(initTestimonialVideos);
+    }
+
+    boot();
+
+    if (!window.__sarvitalTestimonialVideosListeners) {
+      window.__sarvitalTestimonialVideosListeners = true;
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', boot);
       }
-      run();
-    }
 
-    document.querySelectorAll('[data-testimonial-videos-root]').forEach(bootTestimonialSection);
+      document.addEventListener('shopify:section:load', function(event) {
+        if (!event.target) return;
+        var root = event.target.querySelector('[data-testimonial-videos-root]');
+        if (root) initTestimonialVideos(root);
+      });
+
+      document.addEventListener('visibilitychange', function() {
+        if (document.hidden) return;
+        document.querySelectorAll('[data-testimonial-videos-root]').forEach(function(root) {
+          if (root.getAttribute('data-tv-initialized') !== 'true') return;
+          var scrollEl = root.querySelector('[data-tv-scroll]');
+          if (!scrollEl) return;
+          var slides = root.querySelectorAll('[data-tv-slide]');
+          slides.forEach(function(slide) {
+            var v = slide.querySelector('[data-tv-inline-video]');
+            if (!v) return;
+            try {
+              if (v.paused) v.play();
+            } catch (e) {}
+          });
+        });
+      });
+    }
   })();
-{% endjavascript %}
+</script>
+{% endif %}
 
 {% schema %}
 {

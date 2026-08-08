@@ -26,7 +26,6 @@
               {% assign products_shown = products_shown | plus: 1 %}
               {% assign product_card_uid = section.id | append: '-d-' | append: forloop.index %}
               {% render 'product-card', product: product_item, card_instance: product_card_uid %}
-              {% render 'quick-view', product: product_item %}
             {% endunless %}
           {% endfor %}
         </div>
@@ -53,7 +52,6 @@
                     {% assign product_card_uid = section.id | append: '-c-' | append: loop_index | append: '-' | append: forloop.index %}
                     <div class="product-grid-section__carousel-slide">
                       {% render 'product-card', product: product_item, card_instance: product_card_uid %}
-                      {% render 'quick-view', product: product_item %}
                     </div>
                   {% endunless %}
                 {% endfor %}
@@ -70,7 +68,6 @@
               {% assign products_shown = products_shown | plus: 1 %}
               {% assign product_card_uid = section.id | append: '-g-' | append: forloop.index %}
               {% render 'product-card', product: product_item, card_instance: product_card_uid %}
-              {% render 'quick-view', product: product_item %}
             {% endunless %}
           {% endfor %}
         </div>
@@ -232,7 +229,7 @@
     }
 
     .product-grid-section__grid {
-      grid-template-columns: 1fr;
+      grid-template-columns: repeat(2, 1fr);
       gap: var(--spacing-sm);
     }
 
@@ -450,12 +447,18 @@
       object-fit: cover;
       object-position: center;
     }
-    .product-grid-section__carousel-wrap--mobile .product-grid-section__carousel-slide .product-card__badge {
+    .product-grid-section__carousel-wrap--mobile .product-grid-section__carousel-slide .product-card__badges {
       top: 12px;
       left: 12px;
-      padding: 6px 12px;
-      font-size: 11px;
+      right: 12px;
+    }
+    .product-grid-section__carousel-wrap--mobile .product-grid-section__carousel-slide .product-card__badge {
+      padding: 6px 10px;
+      font-size: 10px;
       border-radius: 8px;
+    }
+    .product-grid-section__carousel-wrap--mobile .product-grid-section__carousel-slide .product-card__badge--limited-stock {
+      font-size: 10px;
     }
     .product-grid-section__carousel-wrap--mobile .product-grid-section__carousel-slide .product-card__info {
       padding: 18px 20px 22px;

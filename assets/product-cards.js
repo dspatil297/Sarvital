@@ -43,6 +43,15 @@
           function done() {
             document.dispatchEvent(new CustomEvent('cart:updated'));
           }
+          // Shopify Customer Events: ensure AJAX add-to-cart triggers standard event pipeline (Meta/GA4/Ads via pixel.modern.js).
+          try {
+            if (window.Shopify && Shopify.analytics && typeof Shopify.analytics.publish === 'function') {
+              Shopify.analytics.publish('product_added_to_cart', {
+                cartLine: { quantity: qty },
+                productVariant: { id: variantId }
+              });
+            }
+          } catch (e) {}
           if (!key) {
             fetch('/cart.js')
               .then(function (r) {

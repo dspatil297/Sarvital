@@ -101,6 +101,9 @@
       "link_amla": "Amla powder",
       "link_faq": "FAQ"
     },
+    "product_testimonial_videos": {
+      "play_video": "Play video"
+    },
     "blog": {
       "read_article": "Read article",
       "empty_state": "No articles yet. Check back soon for wellness guides."

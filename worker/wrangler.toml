@@ -6,18 +6,62 @@ compatibility_date = "2024-01-01"
 # Prerequisite: sarvital.com DNS proxied through Cloudflare (orange cloud).
 #
 # IMPORTANT: Only discovery paths are routed to this Worker. Do NOT use sarvital.com/*
-# — proxying the full storefront breaks Shopify bot verification and guest checkout.
+# or .well-known/* wildcards — they break Shopify analytics at
+# /.well-known/shopify/monorail/* (Live View / produce_batch 404).
+#
+# After deploy, remove any legacy .well-known/* routes in the Cloudflare Dashboard
+# (Workers → sarvital-agent-discovery → Triggers) if they still exist.
 #
 # After deploy, enable HTML Link headers via Cloudflare Dashboard:
 #   Rules → Transform Rules → Response Header Modification
 #   Import worker/cloudflare-link-headers-rule.json (or create manually).
 
 [[routes]]
-pattern = "sarvital.com/.well-known/*"
+pattern = "sarvital.com/.well-known/api-catalog"
 zone_name = "sarvital.com"
 
 [[routes]]
-pattern = "www.sarvital.com/.well-known/*"
+pattern = "www.sarvital.com/.well-known/api-catalog"
+zone_name = "sarvital.com"
+
+[[routes]]
+pattern = "sarvital.com/.well-known/oauth-protected-resource"
+zone_name = "sarvital.com"
+
+[[routes]]
+pattern = "www.sarvital.com/.well-known/oauth-protected-resource"
+zone_name = "sarvital.com"
+
+[[routes]]
+pattern = "sarvital.com/.well-known/oauth-authorization-server"
+zone_name = "sarvital.com"
+
+[[routes]]
+pattern = "www.sarvital.com/.well-known/oauth-authorization-server"
+zone_name = "sarvital.com"
+
+[[routes]]
+pattern = "sarvital.com/.well-known/mcp/server-card.json"
+zone_name = "sarvital.com"
+
+[[routes]]
+pattern = "www.sarvital.com/.well-known/mcp/server-card.json"
+zone_name = "sarvital.com"
+
+[[routes]]
+pattern = "sarvital.com/.well-known/agent-skills/index.json"
+zone_name = "sarvital.com"
+
+[[routes]]
+pattern = "www.sarvital.com/.well-known/agent-skills/index.json"
+zone_name = "sarvital.com"
+
+[[routes]]
+pattern = "sarvital.com/.well-known/acp.json"
+zone_name = "sarvital.com"
+
+[[routes]]
+pattern = "www.sarvital.com/.well-known/acp.json"
 zone_name = "sarvital.com"
 
 [[routes]]

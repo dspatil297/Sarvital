@@ -17,6 +17,24 @@
     assign og_description = shop.description
   endif
 
+  if request.page_type == 'index' and sections['hero_banner']
+    assign hb = sections['hero_banner']
+    assign hero_slide_blocks = hb.blocks | where: 'type', 'slide'
+    assign index_og_from_hero = false
+    for block in hero_slide_blocks
+      if block.settings.image != blank
+        assign og_image = block.settings.image
+        assign index_og_from_hero = true
+        break
+      endif
+    endfor
+    if index_og_from_hero == false
+      if hb.settings.hero_image != blank
+        assign og_image = hb.settings.hero_image
+      endif
+    endif
+  endif
+
   if request.page_type == 'product'
     assign og_type = 'product'
     assign og_image = product.featured_image | default: og_image
@@ -78,8 +96,8 @@
 <meta property="og:locale" content="{{ request.locale.iso_code | replace: '-', '_' }}">
 
 {%- if og_image -%}
-  <meta property="og:image" content="https:{{ og_image | image_url: width: 1200 }}">
-  <meta property="og:image:secure_url" content="https:{{ og_image | image_url: width: 1200 }}">
+  <meta property="og:image" content="https:{{ og_image | image_url: width: 1200, format: 'webp' }}">
+  <meta property="og:image:secure_url" content="https:{{ og_image | image_url: width: 1200, format: 'webp' }}">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="{{ og_image.alt | default: og_title | escape }}">
@@ -108,7 +126,7 @@
 <meta name="twitter:title" content="{{ og_title | escape }}">
 <meta name="twitter:description" content="{{ og_description | strip_html | escape | truncate: 200 }}">
 {%- if og_image -%}
-  <meta name="twitter:image" content="https:{{ og_image | image_url: width: 1200 }}">
+  <meta name="twitter:image" content="https:{{ og_image | image_url: width: 1200, format: 'webp' }}">
   <meta name="twitter:image:alt" content="{{ og_image.alt | default: og_title | escape }}">
 {%- else -%}
   <meta name="twitter:image" content="{{ default_og_image_url }}">

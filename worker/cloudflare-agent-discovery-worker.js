@@ -7,6 +7,9 @@
  *
  * HTML Link headers: enable worker/cloudflare-link-headers-rule.json as a
  * Cloudflare Transform Rule (see wrangler.toml).
+ *
+ * Route patterns must be path-specific in wrangler.toml — never .well-known/*
+ * — or Shopify monorail analytics (/.well-known/shopify/monorail/*) returns 404.
  */
 
 import openApiTemplate from '../openapi.json';

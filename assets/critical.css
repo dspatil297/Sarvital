@@ -81,7 +81,7 @@ p:empty {
 /** Theme Base Styles */
 html {
   width: 100%;
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 body {
@@ -97,7 +97,7 @@ body {
   color: var(--text);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 /** Typography System */
@@ -541,10 +541,8 @@ label {
   max-width: 100%;
   margin: 0;
   padding: 0;
-  overflow-x: hidden;
+  overflow-x: clip;
 }
-
-/* Child elements span full width by default */
 .shopify-section > * {
   width: 100%;
   max-width: 100%;
@@ -1115,7 +1113,7 @@ a.btn-secondary:focus {
 
 /* Prevent horizontal overflow from 100vw (scrollbar on some browsers) */
 html {
-  overflow-x: hidden;
+  overflow-x: clip;
   -webkit-text-size-adjust: 100%;
 }
 
@@ -1251,4 +1249,77 @@ body > .mobile-menu-drawer {
   height: 22px;
   display: block;
   fill: currentColor;
+}
+
+/** Hero LCP — minimal layout so slide 1 paints before compiled section CSS loads */
+.hero-banner {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  height: 90vh;
+  min-height: 600px;
+  max-height: 900px;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.hero-banner__image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.hero-banner__slide {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+}
+
+.hero-banner__slide--active {
+  opacity: 1;
+  z-index: 10;
+}
+
+.hero-banner__slide-picture {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.hero-banner__slide-picture img,
+.hero-banner__image img,
+.hero-banner__slide img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+.hero-banner__slide-img--lcp {
+  opacity: 1;
+}
+
+@media (max-width: 768px) {
+  .hero-banner {
+    height: 80vh;
+    min-height: 500px;
+    max-height: 700px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-banner {
+    height: 75vh;
+    min-height: 450px;
+    max-height: 600px;
+  }
 }

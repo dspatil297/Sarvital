@@ -1,0 +1,63 @@
+{% doc %}
+  Bootstraps Meta Pixel on the main document so fbq init and PageView run where
+  Meta Pixel Helper and browser extensions can detect them. Shopify app pixels
+  often run in a sandbox and are invisible to Pixel Helper without this.
+
+  @example
+  {% render 'meta-pixel' %}
+{% enddoc %}
+
+{%- assign pixel_id = settings.fbpixel | strip -%}
+{%- if pixel_id != blank -%}
+<script>
+(function () {
+  var PIXEL_ID = {{ pixel_id | json }};
+  if (!PIXEL_ID || window.__sarvitalMetaPixelBootstrapped) return;
+
+  function bootstrapMetaPixel() {
+    if (window.__sarvitalMetaPixelBootstrapped) return;
+    window.__sarvitalMetaPixelBootstrapped = true;
+
+    var SDK_URL = 'https://connect.facebook.net/en_US/fbevents.js';
+
+    if (!window.fbq) {
+      !function (f, b, e, v, n, t, s) {
+        n = f.fbq = function () {
+          n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments);
+        };
+        if (!f._fbq) f._fbq = n;
+        n.push = n;
+        n.loaded = !0;
+        n.version = '2.0';
+        n.queue = [];
+        t = b.createElement(e);
+        t.async = !0;
+        t.src = v;
+        s = b.getElementsByTagName(e)[0];
+        s.parentNode.insertBefore(t, s);
+      }(window, document, 'script', SDK_URL);
+    } else if (!document.getElementById('sarvital-meta-fbevents')) {
+      var script = document.createElement('script');
+      script.id = 'sarvital-meta-fbevents';
+      script.async = true;
+      script.src = SDK_URL;
+      document.head.appendChild(script);
+    }
+
+    window.fbq('init', PIXEL_ID);
+    window.fbq('track', 'PageView');
+  }
+
+  bootstrapMetaPixel();
+})();
+</script>
+<noscript>
+  <img
+    height="1"
+    width="1"
+    style="display:none"
+    alt=""
+    src="https://www.facebook.com/tr?id={{ pixel_id | url_param_escape }}&ev=PageView&noscript=1"
+  >
+</noscript>
+{%- endif -%}

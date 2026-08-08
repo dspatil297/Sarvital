@@ -1,6 +1,7 @@
 {% doc %}
-  Defers non-critical third-party scripts and styles until after first paint on the homepage.
-  Analytics still load (delayed); dataLayer and fbq queues are preserved where possible.
+  Defers non-critical third-party scripts until after first paint.
+  Meta Pixel / CAPI and Google Analytics (gtag/GTM) scripts are never deferred so sessions fire on paid landing pages.
+  dataLayer queue is preserved for scripts that load later. Meta fbq is initialized in meta-pixel.liquid.
 
   @example
   {% render 'defer-third-party-scripts' %}
@@ -10,11 +11,11 @@
   assign defer_delay = 1800
   assign defer_timeout = 12000
   if request.page_type == 'index'
-    assign defer_delay = 4500
-    assign defer_timeout = 14000
+    assign defer_delay = 3000
+    assign defer_timeout = 12000
   elsif request.page_type == 'product' or request.page_type == 'cart'
-    assign defer_delay = 1200
-    assign defer_timeout = 10000
+    assign defer_delay = 800
+    assign defer_timeout = 8000
   endif
 -%}
 
@@ -24,29 +25,37 @@
   window.__sarvitalDefer3p = true;
 
   window.dataLayer = window.dataLayer || [];
-  window.fbq =
-    window.fbq ||
-    function () {
-      (window.fbq.q = window.fbq.q || []).push(arguments);
-    };
-  window.fbq.q = window.fbq.q || [];
 
   var PAGE = {{ request.page_type | json }};
   var DELAY = {{ defer_delay }};
   var MAX_WAIT = {{ defer_timeout }};
 
+  var META_PIXEL_MATCH =
+    /connect\.facebook\.net\/|fbevents\.js|capi-automation\.s3\./;
+
+  var ANALYTICS_MATCH =
+    /googletagmanager\.com\/(gtag\/js|gtm\.js)|google-analytics\.com\/analytics\.js|google-analytics\.com\/ga\.js/;
+
   var SCRIPT_MATCH =
-    /scripts\.clarity\.ms|connect\.facebook\.net\/|fbevents\.js|googletagmanager\.com\/gtag\/js|translate\.googleapis\.com|translate\.google\.com|gstatic\.com\/|capi-automation\.s3\.|trustpilot\.com|invitejs\.trustpilot|ecommplugins-scripts\.trustpilot|media_carousel\.js|cdn\.jsdelivr\.net\/npm\/@shopify\/media-carousel/;
+    /scripts\.clarity\.ms|translate\.googleapis\.com|translate\.google\.com|gstatic\.com\/|trustpilot\.com|invitejs\.trustpilot|ecommplugins-scripts\.trustpilot|media_carousel\.js|cdn\.jsdelivr\.net\/npm\/@shopify\/media-carousel/;
 
+  // NOTE: Do not defer GoKwik on homepage — it is checkout-critical and delaying it can reduce orders.
+  // Keep index-only defers for non-critical integrations.
   var SCRIPT_INDEX_EXTRA =
-    /kwikcart\.gokwik\.co\/side-cart\.js|pdp\.gokwik\.co\/.*\/chunks\/app-/;
+    /kwikcart\.gokwik\.co\/|gkx\.gokwik\.co\//;
 
-  var LINK_MATCH = /carousels\.css|widget_v3_base\.css|kp-main\/kwikpass\.css/;
+  var KWIKPASS_NEVER_DEFER =
+    /kwikpass|kp-main|kp-merchant|kp-sso|kp-login|kwikpass-core|gokwik\.co\/.*\/kp-/i;
+
+  var LINK_MATCH = /carousels\.css|widget_v3_base\.css/;
 
   var queued = [];
 
   function shouldDeferScript(src) {
     if (!src) return false;
+    if (KWIKPASS_NEVER_DEFER.test(src)) return false;
+    if (META_PIXEL_MATCH.test(src)) return false;
+    if (ANALYTICS_MATCH.test(src)) return false;
     if (SCRIPT_MATCH.test(src)) return true;
     if (PAGE === 'index' && SCRIPT_INDEX_EXTRA.test(src)) return true;
     return false;
@@ -54,6 +63,7 @@
 
   function shouldDeferLink(href) {
     if (!href) return false;
+    if (KWIKPASS_NEVER_DEFER.test(href)) return false;
     if (LINK_MATCH.test(href)) return true;
     return false;
   }

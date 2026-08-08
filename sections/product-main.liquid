@@ -55,343 +55,219 @@
       assign pdp_variant = recommended_variant
     endif
   endif
+
+  assign pdp_upgrade_field = pdp_variant.metafields.custom.upgradetext
+  assign pdp_upgrade_plain = pdp_upgrade_field | metafield_text | strip
+  if pdp_upgrade_plain == blank
+    assign pdp_upgrade_field = product.metafields.custom.upgradetext
+    assign pdp_upgrade_plain = pdp_upgrade_field | metafield_text | strip
+  endif
+  assign pdp_has_upgrade_text = false
+  if pdp_upgrade_plain != blank
+    assign pdp_has_upgrade_text = true
+  endif
 %}
+
+<style>
+  html:has(body.template-product),
+  body.template-product {
+    overflow-x: clip;
+  }
+
+  body.template-product #main-content,
+  #shopify-section-{{ section.id }},
+  #shopify-section-{{ section.id }} .product-hero {
+    overflow: visible !important;
+  }
+</style>
 
 <section class="product-hero" id="product-hero">
   <div class="product-hero__container">
-    <!-- Left Column - Product Images (carousel: slide to view) -->
-    <div class="product-images">
+    <!-- Left Column - Product Images (static gallery like reference PDP) -->
+    <div class="product-gallery">
       {% if product.featured_image or product.images.size > 0 %}
-        <div class="product-image-main product-image-carousel-wrapper">
-          <div class="product-image-carousel" id="product-image-carousel">
-            <div class="product-carousel-track" id="product-carousel-track">
-              {% for image in product.images %}
-                <div class="product-carousel-slide" id="product-carousel-slide-{{ forloop.index0 }}" data-index="{{ forloop.index0 }}">
-                  <img
-                    src="{{ image | image_url: width: 900, format: 'webp' }}"
-                    data-zoom-src="{{ image | image_url: width: 2000, format: 'webp' }}"
-                    srcset="
-                      {{ image | image_url: width: 300, format: 'webp' }} 300w,
-                      {{ image | image_url: width: 600, format: 'webp' }} 600w,
-                      {{ image | image_url: width: 900, format: 'webp' }} 900w,
-                      {{ image | image_url: width: 1200, format: 'webp' }} 1200w,
-                      {{ image | image_url: width: 1500, format: 'webp' }} 1500w
-                    "
-                    sizes="(max-width: 768px) 100vw, 50vw"
-                    alt="{{ image.alt | default: product.title }}"
-                    class="product-image-main__img"
-                    {% if forloop.first %}loading="eager" fetchpriority="high"{% else %}loading="lazy"{% endif %}
-                    decoding="async"
-                    width="{{ image.width }}"
-                    height="{{ image.height }}"
-                    onerror="this.classList.add('image-error'); this.alt='Product image failed to load';"
-                  >
-                </div>
-              {% endfor %}
-            </div>
-          </div>
-          {% if product.images.size > 1 %}
-            <button type="button" class="product-carousel-btn product-carousel-prev" aria-label="Previous image">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
-            </button>
-            <button type="button" class="product-carousel-btn product-carousel-next" aria-label="Next image">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
-            </button>
-            <div class="product-carousel-dots" id="product-carousel-dots" aria-hidden="true"></div>
+        {% liquid
+          assign gallery_first = product.featured_image | default: product.images.first
+        %}
+        <div class="product-image-main" id="product-gallery-main">
+          <img
+            id="product-main-img"
+            src="{{ gallery_first | image_url: width: 900, format: 'webp' }}"
+            srcset="
+              {{ gallery_first | image_url: width: 300, format: 'webp' }} 300w,
+              {{ gallery_first | image_url: width: 600, format: 'webp' }} 600w,
+              {{ gallery_first | image_url: width: 900, format: 'webp' }} 900w,
+              {{ gallery_first | image_url: width: 1200, format: 'webp' }} 1200w
+            "
+            sizes="(max-width: 900px) 100%, 640px"
+            alt="{{ gallery_first.alt | default: product.title }}"
+            class="product-image-main__img"
+            loading="eager"
+            fetchpriority="high"
+            decoding="async"
+            width="900"
+            height="900"
+            onerror="this.classList.add('image-error'); this.alt='Product image failed to load';"
+          >
+          {% if section.settings.show_promo_badge %}
+            <div class="gallery-badge gallery-badge--promo" id="product-promo-badge">{{ section.settings.promo_badge_text | default: '🎁 Rakhi Special' }}</div>
           {% endif %}
-          {% if pdp_variant.compare_at_price > pdp_variant.price %}
-            <div class="product-badge-sale" id="product-sale-badge">
-              <span class="badge-sale__text">Save {{ pdp_variant.compare_at_price | minus: pdp_variant.price | times: 100 | divided_by: pdp_variant.compare_at_price }}%</span>
-            </div>
-          {% else %}
-            <div class="product-badge-sale" id="product-sale-badge" hidden>
-              <span class="badge-sale__text"></span>
-            </div>
-          {% endif %}
-          <button type="button" class="product-image-zoom" id="product-image-zoom-btn" aria-label="{{ 'products.media.open_image' | t }}">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="11" cy="11" r="8"></circle>
-              <path d="m21 21-4.35-4.35"></path>
-            </svg>
-          </button>
         </div>
         {% if product.images.size > 1 %}
-          <div
-            class="product-thumbnails"
-            id="product-thumbnails-container"
-            role="tablist"
-            aria-label="{{ 'products.media.gallery' | t }}"
-          >
-            {% for image in product.images %}
-              <button
-                type="button"
-                class="product-thumbnail{% if forloop.first %} is-active{% endif %}"
-                data-index="{{ forloop.index0 }}"
-                role="tab"
-                aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
-                aria-controls="product-carousel-slide-{{ forloop.index0 }}"
-                id="product-thumbnail-{{ forloop.index0 }}"
-                aria-label="{{ 'products.media.load_image' | t: index: forloop.index, count: product.images.size }}"
-              >
-                {{
-                  image
-                  | image_url: width: 160, height: 160, crop: 'center', format: 'webp'
-                  | image_tag:
-                    class: 'product-thumbnail__img',
-                    alt: image.alt | default: product.title,
-                    width: 80,
-                    height: 80,
-                    loading: 'lazy'
-                }}
-              </button>
-            {% endfor %}
+          <div class="product-thumbnails-wrap">
+            <button
+              type="button"
+              class="product-thumbnails-nav product-thumbnails-prev"
+              id="product-thumbnails-prev"
+              aria-label="{{ 'products.media.previous_image' | t }}"
+              hidden
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+            </button>
+            <div
+              class="product-thumbnails"
+              id="product-thumbnails-container"
+              role="tablist"
+              aria-label="{{ 'products.media.gallery' | t }}"
+            >
+              {% for image in product.images %}
+                <button
+                  type="button"
+                  class="product-thumbnail{% if image.id == gallery_first.id %} is-active{% endif %}"
+                  data-index="{{ forloop.index0 }}"
+                  data-src="{{ image | image_url: width: 900, format: 'webp' }}"
+                  data-srcset="{{ image | image_url: width: 300, format: 'webp' }} 300w, {{ image | image_url: width: 600, format: 'webp' }} 600w, {{ image | image_url: width: 900, format: 'webp' }} 900w, {{ image | image_url: width: 1200, format: 'webp' }} 1200w"
+                  data-alt="{{ image.alt | default: product.title | escape }}"
+                  role="tab"
+                  aria-selected="{% if image.id == gallery_first.id %}true{% else %}false{% endif %}"
+                  id="product-thumbnail-{{ forloop.index0 }}"
+                  aria-label="{{ 'products.media.load_image' | t: index: forloop.index, count: product.images.size }}"
+                >
+                  {%- liquid
+                    assign thumb_src = image | image_url: width: 144, format: 'webp'
+                    assign thumb_loading = 'eager'
+                    if forloop.index > 6
+                      assign thumb_loading = 'lazy'
+                    endif
+                  -%}
+                  <img
+                    class="product-thumbnail__img"
+                    src="{{ thumb_src }}"
+                    alt="{{ image.alt | default: product.title | escape }}"
+                    width="72"
+                    height="72"
+                    loading="{{ thumb_loading }}"
+                    decoding="async"
+                    {% if forloop.index <= 3 %}fetchpriority="high"{% endif %}
+                  >
+                </button>
+              {% endfor %}
+            </div>
+            <button
+              type="button"
+              class="product-thumbnails-nav product-thumbnails-next"
+              id="product-thumbnails-next"
+              aria-label="{{ 'products.media.next_image' | t }}"
+              hidden
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
+            </button>
           </div>
         {% endif %}
         <script>
           (function() {
-            var carousel = document.getElementById('product-image-carousel');
-            var track = document.getElementById('product-carousel-track');
-            var dotsEl = document.getElementById('product-carousel-dots');
-            if (!carousel || !track) return;
-            var slides = track.querySelectorAll('.product-carousel-slide');
-            var total = slides.length;
-            if (total === 0) return;
-            var current = 0;
+            var mainImg = document.getElementById('product-main-img');
             var thumbsEl = document.getElementById('product-thumbnails-container');
+            var thumbsPrev = document.getElementById('product-thumbnails-prev');
+            var thumbsNext = document.getElementById('product-thumbnails-next');
+            if (!mainImg) return;
 
-            function syncThumbnails() {
+            var current = 0;
+            var thumbs = thumbsEl ? thumbsEl.querySelectorAll('.product-thumbnail') : [];
+
+            function scrollThumbIntoView(index) {
+              if (!thumbsEl || !thumbs[index]) return;
+              thumbs[index].scrollIntoView({ behavior: 'smooth', inline: 'nearest', block: 'nearest' });
+            }
+
+            function updateThumbNav() {
               if (!thumbsEl) return;
-              var thumbs = thumbsEl.querySelectorAll('.product-thumbnail');
-              for (var ti = 0; ti < thumbs.length; ti++) {
-                var isActive = ti === current;
-                thumbs[ti].classList.toggle('is-active', isActive);
-                thumbs[ti].setAttribute('aria-selected', isActive ? 'true' : 'false');
-              }
-              var activeThumb = thumbs[current];
-              if (activeThumb && typeof activeThumb.scrollIntoView === 'function') {
-                activeThumb.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-              }
+              var hasOverflow = thumbsEl.scrollWidth > thumbsEl.clientWidth + 1;
+              if (thumbsPrev) thumbsPrev.hidden = !hasOverflow;
+              if (thumbsNext) thumbsNext.hidden = !hasOverflow;
+            }
+
+            function scrollThumbsBy(direction) {
+              if (!thumbsEl) return;
+              var step = 80;
+              thumbsEl.scrollBy({ left: direction * step, behavior: 'smooth' });
             }
 
             function goTo(index) {
-              current = Math.max(0, Math.min(index, total - 1));
-              track.style.transform = 'translate3d(-' + (current * 100) + '%, 0, 0)';
-              if (dotsEl) {
-                var dots = dotsEl.querySelectorAll('.product-carousel-dot');
-                for (var di = 0; di < dots.length; di++) dots[di].classList.toggle('active', di === current);
+              if (!thumbs.length) return;
+              current = Math.max(0, Math.min(index, thumbs.length - 1));
+              var thumb = thumbs[current];
+              var src = thumb.getAttribute('data-src') || thumb.getAttribute('data-full-src');
+              var srcset = thumb.getAttribute('data-srcset');
+              var alt = thumb.getAttribute('data-alt');
+              if (src) {
+                mainImg.src = src;
               }
-              syncThumbnails();
+              if (srcset) {
+                mainImg.srcset = srcset;
+              } else {
+                mainImg.removeAttribute('srcset');
+              }
+              if (alt) mainImg.alt = alt;
+              for (var i = 0; i < thumbs.length; i++) {
+                var isActive = i === current;
+                thumbs[i].classList.toggle('is-active', isActive);
+                thumbs[i].setAttribute('aria-selected', isActive ? 'true' : 'false');
+              }
+              scrollThumbIntoView(current);
             }
 
-            function getZoomImages() {
-              var list = [];
-              for (var zi = 0; zi < slides.length; zi++) {
-                var zimg = slides[zi].querySelector('img');
-                if (!zimg) continue;
-                list.push({
-                  src: zimg.getAttribute('data-zoom-src') || zimg.currentSrc || zimg.src,
-                  alt: zimg.alt || ''
+            for (var tb = 0; tb < thumbs.length; tb++) {
+              (function(ix, thumbBtn) {
+                thumbBtn.addEventListener('click', function(e) {
+                  if (e) e.preventDefault();
+                  goTo(ix);
                 });
-              }
-              return list;
-            }
-
-            function openProductImageLightbox(src, alt, index, images) {
-              var gallery = images && images.length ? images : [{ src: src, alt: alt || '' }];
-              var lightboxIndex = typeof index === 'number' ? index : 0;
-              lightboxIndex = Math.max(0, Math.min(lightboxIndex, gallery.length - 1));
-              var hasMultiple = gallery.length > 1;
-
-              var existing = document.getElementById('product-image-lightbox');
-              if (existing && existing.parentNode) existing.parentNode.removeChild(existing);
-
-              var overlay = document.createElement('div');
-              overlay.id = 'product-image-lightbox';
-              overlay.setAttribute('role', 'dialog');
-              overlay.setAttribute('aria-modal', 'true');
-              overlay.setAttribute('aria-label', {{ 'products.media.zoomed_gallery' | t | json }});
-
-              var closeBtn = document.createElement('button');
-              closeBtn.type = 'button';
-              closeBtn.className = 'product-lightbox-close';
-              closeBtn.setAttribute('aria-label', {{ 'products.media.close_zoom' | t | json }});
-              closeBtn.innerHTML = '&times;';
-              overlay.appendChild(closeBtn);
-
-              var prevBtn = null;
-              var nextBtn = null;
-              var counterEl = null;
-              if (hasMultiple) {
-                prevBtn = document.createElement('button');
-                prevBtn.type = 'button';
-                prevBtn.className = 'product-lightbox-nav product-lightbox-prev';
-                prevBtn.setAttribute('aria-label', {{ 'products.media.previous_image' | t | json }});
-                prevBtn.innerHTML = '&#8249;';
-                overlay.appendChild(prevBtn);
-
-                nextBtn = document.createElement('button');
-                nextBtn.type = 'button';
-                nextBtn.className = 'product-lightbox-nav product-lightbox-next';
-                nextBtn.setAttribute('aria-label', {{ 'products.media.next_image' | t | json }});
-                nextBtn.innerHTML = '&#8250;';
-                overlay.appendChild(nextBtn);
-
-                counterEl = document.createElement('div');
-                counterEl.className = 'product-lightbox-counter';
-                counterEl.setAttribute('aria-live', 'polite');
-                overlay.appendChild(counterEl);
-              }
-
-              var inner = document.createElement('div');
-              inner.className = 'product-lightbox-inner';
-              var lightboxImg = document.createElement('img');
-              lightboxImg.className = 'product-lightbox-img';
-              lightboxImg.decoding = 'async';
-              inner.appendChild(lightboxImg);
-              overlay.appendChild(inner);
-
-              function counterText(at) {
-                return {{ 'products.media.image_counter' | t: index: '__INDEX__', count: '__COUNT__' | json }}
-                  .replace('__INDEX__', String(at + 1))
-                  .replace('__COUNT__', String(gallery.length));
-              }
-
-              function showLightboxAt(nextIndex) {
-                lightboxIndex = (nextIndex + gallery.length) % gallery.length;
-                var active = gallery[lightboxIndex];
-                lightboxImg.src = active.src;
-                lightboxImg.alt = active.alt || '';
-                if (counterEl) counterEl.textContent = counterText(lightboxIndex);
-                if (window.productImageGallery && typeof window.productImageGallery.goTo === 'function') {
-                  window.productImageGallery.goTo(lightboxIndex);
+                var preloadSrc = thumbBtn.getAttribute('data-src');
+                if (preloadSrc) {
+                  thumbBtn.addEventListener('mouseenter', function() {
+                    if (thumbBtn.getAttribute('data-main-preloaded') === 'true') return;
+                    var img = new Image();
+                    img.src = preloadSrc;
+                    thumbBtn.setAttribute('data-main-preloaded', 'true');
+                  }, { once: true });
                 }
-              }
-
-              function closeLightbox() {
-                if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
-                if (window.unlockBodyScroll) window.unlockBodyScroll();
-                else document.body.style.overflow = '';
-                document.removeEventListener('keydown', onLightboxKey);
-              }
-
-              function onLightboxKey(ev) {
-                if (ev.key === 'Escape') closeLightbox();
-                else if (hasMultiple && ev.key === 'ArrowLeft') showLightboxAt(lightboxIndex - 1);
-                else if (hasMultiple && ev.key === 'ArrowRight') showLightboxAt(lightboxIndex + 1);
-              }
-
-              closeBtn.addEventListener('click', function(ev) {
-                ev.stopPropagation();
-                closeLightbox();
-              });
-              overlay.addEventListener('click', function(ev) {
-                if (ev.target === overlay) closeLightbox();
-              });
-              if (prevBtn) prevBtn.addEventListener('click', function(ev) {
-                ev.stopPropagation();
-                showLightboxAt(lightboxIndex - 1);
-              });
-              if (nextBtn) nextBtn.addEventListener('click', function(ev) {
-                ev.stopPropagation();
-                showLightboxAt(lightboxIndex + 1);
-              });
-
-              var lightboxTouchStartX = 0;
-              overlay.addEventListener('touchstart', function(ev) {
-                if (ev.touches.length) lightboxTouchStartX = ev.touches[0].clientX;
-              }, { passive: true });
-              overlay.addEventListener('touchend', function(ev) {
-                if (!hasMultiple || !ev.changedTouches || !ev.changedTouches.length) return;
-                var diff = lightboxTouchStartX - ev.changedTouches[0].clientX;
-                if (diff > 50) showLightboxAt(lightboxIndex + 1);
-                else if (diff < -50) showLightboxAt(lightboxIndex - 1);
-              }, { passive: true });
-
-              showLightboxAt(lightboxIndex);
-              document.body.appendChild(overlay);
-              if (window.lockBodyScroll) window.lockBodyScroll();
-              else document.body.style.overflow = 'hidden';
-              document.addEventListener('keydown', onLightboxKey);
+              })(tb, thumbs[tb]);
             }
 
-            window.openProductImageLightbox = openProductImageLightbox;
-
-            function openZoom(atIndex) {
-              var images = getZoomImages();
-              if (!images.length) return;
-              var idx = typeof atIndex === 'number' ? atIndex : current;
-              idx = Math.max(0, Math.min(idx, images.length - 1));
-              var item = images[idx];
-              openProductImageLightbox(item.src, item.alt, idx, images);
+            if (thumbsPrev) {
+              thumbsPrev.addEventListener('click', function() { scrollThumbsBy(-1); });
             }
-
-            var wrapper = carousel.closest('.product-image-carousel-wrapper');
-            if (wrapper) {
-              var prevBtn = wrapper.querySelector('.product-carousel-prev');
-              var nextBtn = wrapper.querySelector('.product-carousel-next');
-              if (prevBtn) prevBtn.addEventListener('click', function(e) { e.stopPropagation(); goTo(current - 1); });
-              if (nextBtn) nextBtn.addEventListener('click', function(e) { e.stopPropagation(); goTo(current + 1); });
+            if (thumbsNext) {
+              thumbsNext.addEventListener('click', function() { scrollThumbsBy(1); });
             }
-
-            var carouselDotLabels = [
-              {% for image in product.images %}
-                {{ 'products.media.go_to_image' | t: index: forloop.index | json }}{% unless forloop.last %},{% endunless %}
-              {% endfor %}
-            ];
-
-            if (dotsEl && total > 1) {
-              for (var i = 0; i < total; i++) {
-                var dot = document.createElement('button');
-                dot.type = 'button';
-                dot.className = 'product-carousel-dot' + (i === 0 ? ' active' : '');
-                dot.setAttribute('aria-label', carouselDotLabels[i] || ('Image ' + (i + 1)));
-                dot.addEventListener('click', function(ix) { return function(e) { e.stopPropagation(); goTo(ix); }; }(i));
-                dotsEl.appendChild(dot);
-              }
-            }
-
             if (thumbsEl) {
-              var thumbButtons = thumbsEl.querySelectorAll('.product-thumbnail');
-              for (var tb = 0; tb < thumbButtons.length; tb++) {
-                thumbButtons[tb].addEventListener('click', function(ix) {
-                  return function() { goTo(ix); };
-                }(tb));
+              thumbsEl.addEventListener('scroll', updateThumbNav, { passive: true });
+              window.addEventListener('resize', updateThumbNav);
+              updateThumbNav();
+            }
+
+            for (var pi = 0; pi < thumbs.length && pi < 4; pi++) {
+              var preloadMainSrc = thumbs[pi].getAttribute('data-src');
+              if (preloadMainSrc) {
+                (new Image()).src = preloadMainSrc;
               }
             }
 
-            var touchStartX = 0;
-            carousel.addEventListener('touchstart', function(e) {
-              if (e.touches.length) touchStartX = e.touches[0].clientX;
-            }, { passive: true });
-            carousel.addEventListener('touchend', function(e) {
-              if (!e.changedTouches || !e.changedTouches.length) return;
-              var touchEndX = e.changedTouches[0].clientX;
-              var diff = touchStartX - touchEndX;
-              if (diff > 50) goTo(current + 1);
-              else if (diff < -50) goTo(current - 1);
-            }, { passive: true });
-
-            function handleGalleryZoomClick(e) {
-              if (e.target.closest('.product-carousel-btn, .product-carousel-dot, .product-image-zoom, .product-badge-sale')) return;
-              e.preventDefault();
-              openZoom(current);
-            }
-
-            if (wrapper) {
-              wrapper.addEventListener('click', handleGalleryZoomClick);
-            } else {
-              carousel.addEventListener('click', handleGalleryZoomClick);
-            }
-
-            var zoomBtn = document.getElementById('product-image-zoom-btn');
-            if (zoomBtn) {
-              zoomBtn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                openZoom(current);
-              });
-            }
-
-            window.productImageGallery = { goTo: goTo, getCurrent: function() { return current; }, openZoom: openZoom };
+            window.productImageGallery = {
+              goTo: goTo,
+              getCurrent: function() { return current; }
+            };
           })();
         </script>
       {% else %}
@@ -403,30 +279,55 @@
     
     <!-- Right Column - Product Info & CTA -->
     <div class="product-info fade-in-up" style="animation-delay: 0.2s;">
-      <!-- Trust Badge -->
       <div class="product-trust-badges">
-        {% if product.metafields.custom.certificates %}
-          <span class="trust-badge">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-              <path d="M9 12l2 2 4-4"/>
-            </svg>
-            {{ product.metafields.custom.certificates }}
-          </span>
-        {% endif %}
         <span class="trust-badge trust-badge--shipping">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M1 3h15v13H1V3zm16 8h4l3 3v4h-7v-7z"/>
             <path d="M5 21a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm12 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/>
           </svg>
           Free Shipping Above ₹499
         </span>
+        {% if section.settings.show_promo_badge %}
+          <span class="trust-badge trust-badge--high-demand">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M12 6v6l4 2"/>
+            </svg>
+            {{ section.settings.offer_tag_text | default: 'Rakshabandhan Sale' }}
+          </span>
+        {% endif %}
+        {% liquid
+          assign certificates = product.metafields.custom.certificates.value
+          if certificates == blank
+            assign certificates = product.metafields.custom.certificates
+          endif
+          assign high_demand = product.metafields.custom.high_demand.value
+          if high_demand == blank
+            assign high_demand = product.metafields.custom.high_demand
+          endif
+        %}
+        {% if certificates != blank %}
+          <span class="trust-badge">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              <path d="M9 12l2 2 4-4"/>
+            </svg>
+            {{ certificates }}
+          </span>
+        {% endif %}
+        {% if high_demand == true %}
+          <span class="trust-badge trust-badge--high-demand">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M12 6v6l4 2"/>
+            </svg>
+            High Demand Alert
+          </span>
+        {% endif %}
       </div>
-      
-      <!-- Product Title -->
+
       <h1 class="product-title">{{ product.title }}</h1>
-      
-      <!-- Star Rating & Review Count -->
+
       <div class="product-rating-summary">
         <div class="rating-stars">
           {% assign avg_rating = 4.8 %}
@@ -451,35 +352,31 @@
           {% endfor %}
         </div>
         <span class="rating-text">
-          <strong>{{ avg_rating }}</strong> 
+          <strong>{{ avg_rating }}</strong>
           <a href="#product-reviews" class="rating-link">({{ review_count }} reviews)</a>
         </span>
       </div>
-      
-      <!-- Price Display -->
-      <div class="product-price-section">
+
+      <div class="product-price-section price-block" id="product-price-block">
         {% if pdp_variant.compare_at_price > pdp_variant.price %}
-          <div class="price-original">
-            <span class="price-label">Was:</span>
-            <span class="price-value price-value--old">{{ pdp_variant.compare_at_price | money }}</span>
-          </div>
-          <div class="price-current">
-            <span class="price-label">Now:</span>
-            <span class="price-value price-value--sale">{{ pdp_variant.price | money }}</span>
-            <span class="price-savings">Save {{ pdp_variant.compare_at_price | minus: pdp_variant.price | money }}</span>
+          <div class="price-was" id="priceWas">MRP: {{ pdp_variant.compare_at_price | money }}</div>
+          <div class="price-now">
+            <div class="price-main" id="priceNow">{{ pdp_variant.price | money }}</div>
+            <span class="price-save-pill" id="priceSave">Save {{ pdp_variant.compare_at_price | minus: pdp_variant.price | money }}</span>
           </div>
         {% else %}
-          <div class="price-current">
-            <span class="price-value">{{ pdp_variant.price | money }}</span>
+          <div class="price-now">
+            <div class="price-main" id="priceNow">{{ pdp_variant.price | money }}</div>
           </div>
         {% endif %}
-        <span class="price-gst">Incl. GST</span>
+        <div class="price-note" id="priceNote">
+          Incl. GST
+        </div>
         {% if product.tags contains 'gst-5' %}
           <span class="price-gst-note">GST 5% for fruit and vegetables Dehydrated products.</span>
         {% endif %}
       </div>
-      
-      <!-- Stock Availability -->
+
       {% if pdp_variant.inventory_quantity > 0 and pdp_variant.inventory_quantity <= 10 %}
         <div class="product-stock-alert">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -489,16 +386,8 @@
           </svg>
           <span>Only {{ pdp_variant.inventory_quantity }} left in stock!</span>
         </div>
-      {% elsif pdp_variant.available %}
-        <div class="product-stock-available">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="20 6 9 17 4 12"/>
-          </svg>
-          <span>In Stock - Ready to Ship</span>
-        </div>
       {% endif %}
-      
-      <!-- Product Form -->
+
       {% form 'product', product, class: 'product-form', id: 'product-form' %}
         <span data-product-config data-gst5="{% if product.tags contains 'gst-5' %}true{% else %}false{% endif %}" data-currency="{{ cart.currency.symbol | escape }}" style="display:none" aria-hidden="true"></span>
         {% if product.variants.size > 1 %}
@@ -510,20 +399,20 @@
             }
           </script>
         {% endif %}
-        <!-- Variant Selector -->
+
         {% if product.variants.size > 1 %}
           <div class="product-variants">
             {% for option in product.options_with_values %}
               {% liquid
                 assign option_name_down = option.name | downcase
-                assign variant_grid_class = 'variant-options-grid'
-                if option_name_down contains 'weight' or option_name_down contains 'size'
-                  assign variant_grid_class = 'variant-options-grid variant-options-grid--2x2'
-                endif
+                assign variant_grid_class = 'variant-options-grid pack-grid'
+                unless option_name_down contains 'weight' or option_name_down contains 'size'
+                  assign variant_grid_class = 'variant-options-grid'
+                endunless
                 assign option_index = forloop.index0
               %}
               <div class="variant-option">
-                <label class="variant-label">{{ option.name }}</label>
+                <label class="variant-label pack-label">{{ section.settings.pack_label | default: 'Choose Pack Size' }}</label>
                 <div class="{{ variant_grid_class }}">
                   {% for value in option.values %}
                     {% liquid
@@ -539,6 +428,20 @@
                       if weight_subtitle == blank
                         assign weight_subtitle = variant_for_value.metafields.custom.weight_subtitle
                       endif
+                      assign supply_duration = variant_for_value.metafields.custom.supply_duration.value
+                      if supply_duration == blank
+                        assign supply_duration = variant_for_value.metafields.custom.supply_duration
+                      endif
+                      assign value_down = value | downcase
+                      if supply_duration == blank
+                        if value_down contains '150'
+                          assign supply_duration = '18–21 day supply'
+                        elsif value_down contains '300'
+                          assign supply_duration = '43-day supply'
+                        elsif value_down contains '450'
+                          assign supply_duration = '64-day supply'
+                        endif
+                      endif
                       assign is_recommended_variant = false
                       if variant_for_value != blank
                         assign recommended_flag = variant_for_value.metafields.custom.variant_recommended.value
@@ -549,14 +452,30 @@
                           assign is_recommended_variant = true
                         endif
                       endif
+                      assign pack_ribbon_text = ''
+                      assign pack_ribbon_modifier = ''
+                      if value_down contains '150'
+                        assign pack_ribbon_text = section.settings.trial_ribbon_text | default: 'Trial Pack'
+                      elsif value_down contains '300'
+                        assign pack_ribbon_text = section.settings.offer_ribbon_text | default: 'Buy 2 · 10% Off'
+                        assign pack_ribbon_modifier = 'offer'
+                      elsif value_down contains '450'
+                        assign pack_ribbon_text = section.settings.bundle_ribbon_text | default: 'Buy 2 · Free 150g'
+                        assign pack_ribbon_modifier = 'offer'
+                      elsif is_recommended_variant
+                        assign pack_ribbon_text = section.settings.best_value_ribbon_text | default: '★ Best Value'
+                      endif
                     %}
                     <button
                       type="button"
-                      class="variant-option-btn {% if variant_for_value.id == pdp_variant.id %}active{% endif %}"
+                      class="variant-option-btn pack-btn{% if is_recommended_variant %} best-value{% endif %}{% if variant_for_value.id == pdp_variant.id %} active{% endif %}"
                       data-option="{{ option.name }}"
                       data-value="{{ value }}"
                       {% if variant_for_value %}
                         data-variant-id="{{ variant_for_value.id }}"
+                        data-price="{{ variant_for_value.price }}"
+                        data-compare-price="{{ variant_for_value.compare_at_price }}"
+                        data-supply="{{ supply_duration | escape }}"
                       {% endif %}
                       {% if variant_for_value == blank %}
                         disabled
@@ -566,13 +485,25 @@
                         {% endunless %}
                       {% endif %}
                     >
-                      {% if is_recommended_variant %}
-                        <span class="variant-option-btn__badge">Recommended</span>
+                      {% if pack_ribbon_text != blank %}
+                        <span class="pack-ribbon{% if pack_ribbon_modifier != blank %} {{ pack_ribbon_modifier }}{% endif %}">{{ pack_ribbon_text }}</span>
                       {% endif %}
-                      <span class="variant-option-btn__title">{{ value }}</span>
-                      {% if weight_subtitle != blank %}
-                        <span class="variant-option-btn__subtitle">{{ weight_subtitle }}</span>
-                      {% endif %}
+                      <span class="pack-btn__body">
+                        <span class="pack-btn__main">
+                          <span class="pack-size">{{ value }}</span>
+                          {% if weight_subtitle != blank %}
+                            <span class="pack-name">{{ weight_subtitle }}</span>
+                          {% endif %}
+                        </span>
+                        <span class="pack-btn__pricing">
+                          {% if variant_for_value != blank and variant_for_value.compare_at_price > variant_for_value.price %}
+                            <span class="pack-mrp">{{ variant_for_value.compare_at_price | money }}</span>
+                          {% endif %}
+                          {% if variant_for_value != blank %}
+                            <span class="pack-price">{{ variant_for_value.price | money }}</span>
+                          {% endif %}
+                        </span>
+                      </span>
                       {% if variant_for_value != blank %}
                         {% unless variant_for_value.available %}
                           <span class="variant-unavailable">Sold out</span>
@@ -585,7 +516,7 @@
             {% endfor %}
             <select name="id" id="product-variant-select" class="variant-select-hidden" data-variant-select>
               {% for variant in product.variants %}
-                <option 
+                <option
                   value="{{ variant.id }}"
                   {% if variant.id == pdp_variant.id %}selected{% endif %}
                   {% unless variant.available %}disabled{% endunless %}
@@ -601,56 +532,72 @@
         {% else %}
           <input type="hidden" name="id" value="{{ pdp_variant.id }}">
         {% endif %}
-        
-        <!-- Quantity Selector -->
-        <div class="product-quantity">
-          <label for="quantity-select" class="quantity-label">Quantity</label>
+
+        <div id="upgrade-text-templates" hidden aria-hidden="true">
+          {% for variant in product.variants %}
+            {% assign variant_upgrade_plain = variant.metafields.custom.upgradetext | metafield_text | strip %}
+            {% if variant_upgrade_plain != blank %}
+              <template id="upgrade-text-{{ variant.id }}">
+                {{ variant.metafields.custom.upgradetext | metafield_tag }}
+              </template>
+            {% endif %}
+          {% endfor %}
+          {% assign product_upgrade_plain = product.metafields.custom.upgradetext | metafield_text | strip %}
+          {% if product_upgrade_plain != blank %}
+            <template id="upgrade-text-product">
+              {{ product.metafields.custom.upgradetext | metafield_tag }}
+            </template>
+          {% endif %}
+        </div>
+
+        <div class="info-badge" id="pgramExplainer"{% unless pdp_has_upgrade_text %} data-fallback="true"{% endunless %}>
+          {% if pdp_has_upgrade_text %}
+            {{ pdp_upgrade_field | metafield_tag }}
+          {% else %}
+            <strong>Good for trying {{ product.title | split: ' ' | first }} for the first time.</strong>
+            <div class="info-tip">Most customers who start small come back for a larger pack within a few weeks.</div>
+          {% endif %}
+        </div>
+
+        {% capture combo_offers_markup %}
+          {% render 'combo-offers-inline' %}
+        {% endcapture %}
+        {% assign combo_offers_markup = combo_offers_markup | strip %}
+        {% if combo_offers_markup != blank %}
+          <div class="combo-offers-inline">{{ combo_offers_markup }}</div>
+        {% endif %}
+
+        <div class="qty-row">
+          <span class="qty-label">Qty:</span>
           <div class="quantity-selector">
             <button type="button" class="quantity-btn" data-action="decrease" aria-label="Decrease quantity">−</button>
             <input type="number" id="quantity-select" name="quantity" value="1" min="1" max="10" class="quantity-input" readonly>
             <button type="button" class="quantity-btn" data-action="increase" aria-label="Increase quantity">+</button>
           </div>
         </div>
-        
-        <!-- Add to Cart Button -->
-        <button 
-          type="submit" 
-          name="add" 
-          class="cta-button cta-button--primary"
+
+        <button
+          type="submit"
+          name="add"
+          class="cta-button cta-button--primary btn-atc"
           id="add-to-cart-btn"
           {% unless pdp_variant.available %}disabled{% endunless %}
-          >
-          <span class="cta-button__icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="9" cy="21" r="1"/>
-              <circle cx="20" cy="21" r="1"/>
-              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
-            </svg>
-          </span>
+        >
           <span class="cta-button__text">
             {% if pdp_variant.available %}
-              Add to Cart - {{ pdp_variant.price | money }}
+              Add to Cart — <span class="atc-price" id="atcPrice">{{ pdp_variant.price | money }}</span>
             {% else %}
               Sold Out
             {% endif %}
           </span>
         </button>
 
-        {%- comment -%} Buy Now area: controlled by blocks. Add "Buy Now button" (theme) or an app block (e.g. GoKwik) from Theme editor > Product template > Product Main > Add block. {%- endcomment -%}
         {% if pdp_variant.available %}
           <div class="product-buy-now-blocks">
             {% for block in section.blocks %}
               <div class="product-buy-now-block" {{ block.shopify_attributes }}>
                 {% case block.type %}
                   {% when 'buy_now_button' %}
-                    {% comment %} <button
-                      type="button"
-                      class="cta-button cta-button--secondary"
-                      id="buy-now-btn"
-                      data-buy-now-button
-                    >
-                      {{ block.settings.button_text | default: 'Buy Now' }}
-                    </button> {% endcomment %}
                     {% render 'gokwik-buy-now' %}
                   {% when '@app' %}
                     {% render block %}
@@ -661,10 +608,8 @@
         {% endif %}
       {% endform %}
 
-      <!-- Buy On Amazon: real <a> so redirect works without JavaScript -->
       {% assign amazon_link_metafield = product.metafields.custom.amazon_link %}
       {% if amazon_link_metafield != blank %}
-        {% comment %} Support both "url" type (.value = URL string) and "link" type (.value.url) {% endcomment %}
         {% if amazon_link_metafield.value.url != blank %}
           {% assign amazon_url = amazon_link_metafield.value.url %}
         {% elsif amazon_link_metafield.value != blank %}
@@ -678,66 +623,37 @@
             class="cta-button cta-button--secondary cta-button--amazon"
             aria-label="Buy On Amazon"
           >
-            <span class="cta-button__icon">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
-                <polyline points="15 3 21 3 21 9"/>
-                <line x1="10" y1="14" x2="21" y2="3"/>
-              </svg>
-            </span>
             <span class="cta-button__text">Buy On Amazon</span>
           </a>
         {% endif %}
       {% endif %}
 
-      <!-- Delivery Estimator (pincode-based, pan-India) -->
-      <div class="delivery-estimator"{% if product %} data-product-id="{{ product.id }}"{% endif %}>
-        <label for="delivery-estimator-pincode" class="delivery-estimator__label">Check delivery time</label>
-        <div class="delivery-estimator__wrapper">
-          <input
-            type="text"
-            id="delivery-estimator-pincode"
-            name="pincode"
-            class="delivery-estimator__input"
-            placeholder="Enter 6-digit pincode"
-            maxlength="6"
-            pattern="[0-9]{6}"
-            inputmode="numeric"
-            autocomplete="postal-code"
-            aria-describedby="delivery-estimator-result"
-          >
-          <button type="button" id="delivery-estimator-check" class="delivery-estimator__btn" aria-label="Check delivery">
-            Check
-          </button>
+      <div class="trust-row" aria-label="Trust highlights">
+        <div class="trust-item">
+          <div class="trust-icon" aria-hidden="true">🚚</div>
+          <strong>Free Shipping</strong>
+          On orders ₹499+
         </div>
-        <div id="delivery-estimator-result" class="delivery-estimator__result" aria-live="polite"></div>
-      </div>
-
-      <div class="delivery-trust-grid" aria-label="Trust highlights">
-        <div class="delivery-trust-grid__item">
-          <span class="delivery-trust-grid__title">Free Shipping</span>
-          <span class="delivery-trust-grid__copy">On qualifying orders</span>
+        <div class="trust-item">
+          <div class="trust-icon" aria-hidden="true">🔒</div>
+          <strong>Secure Pay</strong>
+          SSL encrypted
         </div>
-        <div class="delivery-trust-grid__item">
-          <span class="delivery-trust-grid__title">Secure Checkout</span>
-          <span class="delivery-trust-grid__copy">SSL encrypted payment</span>
+        <div class="trust-item">
+          <div class="trust-icon" aria-hidden="true">⚡</div>
+          <strong>Ships in 24h</strong>
+          Fast dispatch
         </div>
-        <div class="delivery-trust-grid__item">
-          <span class="delivery-trust-grid__title">Fast Dispatch</span>
-          <span class="delivery-trust-grid__copy">Ships within 24 hours</span>
-        </div>
-        <div class="delivery-trust-grid__item">
-          <span class="delivery-trust-grid__title">Expert Support</span>
-          <span class="delivery-trust-grid__copy">Help from nutrition team</span>
+        <div class="trust-item">
+          <div class="trust-icon" aria-hidden="true">🧪</div>
+          <strong>Lab Tested</strong>
+          3rd party verified
         </div>
       </div>
     </div>
   </div>
 </section>
 
-{% if product %}
-<script src="{{ 'delivery-estimator.js' | asset_url }}" defer></script>
-{% endif %}
 
 <!-- Product Description Section -->
 {% if product and product.description != blank %}
@@ -869,140 +785,50 @@
   .product-hero {
     width: 100%;
     max-width: 100%;
-    padding: 30px 40px;
+    padding: 0 32px 60px;
     background: var(--white);
     box-sizing: border-box;
   }
 
   .product-hero__container {
-    max-width: 1400px;
+    max-width: 1160px;
     margin: 0 auto;
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 60px;
-    align-items: start;
+    grid-template-columns: minmax(0, 640px) minmax(0, 480px);
+    gap: 40px;
+    justify-content: center;
   }
 
-  /* Product Images */
-  .product-images {
+  /* Product Gallery */
+  .product-gallery {
     position: sticky;
-    top: 100px;
+    top: 80px;
+    height: fit-content;
+    min-width: 0;
+    max-width: 640px;
+    width: 100%;
   }
 
   .product-image-main {
     position: relative;
     width: 100%;
-    aspect-ratio: 1;
-    border-radius: 16px;
+    max-width: 640px;
+    aspect-ratio: 1 / 1;
+    border-radius: 20px;
     overflow: hidden;
-    background: var(--bg);
-    margin-bottom: 20px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    background: #f5f9f2;
+    margin-bottom: 12px;
+    border: 1px solid #e0ddd7;
   }
 
-  .product-image-main:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-  }
-
-  /* Carousel */
-  .product-image-carousel-wrapper {
-    position: relative;
-    width: 100%;
-    aspect-ratio: 1;
-    min-height: 0;
-  }
-
-  .product-image-carousel {
-    position: relative;
-    width: 100%;
-    overflow: hidden;
-    border-radius: 16px;
-    touch-action: pan-y pinch-zoom;
-    cursor: zoom-in;
-  }
-
-  .product-carousel-track {
-    display: flex;
-    width: 100%;
-    transition: transform 0.35s ease-out;
-    will-change: transform;
-  }
-
-  .product-carousel-slide {
-    flex: 0 0 100%;
-    width: 100%;
-    aspect-ratio: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    background: var(--bg);
-  }
-
-  .product-carousel-slide .product-image-main__img {
+  .product-image-main__img {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
-    object-fit: contain;
-    pointer-events: none;
-  }
-
-  .product-carousel-btn {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 44px;
-    height: 44px;
-    border: none;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.85);
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 3;
-    transition: background 0.2s, transform 0.2s, opacity 0.2s;
-  }
-
-  .product-carousel-btn:hover {
-    background: rgba(255, 255, 255, 0.95);
-    transform: translateY(-50%) scale(1.05);
-  }
-
-  .product-carousel-prev { left: 8px; }
-  .product-carousel-next { right: 8px; }
-
-  .product-carousel-dots {
-    position: absolute;
-    bottom: 16px;
-    left: 0;
-    right: 0;
-    display: flex;
-    justify-content: center;
-    gap: 8px;
-    z-index: 3;
-  }
-
-  .product-carousel-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    border: none;
-    background: rgba(255, 255, 255, 0.5);
-    cursor: pointer;
-    padding: 0;
-    transition: background 0.2s, transform 0.2s;
-  }
-
-  .product-carousel-dot:hover {
-    background: rgba(255, 255, 255, 0.8);
-  }
-
-  .product-carousel-dot.active {
-    background: var(--white);
-    transform: scale(1.2);
+    object-fit: cover;
+    object-position: center;
+    display: block;
   }
 
   .product-image-main__img.image-error {
@@ -1015,19 +841,22 @@
     background: rgba(245, 245, 245, 0.8);
   }
 
-  .product-badge-sale {
+  .gallery-badge {
     position: absolute;
-    top: 20px;
-    left: 20px;
-    background: linear-gradient(135deg, var(--sage-green), var(--forest-green));
-    color: var(--white);
-    padding: 8px 16px;
-    border-radius: 6px;
-    font-size: 14px;
+    top: 16px;
+    right: 16px;
+    font-size: 12px;
     font-weight: 700;
+    padding: 5px 12px;
+    border-radius: 20px;
+    letter-spacing: 0.3px;
     z-index: 2;
-    box-shadow: 0 4px 12px rgba(74, 124, 44, 0.4);
     pointer-events: none;
+  }
+
+  .gallery-badge--promo {
+    background: #c0186a;
+    color: #fff;
   }
 
   #product-image-lightbox {
@@ -1136,24 +965,68 @@
     transform: scale(1.1);
   }
 
+  .product-thumbnails-wrap {
+    position: relative;
+    max-width: 100%;
+    min-width: 0;
+  }
+
   .product-thumbnails {
     display: flex;
     flex-wrap: nowrap;
-    gap: 10px;
-    margin-top: 16px;
+    gap: 8px;
+    margin-top: 0;
     overflow-x: auto;
-    padding-bottom: 4px;
+    overflow-y: hidden;
+    scroll-snap-type: x proximity;
     -webkit-overflow-scrolling: touch;
-    scrollbar-width: thin;
+    scrollbar-width: none;
+    padding: 2px 0;
+  }
+
+  .product-thumbnails::-webkit-scrollbar {
+    display: none;
+  }
+
+  .product-thumbnails-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.12);
+    color: var(--forest-green);
+    cursor: pointer;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+  }
+
+  .product-thumbnails-nav[hidden] {
+    display: none;
+  }
+
+  .product-thumbnails-prev {
+    left: -6px;
+  }
+
+  .product-thumbnails-next {
+    right: -6px;
   }
 
   .product-thumbnail {
-    flex: 0 0 auto;
+    flex: 0 0 72px;
     width: 72px;
     height: 72px;
+    scroll-snap-align: start;
     padding: 0;
     border: 2px solid transparent;
-    border-radius: 8px;
+    border-radius: 6px;
     overflow: hidden;
     cursor: pointer;
     background: var(--bg);
@@ -1181,15 +1054,18 @@
   .product-info {
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: 16px;
+    padding-top: 4px;
+    min-width: 0;
+    max-width: 480px;
+    width: 100%;
   }
 
-  /* Trust Badges */
   .product-trust-badges {
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
-    margin-bottom: 8px;
+    margin-bottom: 4px;
   }
 
   .trust-badge {
@@ -1214,14 +1090,29 @@
     font-weight: 600;
   }
 
+  .trust-badge--high-demand {
+    background: linear-gradient(135deg, rgba(220, 38, 38, 0.12) 0%, rgba(220, 38, 38, 0.06) 100%);
+    color: #b91c1c;
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: 1px solid rgba(220, 38, 38, 0.25);
+    font-weight: 600;
+  }
+
+  .product-eyebrow,
+  .pdp-tag {
+    display: none;
+  }
+
   /* Product Title */
   .product-title {
-    font-size: 42px;
-    line-height: 1.2;
+    font-size: 30px;
+    line-height: 1.15;
     font-weight: 600;
     margin: 0;
-    color: var(--text);
+    color: var(--forest-green);
     font-family: var(--font-heading);
+    letter-spacing: -0.5px;
   }
 
   /* Rating Summary */
@@ -1234,8 +1125,8 @@
 
   .rating-stars {
     display: flex;
-    gap: 4px;
-    color: var(--sage-green);
+    gap: 2px;
+    color: #c8952a;
   }
 
   .rating-text {
@@ -1253,66 +1144,59 @@
   }
 
   /* Price Section */
-  .product-price-section {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    padding: 20px 0;
-    border-top: 1px solid var(--border-color);
-    border-bottom: 1px solid var(--border-color);
+  .product-price-section.price-block {
+    display: block;
+    background: #f5f9f2;
+    border-radius: 12px;
+    padding: 16px 18px;
+    margin-bottom: 4px;
+    border: 1px solid #d4e8c2;
   }
 
-  .price-original {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+  .price-was {
+    font-size: 13px;
+    color: rgba(26, 26, 26, 0.55);
+    text-decoration: line-through;
+    margin-bottom: 4px;
   }
 
-  .price-current {
+  .price-now {
     display: flex;
     align-items: baseline;
-    gap: 12px;
+    gap: 10px;
+    margin-bottom: 6px;
     flex-wrap: wrap;
   }
 
-  .price-label {
-    font-size: 14px;
-    color: rgba(26, 26, 26, 0.6);
-    font-weight: 400;
-  }
-
-  .price-value {
+  .price-main {
     font-size: 36px;
     font-weight: 700;
     color: var(--forest-green);
     font-family: var(--font-heading);
+    line-height: 1;
   }
 
-  .price-value--old {
-    font-size: 24px;
-    text-decoration: line-through;
-    color: rgba(26, 26, 26, 0.4);
-    font-weight: 400;
-  }
-
-  .price-value--sale {
-    color: var(--sage-green);
-  }
-
-  .price-savings {
-    background: rgba(74, 124, 44, 0.1);
-    color: var(--sage-green);
-    padding: 4px 12px;
-    border-radius: 4px;
-    font-size: 14px;
-    font-weight: 600;
-  }
-
-  .price-gst {
-    font-size: 13px;
-    color: rgba(26, 26, 26, 0.6);
+  .price-save-pill {
+    background: #c0186a;
+    color: #fff;
+    font-size: 11px;
     font-weight: 700;
-    margin-top: 4px;
+    padding: 3px 10px;
+    border-radius: 20px;
+  }
+
+  .price-note {
+    font-size: 12px;
+    color: rgba(26, 26, 26, 0.55);
+  }
+
+  .price-original,
+  .price-current,
+  .price-label,
+  .price-value,
+  .price-savings,
+  .price-gst {
+    display: none;
   }
 
   .price-gst-note {
@@ -1345,27 +1229,29 @@
   }
 
   .product-stock-available {
-    background: rgba(74, 124, 44, 0.1);
-    color: var(--forest-green);
+    background: rgba(220, 38, 38, 0.1);
+    color: #b91c1c;
   }
 
   /* Variants */
   .product-variants {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 0;
   }
 
   .variant-option {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
   }
 
-  .variant-label {
-    font-size: 15px;
+  .variant-label,
+  .pack-label {
+    font-size: 13px;
     font-weight: 600;
     color: var(--text);
+    margin-bottom: 0;
   }
 
   .variant-options-grid {
@@ -1374,88 +1260,107 @@
     gap: 10px;
   }
 
-  .variant-options-grid--2x2 {
+  .variant-options-grid.pack-grid {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
     width: 100%;
   }
 
-  .variant-option-btn {
-    padding: 12px 24px;
-    border: 2px solid var(--border-color);
-    background: var(--white);
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s ease;
+  .variant-option-btn.pack-btn {
     position: relative;
-  }
-
-  .variant-options-grid--2x2 .variant-option-btn {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    min-height: 88px;
-    padding: 18px 16px;
+    border: 2px solid var(--border-color);
     border-radius: 12px;
+    padding: 12px 10px 10px;
+    cursor: pointer;
+    background: #fff;
+    transition: border-color 0.18s, box-shadow 0.18s;
     text-align: center;
+    user-select: none;
+    min-height: auto;
+    display: block;
     width: 100%;
   }
 
-  .variant-option-btn__title {
-    display: block;
-    font-size: 18px;
-    font-weight: 700;
-    line-height: 1.2;
+  .variant-option-btn.pack-btn:hover:not(:disabled):not(.active) {
+    border-color: #3d6b1e;
+    background: #fff;
     color: inherit;
   }
 
-  .variant-option-btn__subtitle {
-    display: block;
-    font-size: 13px;
-    font-weight: 500;
-    line-height: 1.35;
-    color: rgba(26, 26, 26, 0.72);
-    max-width: 100%;
-  }
-
-  .variant-option-btn:hover:not(:disabled):not(.active) {
-    border-color: var(--sage-green);
-    background: rgba(74, 124, 44, 0.08);
-    color: var(--text);
-  }
-
-  .variant-option-btn:hover:not(:disabled):not(.active) .variant-option-btn__subtitle {
-    color: rgba(26, 26, 26, 0.72);
-  }
-
-  .variant-option-btn.active {
+  .variant-option-btn.pack-btn.active {
     border-color: var(--forest-green);
+    background: #f5f9f2;
+    box-shadow: 0 0 0 3px rgba(45, 80, 22, 0.1);
+    color: inherit;
+  }
+
+  .variant-option-btn.pack-btn.best-value {
+    border-color: var(--forest-green);
+  }
+
+  .pack-ribbon {
+    position: absolute;
+    top: -11px;
+    left: 50%;
+    transform: translateX(-50%);
     background: var(--forest-green);
-    color: var(--white);
+    color: #fff;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    padding: 2px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+    text-transform: uppercase;
+    pointer-events: none;
   }
 
-  .variant-option-btn.active .variant-option-btn__title {
-    color: var(--white);
+  .pack-ribbon.offer {
+    background: #b07d12;
   }
 
-  .variant-option-btn.active .variant-option-btn__subtitle {
-    color: rgba(255, 255, 255, 0.9);
+  .pack-btn__body,
+  .pack-btn__main,
+  .pack-btn__pricing {
+    display: block;
   }
 
-  .variant-option-btn.active:hover:not(:disabled) {
-    border-color: var(--forest-green);
-    background: var(--sage-green);
-    color: var(--white);
+  .pack-size {
+    display: block;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1;
   }
 
-  .variant-option-btn.active:hover:not(:disabled) .variant-option-btn__title,
-  .variant-option-btn.active:hover:not(:disabled) .variant-option-btn__subtitle {
-    color: rgba(255, 255, 255, 0.95);
+  .pack-name {
+    display: block;
+    font-size: 10px;
+    color: rgba(26, 26, 26, 0.55);
+    margin: 3px 0 6px;
+    font-weight: 400;
+  }
+
+  .pack-mrp {
+    display: block;
+    font-size: 11px;
+    color: rgba(26, 26, 26, 0.55);
+    text-decoration: line-through;
+    margin-bottom: 2px;
+  }
+
+  .pack-price {
+    display: block;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--forest-green);
+  }
+
+  .variant-option-btn__title,
+  .variant-option-btn__subtitle,
+  .variant-option-btn__badge {
+    display: none;
   }
 
   .variant-option-btn:disabled {
@@ -1471,74 +1376,181 @@
     opacity: 0.85;
   }
 
-  .variant-option-btn__badge {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    z-index: 1;
-    padding: 4px 8px;
-    border-radius: 999px;
-    background: var(--forest-green);
-    color: var(--white);
+  .info-badge {
+    background: #f5f9f2;
+    border: 1px solid #c8e0ad;
+    border-left: 3px solid var(--forest-green);
+    border-radius: 12px;
+    padding: 10px 12px;
+    margin: 4px 0 0;
+    font-size: 11px;
+    line-height: 1.45;
+    color: rgba(26, 26, 26, 0.65);
+  }
+
+  .info-badge strong {
+    color: var(--forest-green);
+    font-size: inherit;
+    font-weight: 600;
+  }
+
+  .info-badge .metafield-rich_text_field {
+    font-size: inherit;
+    line-height: inherit;
+  }
+
+  .info-badge .metafield-rich_text_field > :first-child {
+    margin-top: 0;
+  }
+
+  .info-badge .metafield-rich_text_field > :last-child {
+    margin-bottom: 0;
+  }
+
+  .info-badge .metafield-rich_text_field p,
+  .info-badge .metafield-rich_text_field li,
+  .info-badge .metafield-rich_text_field span {
+    font-size: inherit;
+    line-height: inherit;
+  }
+
+  .info-badge .metafield-rich_text_field p {
+    margin: 0 0 6px;
+    color: rgba(26, 26, 26, 0.65);
+  }
+
+  .info-badge .metafield-rich_text_field p:last-child {
+    margin-bottom: 0;
+  }
+
+  .info-badge .metafield-rich_text_field p strong {
+    color: var(--forest-green);
+    font-size: inherit;
+  }
+
+  .info-badge .info-tip {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    margin-top: 6px;
+    font-size: inherit;
+    color: rgba(26, 26, 26, 0.65);
+  }
+
+  .info-badge .info-tip::before {
+    content: "💡";
+    flex-shrink: 0;
+  }
+
+  .offer-banner {
+    background: linear-gradient(135deg, #fff8e7 0%, #fdf0cc 100%);
+    border: 1.5px solid #c8952a;
+    border-radius: 12px;
+    padding: 11px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+  }
+
+  .combo-offers-inline {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 4px;
+  }
+
+  .combo-offer-banner {
+    border-color: var(--combo-offer-accent, #c8952a);
+  }
+
+  .combo-offer-banner .offer-banner__text strong {
+    color: var(--combo-offer-accent, #b07d10);
+  }
+
+  .combo-offer-banner .offer-banner__tag {
+    background: var(--combo-offer-accent, #c8952a);
+  }
+
+  .offer-banner__icon {
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  .offer-banner__text {
+    line-height: 1.45;
+    color: rgba(26, 26, 26, 0.65);
+  }
+
+  .offer-banner__text strong {
+    color: #b07d10;
+    font-weight: 700;
+  }
+
+  .offer-banner__how-to-claim {
+    display: block;
+    margin-top: 4px;
+    font-size: 12px;
+    line-height: 1.4;
+    color: rgba(26, 26, 26, 0.55);
+  }
+
+  .offer-banner__tag {
+    display: inline-block;
+    background: #c8952a;
+    color: #fff;
     font-size: 10px;
     font-weight: 700;
-    line-height: 1.2;
-    letter-spacing: 0.03em;
+    padding: 1px 7px;
+    border-radius: 10px;
+    letter-spacing: 0.3px;
     text-transform: uppercase;
-    pointer-events: none;
-  }
-
-  .variant-option-btn.active .variant-option-btn__badge {
-    background: var(--white);
-    color: var(--forest-green);
-  }
-
-  .variant-options-grid--2x2 .variant-option-btn {
-    padding-top: 28px;
+    margin-left: 4px;
+    vertical-align: middle;
   }
 
   .variant-select-hidden {
     display: none;
   }
 
-  /* Product Form – consistent spacing between quantity, buttons, trust message */
+  /* Product Form */
   .product-form {
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: 14px;
   }
 
-  /* Quantity */
-  .product-quantity {
+  .qty-row {
     display: flex;
-    flex-direction: column;
+    align-items: center;
     gap: 12px;
+    margin-bottom: 0;
   }
 
-  .quantity-label {
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--text);
+  .qty-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(26, 26, 26, 0.65);
   }
 
   .quantity-selector {
     display: flex;
     align-items: center;
-    border: 2px solid var(--border-color);
-    border-radius: 8px;
+    border: 1.5px solid var(--border-color);
+    border-radius: 6px;
     width: fit-content;
     overflow: hidden;
   }
 
   .quantity-btn {
-    width: 44px;
-    height: 44px;
+    width: 36px;
+    height: 36px;
     border: none;
-    background: var(--bg);
-    font-size: 20px;
-    font-weight: 600;
+    background: #faf8f4;
+    font-size: 18px;
+    font-weight: 300;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: background 0.15s;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1549,13 +1561,13 @@
   }
 
   .quantity-input {
-    width: 60px;
-    height: 44px;
+    width: 44px;
+    height: 36px;
     border: none;
-    border-left: 2px solid var(--border-color);
-    border-right: 2px solid var(--border-color);
+    border-left: 1px solid var(--border-color);
+    border-right: 1px solid var(--border-color);
     text-align: center;
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 600;
     -moz-appearance: textfield;
   }
@@ -1566,45 +1578,57 @@
     margin: 0;
   }
 
-  /* CTA Buttons */
   .cta-button {
     width: 100%;
-    padding: 18px 32px;
-    border-radius: 8px;
+    padding: 16px;
+    border-radius: 12px;
     font-size: 16px;
     font-weight: 600;
     border: none;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: background 0.2s, transform 0.1s;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: 8px;
     text-transform: none;
     letter-spacing: 0;
+    font-family: inherit;
   }
 
-  .cta-button--primary {
+  .cta-button--primary,
+  .btn-atc {
     background: var(--forest-green);
-    color: var(--white);
-    box-shadow: 0 4px 12px rgba(74, 124, 44, 0.3);
+    color: #fff;
+    margin-bottom: 0;
   }
 
-  .cta-button--primary:hover:not(:disabled) {
-    background: var(--sage-green);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(74, 124, 44, 0.4);
+  .cta-button--primary:hover:not(:disabled),
+  .btn-atc:hover:not(:disabled) {
+    background: #3d6b1e;
+    transform: none;
+    box-shadow: none;
+  }
+
+  .cta-button--primary:active:not(:disabled),
+  .btn-atc:active:not(:disabled) {
+    transform: scale(0.99);
   }
 
   .cta-button--secondary {
-    background: transparent;
+    background: #fff;
     color: var(--forest-green);
     border: 2px solid var(--forest-green);
-    margin-top: 8px;
+    margin-top: 0;
   }
 
   .cta-button--secondary:hover {
-    background: rgba(74, 124, 44, 0.05);
+    background: #f5f9f2;
+  }
+
+  .atc-price {
+    font-size: 18px;
+    opacity: 0.9;
   }
 
   .cta-button:disabled {
@@ -1651,138 +1675,38 @@
     align-items: center;
     justify-content: center;
     box-sizing: border-box;
+    background: #fff !important;
+    color: var(--forest-green) !important;
+    border: 2px solid var(--forest-green) !important;
+    border-radius: 12px !important;
+    padding: 13px !important;
+    font-size: 15px !important;
+    font-weight: 600 !important;
   }
 
-  /* Trust Message */
-  .product-trust-message {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 16px;
-    background: rgba(74, 124, 44, 0.05);
-    border-radius: 8px;
-    color: var(--forest-green);
-  }
-
-  .product-trust-message svg {
-    flex-shrink: 0;
-  }
-
-  .product-trust-message div {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    font-size: 13px;
-  }
-
-  .product-trust-message strong {
-    font-size: 14px;
-  }
-
-  /* Delivery Estimator - desktop (input + button in one row, styled button) */
-  .delivery-estimator {
-    margin: 1rem 0;
-    padding: 20px;
-    background: rgba(74, 124, 44, 0.06);
-    border: 1px solid rgba(74, 124, 44, 0.2);
-    border-radius: 12px;
-  }
-
-  .delivery-estimator__label {
-    display: block;
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--forest-green);
-    margin-bottom: 12px;
-  }
-
-  .delivery-estimator__wrapper {
-    display: flex;
-    align-items: stretch;
-    gap: 12px;
-    max-width: 400px;
-  }
-
-  .delivery-estimator__input {
-    flex: 1;
-    min-width: 0;
-    padding: 14px 18px;
-    border: 2px solid var(--border-color);
-    border-radius: 8px;
-    font-size: 15px;
-    transition: border-color 0.2s ease;
-  }
-
-  .delivery-estimator__input:focus {
-    outline: none;
-    border-color: var(--forest-green);
-  }
-
-  .delivery-estimator__btn {
-    padding: 14px 28px;
-    background: var(--forest-green);
-    color: var(--white);
-    border: none;
-    border-radius: 8px;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    white-space: nowrap;
-    flex-shrink: 0;
-    transition: background 0.2s ease, transform 0.2s ease;
-    box-shadow: 0 2px 8px rgba(74, 124, 44, 0.25);
-  }
-
-  .delivery-estimator__btn:hover {
-    background: var(--sage-green);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(74, 124, 44, 0.3);
-  }
-
-  .delivery-estimator__result {
-    margin-top: 12px;
-    font-size: 14px;
-    min-height: 1.4em;
-  }
-
-  .delivery-estimator__result.delivery-success {
-    color: var(--forest-green);
-    font-weight: 500;
-  }
-
-  .delivery-estimator__result.delivery-error {
-    color: #c62828;
-  }
-
-  .delivery-trust-grid {
+  .trust-row {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 10px;
-    margin-top: 14px;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-top: 4px;
   }
 
-  .delivery-trust-grid__item {
-    padding: 12px 10px;
-    border: 1px solid rgba(45, 80, 22, 0.2);
-    border-radius: 10px;
-    background: rgba(74, 124, 44, 0.05);
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
+  .trust-item {
     text-align: center;
+    font-size: 11px;
+    color: rgba(26, 26, 26, 0.55);
+    line-height: 1.4;
   }
 
-  .delivery-trust-grid__title {
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--forest-green);
-    line-height: 1.2;
+  .trust-icon {
+    font-size: 18px;
+    margin-bottom: 3px;
   }
 
-  .delivery-trust-grid__copy {
-    font-size: 12px;
-    color: rgba(26, 26, 26, 0.75);
-    line-height: 1.35;
+  .trust-item strong {
+    display: block;
+    color: var(--text);
+    font-size: 11px;
   }
 
   /* Product Description Section */
@@ -2030,7 +1954,7 @@
   }
 
   .sticky-cart-bar__content {
-    max-width: 1400px;
+    max-width: 1160px;
     margin: 0 auto;
     display: flex;
     align-items: center;
@@ -2112,95 +2036,56 @@
   }
 
   /* Responsive – mobile only (desktop unchanged) */
-  @media (max-width: 968px) {
+  @media (max-width: 900px) {
     .product-hero {
-      padding: 24px 20px;
+      padding: 0 16px 40px;
       padding-bottom: 100px;
     }
 
     .product-hero__container {
       grid-template-columns: 1fr;
-      gap: 28px; /* Tighter gap so price + CTA appear above fold */
+      gap: 28px;
+      justify-content: stretch;
     }
 
-    /* Prevent main product image flowing out of screen on mobile */
-    .product-images {
+    .product-gallery {
       position: static;
       max-width: 100%;
-      overflow: hidden;
       box-sizing: border-box;
       margin-bottom: 0;
+      height: auto;
+      min-width: 0;
     }
 
     .product-image-main {
       max-width: 100%;
       box-sizing: border-box;
-      margin-bottom: 0;
+      margin-bottom: 12px;
     }
 
-    .product-image-carousel-wrapper {
-      margin-bottom: 0;
-      aspect-ratio: 1;
-      width: 100%;
+    .product-info {
       max-width: 100%;
-    }
-
-    .product-image-carousel {
-      border-radius: 12px;
-    }
-
-    /* Larger carousel images on mobile - taller aspect ratio */
-    .product-carousel-slide {
-      aspect-ratio: 4/3; /* Taller than square for better product visibility */
-      min-height: 60vh; /* Ensure images take up significant screen space */
-    }
-
-    .product-carousel-slide .product-image-main__img {
-      max-width: 100%;
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-    }
-
-    /* Smaller, edge-positioned arrows that don't block content */
-    .product-carousel-btn {
-      width: 36px;
-      height: 36px;
-      background: rgba(255, 255, 255, 0.75);
-      opacity: 0.9;
-    }
-
-    .product-carousel-btn:active {
-      opacity: 1;
-      background: rgba(255, 255, 255, 0.9);
-    }
-
-    .product-carousel-prev {
-      left: 4px;
-    }
-
-    .product-carousel-next {
-      right: 4px;
-    }
-
-    /* Smaller dots on mobile */
-    .product-carousel-dots {
-      bottom: 12px;
-    }
-
-    .product-carousel-dot {
-      width: 6px;
-      height: 6px;
     }
 
     .product-thumbnails {
       margin-top: 12px;
       gap: 8px;
+      padding-left: 4px;
+      padding-right: 4px;
     }
 
     .product-thumbnail {
+      flex: 0 0 64px;
       width: 64px;
       height: 64px;
+    }
+
+    .product-thumbnails-prev {
+      left: 0;
+    }
+
+    .product-thumbnails-next {
+      right: 0;
     }
 
     .product-info {
@@ -2216,12 +2101,88 @@
       line-height: 1.25;
     }
 
-    .price-value {
-      font-size: 26px;
+    .price-main {
+      font-size: 30px;
     }
 
-    .product-price-section {
-      padding: 16px 0;
+    .product-price-section.price-block {
+      padding: 14px 16px;
+    }
+
+    .variant-options-grid.pack-grid {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    .variant-option-btn.pack-btn {
+      padding: 0;
+      overflow: hidden;
+      text-align: left;
+    }
+
+    .pack-ribbon {
+      position: static;
+      transform: none;
+      left: auto;
+      width: 100%;
+      max-width: 100%;
+      margin: 0;
+      white-space: normal;
+      font-size: 10px;
+      line-height: 1.35;
+      letter-spacing: 0.4px;
+      padding: 7px 12px;
+      border-radius: 0;
+      box-sizing: border-box;
+      text-align: center;
+    }
+
+    .pack-ribbon.offer {
+      background: #9a6b0a;
+    }
+
+    .pack-btn__body {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 14px;
+    }
+
+    .pack-btn__main {
+      flex-shrink: 0;
+      min-width: 0;
+    }
+
+    .pack-btn__pricing {
+      text-align: right;
+      margin-left: auto;
+      flex-shrink: 0;
+    }
+
+    .pack-size {
+      font-size: 20px;
+      padding: 0;
+    }
+
+    .pack-name {
+      margin: 2px 0 0;
+      font-size: 11px;
+    }
+
+    .pack-mrp {
+      font-size: 12px;
+      padding: 0;
+      margin-bottom: 3px;
+    }
+
+    .pack-price {
+      font-size: 17px;
+      padding: 0;
+    }
+
+    .trust-row {
+      grid-template-columns: repeat(2, 1fr);
     }
 
     .sticky-cart-bar {
@@ -2322,35 +2283,14 @@
 
   @media (max-width: 480px) {
     .product-hero {
-      padding: 16px 12px;
-      padding-bottom: 88px; /* Space for sticky bar + safe area */
+      padding: 0 16px 40px;
+      padding-bottom: 88px;
     }
 
     .product-hero__container {
       padding-left: 0;
       padding-right: 0;
       gap: 20px;
-    }
-
-    /* Even larger images on small mobile - maximize screen usage */
-    .product-carousel-slide {
-      aspect-ratio: 3/4; /* Portrait orientation for small phones */
-      min-height: 65vh;
-    }
-
-    /* Arrows even smaller and closer to edges */
-    .product-carousel-btn {
-      width: 32px;
-      height: 32px;
-      background: rgba(255, 255, 255, 0.7);
-    }
-
-    .product-carousel-prev {
-      left: 2px;
-    }
-
-    .product-carousel-next {
-      right: 2px;
     }
 
     .product-info {
@@ -2418,12 +2358,34 @@
       font-size: 12px;
     }
 
-    .trust-badge--shipping {
+    .trust-badge--shipping,
+    .trust-badge--high-demand {
       padding: 6px 12px;
     }
 
     .variant-options-grid {
       gap: 8px;
+    }
+
+    .variant-options-grid.pack-grid {
+      gap: 8px;
+    }
+
+    .pack-ribbon {
+      font-size: 10px;
+      padding: 6px 10px;
+    }
+
+    .pack-btn__body {
+      padding: 10px 12px;
+    }
+
+    .pack-size {
+      font-size: 18px;
+    }
+
+    .pack-price {
+      font-size: 16px;
     }
 
     .variant-options-grid--2x2 {
@@ -2722,19 +2684,20 @@
           syncVariantButtonsWithVariant(selectedVariant);
         }
         updatePriceDisplay(price, comparePrice);
-        updateStockAlert(inventory);
+        updateVariantContext(selectedVariant, selectedOption);
         var addToCartBtn = document.getElementById('add-to-cart-btn');
         var stickyBtn = document.getElementById('sticky-add-to-cart');
         if (selectedOption.disabled) {
           if (addToCartBtn) {
             addToCartBtn.disabled = true;
-            addToCartBtn.querySelector('.cta-button__text').textContent = 'Sold Out';
+            var atcText = addToCartBtn.querySelector('.cta-button__text');
+            if (atcText) atcText.textContent = 'Sold Out';
           }
           if (stickyBtn) stickyBtn.disabled = true;
         } else {
           if (addToCartBtn) {
             addToCartBtn.disabled = false;
-            addToCartBtn.querySelector('.cta-button__text').textContent = 'Add to Cart - ' + formatMoney(price);
+            updateAtcButtonPrice(price);
           }
           if (stickyBtn) stickyBtn.disabled = false;
         }
@@ -2760,6 +2723,11 @@
         quantityInput.value = currentValue + 1;
       } else if (action === 'decrease' && currentValue > min) {
         quantityInput.value = currentValue - 1;
+      }
+      var variantSelectEl = document.getElementById('product-variant-select');
+      if (variantSelectEl) {
+        var selectedOption = variantSelectEl.options[variantSelectEl.selectedIndex];
+        if (selectedOption) updateAtcButtonPrice(selectedOption.getAttribute('data-price'));
       }
     });
 
@@ -2789,6 +2757,16 @@
         function done() {
           document.dispatchEvent(new CustomEvent('cart:updated'));
           syncProductFormWithCart();
+        }
+        function publishAddToCart() {
+          try {
+            if (window.Shopify && Shopify.analytics && typeof Shopify.analytics.publish === 'function') {
+              Shopify.analytics.publish('product_added_to_cart', {
+                cartLine: { quantity: quantity },
+                productVariant: { id: variantId }
+              });
+            }
+          } catch (e) {}
         }
         function fail(msg) {
           alert(msg || 'Could not add to cart. Please try again.');
@@ -2824,7 +2802,7 @@
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id: variantId, quantity: quantity })
           }).then(function(res) { return res.json().then(function(data) { return { ok: res.ok, data: data }; }); }).then(function(result) {
-            if (result.ok) done();
+            if (result.ok) { publishAddToCart(); done(); }
             else fail(result.data && result.data.message);
           }).catch(function() { fail(); }).then(finishBtn);
         }
@@ -2885,8 +2863,55 @@
       });
     }
 
+    function updateAtcButtonPrice(priceCents) {
+      var addToCartBtn = document.getElementById('add-to-cart-btn');
+      if (!addToCartBtn || addToCartBtn.disabled) return;
+      var qtyInput = document.querySelector('#product-form input[name="quantity"]');
+      var qty = (qtyInput && parseInt(qtyInput.value, 10)) || 1;
+      var unitPrice = parseInt(priceCents, 10) || 0;
+      var atcText = addToCartBtn.querySelector('.cta-button__text');
+      if (!atcText) return;
+      atcText.innerHTML = 'Add to Cart — <span class="atc-price" id="atcPrice">' + formatMoney(unitPrice * qty) + '</span>';
+    }
+
+    function getUpgradeTextHtml(variantId) {
+      if (variantId) {
+        var variantTemplate = document.getElementById('upgrade-text-' + variantId);
+        if (variantTemplate && variantTemplate.content) {
+          var variantWrap = document.createElement('div');
+          variantWrap.appendChild(variantTemplate.content.cloneNode(true));
+          if (variantWrap.textContent.trim()) return variantWrap.innerHTML;
+        }
+      }
+      var productTemplate = document.getElementById('upgrade-text-product');
+      if (productTemplate && productTemplate.content) {
+        var productWrap = document.createElement('div');
+        productWrap.appendChild(productTemplate.content.cloneNode(true));
+        if (productWrap.textContent.trim()) return productWrap.innerHTML;
+      }
+      return '';
+    }
+
+    function updateVariantContext(variant, selectedOption) {
+      var explainerEl = document.getElementById('pgramExplainer');
+      var variantId = variant && variant.id ? String(variant.id) : (selectedOption ? String(selectedOption.value) : '');
+      var explainer = getUpgradeTextHtml(variantId);
+      if (!explainerEl) return;
+      if (explainer) {
+        explainerEl.innerHTML = explainer;
+        explainerEl.hidden = false;
+        return;
+      }
+      if (explainerEl.getAttribute('data-fallback') === 'true') {
+        explainerEl.innerHTML = '<strong>Good for trying {{ product.title | split: ' ' | first | escape }} for the first time.</strong><div class="info-tip">Most customers who start small come back for a larger pack within a few weeks.</div>';
+        explainerEl.hidden = false;
+        return;
+      }
+      explainerEl.hidden = true;
+    }
+
     function updatePriceDisplay(price, comparePrice) {
-      var priceSection = document.querySelector('.product-price-section');
+      var priceSection = document.getElementById('product-price-block') || document.querySelector('.product-price-section');
       if (!priceSection) return;
       var gstNote = isGst5
         ? '<span class="price-gst-note">GST 5% for fruit and vegetables Dehydrated products.</span>'
@@ -2896,9 +2921,9 @@
       var hasSale = comparePriceCents > priceCents;
       if (hasSale) {
         var savingsCents = comparePriceCents - priceCents;
-        priceSection.innerHTML = '<div class="price-original"><span class="price-label">Was:</span><span class="price-value price-value--old">' + formatMoney(comparePriceCents) + '</span></div><div class="price-current"><span class="price-label">Now:</span><span class="price-value price-value--sale">' + formatMoney(priceCents) + '</span><span class="price-savings">Save ' + formatMoney(savingsCents) + '</span></div><span class="price-gst">Incl. GST</span>' + gstNote;
+        priceSection.innerHTML = '<div class="price-was" id="priceWas">MRP: ' + formatMoney(comparePriceCents) + '</div><div class="price-now"><div class="price-main" id="priceNow">' + formatMoney(priceCents) + '</div><span class="price-save-pill" id="priceSave">Save ' + formatMoney(savingsCents) + '</span></div><div class="price-note" id="priceNote">Incl. GST</div>' + gstNote;
       } else {
-        priceSection.innerHTML = '<div class="price-current"><span class="price-value">' + formatMoney(priceCents) + '</span></div><span class="price-gst">Incl. GST</span>' + gstNote;
+        priceSection.innerHTML = '<div class="price-now"><div class="price-main" id="priceNow">' + formatMoney(priceCents) + '</div></div><div class="price-note" id="priceNote">Incl. GST</div>' + gstNote;
       }
 
       var stickyPriceWrap = document.querySelector('.sticky-cart-bar__price');
@@ -2921,23 +2946,6 @@
         }
       }
 
-      var saleBadge = document.getElementById('product-sale-badge');
-      if (saleBadge) {
-        if (hasSale) {
-          var savingsCents = comparePriceCents - priceCents;
-          var percentOff = Math.round((savingsCents * 100) / comparePriceCents);
-          var badgeText = saleBadge.querySelector('.badge-sale__text');
-          if (!badgeText) {
-            badgeText = document.createElement('span');
-            badgeText.className = 'badge-sale__text';
-            saleBadge.appendChild(badgeText);
-          }
-          badgeText.textContent = 'Save ' + percentOff + '%';
-          saleBadge.hidden = false;
-        } else {
-          saleBadge.hidden = true;
-        }
-      }
     }
 
     function updateStockAlert(inventory) {
@@ -2958,7 +2966,7 @@
       } else if (inventoryNum > 10) {
         var available = document.createElement('div');
         available.className = 'product-stock-available';
-        available.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span>In Stock - Ready to Ship</span>';
+        available.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg><span>Limited Stock</span>';
         var priceSection = document.querySelector('.product-price-section');
         if (priceSection && priceSection.nextSibling) {
           productInfo.insertBefore(available, priceSection.nextSibling);
@@ -3020,65 +3028,6 @@
         setExpanded(!expanded);
       });
     }
-
-    // Delivery Estimator - Inline initialization
-    (function initDeliveryEstimator() {
-      var input = document.getElementById('delivery-estimator-pincode');
-      var button = document.getElementById('delivery-estimator-check');
-      var result = document.getElementById('delivery-estimator-result');
-      
-      if (!input || !button || !result) {
-        setTimeout(initDeliveryEstimator, 100);
-        return;
-      }
-      
-      function checkDelivery() {
-        var pincode = input.value.trim().replace(/[^0-9]/g, '');
-        input.value = pincode;
-        
-        if (pincode.length !== 6) {
-          result.className = 'delivery-estimator__result delivery-error';
-          result.textContent = 'Please enter a valid 6-digit pincode';
-          return;
-        }
-        
-        var prefix = pincode.substring(0, 3);
-        var warehouseRegion = 'west';
-        var customerRegion = 'other';
-        
-        if (['110','111','112','121','122','160','201','226','301','302'].indexOf(prefix) !== -1) customerRegion = 'north';
-        else if (['500','560','600','700'].indexOf(prefix) !== -1) customerRegion = 'south';
-        else if (['400','410','411','380','422'].indexOf(prefix) !== -1) customerRegion = 'west';
-        else if (['700','800'].indexOf(prefix) !== -1) customerRegion = 'east';
-        
-        var days;
-        if (customerRegion === warehouseRegion) {
-          days = '2-4 business days';
-        } else if (
-          (warehouseRegion === 'south' && customerRegion === 'central') ||
-          (warehouseRegion === 'central' && ['south','west','north'].indexOf(customerRegion) !== -1) ||
-          (warehouseRegion === 'west' && ['central','north'].indexOf(customerRegion) !== -1)
-        ) {
-          days = '4-6 business days';
-        } else {
-          days = '6-8 business days';
-        }
-        
-        result.className = 'delivery-estimator__result delivery-success';
-        result.textContent = 'Estimated delivery: ' + days;
-      }
-      
-      button.addEventListener('click', checkDelivery);
-      input.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          checkDelivery();
-        }
-      });
-      input.addEventListener('input', function(e) {
-        e.target.value = e.target.value.replace(/[^0-9]/g, '');
-      });
-    })();
   })();
 </script>
 
@@ -3109,6 +3058,84 @@
       "id": "recommended_option_value",
       "label": "Recommended size (default selection)",
       "info": "Option value to preselect on load, e.g. 300g. Used when no variant has custom.variant_recommended set. URL ?variant= always wins."
+    },
+    {
+      "type": "header",
+      "content": "Promo badges"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_promo_badge",
+      "label": "Show promo badge on image",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "promo_badge_text",
+      "label": "Image promo badge text",
+      "default": "🎁 Rakhi Special"
+    },
+    {
+      "type": "text",
+      "id": "offer_tag_text",
+      "label": "Sale alert text (above title)",
+      "default": "Rakshabandhan Sale"
+    },
+    {
+      "type": "header",
+      "content": "Pack selector"
+    },
+    {
+      "type": "text",
+      "id": "pack_label",
+      "label": "Pack selector label",
+      "default": "Choose Pack Size"
+    },
+    {
+      "type": "text",
+      "id": "offer_ribbon_text",
+      "label": "300g ribbon text",
+      "default": "Buy 2 · 10% Off"
+    },
+    {
+      "type": "text",
+      "id": "bundle_ribbon_text",
+      "label": "450g ribbon text",
+      "default": "Buy 2 · Free 150g"
+    },
+    {
+      "type": "text",
+      "id": "trial_ribbon_text",
+      "label": "150g ribbon text",
+      "default": "Trial Pack"
+    },
+    {
+      "type": "text",
+      "id": "best_value_ribbon_text",
+      "label": "Best value ribbon text",
+      "default": "★ Best Value"
+    },
+    {
+      "type": "header",
+      "content": "Offer banner"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_offer_banner",
+      "label": "Show offer banner",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "offer_banner_title",
+      "label": "Offer banner title",
+      "default": "Buy 2 × 300g — get extra 10% off."
+    },
+    {
+      "type": "text",
+      "id": "offer_banner_body",
+      "label": "Offer banner body",
+      "default": "Add 2 packs of 300g to cart. Discount applies automatically."
     }
   ],
   "presets": [

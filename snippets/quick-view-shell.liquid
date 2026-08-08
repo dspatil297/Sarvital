@@ -1,99 +1,74 @@
 {% doc %}
-  Legacy per-product quick-view modal. Prefer the global shell in quick-view-shell.liquid + application.js.
-
-  @param {product} product - The product to display in the modal
+  Global quick-view modal shell. Populated on demand via application.js using /products/{handle}.js.
 
   @example
-  {% render 'quick-view', product: product %}
+  {% render 'quick-view-shell' %}
 {% enddoc %}
 
-<div class="quick-view" id="quick-view-{{ product.id }}" data-quick-view-modal>
+<div class="quick-view" id="quick-view-global" data-quick-view-global-modal hidden>
   <div class="quick-view__overlay" data-quick-view-close></div>
-  
-  <div class="quick-view__modal">
-    <button type="button" class="quick-view__close" data-quick-view-close aria-label="Close quick view">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+
+  <div class="quick-view__modal" role="dialog" aria-modal="true" aria-labelledby="quick-view-global-title">
+    <button type="button" class="quick-view__close" data-quick-view-close aria-label="{{ 'general.accessibility.close' | t | default: 'Close' }}">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </button>
 
     <div class="quick-view__content">
       <div class="quick-view__image">
-        {% assign quick_view_image = product.images.first %}
-        {% if quick_view_image %}
-          <img 
-            src="{{ quick_view_image | image_url: width: 600 }}" 
-            alt="{{ quick_view_image.alt | default: product.title | escape }}"
-            loading="eager"
-            width="600"
-            height="600"
-            decoding="async"
-          >
-        {% else %}
-          <div class="quick-view__image-placeholder">
-            {{ 'product-1' | placeholder_svg_tag: 'placeholder' }}
-          </div>
-        {% endif %}
+        <img
+          class="quick-view__image-el"
+          data-quick-view-image
+          src=""
+          alt=""
+          width="600"
+          height="600"
+          decoding="async"
+          hidden
+        >
+        <div class="quick-view__image-placeholder" data-quick-view-image-placeholder hidden>
+          {{ 'product-1' | placeholder_svg_tag: 'placeholder' }}
+        </div>
+        <p class="quick-view__loading" data-quick-view-loading hidden>{{ 'general.loading' | t | default: 'Loading…' }}</p>
       </div>
 
       <div class="quick-view__info">
-        <h2 class="quick-view__title">{{ product.title }}</h2>
-        
+        <h2 class="quick-view__title" id="quick-view-global-title" data-quick-view-title></h2>
+
         <div class="quick-view__price">
-          {% if product.compare_at_price > product.price %}
-            <span class="price-compare">{{ product.compare_at_price | money }}</span>
-          {% endif %}
-          <span class="price-current">{{ product.price | money }}</span>
+          <span class="price-compare" data-quick-view-price-compare hidden></span>
+          <span class="price-current" data-quick-view-price-current></span>
         </div>
 
-        {% if product.description != blank %}
-          <div class="quick-view__description">
-            {{ product.description | strip_html | truncatewords: 30 }}
-          </div>
-        {% endif %}
+        <div class="quick-view__description" data-quick-view-description hidden></div>
 
-        {% if product.tags.size > 0 %}
-          <div class="quick-view__badges">
-            {% assign health_tags = product.tags | where: 'health-' %}
-            {% for tag in health_tags limit: 3 %}
-              <span class="badge badge--health">{{ tag | remove: 'health-' | capitalize }}</span>
-            {% endfor %}
-          </div>
-        {% endif %}
+        <div class="quick-view__badges" data-quick-view-badges hidden></div>
 
-        <form action="/cart/add" method="post" enctype="multipart/form-data" class="quick-view__form">
-          {% if product.variants.size > 1 %}
-            <select name="id" class="quick-view__variant-select">
-              {% for variant in product.variants %}
-                <option value="{{ variant.id }}" {% if variant == product.selected_or_first_available_variant %}selected{% endif %}>
-                  {{ variant.title }} - {{ variant.price | money }}
-                </option>
-              {% endfor %}
-            </select>
-          {% else %}
-            <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
-          {% endif %}
+        <form action="{{ routes.cart_add_url }}" method="post" enctype="multipart/form-data" class="quick-view__form" data-quick-view-form>
+          <select name="id" class="quick-view__variant-select" data-quick-view-variant-select hidden></select>
+          <input type="hidden" name="id" value="" data-quick-view-variant-hidden>
 
           <div class="quick-view__quantity">
-            <label for="quantity-{{ product.id }}">Quantity:</label>
-            <input 
-              type="number" 
-              id="quantity-{{ product.id }}" 
-              name="quantity" 
-              value="1" 
-              min="1" 
+            <label for="quick-view-global-quantity">{{ 'products.quantity' | t | default: 'Quantity' }}:</label>
+            <input
+              type="number"
+              id="quick-view-global-quantity"
+              name="quantity"
+              value="1"
+              min="1"
               class="quantity-input"
             >
           </div>
 
           <button type="submit" class="btn btn-primary btn-large quick-view__add-to-cart">
-            Add to Cart
+            {{ 'products.add_to_cart' | t | default: 'Add to cart' }}
           </button>
         </form>
 
-        <a href="{{ product.url }}" class="quick-view__view-full">
-          View Full Details
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <a href="#" class="quick-view__view-full" data-quick-view-full-url>
+          {{ 'products.view_full_details' | t | default: 'View full details' }}
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
             <path d="M6 12L10 8L6 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </a>
@@ -190,7 +165,7 @@
     background-color: var(--bg);
   }
 
-  .quick-view__image img {
+  .quick-view__image-el {
     position: absolute;
     top: 0;
     left: 0;
@@ -215,6 +190,17 @@
     width: 60%;
     height: 60%;
     opacity: 0.5;
+  }
+
+  .quick-view__loading {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    font-size: var(--body-small);
+    color: rgba(26, 26, 26, 0.6);
   }
 
   .quick-view__info {
@@ -322,10 +308,6 @@
       grid-template-columns: 1fr;
       gap: var(--spacing-lg);
       padding: var(--spacing-lg);
-    }
-
-    .quick-view__image {
-      padding-top: 100%;
     }
   }
 {% endstylesheet %}

@@ -12,6 +12,8 @@
     "mid": "19skju4u8nu2",
     "envType": "production",
     "gokwik_inject_ga4_gtag": false,
+    "fbpixel": "26536130665980936",
+    "ga4Gokwik": "G-1HYDM6M8E4",
     "goEnable": true,
     "priClr": "#4a7c2c",
     "goBuynowEnable": true,

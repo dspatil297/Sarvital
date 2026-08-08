@@ -1,0 +1,178 @@
+{% doc %}
+  Keeps KwikPass login popups clickable: load-critical assets are not deferred elsewhere,
+  modal roots sit on body with correct z-index, and full-screen scrims stay below dialog content.
+
+  @example
+  {% render 'kwikpass-modal-fix' %}
+{% enddoc %}
+
+{%- if settings.goEnable -%}
+<style id="sarvital-kwikpass-modal-fix">
+  /* Above header (9999) and theme lightboxes (9999) */
+  [id*="kwikpass" i],
+  [class*="kwikpass" i],
+  [id*="KwikPass" i],
+  [class*="KwikPass" i],
+  [id*="kp-login" i],
+  [class*="kp-login" i],
+  [data-sarvital-kp-root] {
+    z-index: 2147483646 !important;
+    pointer-events: auto !important;
+  }
+
+  [data-sarvital-kp-root] [data-sarvital-kp-dialog] {
+    z-index: 2 !important;
+    pointer-events: auto !important;
+    position: relative !important;
+  }
+
+  [data-sarvital-kp-root] [data-sarvital-kp-scrim] {
+    z-index: 1 !important;
+    pointer-events: auto !important;
+  }
+</style>
+<script>
+(function () {
+  'use strict';
+  if (window.__sarvitalKwikPassFix) return;
+  window.__sarvitalKwikPassFix = true;
+
+  var ROOT_HINT = /kwikpass|kp-login|kp_login|KwikPass|kp-modal/i;
+  var LOGIN_HINT = /login now|avail best offers|enter your (mobile|phone)|verify mobile|notify me with offers/i;
+
+  function isLargeFixed(el) {
+    try {
+      var st = window.getComputedStyle(el);
+      if (st.display === 'none' || st.visibility === 'hidden') return false;
+      if (st.position !== 'fixed' && st.position !== 'absolute') return false;
+      var rect = el.getBoundingClientRect();
+      return rect.width >= window.innerWidth * 0.45 && rect.height >= window.innerHeight * 0.25;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function isKwikPassRoot(el) {
+    if (!el || el.nodeType !== 1) return false;
+    if (el.getAttribute('data-sarvital-kp-root')) return true;
+    var id = String(el.id || '');
+    var cls = String(el.className || '');
+    if (ROOT_HINT.test(id) || ROOT_HINT.test(cls)) return isLargeFixed(el);
+    var text = (el.textContent || '').slice(0, 800);
+    if (LOGIN_HINT.test(text) && isLargeFixed(el)) return true;
+    return false;
+  }
+
+  function isScrim(el, rootRect) {
+    try {
+      var st = window.getComputedStyle(el);
+      if (st.display === 'none') return false;
+      if (st.position !== 'fixed' && st.position !== 'absolute') return false;
+      var rect = el.getBoundingClientRect();
+      var coversViewport =
+        rect.width >= window.innerWidth * 0.9 &&
+        rect.height >= window.innerHeight * 0.9;
+      var cls = String(el.className || '').toLowerCase();
+      var namedScrim = /backdrop|scrim|overlay|mask|shade/.test(cls);
+      var hasFill =
+        (st.backgroundColor && st.backgroundColor !== 'rgba(0, 0, 0, 0)' && st.backgroundColor !== 'transparent') ||
+        (st.opacity && parseFloat(st.opacity) < 1 && parseFloat(st.opacity) > 0);
+      if (coversViewport && (namedScrim || hasFill)) return true;
+      if (namedScrim && rect.width >= rootRect.width * 0.95) return true;
+      return false;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function isDialog(el) {
+    var text = (el.textContent || '').slice(0, 600);
+    if (!LOGIN_HINT.test(text)) return false;
+    try {
+      var rect = el.getBoundingClientRect();
+      return rect.width >= 280 && rect.height >= 200;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function fixRoot(root) {
+    if (!root || root.getAttribute('data-sarvital-kp-fixed') === '1') return;
+    root.setAttribute('data-sarvital-kp-fixed', '1');
+    root.setAttribute('data-sarvital-kp-root', '1');
+
+    if (root.parentNode && root.parentNode !== document.body) {
+      document.body.appendChild(root);
+    }
+
+    root.style.setProperty('z-index', '2147483646', 'important');
+    root.style.setProperty('pointer-events', 'auto', 'important');
+
+    var rootRect = root.getBoundingClientRect();
+    var scrims = [];
+    var dialogs = [];
+    var nodes = root.querySelectorAll('*');
+
+    for (var i = 0; i < nodes.length; i++) {
+      var node = nodes[i];
+      if (isDialog(node)) dialogs.push(node);
+      if (isScrim(node, rootRect)) scrims.push(node);
+    }
+
+    if (!dialogs.length && LOGIN_HINT.test(root.textContent || '')) {
+      dialogs.push(root);
+    }
+
+    for (var s = 0; s < scrims.length; s++) {
+      scrims[s].setAttribute('data-sarvital-kp-scrim', '1');
+      scrims[s].style.setProperty('z-index', '1', 'important');
+    }
+
+    for (var d = 0; d < dialogs.length; d++) {
+      dialogs[d].setAttribute('data-sarvital-kp-dialog', '1');
+      dialogs[d].style.setProperty('z-index', '2', 'important');
+      dialogs[d].style.setProperty('pointer-events', 'auto', 'important');
+      dialogs[d].style.setProperty('position', 'relative', 'important');
+    }
+
+    /* If scrim ended up after dialog in DOM with higher stack, force scrim behind */
+    for (var j = 0; j < scrims.length; j++) {
+      scrims[j].style.setProperty('pointer-events', 'auto', 'important');
+    }
+  }
+
+  function scan() {
+    var candidates = document.querySelectorAll('body > div, body > section, [id*="kwik" i], [class*="kwik" i]');
+    for (var i = 0; i < candidates.length; i++) {
+      if (isKwikPassRoot(candidates[i])) fixRoot(candidates[i]);
+    }
+  }
+
+  var scheduled = false;
+  function scheduleScan() {
+    if (scheduled) return;
+    scheduled = true;
+    requestAnimationFrame(function () {
+      scheduled = false;
+      scan();
+    });
+  }
+
+  try {
+    var mo = new MutationObserver(scheduleScan);
+    mo.observe(document.documentElement, { childList: true, subtree: true });
+    setTimeout(function () {
+      try { mo.disconnect(); } catch (e) {}
+    }, 60000);
+  } catch (e) {}
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', scan);
+  } else {
+    scan();
+  }
+  setTimeout(scan, 300);
+  setTimeout(scan, 1500);
+})();
+</script>
+{%- endif -%}

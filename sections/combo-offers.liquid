@@ -1,0 +1,58 @@
+{% comment %}
+  Standalone Combo Offers section — optional. PDP uses combo-offers-inline snippet in product-main.
+{% endcomment %}
+
+{% capture combo_offers_markup %}
+  {% render 'combo-offers-inline' %}
+{% endcapture %}
+{% assign combo_offers_markup = combo_offers_markup | strip %}
+
+{% if combo_offers_markup != blank %}
+  <section class="combo-offers combo-offers--section" id="combo-offers-{{ section.id }}">
+    <div class="combo-offers__container">
+      <div class="combo-offers-inline">{{ combo_offers_markup }}</div>
+    </div>
+  </section>
+{% endif %}
+
+{% stylesheet %}
+  .combo-offers--section {
+    width: 100%;
+    max-width: 100%;
+    padding: var(--spacing-lg, 24px);
+    box-sizing: border-box;
+  }
+
+  .combo-offers--section .combo-offers__container {
+    max-width: var(--container-max-width, 1160px);
+    margin: 0 auto;
+  }
+
+  .combo-offers--section .combo-offers-inline {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  @media (min-width: 768px) {
+    .combo-offers--section .combo-offers-inline {
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Combo Offers",
+  "tag": "section",
+  "class": "section-combo-offers",
+  "enabled_on": {
+    "templates": ["product"]
+  },
+  "presets": [
+    {
+      "name": "Combo Offers"
+    }
+  ]
+}
+{% endschema %}

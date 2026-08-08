@@ -1,20 +1,18 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "shop_header": {
       "type": "shop-header",
       "settings": {
         "show_background_image": false
-      }
-    },
-    "collection_intro": {
-      "type": "collection-intro",
-      "settings": {
-        "fallback_collection_handle": "all",
-        "show_product_links": true,
-        "moringa_url": "/products/moringa-powder",
-        "sattu_url": "/products/sattu-powder",
-        "amla_url": "/products/amla-powder",
-        "faq_url": "/pages/faq"
       }
     },
     "collection_product_grid": {
@@ -26,7 +24,6 @@
   },
   "order": [
     "shop_header",
-    "collection_intro",
     "collection_product_grid"
   ]
 }

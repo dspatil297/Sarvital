@@ -1,0 +1,82 @@
+{% comment %}
+  Inline combo offers for product buy box.
+  Reads product.metafields.custom.combo_offers (combo_offer metaobjects).
+{% endcomment %}
+
+{% liquid
+  assign combo_offers = product.metafields.custom.combo_offers.value
+  if combo_offers == blank
+    assign combo_offers = product.metafields.custom.combo_offers
+  endif
+%}
+
+{% if combo_offers != blank %}
+  {% for offer in combo_offers %}
+    {% liquid
+      assign offer_active = offer.active.value
+      if offer_active == blank
+        assign offer_active = offer.active
+      endif
+    %}
+    {% if offer_active == true or offer_active == 'true' %}
+      {% liquid
+        assign offer_title = offer.title.value
+        if offer_title == blank
+          assign offer_title = offer.title
+        endif
+
+        assign offer_badge = offer.badge.value
+        if offer_badge == blank
+          assign offer_badge = offer.badge
+        endif
+
+        assign offer_description = offer.description.value
+        if offer_description == blank
+          assign offer_description = offer.description
+        endif
+
+        assign offer_how_to_claim = offer.how_to_claim.value
+        if offer_how_to_claim == blank
+          assign offer_how_to_claim = offer.how_to_claim
+        endif
+
+        assign offer_applied_at = offer.applied_at.value
+        if offer_applied_at == blank
+          assign offer_applied_at = offer.applied_at
+        endif
+
+        assign offer_badge_color = offer.badge_color.value
+        if offer_badge_color == blank
+          assign offer_badge_color = offer.badge_color
+        endif
+        if offer_badge_color == blank
+          assign offer_badge_color = '#c8952a'
+        endif
+      %}
+
+      <div
+        class="offer-banner combo-offer-banner"
+        style="--combo-offer-accent: {{ offer_badge_color }};"
+      >
+        <div class="offer-banner__icon" aria-hidden="true">🎁</div>
+        <div class="offer-banner__text">
+          {% if offer_title != blank %}
+            <strong>
+              {{- offer_title -}}
+              {%- if offer_badge != blank %} — {{ offer_badge }}{% endif -%}
+            </strong><br>
+          {% endif %}
+          {% if offer_description != blank %}
+            {{- offer_description -}}
+          {% endif %}
+          {% if offer_how_to_claim != blank %}
+            <span class="offer-banner__how-to-claim">{{ offer_how_to_claim }}</span>
+          {% endif %}
+          {% if offer_applied_at != blank %}
+            <span class="offer-banner__tag">{{ offer_applied_at }}</span>
+          {% endif %}
+        </div>
+      </div>
+    {% endif %}
+  {% endfor %}
+{% endif %}

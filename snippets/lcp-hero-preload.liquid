@@ -16,11 +16,23 @@
     {%- for block in slide_blocks -%}
       {%- if block.settings.image != blank -%}
         {%- assign preload_mobile = block.settings.mobile_image | default: block.settings.image -%}
+        {%- assign preload_lcp_mobile_url = preload_mobile | image_url: width: 750, format: 'webp' -%}
+        {%- assign preload_lcp_desktop_url = block.settings.image | image_url: width: 1100, format: 'webp' -%}
         <link
           rel="preload"
           as="image"
-          imagesrcset="{{ preload_mobile | image_url: width: 375, format: 'webp' }} 375w, {{ preload_mobile | image_url: width: 750, format: 'webp' }} 750w, {{ block.settings.image | image_url: width: 1100, format: 'webp' }} 1100w"
-          imagesizes="(max-width: 768px) 100vw, min(100vw, 1500px)"
+          type="image/webp"
+          href="{{ preload_lcp_mobile_url }}"
+          fetchpriority="high"
+          media="(max-width: 768px)"
+        >
+        <link
+          rel="preload"
+          as="image"
+          type="image/webp"
+          href="{{ preload_lcp_desktop_url }}"
+          fetchpriority="high"
+          media="(min-width: 769px)"
         >
         {%- break -%}
       {%- endif -%}
@@ -29,6 +41,7 @@
     <link
       rel="preload"
       as="image"
+      fetchpriority="high"
       imagesrcset="{{ hb.settings.hero_image | image_url: width: 375, format: 'webp' }} 375w, {{ hb.settings.hero_image | image_url: width: 750, format: 'webp' }} 750w, {{ hb.settings.hero_image | image_url: width: 1100, format: 'webp' }} 1100w, {{ hb.settings.hero_image | image_url: width: 1500, format: 'webp' }} 1500w, {{ hb.settings.hero_image | image_url: width: 1920, format: 'webp' }} 1920w, {{ hb.settings.hero_image | image_url: width: 2560, format: 'webp' }} 2560w"
       imagesizes="(max-width: 768px) 100vw, min(100vw, 1920px)"
     >

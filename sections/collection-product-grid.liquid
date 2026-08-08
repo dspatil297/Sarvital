@@ -1,12 +1,73 @@
 <section class="collection-product-grid">
   <div class="collection-product-grid__container">
+    {%- liquid
+      assign use_custom_all_order = false
+      assign all_collection_handles = 'sattu-powder,moringa-powder,amla-powder,moringa-amla-combo-150-g-each-1,moringa-sattu-combo-150-g-each-1,sattu-amla-combo-150-g-each-1,ultimate-wellness-combo-moringa-sattu-amla-150-g-each-1' | split: ','
+
+      if collection.handle == 'all'
+        assign use_custom_all_order = true
+      endif
+
+      if collection == collections.all
+        assign use_custom_all_order = true
+      endif
+
+      if template.suffix == 'all'
+        assign use_custom_all_order = true
+      endif
+
+      if request.path == '/collections/all'
+        assign use_custom_all_order = true
+      endif
+    -%}
+
+    {% if use_custom_all_order %}
+      {% if collection.products.size > 0 %}
+        <div class="collection-product-grid__grid" id="product-grid">
+          {% assign card_index = 0 %}
+          {% for handle in all_collection_handles %}
+            {% assign ordered_product = collection.products | where: 'handle', handle | first %}
+            {% if ordered_product != blank %}
+              {% assign card_index = card_index | plus: 1 %}
+              {% assign product_card_uid = section.id | append: '-col-' | append: card_index %}
+              {% render 'product-card', product: ordered_product, card_instance: product_card_uid %}
+            {% endif %}
+          {% endfor %}
+          {% for product in collection.products %}
+            {% assign already_listed = false %}
+            {% for handle in all_collection_handles %}
+              {% if product.handle == handle %}
+                {% assign already_listed = true %}
+                {% break %}
+              {% endif %}
+            {% endfor %}
+            {% unless already_listed %}
+              {% assign card_index = card_index | plus: 1 %}
+              {% assign product_card_uid = section.id | append: '-col-' | append: card_index %}
+              {% render 'product-card', product: product, card_instance: product_card_uid %}
+            {% endunless %}
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="collection-product-grid__empty">
+          <div class="empty-state">
+            <svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" class="empty-state__icon">
+              <path d="M60 15L15 30V54C15 69 25.5 84 39 90C52.5 84 63 69 63 54V30L60 15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M45 60L52.5 67.5L75 45" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <h2 class="empty-state__title">No products found</h2>
+            <p class="empty-state__message">This collection is currently empty. Check back soon for new products!</p>
+            <a href="{{ routes.all_products_collection_url }}" class="btn btn-primary">Browse All Collections</a>
+          </div>
+        </div>
+      {% endif %}
+    {% else %}
     {% paginate collection.products by section.settings.products_per_page %}
       {% if collection.products.size > 0 %}
         <div class="collection-product-grid__grid" id="product-grid">
           {% for product in collection.products %}
             {% assign product_card_uid = section.id | append: '-col-' | append: forloop.index %}
             {% render 'product-card', product: product, card_instance: product_card_uid %}
-            {% render 'quick-view', product: product %}
           {% endfor %}
         </div>
 
@@ -27,6 +88,7 @@
         </div>
       {% endif %}
     {% endpaginate %}
+    {% endif %}
   </div>
 </section>
 
@@ -107,35 +169,28 @@
     }
   }
 
-  /* Mobile breakpoint (max-width: 768px) */
+  /* Mobile: single column — 2-col cards were too cramped and tall */
   @media (max-width: 768px) {
     .collection-product-grid {
-      padding: var(--spacing-3xl) var(--spacing-md);
+      padding: var(--spacing-xl) var(--spacing-md);
+      padding-bottom: calc(var(--spacing-2xl) + 72px);
     }
 
-    .collection-product-grid__grid {
-      grid-template-columns: repeat(2, 1fr);
-      gap: var(--spacing-md);
-    }
-  }
-
-  /* Small mobile breakpoint (max-width: 480px) */
-  @media (max-width: 480px) {
-    .collection-product-grid {
-      padding: var(--spacing-2xl) var(--spacing-sm);
-    }
-
-    .collection-product-grid__grid {
-      grid-template-columns: repeat(2, 1fr);
-      gap: var(--spacing-sm);
-    }
-  }
-
-  /* Extra small screens - single column for better readability */
-  @media (max-width: 360px) {
     .collection-product-grid__grid {
       grid-template-columns: 1fr;
       gap: var(--spacing-md);
+      align-items: start;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .collection-product-grid {
+      padding: var(--spacing-lg) var(--spacing-sm);
+      padding-bottom: calc(var(--spacing-xl) + 72px);
+    }
+
+    .collection-product-grid__grid {
+      gap: var(--spacing-sm);
     }
   }
 {% endstylesheet %}

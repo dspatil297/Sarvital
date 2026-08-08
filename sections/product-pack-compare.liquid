@@ -1,0 +1,394 @@
+{% comment %}
+  Pack size comparison table — dynamic prices from variants.
+  Shows when product has 2+ variants on a weight/size option (or 2+ variants total).
+{% endcomment %}
+
+{% liquid
+  assign pack_option = nil
+  assign pack_option_index = 0
+
+  for option in product.options_with_values
+    assign option_name_down = option.name | downcase
+    if option_name_down contains 'weight' or option_name_down contains 'size' or option_name_down contains 'pack'
+      assign pack_option = option
+      assign pack_option_index = forloop.index0
+      break
+    endif
+  endfor
+
+  if pack_option == nil and product.options_with_values.size > 0
+    assign pack_option = product.options_with_values.first
+    assign pack_option_index = 0
+  endif
+
+  assign pack_count = 0
+  if pack_option != nil
+    assign pack_count = pack_option.values.size
+  endif
+%}
+
+{% if pack_count >= 2 %}
+  <section class="pack-compare" id="pack-compare" aria-labelledby="pack-compare-heading">
+    <div class="pack-compare__container">
+      <div class="pack-compare__block">
+        <h2 class="pack-compare__title" id="pack-compare-heading">
+          {{ section.settings.title | default: 'Which pack size is right for you?' }}
+        </h2>
+        {% if section.settings.subtitle != blank %}
+          <p class="pack-compare__sub">{{ section.settings.subtitle }}</p>
+        {% endif %}
+
+        <div class="pack-compare__table-wrap">
+          <table class="pack-compare__table">
+            <thead>
+              <tr>
+                <th scope="col">{{ section.settings.row_label_header | default: 'What you get' }}</th>
+                {% for value in pack_option.values %}
+                  {% liquid
+                    assign pack_variant = nil
+                    if pack_option_index == 0
+                      assign pack_variant = product.variants | where: 'option1', value | first
+                    elsif pack_option_index == 1
+                      assign pack_variant = product.variants | where: 'option2', value | first
+                    else
+                      assign pack_variant = product.variants | where: 'option3', value | first
+                    endif
+
+                    assign column_label = value
+                    assign weight_subtitle = pack_variant.metafields.custom.weight_subtitle.value
+                    if weight_subtitle == blank
+                      assign weight_subtitle = pack_variant.metafields.custom.weight_subtitle
+                    endif
+                    if weight_subtitle != blank
+                      assign column_label = value | append: ' — ' | append: weight_subtitle
+                    endif
+
+                    assign is_recommended = false
+                    if pack_variant != blank
+                      assign recommended_flag = pack_variant.metafields.custom.variant_recommended.value
+                      if recommended_flag == blank
+                        assign recommended_flag = pack_variant.metafields.custom.variant_recommended
+                      endif
+                      if recommended_flag == true
+                        assign is_recommended = true
+                        assign column_label = column_label | append: ' ★'
+                      endif
+                    endif
+                  %}
+                  <th scope="col"{% if forloop.last %} class="pack-compare__th--best"{% endif %}>{{ column_label }}</th>
+                {% endfor %}
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">{{ section.settings.price_row_label | default: 'Selling price' }}</th>
+                {% for value in pack_option.values %}
+                  {% liquid
+                    if pack_option_index == 0
+                      assign pack_variant = product.variants | where: 'option1', value | first
+                    elsif pack_option_index == 1
+                      assign pack_variant = product.variants | where: 'option2', value | first
+                    else
+                      assign pack_variant = product.variants | where: 'option3', value | first
+                    endif
+                  %}
+                  <td{% if forloop.last %} class="val-best"{% elsif forloop.index == 2 %} class="val-ok"{% endif %}>
+                    {% if pack_variant != blank %}
+                      {{ pack_variant.price | money }}
+                    {% else %}
+                      —
+                    {% endif %}
+                  </td>
+                {% endfor %}
+              </tr>
+
+              <tr>
+                <th scope="row">{{ section.settings.supply_row_label | default: 'Supply duration' }}</th>
+                {% for value in pack_option.values %}
+                  {% liquid
+                    if pack_option_index == 0
+                      assign pack_variant = product.variants | where: 'option1', value | first
+                    elsif pack_option_index == 1
+                      assign pack_variant = product.variants | where: 'option2', value | first
+                    else
+                      assign pack_variant = product.variants | where: 'option3', value | first
+                    endif
+
+                    assign supply_duration = pack_variant.metafields.custom.supply_duration.value
+                    if supply_duration == blank
+                      assign supply_duration = pack_variant.metafields.custom.supply_duration
+                    endif
+                    assign value_down = value | downcase
+                    if supply_duration == blank
+                      if value_down contains '150'
+                        assign supply_duration = '18–21 days'
+                      elsif value_down contains '300'
+                        assign supply_duration = '43 days'
+                      elsif value_down contains '450'
+                        assign supply_duration = '64 days'
+                      endif
+                    endif
+                  %}
+                  <td class="{% if forloop.first %}val-bad{% elsif forloop.last %}val-best{% else %}val-ok{% endif %}">
+                    {{ supply_duration | default: '—' }}
+                  </td>
+                {% endfor %}
+              </tr>
+
+              <tr>
+                <th scope="row">{{ section.settings.savings_row_label | default: 'Saving vs MRP' }}</th>
+                {% for value in pack_option.values %}
+                  {% liquid
+                    if pack_option_index == 0
+                      assign pack_variant = product.variants | where: 'option1', value | first
+                    elsif pack_option_index == 1
+                      assign pack_variant = product.variants | where: 'option2', value | first
+                    else
+                      assign pack_variant = product.variants | where: 'option3', value | first
+                    endif
+                  %}
+                  <td class="{% if forloop.first %}{% elsif forloop.last %}val-best{% else %}val-ok{% endif %}">
+                    {% if pack_variant != blank and pack_variant.compare_at_price > pack_variant.price %}
+                      {{ pack_variant.compare_at_price | minus: pack_variant.price | money }} off
+                    {% else %}
+                      —
+                    {% endif %}
+                  </td>
+                {% endfor %}
+              </tr>
+
+              {% if section.settings.show_extra_rows and pack_count == 3 %}
+                <tr>
+                  <th scope="row">{{ section.settings.results_window_label | default: 'Covers results window?' }}</th>
+                  <td><span class="cross">✗ Runs out early</span></td>
+                  <td><span class="check">✓ Yes — weeks 1–6</span></td>
+                  <td><span class="check">✓✓ Full 2 cycles</span></td>
+                </tr>
+                <tr>
+                  <th scope="row">{{ section.settings.feel_results_label | default: 'Enough to feel results?' }}</th>
+                  <td><span class="cross">✗ Too short</span></td>
+                  <td><span class="check">✓ Definitely</span></td>
+                  <td><span class="check">✓✓ Yes — deeply</span></td>
+                </tr>
+                <tr>
+                  <th scope="row">{{ section.settings.offer_row_label | default: 'Special offer available?' }}</th>
+                  <td><span class="cross">✗ No</span></td>
+                  <td><span class="check">✓ Buy 2, get 10% off</span></td>
+                  <td><span class="check">✓ Best value single pack</span></td>
+                </tr>
+                <tr>
+                  <th scope="row">{{ section.settings.reorder_row_label | default: 'Reorder needed soon?' }}</th>
+                  <td class="val-bad">Yes — in 3 weeks</td>
+                  <td>Yes — in 6 weeks</td>
+                  <td class="val-best">No — 2+ months sorted</td>
+                </tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+{% endif %}
+
+{% stylesheet %}
+  .pack-compare {
+    width: 100%;
+    padding: 0 40px 40px;
+    box-sizing: border-box;
+  }
+
+  .pack-compare__container {
+    max-width: 1160px;
+    margin: 0 auto;
+  }
+
+  .pack-compare__block {
+    background: var(--white);
+    border-radius: 20px;
+    padding: 32px;
+    border: 1px solid var(--border-color, #e0ddd7);
+  }
+
+  .pack-compare__title {
+    font-family: var(--font-heading);
+    font-size: 24px;
+    color: var(--forest-green);
+    margin: 0 0 6px;
+    letter-spacing: -0.3px;
+  }
+
+  .pack-compare__sub {
+    font-size: 14px;
+    color: rgba(26, 26, 26, 0.6);
+    margin: 0 0 24px;
+    line-height: 1.5;
+  }
+
+  .pack-compare__table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .pack-compare__table {
+    width: 100%;
+    min-width: 560px;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border-color, #e0ddd7);
+  }
+
+  .pack-compare__table th,
+  .pack-compare__table td {
+    padding: 12px 16px;
+    font-size: 13px;
+    border-right: 1px solid var(--border-color, #e0ddd7);
+    border-bottom: 1px solid var(--border-color, #e0ddd7);
+    text-align: center;
+    vertical-align: middle;
+  }
+
+  .pack-compare__table thead th {
+    background: var(--forest-green);
+    color: #fff;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+
+  .pack-compare__table thead th:first-child {
+    text-align: left;
+  }
+
+  .pack-compare__table thead th:last-child,
+  .pack-compare__th--best {
+    border-right: none;
+    background: #3d6b1e;
+  }
+
+  .pack-compare__table tbody th[scope='row'] {
+    text-align: left;
+    font-weight: 500;
+    color: rgba(26, 26, 26, 0.65);
+    background: var(--white);
+  }
+
+  .pack-compare__table tbody td {
+    background: var(--white);
+  }
+
+  .pack-compare__table tbody td:last-child {
+    border-right: none;
+    background: #f5f9f2;
+  }
+
+  .pack-compare__table tbody tr:last-child th,
+  .pack-compare__table tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  .pack-compare__table .val-bad {
+    color: #c0392b;
+    font-weight: 600;
+  }
+
+  .pack-compare__table .val-ok {
+    color: #3a5bd9;
+    font-weight: 600;
+  }
+
+  .pack-compare__table .val-best {
+    color: var(--forest-green);
+    font-weight: 700;
+  }
+
+  .pack-compare__table .check {
+    color: var(--forest-green);
+    font-size: 16px;
+  }
+
+  .pack-compare__table .cross {
+    color: #c0392b;
+    font-size: 14px;
+  }
+
+  @media (max-width: 768px) {
+    .pack-compare {
+      padding: 0 16px 32px;
+    }
+
+    .pack-compare__block {
+      padding: 20px 16px;
+    }
+
+    .pack-compare__title {
+      font-size: 20px;
+    }
+
+    .pack-compare__table th,
+    .pack-compare__table td {
+      padding: 10px 12px;
+      font-size: 12px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Pack size compare",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Which pack size is right for you?"
+    },
+    {
+      "type": "textarea",
+      "id": "subtitle",
+      "label": "Subheading",
+      "default": "Same quality across all sizes. The difference is how long you stick with it — and results come with consistency."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_extra_rows",
+      "label": "Show full comparison rows (results window, offers, reorder)",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Row labels"
+    },
+    {
+      "type": "text",
+      "id": "row_label_header",
+      "label": "First column header",
+      "default": "What you get"
+    },
+    {
+      "type": "text",
+      "id": "price_row_label",
+      "label": "Price row",
+      "default": "Selling price"
+    },
+    {
+      "type": "text",
+      "id": "supply_row_label",
+      "label": "Supply row",
+      "default": "Supply duration"
+    },
+    {
+      "type": "text",
+      "id": "savings_row_label",
+      "label": "Savings row",
+      "default": "Saving vs MRP"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Pack size compare"
+    }
+  ]
+}
+{% endschema %}

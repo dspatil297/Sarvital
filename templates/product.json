@@ -23,7 +23,30 @@
         "buy_now_button_pFrqW8"
       ],
       "settings": {
-        "recommended_option_value": ""
+        "recommended_option_value": "",
+        "show_promo_badge": true,
+        "promo_badge_text": "🎁 Rakhi Special",
+        "offer_tag_text": "Rakshabandhan Sale",
+        "pack_label": "Choose Pack Size",
+        "offer_ribbon_text": "Buy 2 · 10% Off",
+        "bundle_ribbon_text": "Buy 2 · Free 150g",
+        "trial_ribbon_text": "Trial Pack",
+        "best_value_ribbon_text": "★ Best Value",
+        "show_offer_banner": true,
+        "offer_banner_title": "Buy 2 × 300g — get extra 10% off.",
+        "offer_banner_body": "Add 2 packs of 300g to cart. Discount applies automatically."
+      }
+    },
+    "product_pack_compare": {
+      "type": "product-pack-compare",
+      "settings": {
+        "title": "Which pack size is right for you?",
+        "subtitle": "Same quality across all sizes. The difference is how long you stick with it — and results come with consistency.",
+        "show_extra_rows": true,
+        "row_label_header": "What you get",
+        "price_row_label": "Selling price",
+        "supply_row_label": "Supply duration",
+        "savings_row_label": "Saving vs MRP"
       }
     },
     "product_benefits_compact": {
@@ -35,49 +58,16 @@
       "name": "Ingredients & Nutrition",
       "settings": {}
     },
-    "product_sattu_protein": {
-      "type": "product-sattu-protein",
-      "blocks": {
-        "use_smoothies": {
-          "type": "use",
-          "settings": {
-            "label": "Smoothies and protein shakes"
-          }
-        },
-        "use_sharbat": {
-          "type": "use",
-          "settings": {
-            "label": "Traditional sharbat (salted or sweet)"
-          }
-        },
-        "use_chilla": {
-          "type": "use",
-          "settings": {
-            "label": "Sattu chilla and savory pancakes"
-          }
-        },
-        "use_post_workout": {
-          "type": "use",
-          "settings": {
-            "label": "Post-workout recovery drinks"
-          }
-        }
-      },
-      "block_order": [
-        "use_smoothies",
-        "use_sharbat",
-        "use_chilla",
-        "use_post_workout"
-      ],
-      "settings": {
-        "product_handle": "sattu-powder",
-        "heading": "Why sattu is a natural protein powder",
-        "show_nutrition_link": true
-      }
-    },
     "product_testimonial_videos": {
       "type": "product-testimonial-videos",
       "blocks": {
+        "testimonial_video_TbgQja": {
+          "type": "testimonial_video",
+          "settings": {
+            "video": "shopify://files/videos/A828B504-1F34-41D8-8A5C-221EA8769CC6 (1).MP4",
+            "caption": ""
+          }
+        },
         "testimonial_video_Pe9ytK": {
           "type": "testimonial_video",
           "settings": {
@@ -89,6 +79,13 @@
           "type": "testimonial_video",
           "settings": {
             "video": "shopify://files/videos/Video-306.mp4",
+            "caption": ""
+          }
+        },
+        "testimonial_video_jg7Gdb": {
+          "type": "testimonial_video",
+          "settings": {
+            "video": "shopify://files/videos/A4531C34-B6AE-417C-A6B9-724B5CE6397B.MP4",
             "caption": ""
           }
         },
@@ -115,8 +112,10 @@
         }
       },
       "block_order": [
+        "testimonial_video_TbgQja",
         "testimonial_video_Pe9ytK",
         "testimonial_video_7RQh3G",
+        "testimonial_video_jg7Gdb",
         "testimonial_video_C6EGJV",
         "testimonial_video_faY6tK",
         "testimonial_video_yHJ8md"
@@ -130,14 +129,6 @@
     "reviews_anchor": {
       "type": "reviews-anchor",
       "settings": {}
-    },
-    "product_image_banner": {
-      "type": "product-image-banner",
-      "settings": {
-        "banner_image": "shopify://shop_images/WhatsApp_Image_2026-02-03_at_20.43.06.jpg",
-        "banner_alt": "Product banner",
-        "banner_link": ""
-      }
     },
     "product_reviews_carousel": {
       "type": "apps",
@@ -158,6 +149,9 @@
             "show_sample_reviews": false,
             "reviews_selection": "all",
             "products": [],
+            "filter_pinned": false,
+            "filter_featured": false,
+            "filter_custom_tags": "",
             "star_rating": "all",
             "show_review_media": false,
             "display_order": "media_first",
@@ -180,7 +174,8 @@
             "arrows_color": "#2d5016",
             "transition_speed": 5,
             "header_text": "Customer reviews",
-            "show_average_rating": true
+            "show_average_rating": true,
+            "rating_display": "default"
           }
         }
       },
@@ -189,6 +184,14 @@
         "judge_me_reviews_cards_carousel"
       ],
       "settings": {}
+    },
+    "product_image_banner": {
+      "type": "product-image-banner",
+      "settings": {
+        "banner_image": "shopify://shop_images/WhatsApp_Image_2026-02-03_at_20.43.06.jpg",
+        "banner_alt": "Product banner",
+        "banner_link": ""
+      }
     },
     "related_products": {
       "type": "product-grid",
@@ -211,9 +214,9 @@
   },
   "order": [
     "product_main",
+    "product_pack_compare",
     "product_benefits_compact",
     "product_ingredients_nutrition_y7n8pk",
-    "product_sattu_protein",
     "product_testimonial_videos",
     "reviews_anchor",
     "product_reviews_carousel",

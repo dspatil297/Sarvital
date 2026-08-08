@@ -40,37 +40,56 @@
               {%- assign lcp_hero_image_done = true -%}
               {%- assign is_lcp_hero_slide = true -%}
             {%- endunless -%}
-            <picture class="hero-banner__slide-picture">
-              <source
-                media="(max-width: 768px)"
-                srcset="
-                  {{ mobile_img | image_url: width: 375, format: 'webp' }} 375w,
-                  {{ mobile_img | image_url: width: 750, format: 'webp' }} 750w,
-                  {{ mobile_img | image_url: width: 1100, format: 'webp' }} 1100w,
-                  {{ mobile_img | image_url: width: 1500, format: 'webp' }} 1500w
-                "
-                sizes="100vw"
-              >
+            {%- if is_lcp_hero_slide -%}
+              <picture class="hero-banner__slide-picture">
+                <source
+                  media="(max-width: 768px)"
+                  srcset="
+                    {{ mobile_img | image_url: width: 375, format: 'webp' }} 375w,
+                    {{ mobile_img | image_url: width: 750, format: 'webp' }} 750w
+                  "
+                  sizes="100vw"
+                >
+                <source
+                  media="(min-width: 769px)"
+                  srcset="
+                    {{ block.settings.image | image_url: width: 750, format: 'webp' }} 750w,
+                    {{ block.settings.image | image_url: width: 1100, format: 'webp' }} 1100w,
+                    {{ block.settings.image | image_url: width: 1500, format: 'webp' }} 1500w,
+                    {{ block.settings.image | image_url: width: 1920, format: 'webp' }} 1920w
+                  "
+                  sizes="min(100vw, 1500px)"
+                >
+                <img
+                  class="hero-banner__slide-img hero-banner__slide-img--lcp"
+                  src="{{ mobile_img | image_url: width: 750, format: 'webp' }}"
+                  alt="{{ block.settings.image.alt | default: '' }}"
+                  width="{{ block.settings.image.width }}"
+                  height="{{ block.settings.image.height }}"
+                  loading="eager"
+                  fetchpriority="high"
+                  decoding="async"
+                  onerror="this.classList.add('image-error'); this.alt='Image failed to load';"
+                >
+              </picture>
+            {%- else -%}
               <img
-                class="hero-banner__slide-img{% if is_lcp_hero_slide %} hero-banner__slide-img--lcp{% endif %}"
-                src="{% if is_lcp_hero_slide %}{{ mobile_img | image_url: width: 750, format: 'webp' }}{% else %}{{ block.settings.image | image_url: width: 1100, format: 'webp' }}{% endif %}"
-                srcset="
-                  {{ block.settings.image | image_url: width: 375, format: 'webp' }} 375w,
-                  {{ block.settings.image | image_url: width: 750, format: 'webp' }} 750w,
-                  {{ block.settings.image | image_url: width: 1100, format: 'webp' }} 1100w,
-                  {{ block.settings.image | image_url: width: 1500, format: 'webp' }} 1500w,
-                  {{ block.settings.image | image_url: width: 1920, format: 'webp' }} 1920w
-                "
+                class="hero-banner__slide-img hero-banner__slide-img--deferred"
+                src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+                data-hero-src="{{ block.settings.image | image_url: width: 1100, format: 'webp' }}"
+                data-hero-srcset="{{ block.settings.image | image_url: width: 375, format: 'webp' }} 375w, {{ block.settings.image | image_url: width: 750, format: 'webp' }} 750w, {{ block.settings.image | image_url: width: 1100, format: 'webp' }} 1100w, {{ block.settings.image | image_url: width: 1500, format: 'webp' }} 1500w, {{ block.settings.image | image_url: width: 1920, format: 'webp' }} 1920w"
+                data-hero-mobile-src="{{ mobile_img | image_url: width: 750, format: 'webp' }}"
+                data-hero-mobile-srcset="{{ mobile_img | image_url: width: 375, format: 'webp' }} 375w, {{ mobile_img | image_url: width: 750, format: 'webp' }} 750w, {{ mobile_img | image_url: width: 1100, format: 'webp' }} 1100w"
                 sizes="(max-width: 768px) 100vw, min(100vw, 1500px)"
                 alt="{{ block.settings.image.alt | default: '' }}"
                 width="{{ block.settings.image.width }}"
                 height="{{ block.settings.image.height }}"
-                loading="eager"
-                fetchpriority="{% if is_lcp_hero_slide %}high{% else %}auto{% endif %}"
+                loading="lazy"
+                fetchpriority="low"
                 decoding="async"
                 onerror="this.classList.add('image-error'); this.alt='Image failed to load';"
               >
-            </picture>
+            {%- endif -%}
           {%- else -%}
             <span class="hero-banner__slide-placeholder">Select image in Theme Customizer → click this slide → Slide image</span>
           {%- endif -%}
@@ -80,7 +99,7 @@
       {% if section.settings.hero_image %}
         <div class="hero-banner__slide hero-banner__slide--active">
           <img
-            class="hero-banner__slide-img"
+            class="hero-banner__slide-img hero-banner__slide-img--lcp"
             src="{{ section.settings.hero_image | image_url: width: 1100, format: 'webp' }}"
             srcset="
               {{ section.settings.hero_image | image_url: width: 375, format: 'webp' }} 375w,
@@ -127,28 +146,6 @@
         <p class="hero-banner__subheading">{{ section.settings.subheading }}</p>
       {% endif %}
 
-      <div class="hero-banner__trust-badges">
-        <span class="trust-badge">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M10 2L12 7L17 7.5L13.5 11L14.5 16L10 13.5L5.5 16L6.5 11L3 7.5L8 7L10 2Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          Premium Quality
-        </span>
-        <span class="trust-badge">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M10 18C14.4183 18 18 14.4183 18 10C18 5.58172 14.4183 2 10 2C5.58172 2 2 5.58172 2 10C2 14.4183 5.58172 18 10 18Z" stroke="currentColor" stroke-width="1.5"/>
-            <path d="M7 10L9 12L13 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          Natural
-        </span>
-        <span class="trust-badge">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M10 2L12 7L17 7.5L13.5 11L14.5 16L10 13.5L5.5 16L6.5 11L3 7.5L8 7L10 2Z" fill="currentColor"/>
-          </svg>
-          Lab Tested
-        </span>
-      </div>
-      
       <div class="hero-banner__ctas">
         {% if section.settings.cta_text != blank and section.settings.cta_link != blank %}
           <a href="{{ section.settings.cta_link }}" class="btn btn-primary btn-large hero-banner__cta-primary">
@@ -201,9 +198,9 @@
     z-index: 1;
     width: 100%;
     max-width: 100%;
-    height: 90vh;
-    min-height: 600px;
-    max-height: 900px;
+    height: 85vh;
+    min-height: 480px;
+    max-height: 950px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -293,6 +290,15 @@
   }
 
   .hero-banner__slide-img--lcp {
+    opacity: 1;
+    animation: none;
+  }
+
+  .hero-banner__slide-img--deferred {
+    opacity: 0;
+  }
+
+  .hero-banner__slide--active .hero-banner__slide-img--deferred[data-hero-hydrated='true'] {
     opacity: 1;
     animation: none;
   }
@@ -390,17 +396,20 @@
     max-width: 1400px;
     padding: var(--spacing-xl) var(--spacing-lg);
     margin: 0 auto;
-    text-align: left;
+    text-align: center;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-end;
+    align-items: center;
+    align-self: stretch;
     min-height: 100%;
+    padding-bottom: calc(var(--spacing-2xl) + 2rem);
     box-sizing: border-box;
   }
 
   .hero-banner__text {
-    max-width: 700px;
-    width: 100%;
+    max-width: none;
+    width: auto;
     box-sizing: border-box;
   }
 
@@ -474,9 +483,10 @@
   .hero-banner__ctas {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: var(--spacing-md);
     flex-wrap: wrap;
-    width: 100%;
+    width: auto;
   }
 
   .hero-banner__cta-primary {
@@ -687,19 +697,20 @@
 
   @media (max-width: 768px) {
     .hero-banner {
-      height: 80vh;
+      height: 72vh;
       min-height: 420px;
-      max-height: 640px;
+      max-height: 680px;
     }
 
     .hero-banner__content {
       padding: var(--spacing-xl) var(--spacing-md);
+      padding-bottom: calc(var(--spacing-xl) + 2rem);
       text-align: center;
     }
 
     .hero-banner__text {
-      max-width: 100%;
-      width: 100%;
+      max-width: none;
+      width: auto;
     }
 
     .hero-banner__heading {
@@ -769,8 +780,8 @@
 
   @media (max-width: 480px) {
     .hero-banner {
-      height: 80vh;
-      min-height: 450px;
+      height: 70vh;
+      min-height: 380px;
       max-height: 600px;
     }
 
@@ -835,6 +846,30 @@
     var currentIndex = 0;
     var timer = null;
 
+    function hydrateSlideImage(slide) {
+      if (!slide) return;
+      var img = slide.querySelector('.hero-banner__slide-img--deferred[data-hero-src]');
+      if (!img || img.getAttribute('data-hero-hydrated') === 'true') return;
+
+      var isMobile = window.matchMedia('(max-width: 768px)').matches;
+      var src = isMobile ? (img.getAttribute('data-hero-mobile-src') || img.getAttribute('data-hero-src')) : img.getAttribute('data-hero-src');
+      var srcset = isMobile ? (img.getAttribute('data-hero-mobile-srcset') || img.getAttribute('data-hero-srcset')) : img.getAttribute('data-hero-srcset');
+
+      if (src) img.src = src;
+      if (srcset) img.srcset = srcset;
+
+      img.removeAttribute('data-hero-src');
+      img.removeAttribute('data-hero-srcset');
+      img.removeAttribute('data-hero-mobile-src');
+      img.removeAttribute('data-hero-mobile-srcset');
+      img.setAttribute('data-hero-hydrated', 'true');
+    }
+
+    function prefetchNextSlideImage() {
+      var nextIndex = (currentIndex + 1) % slides.length;
+      hydrateSlideImage(slides[nextIndex]);
+    }
+
     function goToSlide(index) {
       currentIndex = (index % slides.length + slides.length) % slides.length;
       for (var i = 0; i < slides.length; i++) {
@@ -844,6 +879,8 @@
         dots[j].classList.toggle('hero-banner__carousel-dot--active', j === currentIndex);
         dots[j].setAttribute('aria-selected', j === currentIndex);
       }
+      hydrateSlideImage(slides[currentIndex]);
+      prefetchNextSlideImage();
     }
 
     function next() { goToSlide(currentIndex + 1); }
@@ -891,6 +928,7 @@
 
     function beginAutoplayAfterLcpWindow() {
       section.setAttribute('data-paused', 'false');
+      prefetchNextSlideImage();
       startAutoplay();
     }
 

@@ -12,44 +12,20 @@
     "hero_banner": {
       "type": "hero-banner",
       "blocks": {
-        "slide_Nq893k": {
+        "slide_LNqKxV": {
           "type": "slide",
           "settings": {
-            "image": "shopify://shop_images/WhatsApp_Image_2026-01-30_at_11.50.09_14ac557d-a7ca-4612-accf-6ccaf47acc0d.webp",
-            "mobile_image": "shopify://shop_images/WhatsApp_Image_2026-01-30_at_11.50.09.webp"
-          }
-        },
-        "slide_4NXNRf": {
-          "type": "slide",
-          "settings": {
-            "image": "shopify://shop_images/WhatsApp_Image_2026-01-31_at_13.44.35_a64133cf-50f0-4be1-8fe0-0556bae000f2.webp",
-            "mobile_image": "shopify://shop_images/moringa.webp"
-          }
-        },
-        "slide_hMhcUm": {
-          "type": "slide",
-          "settings": {
-            "image": "shopify://shop_images/WhatsApp_Image_2026-01-31_at_13.44.34_1_f5d4b477-adf5-49d1-ad4d-f933dd613f41.webp",
-            "mobile_image": "shopify://shop_images/amla.webp"
-          }
-        },
-        "slide_knjxEJ": {
-          "type": "slide",
-          "settings": {
-            "image": "shopify://shop_images/WhatsApp_Image_2026-01-31_at_13.44.35_1_226df6b3-7767-4273-8743-18131fd0a5a8.webp",
-            "mobile_image": "shopify://shop_images/sattu.webp"
+            "image": "shopify://shop_images/ChatGPT_Image_Aug_8_2026_03_21_01_PM.webp",
+            "mobile_image": "shopify://shop_images/Image_2.webp"
           }
         }
       },
       "block_order": [
-        "slide_Nq893k",
-        "slide_4NXNRf",
-        "slide_hMhcUm",
-        "slide_knjxEJ"
+        "slide_LNqKxV"
       ],
       "settings": {
-        "heading": "Transform Your Health with Nature's Finest",
-        "subheading": "Premium natural fruit & vegetable powders. Lab-tested, sustainably sourced, and packed with natural goodness.",
+        "heading": "",
+        "subheading": "",
         "cta_text": "Shop Now",
         "cta_link": "/collections/all",
         "secondary_cta_text": "Learn More",
@@ -105,58 +81,6 @@
         "title": "Why Choose Sarvital"
       }
     },
-    "home_testimonial_videos": {
-      "type": "product-testimonial-videos",
-      "blocks": {
-        "testimonial_video_zmpXj6": {
-          "type": "testimonial_video",
-          "settings": {
-            "video": "shopify://files/videos/Video-530.mp4",
-            "caption": ""
-          }
-        },
-        "testimonial_video_9UaGTG": {
-          "type": "testimonial_video",
-          "settings": {
-            "video": "shopify://files/videos/Video-306.mp4",
-            "caption": ""
-          }
-        },
-        "testimonial_video_qAfwht": {
-          "type": "testimonial_video",
-          "settings": {
-            "video": "shopify://files/videos/Video-48.mp4",
-            "caption": ""
-          }
-        },
-        "testimonial_video_qXzL3w": {
-          "type": "testimonial_video",
-          "settings": {
-            "video": "shopify://files/videos/Video-853.mp4",
-            "caption": ""
-          }
-        },
-        "testimonial_video_ANMbcB": {
-          "type": "testimonial_video",
-          "settings": {
-            "video": "shopify://files/videos/Video-946.mp4",
-            "caption": ""
-          }
-        }
-      },
-      "block_order": [
-        "testimonial_video_zmpXj6",
-        "testimonial_video_9UaGTG",
-        "testimonial_video_qAfwht",
-        "testimonial_video_qXzL3w",
-        "testimonial_video_ANMbcB"
-      ],
-      "name": "Testimonial videos",
-      "settings": {
-        "heading": "Tried & trusted",
-        "subheading": "Real stories from people who use Sarvital."
-      }
-    },
     "176943494681be9f0a": {
       "type": "apps",
       "blocks": {
@@ -166,6 +90,9 @@
             "show_sample_reviews": true,
             "reviews_selection": "all",
             "products": [],
+            "filter_pinned": false,
+            "filter_featured": false,
+            "filter_custom_tags": "",
             "star_rating": "4_to_5_star",
             "show_review_media": false,
             "display_order": "media_first",
@@ -188,7 +115,8 @@
             "arrows_color": "#1a1a1a",
             "transition_speed": 5,
             "header_text": "What Our Customers Say",
-            "show_average_rating": false
+            "show_average_rating": false,
+            "rating_display": "default"
           }
         }
       },
@@ -202,7 +130,7 @@
       "settings": {
         "title": "Our Premium Powders",
         "description": "Discover our range of premium fruit and vegetable powders, carefully crafted for your wellness journey.",
-        "layout": "carousel",
+        "layout": "grid",
         "carousel_auto_scroll": true,
         "carousel_auto_scroll_interval": 6,
         "collection": "frontpage",
@@ -281,6 +209,74 @@
         "cta_link": "/collections/all"
       }
     },
+    "home_testimonial_videos": {
+      "type": "product-testimonial-videos",
+      "blocks": {
+        "testimonial_video_c6ainy": {
+          "type": "testimonial_video",
+          "settings": {
+            "video": "shopify://files/videos/A828B504-1F34-41D8-8A5C-221EA8769CC6 (1).MP4",
+            "caption": ""
+          }
+        },
+        "testimonial_video_zmpXj6": {
+          "type": "testimonial_video",
+          "settings": {
+            "video": "shopify://files/videos/Video-530.mp4",
+            "caption": ""
+          }
+        },
+        "testimonial_video_9UaGTG": {
+          "type": "testimonial_video",
+          "settings": {
+            "video": "shopify://files/videos/Video-306.mp4",
+            "caption": ""
+          }
+        },
+        "testimonial_video_fYUqYr": {
+          "type": "testimonial_video",
+          "settings": {
+            "video": "shopify://files/videos/A4531C34-B6AE-417C-A6B9-724B5CE6397B.MP4",
+            "caption": ""
+          }
+        },
+        "testimonial_video_qAfwht": {
+          "type": "testimonial_video",
+          "settings": {
+            "video": "shopify://files/videos/Video-48.mp4",
+            "caption": ""
+          }
+        },
+        "testimonial_video_qXzL3w": {
+          "type": "testimonial_video",
+          "settings": {
+            "video": "shopify://files/videos/Video-853.mp4",
+            "caption": ""
+          }
+        },
+        "testimonial_video_ANMbcB": {
+          "type": "testimonial_video",
+          "settings": {
+            "video": "shopify://files/videos/Video-946.mp4",
+            "caption": ""
+          }
+        }
+      },
+      "block_order": [
+        "testimonial_video_c6ainy",
+        "testimonial_video_zmpXj6",
+        "testimonial_video_9UaGTG",
+        "testimonial_video_fYUqYr",
+        "testimonial_video_qAfwht",
+        "testimonial_video_qXzL3w",
+        "testimonial_video_ANMbcB"
+      ],
+      "name": "Testimonial videos",
+      "settings": {
+        "heading": "Tried & trusted",
+        "subheading": "Real stories from people who use Sarvital."
+      }
+    },
     "quality_assurance": {
       "type": "quality-assurance",
       "blocks": {
@@ -333,7 +329,8 @@
       "type": "home-faq",
       "settings": {
         "title": "Frequently asked questions",
-        "show_view_all_link": true
+        "show_view_all_link": true,
+        "view_all_url": ""
       }
     }
   },
