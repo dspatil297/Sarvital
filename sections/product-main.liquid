@@ -8,6 +8,15 @@
   assign recommended_variant = nil
   assign recommended_option_value = section.settings.recommended_option_value
 
+  assign pdp_newly_launched = false
+  assign nl_raw = product.metafields.custom.newly_launched.value
+  if nl_raw == blank
+    assign nl_raw = product.metafields.custom.newly_launched
+  endif
+  if nl_raw == true or nl_raw == 'true'
+    assign pdp_newly_launched = true
+  endif
+
   if recommended_option_value == blank
     assign recommended_option_value = product.metafields.custom.recommended_option_value.value
   endif
@@ -110,7 +119,10 @@
             onerror="this.classList.add('image-error'); this.alt='Product image failed to load';"
           >
           {% if section.settings.show_promo_badge %}
-            <div class="gallery-badge gallery-badge--promo" id="product-promo-badge">{{ section.settings.promo_badge_text | default: '🎁 Rakhi Special' }}</div>
+            <div class="gallery-badge gallery-badge--promo" id="product-promo-badge">{{ section.settings.promo_badge_text }}</div>
+          {% endif %}
+          {% if pdp_newly_launched %}
+            <div class="gallery-badge gallery-badge--newly-launched" id="product-newly-launched-badge">✦ Newly Launched</div>
           {% endif %}
         </div>
         {% if product.images.size > 1 %}
@@ -285,7 +297,7 @@
             <path d="M1 3h15v13H1V3zm16 8h4l3 3v4h-7v-7z"/>
             <path d="M5 21a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm12 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/>
           </svg>
-          Free Shipping Above ₹499
+          Free Shipping Above ₹449
         </span>
         {% if section.settings.show_promo_badge %}
           <span class="trust-badge trust-badge--high-demand">
@@ -377,14 +389,17 @@
         {% endif %}
       </div>
 
-      {% if pdp_variant.inventory_quantity > 0 and pdp_variant.inventory_quantity <= 10 %}
-        <div class="product-stock-alert">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="10"/>
-            <line x1="12" y1="8" x2="12" y2="12"/>
-            <line x1="12" y1="16" x2="12.01" y2="16"/>
-          </svg>
-          <span>Only {{ pdp_variant.inventory_quantity }} left in stock!</span>
+      {% if section.settings.show_urgency_bar %}
+        <div class="urgency-bar" id="urgency-bar" role="alert" aria-live="polite">
+          <span class="urgency-bar__fire" aria-hidden="true">🔥</span>
+          <span class="urgency-bar__dot" aria-hidden="true"></span>
+          <span class="urgency-bar__text">
+            <strong>{{ section.settings.urgency_bar_text | default: 'Hurry! Limited stock remaining.' }}</strong>
+            {{ section.settings.urgency_bar_subtext | default: 'High demand — order before it sells out.' }}
+          </span>
+          <span class="urgency-bar__viewers" aria-hidden="true">
+            👁️ <span id="urgency-viewer-count">{{ section.settings.urgency_bar_viewers | default: '24' }}</span> viewing now
+          </span>
         </div>
       {% endif %}
 
@@ -585,7 +600,7 @@
         >
           <span class="cta-button__text">
             {% if pdp_variant.available %}
-              Add to Cart — <span class="atc-price" id="atcPrice">{{ pdp_variant.price | money }}</span>
+              Add to Cart
             {% else %}
               Sold Out
             {% endif %}
@@ -632,7 +647,7 @@
         <div class="trust-item">
           <div class="trust-icon" aria-hidden="true">🚚</div>
           <strong>Free Shipping</strong>
-          On orders ₹499+
+          On orders ₹449+
         </div>
         <div class="trust-item">
           <div class="trust-icon" aria-hidden="true">🔒</div>
@@ -802,7 +817,7 @@
   /* Product Gallery */
   .product-gallery {
     position: sticky;
-    top: 80px;
+    top: var(--header-total-height, 120px);
     height: fit-content;
     min-width: 0;
     max-width: 640px;
@@ -857,6 +872,20 @@
   .gallery-badge--promo {
     background: #c0186a;
     color: #fff;
+  }
+
+  .gallery-badge--newly-launched {
+    top: 16px;
+    right: auto;
+    left: 16px;
+    background: linear-gradient(135deg, #0d9e6e 0%, #10b981 100%);
+    color: #fff;
+    animation: nl-pdp-glow 2s ease-in-out infinite;
+  }
+
+  @keyframes nl-pdp-glow {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(16,185,129,.5); }
+    50%       { box-shadow: 0 0 0 8px rgba(16,185,129,0); }
   }
 
   #product-image-lightbox {
@@ -1211,26 +1240,108 @@
     border-left: 3px solid var(--sage-green);
   }
 
-  /* Stock Alert */
+  /* Stock Alert (legacy, kept for JS-injected variant-switch alerts) */
   .product-stock-alert,
   .product-stock-available {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 12px 16px;
+    padding: 10px 14px;
     border-radius: 8px;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 500;
   }
 
   .product-stock-alert {
-    background: rgba(255, 87, 34, 0.1);
-    color: var(--forest-green);
+    background: rgba(255, 87, 34, 0.08);
+    color: #c0392b;
   }
 
   .product-stock-available {
-    background: rgba(220, 38, 38, 0.1);
+    background: rgba(46, 125, 50, 0.08);
+    color: #2e7d32;
+  }
+
+  /* ── Urgency Bar ─────────────────────────────────────────── */
+  @keyframes urgency-pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50%       { transform: scale(1.15); opacity: 0.7; }
+  }
+  @keyframes urgency-dot {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(220,38,38,.5); }
+    60%       { box-shadow: 0 0 0 6px rgba(220,38,38,0); }
+  }
+  @keyframes urgency-shimmer {
+    from { background-position: -200% center; }
+    to   { background-position:  200% center; }
+  }
+
+  .urgency-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(135deg, #fff1f0 0%, #ffe4e1 100%);
+    border: 1.5px solid #e53e3e;
+    border-radius: 10px;
+    padding: 11px 14px;
+    font-size: 13px;
+    line-height: 1.4;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* shimmer sweep */
+  .urgency-bar::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255,255,255,.35) 50%,
+      transparent 100%
+    );
+    background-size: 200% 100%;
+    animation: urgency-shimmer 3s linear infinite;
+    pointer-events: none;
+  }
+
+  .urgency-bar__fire {
+    font-size: 18px;
+    flex-shrink: 0;
+    animation: urgency-pulse 1.4s ease-in-out infinite;
+  }
+
+  .urgency-bar__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #dc2626;
+    flex-shrink: 0;
+    animation: urgency-dot 1.4s ease-in-out infinite;
+  }
+
+  .urgency-bar__text {
+    flex: 1;
+    color: #7f1d1d;
+  }
+
+  .urgency-bar__text strong {
     color: #b91c1c;
+    font-weight: 700;
+    display: block;
+    font-size: 13.5px;
+  }
+
+  .urgency-bar__viewers {
+    flex-shrink: 0;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: #b91c1c;
+    background: rgba(220,38,38,.1);
+    padding: 3px 8px;
+    border-radius: 20px;
+    white-space: nowrap;
   }
 
   /* Variants */
@@ -1271,13 +1382,13 @@
     position: relative;
     border: 2px solid var(--border-color);
     border-radius: 12px;
-    padding: 12px 10px 10px;
+    padding: 18px 12px 16px;
     cursor: pointer;
     background: #fff;
     transition: border-color 0.18s, box-shadow 0.18s;
     text-align: center;
     user-select: none;
-    min-height: auto;
+    min-height: 96px;
     display: block;
     width: 100%;
   }
@@ -1326,12 +1437,25 @@
     display: block;
   }
 
+  .pack-btn__body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .pack-btn__pricing {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
   .pack-size {
     display: block;
     font-size: 18px;
     font-weight: 600;
     color: var(--text);
-    line-height: 1;
+    line-height: 1.2;
   }
 
   .pack-name {
@@ -1347,7 +1471,7 @@
     font-size: 11px;
     color: rgba(26, 26, 26, 0.55);
     text-decoration: line-through;
-    margin-bottom: 2px;
+    margin-bottom: 0;
   }
 
   .pack-price {
@@ -1624,11 +1748,6 @@
 
   .cta-button--secondary:hover {
     background: #f5f9f2;
-  }
-
-  .atc-price {
-    font-size: 18px;
-    opacity: 0.9;
   }
 
   .cta-button:disabled {
@@ -2146,7 +2265,7 @@
       align-items: center;
       justify-content: space-between;
       gap: 12px;
-      padding: 12px 14px;
+      padding: 14px 16px;
     }
 
     .pack-btn__main {
@@ -2377,7 +2496,7 @@
     }
 
     .pack-btn__body {
-      padding: 10px 12px;
+      padding: 12px 14px;
     }
 
     .pack-size {
@@ -2697,7 +2816,8 @@
         } else {
           if (addToCartBtn) {
             addToCartBtn.disabled = false;
-            updateAtcButtonPrice(price);
+            var atcTextAvailable = addToCartBtn.querySelector('.cta-button__text');
+            if (atcTextAvailable) atcTextAvailable.textContent = 'Add to Cart';
           }
           if (stickyBtn) stickyBtn.disabled = false;
         }
@@ -2723,11 +2843,6 @@
         quantityInput.value = currentValue + 1;
       } else if (action === 'decrease' && currentValue > min) {
         quantityInput.value = currentValue - 1;
-      }
-      var variantSelectEl = document.getElementById('product-variant-select');
-      if (variantSelectEl) {
-        var selectedOption = variantSelectEl.options[variantSelectEl.selectedIndex];
-        if (selectedOption) updateAtcButtonPrice(selectedOption.getAttribute('data-price'));
       }
     });
 
@@ -2861,17 +2976,6 @@
           }).catch(function() { fail(); });
         }
       });
-    }
-
-    function updateAtcButtonPrice(priceCents) {
-      var addToCartBtn = document.getElementById('add-to-cart-btn');
-      if (!addToCartBtn || addToCartBtn.disabled) return;
-      var qtyInput = document.querySelector('#product-form input[name="quantity"]');
-      var qty = (qtyInput && parseInt(qtyInput.value, 10)) || 1;
-      var unitPrice = parseInt(priceCents, 10) || 0;
-      var atcText = addToCartBtn.querySelector('.cta-button__text');
-      if (!atcText) return;
-      atcText.innerHTML = 'Add to Cart — <span class="atc-price" id="atcPrice">' + formatMoney(unitPrice * qty) + '</span>';
     }
 
     function getUpgradeTextHtml(variantId) {
@@ -3061,25 +3165,53 @@
     },
     {
       "type": "header",
+      "content": "Urgency bar"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_urgency_bar",
+      "label": "Show urgency bar",
+      "info": "Displays below price, above variant selector.",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "urgency_bar_text",
+      "label": "Urgency headline",
+      "default": "Hurry! Limited stock remaining."
+    },
+    {
+      "type": "text",
+      "id": "urgency_bar_subtext",
+      "label": "Urgency sub-text",
+      "default": "High demand — order before it sells out."
+    },
+    {
+      "type": "text",
+      "id": "urgency_bar_viewers",
+      "label": "Viewing now count",
+      "info": "Static number shown as 'X viewing now'.",
+      "default": "24"
+    },
+    {
+      "type": "header",
       "content": "Promo badges"
     },
     {
       "type": "checkbox",
       "id": "show_promo_badge",
       "label": "Show promo badge on image",
-      "default": true
+      "default": false
     },
     {
       "type": "text",
       "id": "promo_badge_text",
-      "label": "Image promo badge text",
-      "default": "🎁 Rakhi Special"
+      "label": "Image promo badge text"
     },
     {
       "type": "text",
       "id": "offer_tag_text",
-      "label": "Sale alert text (above title)",
-      "default": "Rakshabandhan Sale"
+      "label": "Sale alert text (above title)"
     },
     {
       "type": "header",

@@ -24,9 +24,9 @@
       ],
       "settings": {
         "recommended_option_value": "",
-        "show_promo_badge": true,
-        "promo_badge_text": "🎁 Rakhi Special",
-        "offer_tag_text": "Rakshabandhan Sale",
+        "show_promo_badge": false,
+        "promo_badge_text": "",
+        "offer_tag_text": "",
         "pack_label": "Choose Pack Size",
         "offer_ribbon_text": "Buy 2 · 10% Off",
         "bundle_ribbon_text": "Buy 2 · Free 150g",

@@ -219,6 +219,33 @@
       {% endif %}
     </div>
   </div>
+
+  {% if section.settings.enable_sale_timer %}
+    {% assign sale_end_date = section.settings.sale_timer_end_date | default: '' %}
+    {% assign sale_end_time = section.settings.sale_timer_end_time | default: '23:59' %}
+    {% if sale_end_date != '' %}
+      {% assign sale_end_iso = sale_end_date | append: 'T' | append: sale_end_time | append: ':00' %}
+    {% else %}
+      {% assign sale_end_iso = '' %}
+    {% endif %}
+    <div class="global-sale-timer-bar" id="global-sale-timer-bar" data-sale-end="{{ sale_end_iso }}">
+      <div class="sale-timer-inner">
+        <span class="sale-timer-badge">🔥 {{ section.settings.sale_timer_badge | default: 'LIMITED TIME SALE' }}</span>
+        <span class="sale-timer-text">{{ section.settings.sale_timer_text | default: 'Sale Ends In:' }}</span>
+        <div class="sale-countdown-clock" id="sale-countdown-clock">
+          <div class="clock-box"><span class="clock-num" id="timer-days">00</span><span class="clock-label">d</span></div>
+          <span class="clock-colon">:</span>
+          <div class="clock-box"><span class="clock-num" id="timer-hours">00</span><span class="clock-label">h</span></div>
+          <span class="clock-colon">:</span>
+          <div class="clock-box"><span class="clock-num" id="timer-mins">00</span><span class="clock-label">m</span></div>
+          <span class="clock-colon">:</span>
+          <div class="clock-box"><span class="clock-num" id="timer-secs">00</span><span class="clock-label">s</span></div>
+        </div>
+        {% assign shop_now_url = section.settings.sale_timer_button_url | default: routes.all_products_collection_url %}
+        <a href="{{ shop_now_url }}" class="sale-timer-btn">{{ section.settings.sale_timer_button_text | default: 'Shop Now' }} &rarr;</a>
+      </div>
+    </div>
+  {% endif %}
 </header>
 
 {% stylesheet %}
@@ -729,6 +756,159 @@
       max-width: 100%;
     }
   }
+
+  /* Global Sale Timer Bar */
+  .global-sale-timer-bar {
+    background: linear-gradient(90deg, #14280b 0%, #2d5016 50%, #14280b 100%);
+    color: #ffffff;
+    border-top: 1px solid rgba(212, 175, 55, 0.35);
+    padding: 8px 20px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .sale-timer-inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    max-width: 1200px;
+    margin: 0 auto;
+    font-size: 15px;
+    font-weight: 500;
+  }
+
+  .sale-timer-badge {
+    background: linear-gradient(135deg, #d4af37 0%, #f3e5ab 100%);
+    color: #14280b;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    box-shadow: 0 0 8px rgba(212, 175, 55, 0.4);
+  }
+
+  .sale-timer-text {
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 14px;
+    white-space: nowrap;
+  }
+
+  .sale-countdown-clock {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .clock-box {
+    background: rgba(0, 0, 0, 0.45);
+    border: 1px solid rgba(212, 175, 55, 0.5);
+    border-radius: 4px;
+    padding: 4px 8px;
+    display: flex;
+    align-items: baseline;
+    gap: 2px;
+    min-width: 36px;
+    justify-content: center;
+  }
+
+  .clock-num {
+    font-family: monospace;
+    font-weight: 700;
+    font-size: 17px;
+    color: #ffe066;
+    line-height: 1;
+  }
+
+  .clock-label {
+    font-size: 11px;
+    color: #d4af37;
+    text-transform: lowercase;
+    line-height: 1;
+  }
+
+  .clock-colon {
+    color: #d4af37;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 1;
+  }
+
+  .sale-timer-btn {
+    background: #d4af37;
+    color: #14280b;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: transform 0.2s, background 0.2s;
+    white-space: nowrap;
+    margin-left: 4px;
+  }
+
+  .sale-timer-btn:hover {
+    background: #e5be48;
+    transform: translateY(-1px);
+  }
+
+  @media (max-width: 768px) {
+    .global-sale-timer-bar {
+      padding: 7px 12px;
+    }
+    .sale-timer-inner {
+      gap: 8px;
+      font-size: 13px;
+      justify-content: space-between;
+    }
+    .sale-timer-badge {
+      display: none;
+    }
+    .sale-timer-text {
+      font-size: 12px;
+    }
+    .clock-box {
+      padding: 3px 6px;
+      min-width: 28px;
+    }
+    .clock-num {
+      font-size: 14px;
+    }
+    .clock-label {
+      font-size: 10px;
+    }
+    .sale-timer-btn {
+      padding: 4px 12px;
+      font-size: 12px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .sale-timer-inner {
+      gap: 6px;
+    }
+    .sale-timer-text {
+      font-size: 11px;
+    }
+    .clock-box {
+      padding: 2px 5px;
+      min-width: 26px;
+    }
+    .clock-num {
+      font-size: 13px;
+    }
+    .clock-label {
+      font-size: 9px;
+    }
+    .sale-timer-btn {
+      padding: 3px 8px;
+      font-size: 11px;
+    }
+  }
 {% endstylesheet %}
 
 <script>
@@ -826,6 +1006,81 @@
       });
     }
     document.addEventListener('cart:updated', updateCartCount);
+
+    function initSaleTimer() {
+      var bar = document.getElementById('global-sale-timer-bar');
+      if (!bar) return;
+
+      var saleEndAttr = bar.getAttribute('data-sale-end');
+      // No end date configured — hide bar silently
+      if (!saleEndAttr) {
+        bar.style.display = 'none';
+        return;
+      }
+
+      // Parse as local time (no trailing Z so browser treats as local)
+      var targetMs = new Date(saleEndAttr).getTime();
+      if (isNaN(targetMs)) {
+        bar.style.display = 'none';
+        return;
+      }
+
+      var GRACE_MS = 24 * 60 * 60 * 1000; // 24h after expiry before hiding
+
+      // If more than 24h past end, hide immediately
+      if (Date.now() > targetMs + GRACE_MS) {
+        bar.style.display = 'none';
+        return;
+      }
+
+      var daysEl  = document.getElementById('timer-days');
+      var hoursEl = document.getElementById('timer-hours');
+      var minsEl  = document.getElementById('timer-mins');
+      var secsEl  = document.getElementById('timer-secs');
+
+      var intervalId;
+
+      function updateClock() {
+        var now  = Date.now();
+        var diff = targetMs - now;
+
+        if (diff <= 0) {
+          // Expired — show zeros, then hide after grace period
+          if (daysEl)  daysEl.textContent  = '00';
+          if (hoursEl) hoursEl.textContent = '00';
+          if (minsEl)  minsEl.textContent  = '00';
+          if (secsEl)  secsEl.textContent  = '00';
+          if (now > targetMs + GRACE_MS) {
+            clearInterval(intervalId);
+            bar.style.display = 'none';
+          }
+          return;
+        }
+
+        var d = Math.floor(diff / (1000 * 60 * 60 * 24));
+        var h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        var m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        var s = Math.floor((diff % (1000 * 60)) / 1000);
+
+        if (daysEl)  daysEl.textContent  = String(d).padStart(2, '0');
+        if (hoursEl) hoursEl.textContent = String(h).padStart(2, '0');
+        if (minsEl)  minsEl.textContent  = String(m).padStart(2, '0');
+        if (secsEl)  secsEl.textContent  = String(s).padStart(2, '0');
+      }
+
+      updateClock();
+      intervalId = setInterval(updateClock, 1000);
+
+      function updateHeaderTotalHeight() {
+        var headerEl = document.getElementById('site-header');
+        if (headerEl) {
+          document.documentElement.style.setProperty('--header-total-height', headerEl.offsetHeight + 'px');
+        }
+      }
+      updateHeaderTotalHeight();
+      window.addEventListener('resize', updateHeaderTotalHeight);
+    }
+    initSaleTimer();
     }
 
     if (document.readyState === 'loading') {
@@ -856,6 +1111,53 @@
       "id": "enable_sticky_header",
       "label": "Enable sticky header",
       "default": true
+    },
+    {
+      "type": "header",
+      "content": "Global Sale Timer"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_sale_timer",
+      "label": "Enable Sale Timer Bar",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "sale_timer_badge",
+      "label": "Sale Badge Text",
+      "default": "LIMITED TIME SALE"
+    },
+    {
+      "type": "text",
+      "id": "sale_timer_text",
+      "label": "Sale Timer Label",
+      "default": "Sale Ends In:"
+    },
+    {
+      "type": "text",
+      "id": "sale_timer_end_date",
+      "label": "Sale End Date (YYYY-MM-DD)",
+      "info": "Global end date for all visitors, e.g. 2026-09-30",
+      "placeholder": "2026-09-30"
+    },
+    {
+      "type": "text",
+      "id": "sale_timer_end_time",
+      "label": "Sale End Time (HH:MM, your local time)",
+      "info": "24-hour format in the store's local timezone, e.g. 23:59",
+      "default": "23:59"
+    },
+    {
+      "type": "url",
+      "id": "sale_timer_button_url",
+      "label": "Button Link URL"
+    },
+    {
+      "type": "text",
+      "id": "sale_timer_button_text",
+      "label": "Button Text",
+      "default": "Shop Now"
     }
   ]
 }

@@ -13,10 +13,20 @@
   "sections": {
     "header": {
       "type": "header",
-      "settings": {}
+      "settings": {
+        "menu": "main-menu",
+        "enable_sticky_header": true,
+        "enable_sale_timer": false,
+        "sale_timer_badge": "Sale Extended till 31 Aug",
+        "sale_timer_text": "Sale Ends In:",
+        "sale_timer_end_date": "2026-08-31",
+        "sale_timer_end_time": "23:59",
+        "sale_timer_button_url": "",
+        "sale_timer_button_text": "Shop Now"
+      }
     }
   },
   "order": [
     "header"
-  ],
+  ]
 }

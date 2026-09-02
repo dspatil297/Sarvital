@@ -12,15 +12,24 @@
     "hero_banner": {
       "type": "hero-banner",
       "blocks": {
+        "slide_Q4EchA": {
+          "type": "slide",
+          "settings": {
+            "image": "shopify://shop_images/SARVITAL_3.webp",
+            "mobile_image": "shopify://shop_images/SARVITAL_2.webp"
+          }
+        },
+
         "slide_LNqKxV": {
           "type": "slide",
           "settings": {
-            "image": "shopify://shop_images/ChatGPT_Image_Aug_8_2026_03_21_01_PM.webp",
-            "mobile_image": "shopify://shop_images/Image_2.webp"
+            "image": "shopify://shop_images/SARVITAL_1.webp",
+            "mobile_image": "shopify://shop_images/ChatGPT_Image_Aug_8_2026_05_35_26_PM.webp"
           }
         }
       },
       "block_order": [
+        "slide_Q4EchA",
         "slide_LNqKxV"
       ],
       "settings": {

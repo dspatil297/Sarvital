@@ -43,8 +43,16 @@
         if product.tags contains 'new'
           assign has_new_badge = true
         endif
+        assign is_newly_launched = false
+        assign nl_raw = product.metafields.custom.newly_launched.value
+        if nl_raw == blank
+          assign nl_raw = product.metafields.custom.newly_launched
+        endif
+        if nl_raw == true or nl_raw == 'true'
+          assign is_newly_launched = true
+        endif
       %}
-      {% if has_sale_badge or has_new_badge or limited_stock == true %}
+      {% if has_sale_badge or has_new_badge or is_newly_launched or limited_stock == true %}
         <div class="product-card__badges">
           <div class="product-card__badges-left">
             {% if has_sale_badge %}
@@ -54,11 +62,14 @@
               <span class="product-card__badge product-card__badge--new">New</span>
             {% endif %}
           </div>
-          {% if limited_stock == true %}
-            <div class="product-card__badges-right">
+          <div class="product-card__badges-right">
+            {% if is_newly_launched %}
+              <span class="product-card__badge product-card__badge--newly-launched">✦ Newly Launched</span>
+            {% endif %}
+            {% if limited_stock == true %}
               <span class="product-card__badge product-card__badge--limited-stock">Hurry - Limited Stock</span>
-            </div>
-          {% endif %}
+            {% endif %}
+          </div>
         </div>
       {% endif %}
       
@@ -266,7 +277,7 @@
   .product-card__badges-right {
     align-items: flex-end;
     margin-left: auto;
-    max-width: 58%;
+    max-width: 75%;
   }
 
   .product-card__badge {
@@ -297,9 +308,23 @@
     letter-spacing: 0.02em;
     line-height: 1.2;
     text-align: right;
-    white-space: normal;
+    white-space: nowrap;
     background: linear-gradient(135deg, rgba(185, 28, 28, 0.95) 0%, rgba(220, 38, 38, 0.9) 100%);
     color: var(--white);
+  }
+
+  .product-card__badge--newly-launched {
+    background: linear-gradient(135deg, #0d9e6e 0%, #10b981 100%);
+    color: #fff;
+    white-space: nowrap;
+    font-size: 10px;
+    letter-spacing: 0.05em;
+    animation: nl-badge-glow 2s ease-in-out infinite;
+  }
+
+  @keyframes nl-badge-glow {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(16,185,129,.55); }
+    50%       { box-shadow: 0 0 0 5px rgba(16,185,129,0); }
   }
 
   .product-card__overlay {
@@ -429,13 +454,13 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 10px 10px;
+    padding: 10px 4px;
     border-radius: 12px;
     border: 1px solid rgba(74, 124, 44, 0.22);
     background: rgba(255, 255, 255, 0.96);
     color: rgba(26, 26, 26, 0.86);
     text-decoration: none;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 800;
     line-height: 1.1;
     min-height: 38px;
@@ -694,7 +719,7 @@
     }
 
     .product-card__badges-right {
-      max-width: 60%;
+      max-width: 75%;
     }
 
     .product-card__badge {
@@ -750,14 +775,14 @@
     }
 
     .product-card__variants {
-      gap: 6px;
+      gap: 4px;
       margin-top: 8px;
       max-width: none;
     }
 
     .product-card__variant-pill {
-      padding: 7px 8px;
-      font-size: 11px;
+      padding: 7px 4px;
+      font-size: 10px;
       min-height: 32px;
       border-radius: 8px;
     }

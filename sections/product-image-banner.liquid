@@ -1,75 +1,37 @@
 {% comment %}
   Product Image Banner Section
-  Simple banner image display for product pages
+  Displays the per-product "How to Use" image from the metafield:
+    Namespace: custom
+    Key:       pdp_how_to_use_img
+    Type:      image (file_reference)
+  Recommended image size: 1600×600 (8:3 ratio)
+  Section renders nothing when the metafield is blank.
 {% endcomment %}
 
-<section class="product-image-banner" id="product-image-banner-{{ section.id }}">
-  <div class="product-image-banner__container">
-    {% if section.settings.banner_image != blank %}
+{% assign how_to_use_img = product.metafields.custom.pdp_how_to_use_img.value %}
+
+{% if how_to_use_img != blank %}
+  <section class="product-image-banner" id="product-image-banner-{{ section.id }}">
+    <div class="product-image-banner__container">
       <div class="product-image-banner__image-wrapper">
-        {% if section.settings.banner_link != blank %}
-          <a href="{{ section.settings.banner_link }}" class="product-image-banner__link">
-        {% endif %}
-        
-        {% if section.settings.mobile_image != blank %}
-          <picture class="product-image-banner__picture">
-            <source
-              media="(max-width: 768px)"
-              srcset="
-                {{ section.settings.mobile_image | image_url: width: 480 }} 480w,
-                {{ section.settings.mobile_image | image_url: width: 768 }} 768w,
-                {{ section.settings.mobile_image | image_url: width: 1024 }} 1024w
-              "
-              sizes="100vw"
-            >
-            <img
-              class="product-image-banner__image"
-              src="{{ section.settings.banner_image | image_url: width: 1920 }}"
-              srcset="
-                {{ section.settings.banner_image | image_url: width: 480 }} 480w,
-                {{ section.settings.banner_image | image_url: width: 768 }} 768w,
-                {{ section.settings.banner_image | image_url: width: 960 }} 960w,
-                {{ section.settings.banner_image | image_url: width: 1280 }} 1280w,
-                {{ section.settings.banner_image | image_url: width: 1920 }} 1920w,
-                {{ section.settings.banner_image | image_url: width: 2560 }} 2560w
-              "
-              sizes="100vw"
-              alt="{{ section.settings.banner_image.alt | default: section.settings.banner_alt | default: 'Product banner' }}"
-              width="{{ section.settings.banner_image.width }}"
-              height="{{ section.settings.banner_image.height }}"
-              loading="lazy"
-              onerror="this.classList.add('image-error'); this.alt='Banner image failed to load';"
-            >
-          </picture>
-        {% else %}
-          <img
-            class="product-image-banner__image"
-            src="{{ section.settings.banner_image | image_url: width: 1920 }}"
-            srcset="
-              {{ section.settings.banner_image | image_url: width: 960 }} 960w,
-              {{ section.settings.banner_image | image_url: width: 1280 }} 1280w,
-              {{ section.settings.banner_image | image_url: width: 1920 }} 1920w,
-              {{ section.settings.banner_image | image_url: width: 2560 }} 2560w
-            "
-            sizes="100vw"
-            alt="{{ section.settings.banner_image.alt | default: section.settings.banner_alt | default: 'Product banner' }}"
-            width="{{ section.settings.banner_image.width }}"
-            height="{{ section.settings.banner_image.height }}"
-            loading="lazy"
-          >
-        {% endif %}
-        
-        {% if section.settings.banner_link != blank %}
-          </a>
-        {% endif %}
+        <img
+          class="product-image-banner__image"
+          src="{{ how_to_use_img | image_url: width: 1600 }}"
+          srcset="
+            {{ how_to_use_img | image_url: width: 800 }} 800w,
+            {{ how_to_use_img | image_url: width: 1200 }} 1200w,
+            {{ how_to_use_img | image_url: width: 1600 }} 1600w
+          "
+          sizes="100vw"
+          alt="{{ how_to_use_img.alt | default: 'How to use' }}"
+          width="1600"
+          height="600"
+          loading="lazy"
+        >
       </div>
-    {% else %}
-      <div class="product-image-banner__placeholder">
-        <p>Add a banner image in Theme Customizer</p>
-      </div>
-    {% endif %}
-  </div>
-</section>
+    </div>
+  </section>
+{% endif %}
 
 {% stylesheet %}
   .product-image-banner {

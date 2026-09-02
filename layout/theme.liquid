@@ -107,7 +107,7 @@
     
     {% sections 'header-group' %}
 
-    <main id="main-content" role="main" tabindex="-1" style="padding-top: 80px;">
+    <main id="main-content" role="main" tabindex="-1" style="padding-top: var(--header-total-height, 120px);">
       {{ content_for_layout }}  
     </main>
 
